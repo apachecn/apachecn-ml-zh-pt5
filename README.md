@@ -32,8 +32,6 @@
 
 # ApacheCN 机器学习译文集（五）
 
-> 原文：[{nameEn}]({urlEn})
-> 
 > 协议：[CC BY-NC-SA 4.0](http://creativecommons.org/licenses/by-nc-sa/4.0/)
 > 
 > 利欲驱人万火牛，江湖浪迹一沙鸥。——陆游《秋思》
