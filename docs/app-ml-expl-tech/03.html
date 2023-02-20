@@ -1,0 +1,270 @@
+<html><head/><body>
+
+
+	
+		<title>B18216_02_ePub</title>
+		
+	
+	
+		<div><h1 id="_idParaDest-31"><em class="italic"> <a id="_idTextAnchor033"/>第二章</em>:模型可解释方法</h1>
+			<p>这本书的主要目标之一是让读者能够设计可解释的 ML 系统，这些系统可以在生产中用来解决关键的商业问题。对于一个健壮的可解释的 ML 系统，根据问题的类型和使用的数据类型，可解释性可以以多种方式提供。与图像和文本等非结构化数据相比，为结构化表格数据提供可解释性是相对友好的，因为图像或文本数据更复杂，可解释的粒度特征更少。</p>
+			<p>有不同的方法来增加 ML 模型的可解释性，例如，通过提取关于数据或模型的信息(知识提取)，使用有效的可视化来证明预测结果(结果可视化)，识别训练数据中的主导特征并分析其对模型预测的影响(基于影响的方法)，或者通过将模型结果与已知场景或情况进行比较作为示例(基于示例的方法)。</p>
+			<p>因此，在这一章中，我们将讨论各种模型不可知和模型特定的解释方法，这些方法用于结构化和非结构化数据的模型解释。</p>
+			<p>本章涵盖以下主要主题:</p>
+			<ul>
+				<li>模型可解释性方法的类型</li>
+				<li>知识抽取方法</li>
+				<li>结果可视化方法</li>
+				<li>基于影响的方法</li>
+				<li>基于实例的方法</li>
+			</ul>
+			<h1 id="_idParaDest-32"><a id="_idTextAnchor034"/>技术要求</h1>
+			<p>本章的主要目标是提供对模型可解释性方法的概念性理解。但是，我将提供一些教程示例，在一些有趣的数据集上用 Python 实现其中的一些方法。在本书中，我们将使用 Python Jupyter 笔记本来运行代码并可视化输出。<a href="B18216_02_ePub.xhtml#_idTextAnchor033"> <em class="italic">第二章</em> </a>的代码和数据集资源可以从以下 GitHub 资源库下载或克隆:<a href="https://github.com/PacktPublishing/Applied-Machine-Learning-Explainability-Techniques/tree/main/Chapter02">https://GitHub . com/packt publishing/Applied-Machine-Learning-explability-Techniques/tree/main/Chapter 02</a>。运行代码所需的其他重要 Python 框架将与其他相关细节一起在笔记本中提及，以理解这些概念中的代码实现。</p>
+			<h1 id="_idParaDest-33"><a id="_idTextAnchor035"/>模型解释方法的类型</h1>
+			<p>有不同的方法可以用来提供模型的可解释性。某些技术是特定于模型的，某些方法被应用于模型的输入和输出。在本节中，我们将讨论用于解释 ML 模型的不同类型的方法:</p>
+			<ul>
+				<li><strong class="bold">知识提取方法</strong>:在<strong class="bold">探索性数据分析</strong> ( <strong class="bold"> EDA </strong>)和事后分析期间，从数据<a id="_idIndexMarker096"/>中提取<a id="_idIndexMarker094"/>关键见解和统计信息<a id="_idIndexMarker095"/>是提供模型不可知解释能力的一种方式。通常，统计分析方法用于提取不同数据点的平均值和中值、标准偏差或方差，某些描述性统计用于估计预期的结果范围。</li>
+			</ul>
+			<p>同样，使用相关热图、分解树和分布图的其他见解也用于观察特征之间的任何关系，以解释模型的结果。对于更复杂的非结构化数据，如图像，这些统计知识提取方法往往是不够的。使用<strong class="bold">概念激活向量</strong> ( <strong class="bold"> CAVs </strong>)的人性化方法<a id="_idIndexMarker097"/>，如<a href="B18216_08_ePub.xhtml#_idTextAnchor154"> <em class="italic">第八章</em> </a>、<em class="italic">人性化解释与 TCAV </em>所讨论的，更有效。</p>
+			<p>然而，主要地，知识提取方法提取关于输入数据和输出数据的基本信息，从中定义预期的模型结果。例如，为了解释一个时间序列预测模型，我们可以考虑一个模型性能度量，如训练期间预测误差的方差。误差率可以在(假设)+/- 10%的置信区间内指定。置信区间的形成只有在从输出训练数据中提取关键洞察之后才有可能。</p>
+			<ul>
+				<li><strong class="bold">结果可视化方法</strong>:绘制模型结果并将它们<a id="_idIndexMarker098"/>与之前<a id="_idIndexMarker099"/>的预测值进行比较，特别是使用代理模型，通常被认为是一种有效的模型不可知的可解释方法。来自黑盒 ML 算法的预测被传递给代理模型解释器。通常，这些是高度可解释的线性模型、决策树或任何基于规则的启发式算法，可以解释复杂模型的结果。这种方法的主要限制是可解释性仅仅依赖于模型结果。如果数据或建模过程有任何异常，那么这些可解释的维度就不会被捕获。</li>
+			</ul>
+			<p>例如，让我们假设一个分类器错误地预测了一个输出。对于我们来说，仅仅从预测概率来理解为什么模型会以特定的方式运行是不可行的。但是这些方法很容易在实践中应用，甚至很容易理解，因为使用了高度可解释的解释器算法。</p>
+			<ul>
+				<li><strong class="bold">基于影响的方法</strong>:这些<a id="_idIndexMarker100"/>是帮助我们理解<a id="_idIndexMarker101"/>某些数据特征如何在影响或控制模型结果中发挥重要作用的特定技术。目前，这是为 ML 模型提供可解释性的最常用和最有效的方法之一。特征重要性、敏感性分析、关键影响者图、显著性图、<strong class="bold">类激活图</strong> ( <strong class="bold"> CAMs </strong>)和<a id="_idIndexMarker102"/>其他视觉特征图用于解释数据中的单个特征<a id="_idIndexMarker103"/>如何被模型用于其决策过程。</li>
+				<li><strong class="bold">基于实例的方法</strong>:之前讨论的<a id="_idIndexMarker104"/>三种<a id="_idIndexMarker105"/>模型不可知的可解释方法仍然需要某种技术知识来理解 ML 模型的工作。对于非技术用户来说，解释某事的最好方式是提供一个他们能理解的例子。基于实例的方法，尤其是反事实的基于实例的方法，试图查看数据的某些单一实例来解释 ML 模型的决策过程。</li>
+			</ul>
+			<p>例如，假设一个由 ML 支持的自动化贷款审批系统拒绝了一个申请人的贷款请求。使用基于示例的可解释性方法，申请人还将被建议，如果他们在接下来的三个月中按时支付信用卡账单，并且每月收入增加 2000 美元，他们的贷款请求将被批准。</p>
+			<p>根据最新的趋势，模型不可知的技术比模型相关的方法更受欢迎，因为在某种程度上，甚至复杂的 ML 算法也可以用这些技术来解释。但是某些技术，比如显著图、基于树/森林的特征重要性和激活图，大多是特定于模型的。我们对解释方法的选择是由我们试图解决的关键问题决定的。</p>
+			<p><em class="italic">图 2.1 </em>展示了四种主要类型的可解释性方法，这些方法已经被应用于解释黑盒模型的工作，我们将在下面的章节中介绍这些方法:</p>
+			<div><div><img src="img/B18216_02_01.jpg" alt="Figure 2.1 – Model explainability methods&#13;&#10;"/>
+				</div>
+			</div>
+			<p class="figure-caption">图 2.1–模型可解释性方法</p>
+			<p>现在，让我们从更详细地讨论这些模型可解释性方法开始。</p>
+			<h1 id="_idParaDest-34"><a id="_idTextAnchor036"/>知识提取方法</h1>
+			<p>每当我们在任何背景下谈论可解释性时，它都是关于获得问题的知识，以便获得对预期结果的一些明确性。类似地，如果我们已经知道了结果，可解释性就是追溯到根本原因。ML 中的知识提取方法用于从输入数据中提取关键见解，或者利用模型结果追溯并映射到终端用户已知的结构化数据和非结构化数据的某些信息。虽然有多种方法来提取知识，但在实践中，EDA 的以数据为中心的过程是解释任何黑盒模型的最常见和最流行的方法之一。让我们在<strong class="bold"> XAI </strong>的<a id="_idIndexMarker109"/>背景下讨论更多关于如何使用 EDA 过程的问题。</p>
+			<h2 id="_idParaDest-35"><a id="_idTextAnchor037"/> EDA</h2>
+			<p>我<a id="_idIndexMarker110"/>会<a id="_idIndexMarker111"/>一直认为 EDA 是任何 ML 工作流中最重要的过程。EDA 允许我们探索数据并得出关键的见解；利用这一点，我们可以从数据中形成某些假设。这实际上帮助我们识别数据中的任何独特模式，并最终帮助我们做出正确的算法选择。因此，EDA 是<a id="_idIndexMarker112"/>解释数据本质的传统和模型不可知的方法之一，通过考虑数据，它<a id="_idIndexMarker113"/>帮助我们理解从模型中期待什么。使用 EDA 可以很容易地发现任何明显的异常、模糊、冗余的数据点和数据偏差。现在，让我们看看 EDA 中使用的一些重要方法，来解释结构化和非结构化数据的 ML 模型。</p>
+			<h3>结构化数据的 EDA</h3>
+			<p>对<a id="_idIndexMarker114"/>结构化数据进行 EDA 是应用于提取洞察力以<a id="_idIndexMarker115"/>提供可解释性的初步步骤之一。然而，EDA 过程中应用的实际技术可能因问题而异。但一般来说，对于结构化数据，我们可以使用 EDA 来生成某些描述性统计数据，以便更好地理解数据，然后应用各种单变量和多变量方法来检测每个特征的重要性，观察数据的分布以找到数据中的任何偏差，并寻找异常值、重复值、缺失值、相关性以及特征之间的基数，这些都可能影响模型的结果。</p>
+			<p>从 EDA 步骤中获得的信息和假设有助于执行有意义的功能工程和建模技术，并有助于为涉众建立正确的期望。在本节中，我们将介绍最流行的 EDA 方法，并讨论在 XAI 环境中使用结构化数据的 EDA 的好处。我强烈建议查看 GitHub 存储库(<a href="https://github.com/PacktPublishing/Applied-Machine-Learning-Explainability-Techniques">https://GitHub . com/packt publishing/Applied-Machine-Learning-explability-Techniques</a>)以在实践中应用其中的一些技术，作为实际用例。现在，让我们看看下面列表中的重要 EDA 方法:</p>
+			<ul>
+				<li><strong class="bold">汇总统计</strong>:通常，模型<a id="_idIndexMarker116"/>的可解释性是针对数据中的特征来呈现的。在 EDA 过程中观察数据集统计数据可以提供数据集是否足以建模和解决给定问题的早期指示。它有助于理解数据的维度和存在的特征类型。如果特征是数字的，则观察某些描述性统计，如平均值、标准偏差、变异系数、偏斜度、峰度和四分位间距。</li>
+			</ul>
+			<p>此外，某些基于直方图的分布用于监控数据中的任何偏斜或偏差。对于分类特征，观察分类值的频率分布。如果数据集不平衡，如果数据集偏向某个特定类别值，如果数据集有异常值，或者偏向某个<a id="_idIndexMarker117"/>特定方向，所有这些都很容易观察到。由于所有这些因素都会影响模型预测，因此了解数据集统计数据对于模型的可解释性非常重要。</p>
+			<p><em class="italic">图 2.2 </em>显示了在 EDA 步骤中为提取数据知识而创建的汇总统计和可视化:</p>
+			<div><div><img src="img/B18216_02_02.jpg" alt="Figure 2.2 – Summary statistics and visualizations during EDA&#13;&#10;"/>
+				</div>
+			</div>
+			<p class="figure-caption">图 2.2–EDA 过程中的汇总统计和可视化</p>
+			<ul>
+				<li><strong class="bold">重复和缺失值</strong>:重复或冗余值<a id="_idIndexMarker118"/>会给模型增加更多偏差。相比之下，缺少值会导致信息丢失，并且没有足够的数据来训练模型。这可能会导致模型过度拟合。因此，在训练模型之前，如果观察到缺失值或重复值，并且如果不采取进一步的措施来纠正这种情况，那么这些观察结果可能有助于解释模型非泛化背后的原因。</li>
+				<li><strong class="bold">单变量分析</strong>:这种<a id="_idIndexMarker119"/>包括通过图形技术分析单个特征，如分布图、直方图、箱线图、小提琴图、饼图、聚类图，以及使用非图形技术，如频率、集中趋势测量(即平均值、标准偏差和变异系数)和四分位间距。这些方法帮助我们估计单个特征对模型结果的影响。</li>
+				<li><strong class="bold">多变量分析</strong>:这种<a id="_idIndexMarker120"/>包括使用图形和非图形方法一起分析两个或多个特征。它用于识别数据相关性和变量的依赖性。在 XAI 的背景下，与单变量分析方法相比，多变量分析用于理解数据中的复杂关系，并提供详细的粒度解释。</li>
+				<li><strong class="bold">异常值检测</strong>:异常值<a id="_idIndexMarker121"/>是某些异常数据点，它们会完全扭曲模型。如果模型是在离群数据点上训练的，则很难实现泛化。然而，在异常数据点的模型推断时间内，模型预测可能会完全出错。因此，在训练和推理期间的异常检测是模型可解释性的一个重要部分。可视化<a id="_idIndexMarker122"/>方法，例如箱线图、散点图，以及统计方法，例如 1.5xIQR 规则(<a href="https://www.khanacademy.org/math/statistics-probability/summarizing-quantitative-data/box-whisker-plots/a/identifying-outliers-iqr-rule">https://www . khanacademy . org/math/statistics-probability/summaring-quantitative-data/box-whisker-plots/a/identifying-outliers-iqr-Rule</a>)和 Nelson 规则(<a href="https://www.leansixsigmadefinition.com/glossary/nelson-rules/">https://www . leansix sigma definition . com/glossary/Nelson-rules/</a>)用于检测异常。</li>
+				<li><strong class="bold">帕累托分析</strong>:根据<a id="_idIndexMarker124"/>帕累托原理，80%的价值或影响是由 20%的样本量驱动的。因此，在 XAI，这个<em class="italic">80–20 规则</em>被用来解释对模型结果有最大影响的最有影响力的子样本。</li>
+				<li><strong class="bold">频繁</strong> <strong class="bold">项集挖掘</strong>:这是另一种流行的提取<a id="_idIndexMarker125"/>模型可解释性的方法选择。这种技术经常用于关联规则挖掘，以了解在任何给定的数据集中某些观察值一起出现的频率。这种方法提供了一些有趣的观察结果，有助于从数据中形成重要的假设，并最终对解释模型结果做出很大贡献。</li>
+			</ul>
+			<p>既然我们已经介绍了结构化数据的方法，那么让我们来看看非结构化数据的一些方法。</p>
+			<h3>非结构化数据的 EDA</h3>
+			<p>从图像和文本等非结构化数据中解释特征<a id="_idIndexMarker126"/>非常困难，因为 ML 算法<a id="_idIndexMarker127"/>试图识别人类无法直观解释的粒度级特征。然而，有某些特定的方法应用于图像和文本数据，以从数据中形成有意义的假设。如前所述，EDA 过程可能会根据问题和数据而变化，但在本章中，我们将讨论 XAI 环境中最流行的方法选择。</p>
+			<h4>探索图像数据</h4>
+			<p>用于<a id="_idIndexMarker128"/>图像的 EDA 方法不同于用于表格数据的方法。以下是一些常见的图像数据集 EDA 步骤选择:</p>
+			<ul>
+				<li><strong class="bold">数据维度分析</strong>:对于<a id="_idIndexMarker129"/>一致和一般化的模型，理解数据维度很重要。监控图像的数量和每个图像的形状对于解释任何过度拟合或欠拟合的观察是很重要的。</li>
+				<li><strong class="bold">观察数据分布</strong>:由于<a id="_idIndexMarker130"/>使用图像解决的大部分问题都是分类问题，所以监控分类不平衡很重要。如果数据的分布不均衡，那么模型可能偏向多数类。对于像素级分类(对于分割问题)，观察像素强度分布很重要。这也有助于理解阴影或非均匀照明条件对图像的影响。</li>
+				<li><strong class="bold">观察平均图像和对比图像</strong>:为了观察图像中占优势的<a id="_idIndexMarker131"/>感兴趣区域<a id="_idIndexMarker132"/>，通常使用平均图像和对比图像。这尤其用于基于分类的问题，以比较感兴趣的主要区域。</li>
+				<li><strong class="bold">高级统计和代数方法</strong>:除了到目前为止讨论过的<a id="_idIndexMarker133"/>方法外，其他统计方法，如寻找 z 分数和标准偏差，以及代数方法，如基于特征向量的特征图像，都被用来直观地检查图像数据中的关键特征，这增加了最终模型结果的可解释性。</li>
+			</ul>
+			<p>根据问题的类型，还有其他复杂的方法来探索影像数据集。然而，本小节中讨论的方法是最常见的方法。</p>
+			<h4>浏览文本数据</h4>
+			<p>通常，与图像或表格数据集相比，文本数据<a id="_idIndexMarker134"/>更嘈杂。因此，EDA 通常伴随着一些对文本数据的预处理或清理方法。但是由于我们只关注 EDA 部分，下面的列表详细介绍了一些使用文本数据进行 EDA 的流行方法:</p>
+			<ul>
+				<li><strong class="bold">数据维度分析</strong>:类似于图像的<a id="_idIndexMarker135"/>，执行文本维度分析，例如检查记录的数量和每个记录的长度，以形成关于潜在过拟合或欠拟合的假设。</li>
+				<li><strong class="bold">观察数据分布</strong>:可视化<a id="_idIndexMarker136"/>使用条形图或词云来观察词频分布是观察任何文本数据中的热门词的流行选择。这种技术使我们能够避免高频词与低频词相比的任何偏差。</li>
+				<li><strong class="bold"> n 元语法分析</strong>:考虑到<a id="_idIndexMarker137"/>文本数据的性质，通常，一个短语或一组单词比单个单词更容易理解。例如，对于来自电影评论的情感分析，诸如<em class="italic">电影</em>或<em class="italic">电影</em>之类的高频词是相当模糊的。相比之下，像<em class="italic">好电影</em>和<em class="italic">非常无聊的电影</em>这样的短语更容易理解，也更有助于理解情感。因此，n 元语法分析或取“n 个单词”的集合为理解模型结果带来了更多的可解释性。</li>
+			</ul>
+			<p>通常，EDA 确实包括某些可视化技术来解释并从数据中形成一些重要的假设。但是解释 ML 模型的另一个重要技术是可视化模型结果。在下一节中，我们将更详细地讨论这些结果可视化方法。</p>
+			<h1 id="_idParaDest-36"><a id="_idTextAnchor038"/>结果可视化方法</h1>
+			<p>模型结果<a id="_idIndexMarker139"/>的可视化<a id="_idIndexMarker138"/>是用于解释 ML 模型的一种非常常见的方法。通常，这些是模型不可知的、事后分析方法，应用于经过训练的黑盒模型，并提供可解释性。在下一节中，我们将讨论一些用于解释 ML 模型的常用结果可视化方法。</p>
+			<h2 id="_idParaDest-37"><a id="_idTextAnchor039"/>使用比较分析法</h2>
+			<p>这些<a id="_idIndexMarker140"/>大多是事后分析方法，用于通过在训练过程后可视化模型的预测输出来增加模型的可解释性。大多数情况下，这些是模型不可知的方法，这些方法可以应用于本质上可解释的模型和黑盒模型。比较分析可以用来产生全局和局部的解释。它主要用于使用各种可视化方法比较结果的不同可能性。</p>
+			<p>例如，对于基于分类的问题，某些方法如 t-SNE 和 PCA 用于可视化和<a id="_idIndexMarker142"/>比较模型预测标签的变换特征空间，特别是在错误率高的时候。对于回归和时间序列预测模型，置信水平用于将模型预测结果与上限和下限进行比较。有多种方法可以应用比较分析，并更清楚地了解<em class="italic">假设</em>情景。在项目资源库中提到了一些突出的方法(<a href="https://github.com/PacktPublishing/Applied-Machine-Learning-Explainability-Techniques/blob/main/Chapter02/Comparison%20Analysis.ipynb">https://github . com/packt publishing/Applied-Machine-Learning-explability-Techniques/blob/main/chapter 02/Comparison % 20 analysis . ipynb</a>)。</p>
+			<p>正如我们在<em class="italic">图 2.3 </em>中看到的，结果可视化有助于提供模型的全局视角，以可视化模型预测:</p>
+			<div><div><img src="img/B18216_02_03.jpg" alt="Figure 2.3 – Comparison analysis using the t-SNE method for the classification problem (left-hand side) and the time series prediction model with the confidence interval (right-hand side)&#13;&#10;"/>
+				</div>
+			</div>
+			<p class="figure-caption">图 2.3–使用 t-SNE 方法对分类问题(左侧)和带有置信区间的时间序列预测模型(右侧)进行比较分析</p>
+			<p>在<em class="italic">图 2.3 </em>中，我们可以<a id="_idIndexMarker143"/>看到可视化<a id="_idIndexMarker144"/>方法如何通过可视化模型的最终结果并与其他数据实例或可能的<em class="italic">假设情景</em>进行比较来提供局部解释，从而提供模型的全局视角。</p>
+			<h2 id="_idParaDest-38"><a id="_idTextAnchor040"/>使用代理解释器方法</h2>
+			<p>在 ML 的<a id="_idIndexMarker145"/>上下文中，当外部模型或算法被应用于解释黑盒 ML 模型时，外部方法<a id="_idIndexMarker146"/>被称为<strong class="bold">代理解释器方法</strong>。这种方法背后的基本思想是应用一个本质上可解释的模型，该模型简单且易于解释，并尽可能精确地近似黑盒模型的预测。然后，使用某些可视化<a id="_idIndexMarker147"/>技术来可视化代理解释器方法的结果，以深入了解模型行为。</p>
+			<p>但是现在的问题是<em class="italic">我们能直接应用代理模型而不是使用黑箱模型吗？</em>答案是<em class="italic">不！</em>使用代理模型背后的主要思想是获得一些关于输入数据如何与目标结果相关的信息，而不考虑模型的准确性。相比之下，原始的黑盒模型更加准确和有效，但不可解释。因此，用代理模型完全取代黑盒模型会损害模型的准确性，这是我们不希望的。</p>
+			<p>回归、决策树和基于规则的算法等可解释算法是代理解释器方法的流行选择。为了提供可解释性，主要分析了输入特征和目标结果之间的三种类型的关系:线性、单调性和交互作用。</p>
+			<p>线性<a id="_idIndexMarker148"/>帮助我们检查输入特征是否与目标结果线性相关。单调性有助于我们分析整体输入特征值的增加会导致目标结果的增加还是减少。对于整个要素范围，这解释了输入要素和目标之间的关系是否总是沿同一方向传播。当提供可解释性时，模型交互非常有用，但是很难实现。交互有助于我们分析各个特性如何相互影响模型决策过程。</p>
+			<p>决策树<a id="_idIndexMarker149"/>和基于规则的算法用于检查输入特征和目标结果之间的相互作用。<em class="italic">克里斯托夫·莫尔纳</em>在他的<a id="_idIndexMarker150"/>书<em class="italic">可解释机器学习</em>(<a href="https://christophm.github.io/interpretable-ml-book/">https://christophm.github.io/interpretable-ml-book/</a>)中，提供了一个非常有用的表格，比较不同的内在可解释模型，这对于选择可解释模型作为替代解释模型是有用的。</p>
+			<p>下表显示了这种情况的简化版本:</p>
+			<div><div><img src="img/B18216_02_04.jpg" alt="Figure 2.4 – Comparing interpretable algorithms for selecting a Surrogate Explainer method&#13;&#10;"/>
+				</div>
+			</div>
+			<p class="figure-caption">图 2.4–比较选择代理解释器方法的可解释算法</p>
+			<p>这种技术的一个主要优点是它可以帮助任何黑盒模型变得可解释。它与模型无关，并且非常容易实现。但是当数据复杂时，使用更复杂的算法来实现更高的建模精度。在这种情况下，替代方法往往会过度简化输入要素之间的复杂模式或关系。</p>
+			<p><em class="italic">图 2.5 </em>说明了如何使用可解释的算法，如决策树、线性回归或任何基于启发式规则的算法作为替代模型来解释任何黑盒 ML 模型:</p>
+			<div><div><img src="img/B18216_02_05.jpg" alt="Figure 2.5 – Using Surrogate explainers for model explainability&#13;&#10;"/>
+				</div>
+			</div>
+			<p class="figure-caption"> </p>
+			<p class="figure-caption">图 2.5–使用代理解释器来实现模型的可解释性</p>
+			<p>尽管这种方法有缺点，但线性、单调性和交互的可视化可以在很大程度上证明在复杂的黑盒模型上工作是合理的。在下一节中，我们将讨论基于影响的方法来解释 ML 模型。</p>
+			<h1 id="_idParaDest-39"><a id="_idTextAnchor041"/>基于影响的方法</h1>
+			<p>基于影响的方法<a id="_idIndexMarker153"/>用于理解数据集中存在的特征对模型决策<a id="_idIndexMarker154"/>过程的影响。与其他方法相比，基于影响的方法被广泛使用和首选，因为这有助于从数据集中识别主导属性。从结构化和非结构化数据中识别主导属性有助于我们分析主导特征在影响模型结果中的作用。</p>
+			<p>例如，让我们说<a id="_idIndexMarker155"/>你正在研究一个对狼和西伯利亚哈士奇进行分类的分类问题。假设经过训练和评估过程，你已经取得了 95%以上准确率的好模型。但是，当试图使用基于影响的方法来寻找模型可解释性的重要特征时，您观察到模型将周围的背景作为主要特征来分类它是狼还是哈士奇。在这种情况下，即使你的模型结果看起来非常准确，你的模型也是不可靠的。这是因为模型做出决策所依据的特征并不健壮和通用。</p>
+			<p>基于影响的方法普遍用于执行根本原因分析，以调试 ML 模型和检测 ML 系统中的故障。现在，让我们讨论一些用于模型可解释性的基于影响的方法的流行选择。</p>
+			<h2 id="_idParaDest-40"><a id="_idTextAnchor042"/>特征重要性</h2>
+			<p>在应用 ML 模型时，理解每个特征在影响模型结果方面的相对重要性是至关重要的。这是一种根据要素在预测目标值中的有用性为数据集中的输入要素分配特定分值的技术。特征重要性是对结构化数据建模的模型不可知可解释性的一个非常流行的选择。虽然有各种评分机制来确定特性的重要性，如排列重要性分数、统计相关性分数、基于决策树的评分等等，但在本节中，我们将主要关注整体方法，而不仅仅是评分机制。</p>
+			<p>在 XAI 的上下文中，特征重要性可以提供对数据和模型行为的全局洞察。它通常用于特征选择和降维，以提高 ML 模型的效率。通过从建模过程中移除不太重要的特征，已经观察到，通常，整体模型性能得到改善。</p>
+			<p>重要特征的概念<a id="_idIndexMarker157"/>有时取决于评分机制的类型或所用模型的类型。因此，建议您在得出任何结论之前，与领域专家一起验证这项技术获得的重要特性。这种方法适用于结构化数据集，其中的特征已明确定义。对于文本或图像等非结构化数据，特征重要性不是很相关，因为模型使用的特征或模式更复杂，并且不总是人类可以解释的。</p>
+			<p><em class="italic">图 2.6 </em>说明了突出显示数据集的有影响的特征如何使最终用户关注重要特征的值，以证明模型结果的合理性:</p>
+			<div><div><img src="img/B18216_02_06.jpg" alt="Figure 2.6 – A feature importance graph on the diabetes dataset (from the code tutorials)&#13;&#10;"/>
+				</div>
+			</div>
+			<p class="figure-caption">图 2.6-糖尿病数据集的特征重要性图(来自代码教程)</p>
+			<p>接下来，我们将介绍另一种重要的基于影响的模型可解释性方法，称为敏感性分析。</p>
+			<h2 id="_idParaDest-41"><a id="_idTextAnchor043"/>敏感性分析</h2>
+			<p>敏感性分析<a id="_idIndexMarker158"/>是一个量化过程，通过改变对预测模型使用的重要输入特征的假设来估算预测中的不确定性。在敏感性分析中，增加或减少单个输入特征变量，以评估单个特征对目标结果的影响。这种技术非常常用于预测建模，以优化系统的整体性能和鲁棒性。</p>
+			<p>对于任何数据科学项目来说，进行敏感性<a id="_idIndexMarker159"/>分析可能是一种简单但非常强大的方法，它可以为业务利益相关者提供额外的信息，尤其是对于多元数据集。它有助于理解<em class="italic">假设</em>场景，并观察任何特定特征是否对异常值或任何形式的敌对扰动敏感。它有助于质疑可变假设的可靠性，可以预测假设改变时可能的结果，并可以衡量改变可变假设的重要性。敏感性分析是一种数据驱动的建模方法。它表明数据对于建模过程是否可靠、准确和相关。此外，它有助于发现是否有其他干预因素会影响模型。</p>
+			<p>在 XAI 的背景下，由于敏感性分析与一些广泛使用的方法相比不太常见，所以让我尝试给出我对在 ML 中执行敏感性分析的建议。通常，这对于回归问题非常有用，但是对于基于分类的问题也非常重要。</p>
+			<p>请参考 github 存储库中提供的笔记本(<a href="https://github.com/PacktPublishing/Applied-Machine-Learning-Explainability-Techniques/blob/main/Chapter02/FeatureImportance_SensitivityAnalysis.ipynb">https://GitHub . com/packt publishing/Applied-Machine-Learning-explability-Techniques/blob/main/chapter 02/feature importance _ sensitivity yanalysis . ipynb</a>)以获得进行灵敏度分析的详细实用方法。我建议您进行敏感性分析的第一步是计算原始数据集中每个属性的标准差(σ)。然后，对于每个属性，将原始属性值转换为-3σ、-2σ、-σ、σ、2σ和 3σ，并观察和绘制回归问题的目标结果的百分比变化，或者观察基于分类的问题的预测类。</p>
+			<p>对于一个好的和健壮的模型，我们希望目标结果对特征值的任何变化不太敏感。理想情况下，对于回归问题，我们希望目标结果的百分比变化不要太剧烈，而对于分类问题，预测的类别不应该随着特征值的改变而改变太多。任何超过+/- 3σ的特征值都被认为是异常值，所以通常情况下，我们会将特征值变化到+/- 3σ。</p>
+			<p><em class="italic">图 2.7 </em>显示了详细的敏感性分析如何帮助您分析容易影响模型结果的因素:</p>
+			<div><div><img src="img/B18216_02_07.jpg" alt="Figure 2.7 – Sensitivity analysis to understand the influential features of the data&#13;&#10;"/>
+				</div>
+			</div>
+			<p class="figure-caption">图 2.7-敏感性分析，以了解数据的影响特征</p>
+			<p>除了敏感性分析，在下一节的<a id="_idIndexMarker160"/>中，您将了解到<strong class="bold">部分相关图</strong>(<strong class="bold">PDP</strong>，它也可用于分析有影响的特征。</p>
+			<h2 id="_idParaDest-42"><a id="_idTextAnchor044"/>PDP</h2>
+			<p>当<a id="_idIndexMarker161"/>使用黑盒 ML 模型时，检查特征属性和目标结果之间的功能关系可能是具有挑战性的<a id="_idIndexMarker162"/>。尽管计算特征重要性可能更容易，但 PDP 提供了一种机制来从功能上计算预测特征和预测变量之间的关系。它显示了一个或两个属性对目标结果的边际影响。</p>
+			<p>PDP 可以有效地帮助提取预测变量和预测变量之间的线性、单调或任何复杂的相互作用，并平均指示预测变量对预测变量的总体影响。PDP 通过测量边际效应包括特定预测属性的贡献，这不包括其他变量对特征空间的影响。</p>
+			<p>与<a id="_idIndexMarker163"/>敏感度分析类似，PDP<a id="_idIndexMarker164"/>帮助我们估计具体特性可能影响目标结果的方向。为了简单起见，我不会添加任何复杂的偏相关的数学表示来获得预测变量的平均边际效应；然而，我强烈建议浏览一下<em class="italic">杰罗姆·h·弗里德曼</em>关于<em class="italic">贪婪函数逼近:梯度推进机器</em>的作品，以获得更多信息。PDP 最重要的好处之一是它易于使用、实施和理解，并且可以非常容易地向非技术业务利益相关者或 ML 模型的最终用户解释。</p>
+			<p>但是这种方法也有某些缺点。默认情况下，该方法假设所有特征都不相关，并且特征属性之间没有交互。在任何实际场景中，这种情况都不太可能发生，因为大多数时候，由于特征变量，会有一些交互或联合效应。</p>
+			<p>PDP 也仅限于二维表示，PDP 不显示任何特征分布。因此，如果特征空间不是均匀分布的，在分析结果时，偏差的某些影响可能会被忽略。PDP 可能不会显示任何异质效应，因为它仅显示平均边际效应。这意味着，如果某个特定特性的一半数据对预测结果有正面影响，而另一半数据对预测结果有负面影响，那么 PDP 可能只是一条水平线，因为这两半的影响可以相互抵消。这可能导致特征对目标变量没有任何影响的结论，这是误导性的。</p>
+			<p><a id="_idIndexMarker166"/> PDP 的弊端可以通过<strong class="bold">累积局部效应图</strong> ( <strong class="bold"> ALEP </strong>)和<strong class="bold">个体条件期望曲线</strong> ( <strong class="bold"> ICE 曲线</strong>)来<a id="_idIndexMarker167"/>解决。我们不会在本章中涉及这些概念，但请参考<em class="italic">参考</em>部分、<em class="italic">【参考–4，5】</em>，以获得帮助您理解这些概念的其他资源。</p>
+			<p>让我们来看看<em class="italic">图 2.8 </em>中的一些 PDP 可视化示例:</p>
+			<div><div><img src="img/B18216_02_08.jpg" alt="Figure 2.8 – PDP visualizations (from the code tutorial)&#13;&#10;"/>
+				</div>
+			</div>
+			<p class="figure-caption">图 2.8–PDP 可视化(来自代码教程)</p>
+			<p><em class="italic">图 2.8 </em>展示了<a id="_idIndexMarker169"/> PDP 可视化<a id="_idIndexMarker170"/>，帮助我们从表格数据集中了解有影响的特征。在下一节中，我们将讨论<strong class="bold">分层相关性传播</strong> ( <strong class="bold"> LRP </strong>)方法，以理解来自非结构化数据的有影响的特征。</p>
+			<h2 id="_idParaDest-43"><a id="_idTextAnchor045"/> LRP</h2>
+			<p>我们之前讨论的大多数基于<a id="_idIndexMarker171"/>影响的<a id="_idIndexMarker172"/>方法对于结构化数据都非常有效。但遗憾的是，这些方法无法应用于特征并不总是定义清晰的图像、文本等非结构化数据，尤其是使用<strong class="bold">深度卷积神经网络</strong> ( <strong class="bold"> DCNNs </strong>)时的<a id="_idIndexMarker173"/>。当应用于图像和文本等非结构化数据时，经典的 ML 算法与深度学习算法相比效率不高。由于与经典 ML 中的手动特征工程相比，深度学习中的自动特征提取的好处，深度学习算法在模型准确性方面更有效，因此更受欢迎。然而，深度学习模型比经典的 ML 模型更复杂，更难解释。</p>
+			<p>为深度学习模型提供可解释性也是相当具有挑战性的；通常，很少有量化的方法来为深度学习模型提供可解释性。因此，我们主要依靠定性方法来可视化能够影响权重和偏差计算过程的关键影响数据元素，这是任何<a id="_idIndexMarker174"/>深度学习模型的主要参数。此外，对于具有多层的深度网络，当通过层间梯度流动过程的信息流保持一致时，学习就发生了。因此，为了解释任何深度学习模型，特别是图像和文本，我们将尝试可视化网络不同层中的<em class="italic">激活的</em>或最有影响力的数据元素，并定性地检查算法的功能。</p>
+			<p>为了解释深度学习模型，LRP 是最突出的方法之一。直观地说，这种方法利用网络中的权重和前向传递神经激活，通过网络中的各个层将输出传播回输入层。因此，在网络权重的帮助下，我们可以将对最终模型输出贡献最大的数据元素(图像中的像素和文本数据中的单词)可视化。这些数据元素的贡献是通过网络层传播的相关性的定性度量。</p>
+			<p>现在，我们将<a id="_idIndexMarker176"/>探索一些特定的 LRP 方法，这些方法已经被应用于解释深度学习模型的工作。在实践中，实施这些方法可能具有挑战性。所以，我没有在代码教程中包括这些方法，因为这一章应该帮助初学者。我在<em class="italic">参考</em>部分分享了一些资源，供中级或高级学习者进行代码演练。</p>
+			<h3>显著图</h3>
+			<p>显著图<a id="_idIndexMarker177"/>是解释<strong class="bold">卷积神经网络</strong>(<strong class="bold">CNN</strong>)预测最常用的方法之一<a id="_idIndexMarker178"/>。这种<a id="_idIndexMarker179"/>技术源自图像显著性的概念，图像显著性指的是图像的重要特征，例如视觉上吸引人的像素。因此，显著性图是从原始图像导出的另一个图像，其中像素亮度与图像的显著性成正比。显著图有助于突出显示图像中在模型的最终决策过程中起重要作用的区域。这是一种专门在 DCNN 模型中使用的可视化技术，用于从数据中区分视觉特征。</p>
+			<p>除了为深度学习模型提供可解释性之外，显著图还可以用于识别感兴趣的区域，这些区域可以进一步被自动图像注释算法使用。此外，显著图用于音频领域，特别是音频监控，以检测异常的声音模式，如枪声或爆炸声。</p>
+			<p><em class="italic">图 2.9 </em>显示了给定输入图像的<a id="_idIndexMarker181"/>显著图，它突出显示了模型用来预测结果的重要像素:</p>
+			<div><div><img src="img/B18216_02_09.jpg" alt="Figure 2.9 – Saliency maps for an input image&#13;&#10;"/>
+				</div>
+			</div>
+			<p class="figure-caption">图 2.9–输入图像的显著性图</p>
+			<p>接下来，让我们介绍另一种流行的 LRP 方法——<strong class="bold">导向反向传播</strong> ( <strong class="bold">导向反向传播</strong>)。</p>
+			<h3>制导反投影</h3>
+			<p>另一种<a id="_idIndexMarker182"/>可视化<a id="_idIndexMarker183"/>技术用于解释深度学习模型以增加信任度和它们的采用是<strong class="bold">引导的反向投影</strong>。引导式反向投影突出显示图像中的细微视觉细节，以解释模型预测特定类别的原因。它也被称为导向凸极，实际上结合了普通反向传播和通过 ReLU 非线性的反向传播过程(也称为<strong class="bold">解耦</strong>)。我强烈建议您看一下这篇文章，<a href="https://towardsdatascience.com/review-deconvnet-unpooling-layer-semantic-segmentation-55cf8a6e380e">https://towards data science . com/review-de convnet-un pooling-layer-semantic-segmentation-55 cf 8 a6 e 380 e</a>，如果您不知道这些术语，请了解有关<a id="_idIndexMarker184"/>反向传播和 DeconvNet <a id="_idIndexMarker185"/>机制的更多信息。</p>
+			<p>在该<a id="_idIndexMarker186"/>方法中，网络的神经元充当特征检测器，并且由于使用了 ReLU 激活函数，仅保留特征图中为正的梯度元素。此外，DeconvNets 仅<a id="_idIndexMarker187"/>保留正误差信号。由于负梯度被设置为零，当反向传播通过 ReLU 层时，只有重要的像素被突出显示。因此，这种方法有助于可视化图像的关键区域、重要形状以及将由算法分类的对象的轮廓。</p>
+			<p><em class="italic">图 2.10 </em>显示了给定输入图像的引导后投影图，该图标记了模型用来预测结果的轮廓和一些粒度视觉特征:</p>
+			<div><div><img src="img/B18216_02_10.jpg" alt="Figure 2.10 – Guided backprop for an input image&#13;&#10;"/>
+				</div>
+			</div>
+			<p class="figure-caption">图 2.10-输入图像的引导后投影</p>
+			<p>引导反向投影非常有用，但在下一节中，我们将介绍另一种解释图像等非结构化数据的有用方法，称为梯度凸轮。</p>
+			<h3>梯度凸轮</h3>
+			<p>cam 是<a id="_idIndexMarker188"/>独立的<a id="_idIndexMarker189"/>可视化方法，用于解释深度学习模型。这里，模型预测的类分数被追溯到最后的卷积层，以突出图像中的有区别的感兴趣区域，这些区域是类特定的，甚至对于其他计算机视觉或图像处理算法来说不是通用的。<strong class="bold">渐变 CAM </strong>结合了导向后投影和 CAM 的效果，突出了感兴趣的类别区分区域，而没有突出颗粒像素的重要性，这与导向后投影不同。但是<a id="_idIndexMarker190"/> Grad-CAM 可以应用于任何 CNN 架构，不像 CAM 可以应用于在预测层之前对来自卷积层的输出特征图执行全局平均汇集的架构。</p>
+			<p><strong class="bold"> Grad-CAM </strong>(也称为<strong class="bold">梯度加权类激活图</strong>)有助于可视化高分辨率细节，这些细节通常叠加在原始图像上，以突出显示主要的<a id="_idIndexMarker191"/>图像区域，用于预测特定的类。对于多类分类模型极其有用。Grad-CAM 通过检查进入模型最后一层的梯度信息流来工作。然而，在某些情况下，检查细粒度的像素激活信息也很重要。由于 Grad-CAM 不允许我们检查粒度信息，Grad-CAM 还有另一个变体，称为<a id="_idIndexMarker192"/>的<strong class="bold"> Guided Grad-CAM </strong>，用于结合 guided backprop 和 Grad-CAM 的优势，甚至可以可视化图像中粒度级的类别鉴别信息。</p>
+			<p><em class="italic">图 2.11 </em>显示了 Grad-CAM 对任何输入图像的可视化效果:</p>
+			<div><div><img src="img/B18216_02_11.jpg" alt="Figure 2.11 – Grad-CAM for an input image&#13;&#10;"/>
+				</div>
+			</div>
+			<p class="figure-caption">图 2.11–输入图像的 Grad-CAM</p>
+			<p>Grad-CAM 突出显示图像中的重要区域，模型使用这些区域来预测结果。这种方法的另一种变体是使用导向 Grad-CAM，它结合了导向反向传播和 Grad-CAM 方法，以产生有趣的可视化来解释深度学习模型:</p>
+			<div><div><img src="img/B18216_02_12.jpg" alt="Figure 2.12 – Architecture diagram for guided Grad-CAM&#13;&#10;"/>
+				</div>
+			</div>
+			<p class="figure-caption">图 2.12–引导式 Grad-CAM 的架构图</p>
+			<p><em class="italic">图 2.12 </em>显示了<a id="_idIndexMarker193"/>制导 Grad-CAM 方法<a id="_idIndexMarker194"/>的架构图，理解起来稍微复杂一些。但总的来说，LRP 是一种重要的方法，可以用来解释深度学习模型的功能。</p>
+			<h2 id="_idParaDest-44"><a id="_idTextAnchor046"/>基于表象的解释</h2>
+			<p>模式表示<a id="_idIndexMarker195"/>在决策过程中起着重要的作用，尤其是对于文本和图像等非结构化数据<a id="_idIndexMarker196"/>。传统上，手工设计的模式匹配算法被用于提取人类能够涉及的全局特征。但最近，GoogleAI 基于 CAVs 的模型可解释性技术在 XAI 领域获得了极大的欢迎。在这一部分，我们将更详细地讨论 CAV，尽管从非结构化数据中提取特征和模式也属于基于表示的解释。</p>
+			<h3>骑士队</h3>
+			<p>特别是<a id="_idIndexMarker197"/>对于非结构化数据，大多数深度学习<a id="_idIndexMarker198"/>模型处理边缘、轮廓和主题等低级特征，以及一些中级和高级特征，如感兴趣对象的某些定义部分和部分。大多数时候，这些表示法并不人性化，尤其是对于复杂的深度学习模型。直觉上，CAV 将低级和粒度特征的存在与高级的对人友好的概念联系起来。因此，CAV 的模型可解释性提供了更现实的解释，任何人都可以与之相关联。</p>
+			<p>CAVs 的方法<a id="_idIndexMarker199"/>实际上是使用来自 GoogleAI 的概念激活向量 ( <strong class="bold"> TCAV </strong>)框架<strong class="bold">测试<a id="_idIndexMarker201"/>实现的<a id="_idIndexMarker200"/>。TCAV 利用方向导数将神经网络的内部状态近似为人类定义的概念。例如，如果我们要求一个人解释斑马看起来像什么，他们可能会说斑马是一种看起来像带有黑色条纹的白马的动物，生活在草原上。所以，<em class="italic">动物</em>、<em class="italic">白马</em>、<em class="italic">黑条纹</em>和<em class="italic">草原</em>这些术语都是用来表示斑马的重要概念。</strong></p>
+			<p>同样，TCAV 算法会尝试学习这些概念，并使用训练好的模型了解这些概念对预测有多重要，尽管在训练过程中可能不会用到这些概念。因此，TCAV 试图量化这个模型对特定阶级的特定概念的敏感程度。我发现骑士队的想法非常有吸引力。我认为这是朝着创建人工智能模型的人性化解释迈出的一步，任何非技术用户都可以轻松理解。我们将在第八章<em class="italic">和 TCAV </em>的<a href="B18216_08_ePub.xhtml#_idTextAnchor154"> <em class="italic">中更详细地讨论 GoogleAI 的 TCAV 框架。</em></a></p>
+			<p><em class="italic">图 2.13 </em>展示了使用人类友好的概念来解释模型预测的想法。在下一小节中，我们将看到另一种用于解释复杂深度学习模型的可视化方法:</p>
+			<div><div><img src="img/B18216_02_13.jpg" alt="Figure 2.13 – The fundamental idea behind the CAV &#13;&#10;"/>
+				</div>
+			</div>
+			<p class="figure-caption">图 2.13–CAV 背后的基本思想</p>
+			<p>接下来，我们将讨论<strong class="bold">视觉注意力图</strong> ( <strong class="bold"> VAMs </strong>)，它也可以用于复杂的深度学习模型。</p>
+			<h2 id="_idParaDest-45"><a id="_idTextAnchor047"/> VAMs</h2>
+			<p>在最近几年里，transformer <a id="_idIndexMarker203"/>模型架构因为能够在复杂的非结构化数据上实现最先进的模型性能而广受欢迎。注意力网络是 transformer 架构的核心，它允许算法学习更多的上下文信息，以产生更准确的结果。</p>
+			<p>基本的想法是，数据的每一部分都不是同等重要的，只有重要的特征比其余的数据需要更多的关注。因此，注意力网络会过滤掉数据中不相关的部分，以便做出更好的判断。通过注意机制，网络可以根据对基础任务的重要程度，将较高的权重分配给重要的部分。使用这些注意力权重，可以创建解释复杂算法的决策过程的某些可视化。这些被称为 VAM。</p>
+			<p>这种技术对于<strong class="bold">多模式编码器-解码器</strong>架构来说特别有用<a id="_idIndexMarker204"/>,用于解决诸如自动图像字幕和视觉问答等问题。如果你的理解是初级的，那么应用 VAM 可能会相当复杂。因此，我不会在本书或代码教程中详细介绍这种技术。如果你有兴趣了解更多关于这种技术在实践中如何工作的信息，请参考位于<a href="https://github.com/sgrvinod/a-PyTorch-Tutorial-to-Image-Captioning">https://github . com/sgrvinod/a-py torch-Tutorial-to-Image-Captioning</a>的代码库。</p>
+			<p>正如我们在<em class="italic">图 2.14 </em>中看到的，VAM 提供了一步一步的视觉效果来解释复杂编码器-解码器模型的输出。在下一节中，我们将探索基于示例的方法，这些方法用于解释 ML 模型:</p>
+			<div><div><img src="img/B18216_02_14.jpg" alt="Figure 2.14 – Using VAMs to explain complex encoder-decoder attention-based deep learning models for the task of automated image captioning using a multi-modal dataset&#13;&#10;"/>
+				</div>
+			</div>
+			<p class="figure-caption">图 2.14–使用 VAM 解释复杂的编码器-解码器基于注意力的深度学习模型，用于使用多模态数据集的自动图像字幕任务</p>
+			<p>在下一节的<a id="_idIndexMarker205"/>中，我们将介绍另一种<a id="_idIndexMarker206"/>类型的可解释方法，它使用人类友好的例子来解释来自黑盒模型的预测。</p>
+			<h1 id="_idParaDest-46"><a id="_idTextAnchor048"/>基于实例的方法</h1>
+			<p>另一种模型可解释性的方法是基于实例的方法。基于实例的方法类似于人类试图解释一个新概念。作为人类，当我们试图向他人解释或介绍新的东西时，我们通常会尝试使用我们的观众能够理解的例子。类似地，在 XAI 的背景下，基于实例的方法试图选择数据集的某些实例来解释模型的行为。它假设观察数据的当前实例与历史观察之间的相似性可以用来解释黑盒模型。</p>
+			<p>这些方法大多与模型无关，可以应用于结构化和非结构化数据。如果结构化数据是高维的，那么对于这些方法来说就有点困难了，并且不能包含所有的特征来解释模型。因此，只有当有一个选项来总结数据实例或只选取选定的特性时，它才能很好地工作。</p>
+			<p>在这一章中，我们将主要讨论<strong class="bold">反事实解释</strong> ( <strong class="bold"> CFEs </strong>)，这是最流行的<a id="_idIndexMarker209"/>基于实例的可解释性方法，适用于结构化和非结构化数据。cfe 表明某一特定特征必须改变到什么程度才能显著改变预测的结果。通常，这对于基于分类的问题很有用。</p>
+			<p>对于某些<a id="_idIndexMarker210"/>预测模型，cfe<a id="_idIndexMarker211"/>可以提供对最终用户和业务利益相关者至关重要的说明性见解和建议。例如，让我们假设在自动化贷款审批系统中使用了一个 ML 模型。如果黑盒模型拒绝了特定申请人的贷款请求，贷款申请人可能会联系提供商，以了解他们的请求未被批准的确切原因。但相反，如果系统建议申请人增加 5000 英镑的工资，并在接下来的 3 个月内按时支付信用卡账单，以批准贷款请求，那么申请人将理解并信任系统的决策过程，并可以努力使其贷款请求获得批准。</p>
+			<h2 id="_idParaDest-47"><a id="_idTextAnchor049"/>结构化数据中的 cfe</h2>
+			<p>使用 Python 中的<a id="_idIndexMarker212"/><strong class="bold">多样反事实解释</strong> ( <strong class="bold">骰子</strong>)框架(<a href="https://interpret.ml/DiCE/">https://interpret.ml/DiCE/</a>)，可以<a id="_idIndexMarker213"/>为结构化数据提供 CFE。它可以应用于分类<a id="_idIndexMarker214"/>和基于回归的模型不可知局部可解释性问题，它描述了结构化数据的最小变化如何改变目标结果。</p>
+			<p>Python <a id="_idIndexMarker215"/>中用于 CFE 的另一个重要框架是<strong class="bold">Alibi</strong>(<a href="https://docs.seldon.io/projects/alibi/en/stable/">https://docs.seldon.io/projects/alibi/en/stable/</a>)，它在实现 CFE 的概念来解释 ML 模型方面也相当不错。虽然我们将在第 9 章<a href="B18216_09_ePub.xhtml#_idTextAnchor172"/>、<em class="italic">其他流行的 XAI 框架</em>中讨论这些框架并体验这些框架的实际方面，但现在，我将讨论对结构化数据的 CFE 的一些直观理解。请参考代码库中提供的笔记本(<a href="https://github.com/PacktPublishing/Applied-Machine-Learning-Explainability-Techniques/blob/main/Chapter02/Counterfactual_structured_data.ipynb">https://github . com/packt publishing/Applied-Machine-Learning-explability-Techniques/blob/main/chapter 02/counter factual _ structured _ data . ipynb</a>)，了解如何用 Python 编写这些方法，以解决实际问题。</p>
+			<p>当与结构化数据一起使用<a id="_idIndexMarker216"/>时，CFE 方法尝试分析输入查询数据实例，并尝试观察考虑来自历史数据的相同查询实例的原始目标结果。或者，它尝试检查特征并将它们映射到历史数据中存在的类似实例，以获得目标输出。然后，该算法生成多个反事实的例子来预测相反的结果。</p>
+			<p>对于基于<a id="_idIndexMarker217"/>分类的问题，该方法将尝试预测二元分类问题的相反类，或者多类分类问题的最近或最相似类。对于回归问题，如果目标结果出现在光谱的低端，算法会尝试提供一个目标结果更接近光谱高端的反事实示例，反之亦然。因此，这种方法对于理解<em class="italic">假设</em>场景非常有效，并且可以提供可操作的洞察力以及模型解释能力。解释也非常清楚，非常容易解释和实施。</p>
+			<p>但是这种方法的主要缺点，尤其是对于结构化数据来说，是它遭受了<a id="_idIndexMarker218"/><em class="italic">罗生门效应</em>(<a href="https://www.dictionary.com/e/pop-culture/the-rashomon-effect/">https://www . dictionary . com/e/pop-culture/the-Rashomon-effect/</a>)。对于任何现实世界的问题，它可以找到多个可以相互矛盾的 cfe。有了结构化数据，有了多种特性，相互矛盾的 cfe 会制造更多的混乱，而不是解释 ML 模型！人工干预和应用领域知识来挑选最相关的例子有助于减轻罗生门效应。否则，我的建议是将这种方法与可操作特征的特征重要性方法结合起来，选择涉及重大变化的反事实例子，以提供更好的可操作性。</p>
+			<p><em class="italic">图 2.15 </em>说明了如何使用 cfe 来获得说明性的见解和可行的建议，以解释模型的工作原理:</p>
+			<div><div><img src="img/B18216_02_15.jpg" alt="Figure 2.15 – Prescriptive insights obtained from CFEs in structured data&#13;&#10;"/>
+				</div>
+			</div>
+			<p class="figure-caption">图 2.15–从结构化数据中的 cfe 获得的说明性见解</p>
+			<p><a id="_idIndexMarker219"/>表格数据集中的 cfe 非常有用，因为它们<a id="_idIndexMarker220"/>可以向最终用户提供可操作的建议。在下一小节中，我们将探讨非结构化数据中的 cfe。</p>
+			<h2 id="_idParaDest-48"><a id="_idTextAnchor050"/>非结构化数据中的 cfe</h2>
+			<p>在<a id="_idIndexMarker221"/>图像和文本等非结构化数据<a id="_idIndexMarker222"/>中，实施 cfe 可能相当具有挑战性。其中一个主要原因是深度学习模型在图像或文本中使用的粒度特征并不总是定义良好或对人类友好的。但是<strong class="bold">Alibi</strong>(<a href="https://docs.seldon.io/projects/alibi/en/stable/">https://docs.seldon.io/projects/alibi/en/stable/</a>)框架在生成图像数据的 cfe 方面做得很好。即使是简单 CFE 方法的改进版本，通过生成由类原型指导的 CFE，性能甚至更好。它使用自动编码器或 k-d 树来为使用特定输入实例的每个预测类构建原型。</p>
+			<p>例如，在 MNIST 数据集中，让我们假设输入查询图像是数字 7。然后，反事实原型方法将构建从 0 到 9 的所有数字的原型。接下来，它将尝试产生除了原始数字 7 之外的最接近的数字作为反事实的例子。根据数据的不同，最接近的手写数字可以是 9 或 1；即使作为人类，如果字迹不清楚，我们也可能会混淆数字 7 和 9 或 7 和 1！它采用优化方法来最小化模型的反事实预测损失。</p>
+			<p>我强烈建议看一看<em class="italic">阿诺·范·卢韦伦</em>和<em class="italic">詹妮斯·克莱斯</em>的作品，由原型(<a href="https://arxiv.org/abs/1907.02584">https://arxiv.org/abs/1907.02584</a>)引导的<em class="italic">可解释的反事实解释，以获得关于这种方法如何工作的更多细节。这种由原型指导的<a id="_idIndexMarker223"/> CFE 方法还<a id="_idIndexMarker224"/>消除了由于黑盒深度学习模型的数值梯度评估过程而可能产生的任何计算约束。请看看 github 资源库中的笔记本(<a href="https://github.com/PacktPublishing/Applied-Machine-Learning-Explainability-Techniques/blob/main/Chapter02/Counterfactual_unstructured_data.ipynb">https://GitHub . com/packt publishing/Applied-Machine-Learning-explability-Techniques/blob/main/chapter 02/counter fact _ unstructured _ data . ipynb</a>)了解一下如何针对实际问题实现这种方法。</em></p>
+			<p>下图摘自 Goyal 等人的论文<em class="italic">反事实视觉解释，2019</em>(【https://arxiv.org/pdf/1904.07451.pdf】)显示了视觉 cfe 如何成为解释图像分类器的有效方法:</p>
+			<div><div><img src="img/B18216_02_16.jpg" alt="Figure 2.16 – A counterfactual example-based explanation for images&#13;&#10;"/>
+				</div>
+			</div>
+			<p class="figure-caption">图 2.16-一个基于反事实例子的图像解释</p>
+			<p>实际上，包含非结构化数据的 CFE 很难实现。这仍然是一个积极研究的领域，但我认为这种方法具有巨大的潜力，可以为甚至复杂的模型提供人性化的解释。下图显示了基于可解释类型的各种方法的映射:</p>
+			<div><div><img src="img/B18216_02_17.jpg" alt="Figure 2.17 – Mapping various methods based on their explainability type&#13;&#10;"/>
+				</div>
+			</div>
+			<p class="figure-caption">图 2.17——根据方法的可解释类型映射不同的方法</p>
+			<p>LIME <a id="_idIndexMarker225"/>和 SHAP 是重要的局部和<a id="_idIndexMarker226"/>模型不可知算法，本章没有讨论，但是后面会详细讨论。本章讨论的模型可解释性方法广泛用于各种数据集，以提供不同维度的可解释性。</p>
+			<h1 id="_idParaDest-49"><a id="_idTextAnchor051"/>总结</h1>
+			<p>在这一章中，你学习了用于解释黑盒模型的各种模型可解释性方法。其中一些是与模型无关的，而一些是特定于模型的。这些方法中的一些提供全局可解释性，而一些提供局部可解释性。对于这些方法中的大多数，通过绘图、图表和转换图的可视化被用于定性地检查数据或模型结果；而对于一些方法，使用某些例子来提供解释。统计和数字指标也可以在提供定量解释方面发挥重要作用。</p>
+			<p>在下一章，我们将讨论以数据为中心的 XAI 这个非常重要的概念，并从概念上理解如何在模型可解释性中利用以数据为中心的方法。</p>
+			<h1 id="_idParaDest-50"><a id="_idTextAnchor052"/>参考文献</h1>
+			<p>要获得有关本章主题的更多信息，请参考以下资源:</p>
+			<ul>
+				<li>杰罗姆·弗里德曼:“贪婪函数逼近:梯度推进机器”统计年鉴(2001):<a href="https://www.researchgate.net/publication/280687718_Greedy_Function_Approximation_A_Gradient_Boosting_Machine">https://www . research gate . net/publication/280687718 _ Greedy _ Function _ Approximation _ A _ Gradient _ Boosting _ Machine</a></li>
+				<li><em class="italic">用 1.5xIQR 规则识别异常值</em>:<a href="https://www.khanacademy.org/math/statistics-probability/summarizing-quantitative-data/box-whisker-plots/a/identifying-outliers-iqr-rule">https://www . khanacademy . org/math/statistics-probability/summaring-quantitative-data/box-whisker-plots/a/Identifying-outliers-iqr-rule</a></li>
+				<li><em class="italic">尼尔森规则</em>:<a href="https://www.leansixsigmadefinition.com/glossary/nelson-rules/">https://www . leanssix sigma definition . com/glossary/Nelson-rules/</a></li>
+				<li><em class="italic">累积局部效果(ALE)–特征效果全局可解释性</em>:<em class="italic"/><a href="https://www.analyticsvidhya.com/blog/2020/10/accumulated-local-effects-ale-feature-effects-global-interpretability/">https://www . analyticsvidhya . com/blog/2020/10/Accumulated-Local-Effects-ALE-Feature-Effects-Global-interprebility/</a></li>
+				<li><em class="italic">使用个体条件期望(ICE)图的模型不可知的局部解释</em>:<a href="https://towardsdatascience.com/how-to-explain-and-affect-individual-decisions-with-ice-curves-1-2-f39fd751546f">https://towards data science . com/how-to-explain-and-affect-Individual-decision-with-ICE-curves-1-2-f39fd 751546 f</a></li>
+				<li><em class="italic">图 2.16:反事实视觉解释，戈亚尔等人 2019</em>:【https://arxiv.org/pdf/1904.07451.pdf T2】</li>
+				<li><em class="italic">图 2.13:特征归因之外的可解释性:用概念激活向量进行定量测试(TCAV)，金等【2018】</em>:【https://arxiv.org/abs/1711.11279】T2</li>
+				<li><em class="italic"> Grad-CAM 类激活可视化</em>:【https://keras.io/examples/vision/grad_cam/ T2】</li>
+				<li>使用引导梯度类激活图解释 CNN 的通用方法！！:<a href="mailto:https://medium.com/@chinesh4/generalized-way-of-interpreting-cnns-a7d1b0178709">https://medium . com/@ chinesh 4/generalized-way-of-interpretation-CNNs-a7d1b 0178709</a></li>
+				<li><em class="italic">图 2.12: Grad-CAM:通过基于梯度的定位从深度网络得到的视觉解释，Ramprasaath 等人。阿尔-</em>【https://arxiv.org/abs/1610.02391】T2</li>
+			</ul>
+		</div>
+	
+
+</body></html>

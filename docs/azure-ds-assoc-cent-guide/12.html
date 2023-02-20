@@ -1,0 +1,301 @@
+<html><head/><body>
+
+
+
+
+
+<style type="text/css">body{margin:1em;background-color:transparent!important;}#sbo-rt-content *{text-indent:0pt!important;}#sbo-rt-content .bq{margin-right:1em!important;}</style>
+<div><div><h1 id="_idParaDest-129"><em class="italic"> <a id="_idTextAnchor136"/>第九章</em>:优化 ML 模型</h1>
+			<p>在本章中，您将了解两种可用于发现数据集最佳模型的技术。您将从探索 AzureML SDK 的<strong class="bold"> HyperDrive </strong>包开始。这个<a id="_idIndexMarker646"/>包允许你通过调整模型暴露的参数来微调模型的性能，这个过程也被称为<strong class="bold">超参数调整</strong>。然后您将探索<a id="_idIndexMarker647"/> AzureML SDK 的<strong class="bold">自动化 ML </strong> ( <strong class="bold"> AutoML </strong>)包，它允许您通过代码自动化模型选择、训练和优化过程。</p>
+			<p>在本章中，我们将讨论以下主要话题:</p>
+			<ul>
+				<li>使用超驱动进行超参数调谐</li>
+				<li>用代码运行 AutoML 实验</li>
+			</ul>
+			<h1 id="_idParaDest-130"><a id="_idTextAnchor137"/>技术要求</h1>
+			<p>您需要访问 Azure 订阅。在该订阅中，您将需要一个<code>packt-azureml-rg</code>。你将需要一个<code>Contributor</code>或者<code>Owner</code>T3，如<a href="B16777_02_Final_VK_ePub.xhtml#_idTextAnchor026"> <em class="italic">第二章</em> </a>、<em class="italic">部署 Azure 机器学习工作区资源</em>中所述。</p>
+			<p>你还需要对<strong class="bold"> Python </strong>语言有一个基本的了解。代码片段面向 Python 版或更高版本。你还应该熟悉在 AzureML Studio 中使用笔记本的体验，这在<a href="B16777_08_Final_VK_ePub.xhtml#_idTextAnchor117"> <em class="italic">第八章</em> </a>，<em class="italic">用 Python 代码做实验</em>中有所涉及。</p>
+			<p>本章假设您已经在 AzureML 工作区中注册了<strong class="bold"> scikit-learn </strong>糖尿病数据集，并且已经创建了一个名为<strong class="bold"> cpu-sm-cluster </strong>的计算集群，如<em class="italic">定义数据存储</em>、<em class="italic">处理数据集</em>以及<a href="B16777_07_Final_VK_ePub.xhtml#_idTextAnchor102"> <em class="italic">第 7 章</em> </a>、<em class="italic">azure ml Python SDK</em>中的<em class="italic">处理计算目标</em>部分所述。</p>
+			<p>你可以在 GitHub 的网址<a href="http://bit.ly/dp100-ch09">http://bit.ly/dp100-ch09</a>找到本章的所有笔记和代码片段。</p>
+			<h1 id="_idParaDest-131"><a id="_idTextAnchor138"/>使用 HyperDrive 调节超参数</h1>
+			<p>在<a href="B16777_08_Final_VK_ePub.xhtml#_idTextAnchor117"> <em class="italic">第 8 章</em> </a>，<em class="italic">用 Python 代码</em>做实验，你训练了一个接受<code>alpha</code>参数的<code>LassoLars</code>模型。为了避免过度适应训练数据集，<code>LassoLars</code>模型使用了一种称为<code>alpha</code>的<a id="_idIndexMarker648"/>技术，参数指定了这个惩罚项有多重要，这直接影响了训练结果。影响训练过程的参数被称为<a id="_idIndexMarker650"/>是位于<code>scikit-learn</code>库中的<code>DecisionTreeClassifier</code>类，你可以通过<code>max_depth</code>定义树的最大深度，它是一个整数。在同一个模型中，您可以通过给<code>max_leaf_nodes</code> <strong class="bold">超参数</strong>指定一个数值来控制叶节点的最大数量。</p>
+			<p>这些超参数控制决策树的大小，如图<em class="italic">图 9.1 </em>所示:</p>
+			<div><div><img src="img/B16777_09_001.jpg" alt="Figure 9.1 – Decision tree hyperparameters&#13;&#10;" width="1650" height="505"/>
+				</div>
+			</div>
+			<p class="figure-caption">图 9.1–决策树超参数</p>
+			<p><strong class="bold">超参数调整</strong>是<a id="_idIndexMarker651"/>为<strong class="bold">超参数</strong>寻找最优值的过程，该过程根据您用于训练的数据产生性能最佳的模型<a id="_idIndexMarker652"/>。为了能够评估每个<strong class="bold">超参数</strong>组合的性能，必须训练模型，并且必须评估性能指标。在<a href="B16777_08_Final_VK_ePub.xhtml#_idTextAnchor117"> <em class="italic">第八章</em> </a>、<em class="italic">用 Python 代码</em>进行实验的糖尿病模型中，您<a id="_idIndexMarker653"/>使用<strong class="bold">归一化均方根误差</strong> ( <strong class="bold"> NRMSE </strong>)度量来评估模型。</p>
+			<p>AzureML SDK 提供了<code>HyperDriveConfig</code>类，它允许你执行<code>HyperDriveConfig</code>是你在<a href="B16777_08_Final_VK_ePub.xhtml#_idTextAnchor117"> <em class="italic">第 8 章</em> </a>、<em class="italic">中使用的<code>ScriptRunConfig</code>类的包装，用 Python 代码做实验</em>。这意味着您需要在<code>run_config</code>参数中传递您想要用来训练您的模型的<code>ScriptRunConfig</code>。您还需要指定您的代码正在记录的指标，以及您对该指标的目标是什么。在糖尿病案例中，您试图最小化您在第 8 章 、<em class="italic">使用 Python 代码</em>中看到的<code>submit</code>方法。显示端到端流程的伪代码如下，其中的<code>script</code>变量引用了定义您将使用哪个训练脚本的<code>ScriptRunConfig</code>对象:</p>
+			<pre>hd_config = HyperDriveConfig(
+             run_config=script,
+             primary_metric_name="nrmse",
+             primary_metric_goal=PrimaryMetricGoal.MINIMIZE
+             ,…)
+experiment = Experiment(ws, "chapter09-hyperdrive")
+hyperdrive_run = experiment.submit(hd_config)</pre>
+			<p>除了<code>ScriptRunConfig</code>，你还需要通过<code>HyperDriveConfig</code>才会使用。<strong class="bold">超参数</strong>可以接受离散值或连续值:</p>
+			<ul>
+				<li>离散值的典型例子是整数或字符串值。例如，<code>activation</code>中的<code>selu</code>为<a id="_idIndexMarker655"/>，<code>relu</code>为<a id="_idIndexMarker656"/>，<strong class="bold">为整流线性单元</strong> ( <strong class="bold"> ReLU </strong>)。</li>
+				<li>连续值的一个典型例子是浮点值。您一直在训练的<code>LassoLars</code>模型中的<code>alpha</code>参数是一个接受浮点值的<strong class="bold">超参数</strong>。</li>
+			</ul>
+			<p>当你<a id="_idIndexMarker657"/>在探索可能的<code>azureml.train.hyperdrive.parameter_expressions</code>模块时。</p>
+			<p>在离散<code>choice</code>函数的情况下，它允许你指定选项列表<code>activation</code> <strong class="bold">超参数</strong>你之前用下面的脚本看到:</p>
+			<pre>choice('selu','relu')</pre>
+			<p>该脚本将尝试<code>selu</code>和<code>relu</code>激活函数，同时寻找最佳模型。</p>
+			<p class="callout-heading">重要说明</p>
+			<p class="callout">如果你对神经网络感兴趣，你可能需要更好地理解这些激活功能。有一些很棒的书可以帮助你开始学习神经网络设计。对于 DP-100 考试，你不需要这些知识。</p>
+			<p>注意，即使在连续的<code>alpha</code> <code>LassoLars</code>模型的情况下，你仍然可以使用<code>choice</code>方法来定义离散值进行探索。例如，下面对<code>choice</code>的使用相当于你在<a href="B16777_08_Final_VK_ePub.xhtml#_idTextAnchor117"> <em class="italic">第 8 章</em></a><em class="italic">中的<em class="italic">跟踪模型演化</em>部分所做的用 Python 代码</em>做实验:</p>
+			<pre>choice(0.001, 0.01, 0.1, 0.25, 0.5)</pre>
+			<p>您还可以<a id="_idIndexMarker659"/>定义您在探索搜索空间时将获得的样本的概率分布。例如，如果您想为所有值提供均等的机会，您将使用均匀分布。另一方面，您可以使用正态分布将搜索区域集中在搜索空间的中心。AzureML SDK 提供了一些你可以使用的方法，比如<code>uniform(low, high)</code>、<code>loguniform(low, high)</code>、<code>normal(μ,σ)</code>和<code>lognormal(μ, σ)</code>。您可以对离散值使用带<code>q</code>前缀的等价物，例如<code>quniform(low, high, q)</code>、<code>qloguniform(low, high, q)</code>、<code>qnormal(μ, σ, q)</code>和<code>qlognormal(μ, σ</code>、<code>, q)</code>，其中<code>q</code>参数是将连续值转换为离散值的量化因子。</p>
+			<p>在本书的 GitHub 页面上，您可以找到绘制 1000 个样本的代码，这些样本是用这些函数的分布生成的。结果见<em class="italic">图 9.2 </em>:</p>
+			<div><div><img src="img/B16777_09_002.jpg" alt="Figure 9.2 – Advanced discrete and continuous hyperparameter value distributions. Sample values are ordered. The x axis shows the ordered value's index number&#13;&#10;" width="1644" height="1222"/>
+				</div>
+			</div>
+			<p class="figure-caption">图 9.2-高级离散和连续超参数值分布。样本值已排序。x 轴显示排序值的索引号</p>
+			<p class="callout-heading">重要说明</p>
+			<p class="callout">在<em class="italic">图 9.2 </em>中，在<code>loguniform</code>和<code>lognormal</code>图中，量化因子为 1 的离散函数的线与连续函数的线重叠。因此，你只能看到两条线。</p>
+			<p>一旦<a id="_idIndexMarker660"/>定义了搜索空间，您需要指定用于选择每个<code>azureml.train.hyperdrive</code>模块的采样策略:</p>
+			<ul>
+				<li><code>choice</code> method you saw above. The Azure ML SDK will search all possible <strong class="bold">hyperparameter</strong> combinations of those discrete values. Imagine that you wanted to explore the following four parameter combinations:<ul><li>a=0.01，b=10</li><li>a=0.01，b=100</li><li>a=0.5，b=10</li><li>a=0.5，b=100</li></ul><p>以下代码片段定义了这四种组合的搜索空间:</p><pre>from azureml.train.hyperdrive import GridParameterSampling
+from azureml.train.hyperdrive import choice
+param_sampling = GridParameterSampling( {
+        "a": choice(0.01, 0.5),
+        "b": choice(10, 100)
+    }
+)</pre></li>
+				<li><code>RandomParameterSampling</code>阶级。它允许您从可用选项中随机选择<strong class="bold">超参数</strong>值。它支持离散和连续的<strong class="bold">超参数</strong>。</li>
+				<li>接下来你会读到。它支持离散和连续的<strong class="bold">超参数</strong>。</li>
+			</ul>
+			<p>让我们将迄今为止你所学到的一切付诸行动:</p>
+			<ol>
+				<li>导航到 AzureML Studio web 界面的<strong class="bold">作者</strong> | <strong class="bold">笔记本</strong>部分。</li>
+				<li>创建一个名为<code>chapter09</code>的文件夹。</li>
+				<li>您需要在<code>training.py</code>脚本中创建一个<code>diabetes-training</code>文件夹。该脚本与<a href="B16777_08_Final_VK_ePub.xhtml#_idTextAnchor117"> <em class="italic">第 8 章</em> </a>、<em class="italic">试验 Python 代码</em>中使用的脚本相同，在<em class="italic">部分将代码移动到 Python 脚本文件</em>。你可以从那里复制内容。最终的<strong class="bold">文件</strong>树如图<em class="italic">图 9.3 </em>所示。</li>
+				<li>Create a notebook named <strong class="bold">chapter09.ipynb</strong> within the <strong class="bold">chapter09</strong> folder. <em class="italic">Figure 9.3</em> shows what the final <strong class="bold">Files</strong> tree will look like:<div><img src="img/B16777_09_003.jpg" alt="Figure 9.3 – The Files tree structure that contains the code and the chapter09 notebook&#13;&#10;" width="1262" height="427"/></div><p class="figure-caption">图 9.3-包含代码和第 09 章笔记本的文件树结构</p></li>
+				<li>Add the following initialization code in the first cell:<pre>from azureml.core import (
+    Workspace, Environment
+)
+from azureml.core.conda_dependencies import \
+     CondaDependencies 
+import sklearn
+ws = Workspace.from_config()
+diabetes_env = Environment(name=»diabetes-training-env»)
+diabetes_env.python.conda_dependencies = \
+     CondaDependencies.create(
+      conda_packages=[
+          f"scikit-learn=={sklearn.__version__}"],
+      pip_packages=["azureml-defaults",
+                    "azureml-dataprep[pandas]"])
+target = ws.compute_targets['cpu-sm-cluster'] </pre><p>这是一个类似于你在<a href="B16777_08_Final_VK_ePub.xhtml#_idTextAnchor117"> <em class="italic">第八章</em> </a>、<em class="italic">试验 Python 代码</em>中使用的代码。唯一的区别是您使用的是<code>create</code>方法，而不是一个一个地添加包。</p></li>
+				<li>In a new <a id="_idIndexMarker666"/>cell, define the <code>ScriptRunConfig</code> object that will execute the <code>training.py</code> script:<pre>from azureml.core import ScriptRunConfig
+script = ScriptRunConfig(
+    source_directory='diabetes-training',
+    script='training.py',
+    environment=diabetes_env,
+    compute_target=target
+)</pre><p>这个<code>ScriptRunConfig</code>对象与您在<a href="B16777_08_Final_VK_ePub.xhtml#_idTextAnchor117"> <em class="italic">第 8 章</em> </a>、<em class="italic">使用 Python 代码</em>的<em class="italic">在计算集群上训练糖尿病模型</em>部分中创建的对象几乎相同。唯一的区别是您没有传递<code>arguments</code>参数。特别是，你不要指定<code>--alpha</code>参数。您将在下一步中配置的<code>HyperDriveConfig</code>对象将自动追加该参数。</p></li>
+				<li>Add and <a id="_idIndexMarker667"/>execute the following code in a new cell:<pre>from azureml.train.hyperdrive import HyperDriveConfig
+from azureml.train.hyperdrive import (
+   RandomParameterSampling, uniform, PrimaryMetricGoal
+)
+param_sampling = RandomParameterSampling({
+        'alpha': uniform(0.00001, 0.1),
+    }
+)
+hd_config = HyperDriveConfig(
+               run_config=script,                          
+               hyperparameter_sampling=param_sampling,
+               primary_metric_name="nrmse", 
+               primary_metric_goal=                   
+                          PrimaryMetricGoal.MINIMIZE,
+               max_total_runs=20,
+               max_concurrent_runs=4)</pre><p>在这段代码中，您定义了一个<code>RandomParameterSampling</code>方法来探索均匀分布的值，范围从 0.00001 到 0.1，用于将被传递到您在<em class="italic">步骤 3 </em>中创建的训练脚本的<code>alpha</code>参数<a id="_idIndexMarker668"/>。这个训练脚本接受<code>--alpha</code>参数，然后将其传递给<code>alpha</code> <code>LassoLars</code>模型。</p><p>您将这个<code>RandomParameterSampling</code>配置分配给<code>HyperDriveConfig</code>的<code>hyperparameter_sampling</code>参数。</p><p>您还配置了<code>HyperDriveConfig</code>的<code>run_config</code>属性，以使用您在<em class="italic">步骤 6 </em>中定义的<code>ScriptRunConfig</code>对象。注意，<code>RandomParameterSampling</code>类将传递脚本所需的<code>alpha</code>参数。</p><p>然后您定义生产的模型将使用<code>primary_metric_name</code>参数评估<a id="_idIndexMarker669"/>。您还指定您正在尝试最小化该值(参数<code>primary_metric_goal</code>，因为它是您想要最小化的误差。</p><p>最后两个参数，<code>max_total_runs</code>和<code>max_concurrent_runs</code>，控制着你在寻找最佳模型时愿意投入的资源。<code>max_total_runs</code>参数控制实验运行的最大数量。这可以是 1 到 1，000 次运行。这是一个必需参数。<code>max_concurrent_runs</code>可选参数，控制运行的最大并发量。在这种情况下，您定义了<em class="italic"> 4 </em>，这意味着在<code>ScriptRunConfig</code>中将只提供四个节点。这意味着集群仍将有一个<a id="_idIndexMarker671"/>未配置的节点，因为它最多可以扩展到五个节点，正如您在第 7 章<a href="B16777_07_Final_VK_ePub.xhtml#_idTextAnchor102"> <em class="italic">的<em class="italic">使用计算目标</em>一节中定义的那样</em></a>，<em class="italic">azure ml Python SDK</em>。还有一个可选参数可用于限制搜索最佳<code>max_duration_minutes</code>参数的时间，您在上面的示例中没有指定该参数，该参数定义了运行<strong class="bold">超参数调整</strong>过程的最大持续时间(分钟)。超时后，所有后续计划运行将自动取消。</p></li>
+				<li>In a new cell, add the following code:<pre>from azureml.core import Experiment
+experiment = Experiment(ws, "chapter09-hyperdrive")
+hyperdrive_run = experiment.submit(hd_config)
+hyperdrive_run.wait_for_completion(show_output=True)</pre><p>在这段代码中，您提交的要在<code>hyperdrive_run</code>变量下执行的<code>HyperDriveConfig</code>是<code>HyperDriveRun</code>的一个实例，它继承自普通的<code>Run</code>类。</p></li>
+				<li>You can review the results of the process in the Studio web UI. Navigate to the <code>alpha</code> hyperparameter. You can visually explore the effect the various values of the <code>alpha</code> parameter have regarding the <code>alpha</code> value of <code>HyperDriveRun</code> (<strong class="bold">Run 1</strong>).<p class="callout-heading">重要说明</p><p class="callout">在您的执行中，运行编号可能会有所不同。每次执行单元时，都会创建一个新的运行编号，从之前的编号继续。因此，如果您执行包含 20 个子运行的 hyperdrive 运行代码，则最后一个子运行将是运行 21。下一次执行相同的代码时，hyperdrive 运行将从运行 22 开始，最后一个子级将是运行 42。本节中提到的运行编号是各个图中显示的编号，观察到差异是正常的，尤其是如果您必须重新运行几个细胞。</p></li>
+				<li>Navigate to the <strong class="bold">Outputs + logs</strong> tab of the completed <strong class="bold">Run 1</strong> run. You will notice <a id="_idIndexMarker673"/>that there is a single file under the <strong class="bold">azureml-logs</strong> folder named <strong class="bold">hyperdrive.txt</strong>, as shown in <em class="italic">Figure 9.5</em>: <div><img src="img/B16777_09_005.jpg" alt="Figure 9.5 – Log file in HyperDriveRun, picking up the first four jobs from &#13;&#10;the hyperparameter space that will be executed in parallel&#13;&#10;" width="1650" height="328"/></div><p class="figure-caption">图 9.5–HyperDriveRun 中的日志文件，从将要并行执行的超参数空间中选取前四个作业</p><p>该文件包含计划完成超参数调整过程的所有作业。实际运行日志和存储的模型存储在子运行中。如果您需要调试代码问题，您必须打开其中一个来查看脚本错误。</p></li>
+				<li>您还可以获得最佳模型的运行，相应的<code>get_best_run_by_primary_metric</code>方法检索<code>HyperDriveRun</code>的最佳运行，该运行由<code>hyperdrive_run</code>变量引用。从那里，您可以<a id="_idIndexMarker674"/>读取<code>Run</code>对象的<code>get_metrics</code>方法，并且您可以使用<code>get_details</code>方法获得执行的细节。在这些细节中，有一个<code>runDefinition</code>对象包含一个<code>arguments</code>列表，如图<em class="italic">图 9.6 </em>所示:</li>
+			</ol>
+			<div><div><img src="img/B16777_09_006.jpg" alt="Figure 9.6 – Demystifying the best_run.get_details()['runDefinition']['arguments'] code&#13;&#10;" width="558" height="342"/>
+				</div>
+			</div>
+			<p class="figure-caption">图 9.6–揭开 best _ run . get _ details()[' run definition '][' arguments ']代码的神秘面纱</p>
+			<p>在本节中，您看到了如何运行一个<strong class="bold">超参数调整</strong>过程来为您的模型的<strong class="bold">超参数</strong>找到最佳值。在下一节中，您将看到如何通过使用提前终止策略来优化搜索最佳价值的时间。</p>
+			<h2 id="_idParaDest-132"><a id="_idTextAnchor140"/>使用提前终止政策</h2>
+			<p><code>HyperDriveConfig</code>构造函数的<a id="_idIndexMarker676"/>参数之一是<code>policy</code>参数。该参数接受一个<code>EarlyTerminationPolicy</code>对象，该对象定义了可以提前终止运行的策略。默认情况下，这个参数有一个<code>None</code>值，这意味着将使用<code>NoTerminationPolicy</code>类，允许每次运行执行到完成。</p>
+			<p>为了能够使用提前终止策略，您的脚本必须在每次运行期间执行多次迭代。</p>
+			<p>在<strong class="bold">文件</strong>视图中，添加一个名为<strong class="bold">离职-政策-培训</strong>的文件夹，并在其中添加一个<strong class="bold"> training.py </strong>文件，如图<em class="italic">图 9.7 </em>所示:</p>
+			<div><div><img src="img/B16777_09_007.jpg" alt="Figure 9.7 – Adding a training script that performs multiple epochs&#13;&#10;" width="1650" height="905"/>
+				</div>
+			</div>
+			<p class="figure-caption">图 9.7–添加执行多个时期的训练脚本</p>
+			<p>在培训脚本中添加以下代码:</p>
+			<pre>from azureml.core.run import Run
+import argparse
+import time
+parser = argparse.ArgumentParser()
+parser.add_argument("--a", type=int, dest="a", help="The alpha parameter")
+parser.add_argument("--b", type=int, dest="b", help="The beta parameter")
+args = parser.parse_args()
+if (args.a &gt; 2):
+    args.a = 0
+run = Run.get_context()
+def fake_train(run, a, b):
+    time.sleep(5)
+    metric = a + b
+    run.log("fake_metric", metric)
+for epoch in range(20):
+    fake_train(run, args.a * epoch, args.b)</pre>
+			<p><a id="_idIndexMarker677"/>脚本获得两个参数<code>a</code>和<code>b</code>，然后调用<code>fake_train</code>方法 20 次。在数据科学文献中，人们将这 20 次称为 20 个<strong class="bold">时期</strong>，这些<a id="_idIndexMarker678"/>是整个训练数据集的训练周期。</p>
+			<p>在每个历元中，<code>a</code>参数乘以迭代次数，迭代次数是从<em class="italic"> 0 </em>一直到<em class="italic"> 19 </em>的整数值，调用<code>fake_train</code>方法。<code>fake_train</code>方法休眠 5 秒钟以模拟训练过程，然后将修改后的<code>a</code>值添加到<code>b</code>参数中。结果记录在<code>fake_metric</code>指标中。</p>
+			<p>此外，在<em class="italic">的第 8 行</em>中，代码检查传递给脚本的<code>a</code>参数。如果大于<em class="italic"> 2 </em>，则变为值<em class="italic"> 0 </em>。这意味着，当<code>a</code>值增加到值<em class="italic"> 2 </em>时，您正在训练的假模型将表现得更好，然后其性能将下降，如图<em class="italic">图 9.8 </em>所示。</p>
+			<p>注意，您不需要读取任何数据集，因此，您不需要引用<code>Workspace</code>。这就是为什么上面代码中的<em class="italic">第 10 行</em>不需要检查这是否是一个<code>_OfflineRun</code>对象，就像你在<a href="B16777_08_Final_VK_ePub.xhtml#_idTextAnchor117"> <em class="italic">第 8 章</em> </a>、<em class="italic">试验 Python 代码</em>中的<em class="italic">移动代码 t<a id="_idTextAnchor141"/>o Python 脚本文件</em>一节所做的那样。</p>
+			<p>如果您要运行<code>HyperDriveConfig</code>，对在<em class="italic"> 1 </em>和<em class="italic"> 4 </em>之间的所有值进行网格搜索，以获得各时期的<code>fake_metric</code>演变。在图的右侧<a id="_idIndexMarker679"/>上，您可以看到<code>fake_metric</code>如何受到<code>a</code>和<code>b</code>T5 的各种值的影响，其性能优于使用<code>a</code>参数<em class="italic"> 3 </em>和<em class="italic"> 4 </em>训练的模型，关于<code>fake_metric</code>:</p>
+			<div><div><img src="img/B16777_09_008.jpg" alt="Figure 9.8 – Hyperparameter tuning without early termination policy&#13;&#10;" width="1627" height="503"/>
+				</div>
+			</div>
+			<p class="figure-caption">图 9.8–无提前终止策略的超参数调整</p>
+			<p>理想情况下，您希望减少等待所有运行完成的时间。<code>EarlyTerminationPolicy</code>允许您监控正在运行的作业，如果与其他作业相比，它们的性能很差，请提前取消它们。产生的输出将类似于图 9.9 中的输出，其中您可以看到一些作业在到达第二十个报告间隔之前被终止(该图从 0 开始计数)，从而节省了时间和计算资源:</p>
+			<div><div><img src="img/B16777_09_009.jpg" alt="Figure 9.9 – Hyperparameter tuning with aggressive early termination policy&#13;&#10;" width="1650" height="577"/>
+				</div>
+			</div>
+			<p class="figure-caption">图 9.9–积极提前终止策略下的超参数调整</p>
+			<p>AzureML SDK 为<a id="_idIndexMarker680"/>提供了一些内置的<code>EarlyTerminationPolicy</code>实现，位于<code>azureml.train.hyperdrive</code>模块中:</p>
+			<ul>
+				<li><code>NoTerminationPolicy</code>:这个<a id="_idIndexMarker681"/>是允许所有运行完成的默认停止策略。</li>
+				<li><code>MedianStoppingPolicy</code>:<a id="_idIndexMarker682"/>中位数停止策略计算所有运行的运行平均值。然后，它会取消那些最佳性能比运行平均值的中值差的运行。您可以将此策略视为将每次运行的性能与之前运行的平均性能进行比较。这个策略的好处在于，它考虑了到目前为止发生的所有运行，而不仅仅是将当前运行与到目前为止的最佳运行进行比较。该特征允许中间停止策略避免陷入局部最优值。</li>
+				<li><code>BanditPolicy</code>:<a id="_idIndexMarker683"/>bandit 策略计算当前运行和最佳运行之间的距离，然后基于一些松弛标准终止它。您可以定义最佳运行的绝对距离(<code>slack_amount</code>参数)或最大允许比率(<code>slack_factor</code>参数)。</li>
+				<li><code>TruncationSelectionPolicy</code>:<a id="_idIndexMarker684"/>截断选择策略是最激进的策略，它取消了在主要度量上性能排名最低的运行的一定百分比(<code>truncation_percentage</code>参数)。当对相对年轻的运行进行排序时，在早期的迭代中，该策略将它们与较老的运行的同等迭代性能<a id="_idIndexMarker685"/>进行比较。因此，该策略通过考虑随着训练时间的推移模型性能的提高来努力实现运行排序的公平性。</li>
+			</ul>
+			<p>所有策略都有两个可选参数:</p>
+			<ul>
+				<li><code>evaluation_interva</code> l:应用策略的<a id="_idIndexMarker686"/>频率。</li>
+				<li><code>delay_evaluation</code>:此<a id="_idIndexMarker687"/>将第一个策略评估延迟指定的时间间隔，为年轻运行提供达到成熟状态的时间。</li>
+			</ul>
+			<p>让我们使用最推荐的策略对您在上面创建的脚本进行超参数调优，<code>MedianStoppingPolicy</code>:</p>
+			<ol>
+				<li value="1">转到将在超参数调整过程中使用的<code>ScriptRunConfig</code>对象。</li>
+				<li>In a new cell, add <a id="_idIndexMarker688"/>the following code:<pre>from azureml.train.hyperdrive import (
+    GridParameterSampling,    
+    choice,
+    MedianStoppingPolicy,
+    HyperDriveConfig,
+    PrimaryMetricGoal
+)
+param_sampling = GridParameterSampling(
+    {
+        "a": choice(1, 2, 3, 4),
+        "b": choice(1, 2, 3, 4),
+    }
+)
+early_termination_policy = MedianStoppingPolicy(
+    evaluation_interval=1, delay_evaluation=5
+)
+hd_config = HyperDriveConfig(
+    policy=early_termination_policy,
+    run_config=script,
+    hyperparameter_sampling=param_sampling,
+    primary_metric_name="fake_metric",
+    primary_metric_goal=PrimaryMetricGoal.MAXIMIZE,
+    max_total_runs=50,
+    max_concurrent_runs=4
+)</pre><p>这个<code>HyperDriveConfig</code>对象使用<code>MedianStoppingPolicy</code>作为它的策略<a id="_idIndexMarker689"/>参数来评估第一次<em class="italic"> 5 次</em>迭代后的所有运行，并将每次迭代的结果与运行平均值的中值进行比较。</p></li>
+				<li>In a new cell, add the following code to start the execution of the <code>HyperDriveConfig</code> object you defined in <em class="italic">step 2</em>:<pre>experiment = Experiment(ws, "chapter09-hyperdrive")
+hyperdrive_run = experiment.submit(hd_config)
+hyperdrive_run.wait_for_completion(show_output=True)</pre><p><em class="italic">图 9.10 </em>显示了这次<code>HyperDriveRun</code>运行的<a id="_idIndexMarker690"/>结果，16 个任务中只有 8 个提前终止:</p></li>
+			</ol>
+			<div><div><img src="img/B16777_09_010.jpg" alt="Figure 9.10 – Hyperparameter tuning with median stopping early termination policy&#13;&#10;" width="1284" height="370"/>
+				</div>
+			</div>
+			<p class="figure-caption">图 9.10–采用中位数停止提前终止策略的超参数调整</p>
+			<p class="callout-heading">重要说明</p>
+			<p class="callout">在上面的代码中，<code>max_total_runs</code>参数的值为 50。这是可能发生的子运行数量的上限。在本例中，您只有 16 种组合。这意味着实验将只运行 16 次，然后它将停止，因为整个搜索区域已经被搜索。如果您想让<code>max_total_runs</code>参数生效，您应该指定一个小于 16 的值。</p>
+			<p>到目前为止，您已经看到了如何根据现有的数据优化特定的模型。在下一节中，您将看到如何通过 SDK 搜索运行 AutoML 实验的最佳模型，类似于您在<a href="B16777_05_Final_VK_ePub.xhtml#_idTextAnchor072"> <em class="italic">第 5 章</em></a><em class="italic">中所做的，通过 studio 用户界面让机器进行模型训练</em>。</p>
+			<h1 id="_idParaDest-133"><a id="_idTextAnchor142"/>用代码运行 AutoML 实验</h1>
+			<p>到目前为止，在本章的<a id="_idIndexMarker692"/>中，您正在微调一个<code>LassoLars</code>模型，执行一个超参数调整过程来根据训练数据确定<code>alpha</code>参数的最佳值。在本节中，您将使用 AzureML SDK 中的<strong class="bold"> AutoML </strong>为您的训练数据集自动选择数据预处理、模型和超参数设置的最佳组合。</p>
+			<p>配置<a id="_idIndexMarker693"/>一个<code>AutoMLConfig</code>对象。您需要定义您想要投资的<strong class="bold">任务类型</strong>、<strong class="bold">指标</strong>、<strong class="bold">培训数据</strong>和<strong class="bold">计算预算</strong>。该过程的输出是一个模型列表，您可以从中选择最佳运行以及与该运行相关的最佳模型，如图<em class="italic">图 9.11 </em>所示:</p>
+			<div><div><img src="img/B16777_09_011.jpg" alt="Figure 9.11 – AutoML process&#13;&#10;" width="1650" height="1041"/>
+				</div>
+			</div>
+			<p class="figure-caption">图 9.11–AutoML 流程</p>
+			<p>根据<a id="_idIndexMarker694"/>你试图建模的问题类型，你必须选择<code>task</code>参数，选择<code>classification</code>、<code>regression</code>或<code>forecasting</code>，如图<em class="italic">图 9.12 </em>所示:</p>
+			<div><div><img src="img/B16777_09_012.jpg" alt="Figure 9.12 – AutoML task types, algorithms, and supported metrics&#13;&#10;" width="938" height="834"/>
+				</div>
+			</div>
+			<p class="figure-caption">图 9.12–AutoML 任务类型、算法和支持的指标</p>
+			<p><em class="italic">图 9.12 </em>只显示了 AzureML SDK 支持的算法的子集。<code>azureml.train.automl.constants.SupportedModels</code>包包含了<code>classification</code>、<code>regression</code>和<code>forecasting</code>类，它们列出了所有<a id="_idIndexMarker695"/>支持的算法作为属性。因为预测只是回归的一个更专门化的版本，所以回归的所有算法都可以使用。AutoML 支持一些额外的、更专业的预测算法，比如非常流行的 ARIMA 技术或脸书的预言家算法。</p>
+			<p><code>primary_metric</code>参数决定了优化模型训练过程中使用的指标。回归和预测的指标是相同的。分类算法使用不同的度量标准，如图 9.12 所示。</p>
+			<p>训练<a id="_idIndexMarker698"/>数据可以在<code>training_data</code>参数中提供，或者以<a id="_idIndexMarker699"/>熊猫<code>Dataset</code>对象的格式。培训数据以表格形式显示，包括<code>target</code>栏。您定义想要预测的列的名称，传递<code>label_column_name</code>参数。默认情况下，AutoML 将使用该数据集对生成的模型进行定型和验证。如果数据集超过 20，000 行，数据集将被拆分，保留 10%用于验证。如果数据集小于 20，000 行，则使用交叉验证。如果您想指定从<code>training_data</code>创建多少个折叠，您可以使用<code>n_cross_validations</code>参数。另一种方法是提供<code>validation_size</code>参数，它是训练数据的百分比(值<em class="italic"> 0.0 </em>到<em class="italic"> 1.0 </em>),用作验证。如果您想要手动将数据分割成训练和验证数据，那么您可以将您的验证数据分配给<code>validation_data</code>参数，就像您将在本节后面所做的那样。</p>
+			<p><strong class="bold">计算预算</strong>是你愿意花在从你的训练数据中寻找最佳机器学习模型的<a id="_idIndexMarker700"/>金额。它由三部分组成:</p>
+			<ul>
+				<li><strong class="bold">计算集群的节点类型</strong>:您的计算集群类型<a id="_idIndexMarker701"/>的功能越多，运行 AutoML 作业时每秒的成本就越大。这是您在创建计算群集时配置的设置，除非您创建新的群集，否则此时无法更改。</li>
+				<li><code>max_concurrent_iterations</code>参数<a id="_idIndexMarker702"/>使用计算集群拥有的最大节点数。这将允许您运行并行迭代，但是增加了成本。默认情况下，该参数为<em class="italic"> 1 </em>，一次只允许一次迭代。</li>
+				<li><code>experiment_timeout_hours</code>参数或者您可以定义<code>experiment_exit_score</code>参数，该参数定义要达到的分数，然后停止进一步探索。限制计算支出的另一种方法是限制要探索的不同算法和参数组合的数量。默认情况下，AutoML 将探索 1000 种组合，您可以通过指定<code>iterations</code>参数来限制它。</li>
+			</ul>
+			<p>既然你<a id="_idIndexMarker704"/>已经探索了你需要在<code>AutoMLConfig</code>对象中配置的所有选项，导航到你的<code>chapter09.ipynb</code>笔记本，添加一个新的单元格，并键入以下代码:</p>
+			<pre>from azureml.core import Workspace, Dataset
+from azureml.train.automl import AutoMLConfig
+ws = Workspace.from_config()
+compute_target = ws.compute_targets["cpu-sm-cluster"]
+diabetes_dataset = Dataset.get_by_name(workspace=ws, name='diabetes')
+train_ds,validate_ds = diabetes_dataset.random_split(percentage=0.8, seed=1337)
+experiment_config = AutoMLConfig(
+    task = "regression",
+    primary_metric = 'normalized_root_mean_squared_error',
+    training_data = train_ds,
+    label_column_name = "target",
+    validation_data = validate_ds,
+    compute_target = compute_target,
+    experiment_timeout_hours = 0.25,
+    iterations = 4
+)</pre>
+			<p>在这段代码中，您获得了对工作区、您的计算集群和<code>diabetes</code>数据集的引用，您将数据集分为训练数据集和验证数据集。然后创建一个<code>AutoMLConfig</code>对象，由<a id="_idIndexMarker705"/>来处理<code>target</code>列。您还可以指定<code>validation_data</code>参数。</p>
+			<p class="callout-heading">重要说明</p>
+			<p class="callout">您可以在<code>training_data</code>参数中传递整个数据集并跳过<code>validation_data</code>参数，而不是分割数据集。由于数据集仅包含 442 行，AutoML 会将训练数据集拆分为 10 个折叠，这将用于执行交叉验证技术。</p>
+			<p>然后，您定义用于该训练的<code>compute_target</code>实验，并通过允许实验运行一刻钟(<code>experiment_timeout_hours</code>参数)，即 15 分钟，并仅探索 4 个模型和参数组合(<code>iterations</code>参数)，来确定您的计算预算。在你的情况下，<code>iterations</code>参数可能是终止<strong class="bold"> AutoML </strong>实验的原因。</p>
+			<p class="callout-heading">重要说明</p>
+			<p class="callout">对于预测，除了之前定义的回归参数之外，您还需要指定<code>forecasting_parameters</code>。<code>ForecastingParameters</code>类有以下常用参数:</p>
+			<p class="callout">1) <code>time_column_name</code>:表示时间序列的时间维度的列。</p>
+			<p class="callout">2) <code>max_horizon</code>:以时间序列频率为单位的期望预测范围。这是默认的<em class="italic"> 1 </em>，意味着你的模型将能够预测未来的单个时隙。该时间段是数据集使用的频率。如果您的数据集每小时有 1 行，并且您想要预测 7 天，<code>max_horizon</code>需要是 7 天 x 每天 24 个时段= 168。</p>
+			<p>到目前为止，您已经创建了<code>experiment_config</code>，它包含了您将要执行的<strong class="bold"> AutoML </strong>实验的配置。添加一个新单元，并将以下代码添加到<a id="_idIndexMarker708"/>中，启动 AutoML 培训流程:</p>
+			<pre>from azureml.core.experiment import Experiment
+my_experiment = Experiment(ws, 'chapter09-automl-experiment')
+run = my_experiment.submit(experiment_config, 
+                           show_output=True)</pre>
+			<p><code>run</code>变量包含对使用<code>submit</code>方法创建的<code>AutoMLRun</code>对象的引用。几分钟后，该过程将完成。要获得当前的最佳运行和最佳模型，您可以使用<code>get_output()</code>方法，如下面的代码片段所示:</p>
+			<pre>best_run, best_model = run.get_output()</pre>
+			<p>或者，您可以使用相应的<code>Tuple</code>索引直接访问最佳运行和最佳模型，如下面的代码片段所示:</p>
+			<pre>best_run = run.get_output()[0]
+best_model = run.get_output()[1]</pre>
+			<p>在每一个自动化机器学习实验中，你的数据都会被自动缩放或归一化，以帮助算法表现良好。这种数据转换正在成为训练模型的一部分。这意味着您的数据首先通过数据转换器，然后使用您无法直接看到的新要素名称对模型进行训练。你会在<a href="B16777_10_Final_VK_ePub.xhtml#_idTextAnchor147"> <em class="italic">第十章</em></a><em class="italic">了解模型结果</em>中看到<code>sklearn.composeColumnTransformer</code>的例子。要查看嵌入在 AutoML 模型中的实际步骤，您可以使用生产模型的<code>steps</code>属性:</p>
+			<pre>best_model.steps</pre>
+			<p>第一步被命名为<code>datatransformer</code>，包含用于我们的<code>diabetes</code>数据集的估算值。这个步骤被命名为<code>datatransformer</code>,用于回归和分类任务。对于预测任务，这个步骤被命名为<code>timeseriestransformer</code>，它包含额外的基于日期的转换。要获得一个<a id="_idIndexMarker709"/>转换和工程特性名称的列表，您可以使用下面的代码片段:</p>
+			<pre>print(best_model.named_steps['datatransformer'] \
+                 .get_featurization_summary())
+feature_names=best_model.named_steps['datatransformer'] \
+                 .get_engineered_feature_names()
+print("Engineered feature names:")
+print(feature_names)</pre>
+			<p>在本节中，您使用<strong class="bold"> AutoML </strong>搜索了针对糖尿病回归问题的最佳模型。这总结了在给定特定数据集的情况下，可以优化机器学习模型的最常用方法。</p>
+			<h1 id="_idParaDest-134"><a id="_idTextAnchor144"/>总结</h1>
+			<p>在本章中，您探索了优化特定模型以针对数据集执行良好操作的最常用方法，以及如何实现模型选择过程的自动化。您首先执行并行化的<code>HyperDriveConfig</code>类，以优化针对<code>diabetes</code>数据集训练的<code>LassoLars</code>模型的<code>alpha</code>参数。然后，您自动化了模型选择，使用 AutoML 来检测预测<code>diabetes</code>数据集的<code>target</code>列的算法和参数的最佳组合。</p>
+			<p>在下一章中，你将在这些知识的基础上学习如何使用 AzureML SDK 来解释模型结果。</p>
+			<h1 id="_idParaDest-135"><a id="_idTextAnchor145"/>问题</h1>
+			<ol>
+				<li value="1">You want to get the best model trained by an <code>model = run.get_output()[0]</code><p>b.<code>model = run.get_output()[1]</code></p><p>c.<code>model = run.get_outputs()[0]</code></p><p>d.<code>model = run.get_outputs()[1]</code></p></li>
+				<li>You want to run a forecasting <code>ForecastingParameters</code> class?<p>a.<em class="italic"> forecast_horizon = 5 * 1 </em></p><p>b.<em class="italic"> forecast_horizon = 5 * 24 </em></p><p>c.<em class="italic"> forecast_horizon = 5 * 12 </em></p></li>
+			</ol>
+			<h1 id="_idParaDest-136"><a id="_idTextAnchor146"/>延伸阅读</h1>
+			<p>本节提供了一个有用的 web 资源列表，可以帮助您增加 AzureML SDK 和本章中使用的各种代码片段的知识:</p>
+			<ul>
+				<li><code>HyperDriveConfig</code>类:<a href="https://docs.microsoft.com/en-us/python/api/azureml-train-core/azureml.train.hyperdrive.hyperdriveconfig?view=azure-ml-py">https://docs . Microsoft . com/en-us/python/API/azure ml-train-core/azure ml . train . hyperdrive . hyperdrive config？view=azure-ml-py </a></li>
+				<li><code>AutoMLConfig</code>类:<a href="https://docs.microsoft.com/en-us/Python/api/azureml-train-automl-client/azureml.train.automl.automlconfig.automlconfig">https://docs . Microsoft . com/en-us/Python/API/azure ml-train-automl-client/azure ml . train . automl . automlconfig . automlconfig</a></li>
+				<li>自动化机器学习中的数据特征:<a href="https://docs.microsoft.com/en-us/azure/machine-learning/how-to-configure-auto-features">https://docs . Microsoft . com/en-us/azure/machine-learning/how-to-configure-auto-features</a></li>
+				<li>自动训练预测模型:<a href="https://docs.microsoft.com/en-us/azure/machine-learning/how-to-auto-train-forecast">https://docs . Microsoft . com/en-us/azure/machine-learning/how-to-auto-train-forecast</a></li>
+				<li>对从 scikit-learn 库中加载的糖尿病数据集的引用:<a href="https://scikit-learn.org/stable/modules/generated/sklearn.datasets.load_diabetes.html">https://sci kit-learn . org/stable/modules/generated/sk learn . datasets . load _ diabetes . html</a></li>
+			</ul>
+		</div>
+	</div>
+</body></html>

@@ -1,0 +1,723 @@
+<html><head/><body>
+
+
+
+
+
+	
+
+		<title>B15551_10_Final_NM_ePUB</title>
+
+		
+
+	
+
+	
+
+		<div><h1 id="_idParaDest-215"><em class="italic"> <a id="_idTextAnchor230"/>第十章</em> : XGBoost 模型部署</h1>
+
+			<p>在 XGBoost 的最后一章中，您将把所有的东西放在一起，开发新的技术来构建一个健壮的机器学习模型，这个模型是行业现成的。为行业部署模型与为研究和竞争构建模型略有不同。在工业中，自动化很重要，因为新数据会频繁到达。更多地强调程序，而不是强调通过调整机器学习模型来获得微小的百分点。</p>
+
+			<p>具体来说，在这一章中，你将获得关于<strong class="bold">一键编码</strong>和<strong class="bold">稀疏矩阵</strong>的重要经验。此外，您将实现并定制 scikit-learn transformers，以自动化机器学习管道，对混合了<strong class="bold">分类</strong>和<strong class="bold">数字</strong>列的数据进行预测。在本章结束时，你的机器学习管道将为任何传入的数据做好准备。</p>
+
+			<p>在本章中，我们将讨论以下主题:</p>
+
+			<ul>
+
+				<li><p>编码混合数据</p></li>
+
+				<li><p>定制 sci kit-学习变压器</p></li>
+
+				<li><p>最终确定 XGBoost 模型</p></li>
+
+				<li><p>构建机器学习管道</p></li>
+
+			</ul>
+
+			<h1 id="_idParaDest-216"><a id="_idTextAnchor231"/>技术要求</h1>
+
+			<p>本章的代码可以在<a href="https://github.com/PacktPublishing/Hands-On-Gradient-Boosting-with-XGBoost-and-Scikit-learn/tree/master/Chapter10">https://github . com/packt publishing/Hands-On-Gradient-Boosting-with-XGBoost-and-Scikit-learn/tree/master/chapter 10</a>找到。</p>
+
+			<h1 id="_idParaDest-217"><a id="_idTextAnchor232"/>编码混合数据</h1>
+
+			<p>想象一下，你在一家教育技术公司<a id="_idIndexMarker629"/>工作，你的工作是预测学生的成绩，以提供旨在弥合技术技能差距的服务。第一步是将包含学生成绩的数据加载到<code>pandas</code>中。</p>
+
+			<h2 id="_idParaDest-218"><a id="_idTextAnchor233"/>加载数据</h2>
+
+			<p>由贵公司提供的<a id="_idIndexMarker630"/>学生成绩数据集可以通过加载已经为您导入的<code>student-por.csv</code>文件来访问。</p>
+
+			<p>从导入<code>pandas</code>和消除警告开始。然后，下载数据集并查看前五行:</p>
+
+			<pre>import pandas as pd
+import warnings
+warnings.filterwarnings('ignore')
+df = pd.read_csv('student-por.csv')
+df.head()</pre>
+
+			<p>以下是预期的输出:</p>
+
+			<div><div><img src="img/B15551_10_01.jpg" alt="Figure 10.1 – The Student Performance dataset as is"/>
+
+				</div>
+
+			</div>
+
+			<p class="figure-caption">图 10.1–学生表现数据集</p>
+
+			<p>欢迎来到工业世界，数据并不总是像预期的那样出现。</p>
+
+			<p>建议查看 CSV 文件。这可以在 Jupyter 笔记本中通过找到本章的文件夹并点击<code>student-por.csv</code>文件来完成。</p>
+
+			<p>您应该看到以下内容:</p>
+
+			<div><div><img src="img/B15551_10_02.jpg" alt="Figure 10.2 – The Student Performance CSV file"/>
+
+				</div>
+
+			</div>
+
+			<p class="figure-caption">图 10.2–学生成绩 CSV 文件</p>
+
+			<p>正如您在前面的图中看到的，<a id="_idIndexMarker631"/>数据由分号分隔。CSV 代表<code>pandas</code>的<a id="_idIndexMarker632"/>带有一个<code>sep</code>参数，其中<a id="_idIndexMarker633"/>代表<strong class="bold">分隔符</strong>，可以设置为分号，(<em class="italic">)；</em>)，如下:</p>
+
+			<pre>df = pd.read_csv('student-por.csv', sep=';')
+df.head()</pre>
+
+			<p>以下是预期的输出:</p>
+
+			<div><div><img src="img/B15551_10_03.jpg" alt="Figure 10.3 – The Student Performance dataset "/>
+
+				</div>
+
+			</div>
+
+			<p class="figure-caption">图 10.3–学生表现数据集</p>
+
+			<p>既然 DataFrame 看起来像预期的那样，混合了类别值和数值的<a id="_idIndexMarker634"/> <a id="_idIndexMarker635"/>，我们必须清除<strong class="bold">空值</strong>。</p>
+
+			<h2 id="_idParaDest-219"><a id="_idTextAnchor234"/>清除空值</h2>
+
+			<p>您可以通过调用<code>df.insull()</code>上的<code>.sum()</code>方法来查看空值<a id="_idIndexMarker636"/>的所有列。以下是调查结果的摘录:</p>
+
+			<pre>df.isnull().sum()
+school        0
+sex           1
+age           1
+address       0
+…
+health        0
+absences      0
+G1            0
+G2            0
+G3            0
+dtype: int64</pre>
+
+			<p>您可以使用条件符号查看这些列的行，方法是将<code>df.isna().any(axis=1)</code>放在带有<code>df</code>的括号内:</p>
+
+			<pre>df[df.isna().any(axis=1)]</pre>
+
+			<p>以下是预期的输出:</p>
+
+			<div><div><img src="img/B15551_10_04.jpg" alt="Figure 10.4 – The Student Performance null data"/>
+
+				</div>
+
+			</div>
+
+			<p class="figure-caption">图 10.4-学生成绩空数据</p>
+
+			<p>最好是看到中间的空列，Jupyter 根据<a id="_idIndexMarker637"/>列的数量默认删除了空列。这很容易通过将<code>max columns</code>设置为<code>None</code>来纠正，如下所示:</p>
+
+			<pre>pd.options.display.max_columns = None</pre>
+
+			<p>现在，再次运行代码会显示所有列:</p>
+
+			<pre>df[df.isna().any(axis=1)]</pre>
+
+			<p>以下是预期输出的摘录:</p>
+
+			<div><div><img src="img/B15551_10_05.jpg" alt="Figure 10.5 – Null data from all rows of the Student Performance dataset"/>
+
+				</div>
+
+			</div>
+
+			<p class="figure-caption">图 10.5-学生成绩数据集中所有行的空数据</p>
+
+			<p>如您所见，现在显示了所有列，包括<code>'guardian'</code>下隐藏的空值。</p>
+
+			<p>数值空值可以设置为-999.0，或者其他值，XGBoost 将使用<a href="B15551_05_Final_NM_ePUB.xhtml#_idTextAnchor117"> <em class="italic">第 5 章</em> </a>，<em class="italic"> XGBoost 发布</em>中介绍的<code>missing</code>超参数为您找到最佳替代值。</p>
+
+			<p>下面是用<code>-999.0</code>填充<code>'age'</code>列的代码:</p>
+
+			<pre>df['age'].fillna(-999.0)</pre>
+
+			<p>接下来，分类列可以由模式填充。模式是列中最常见的情况。但是，仅当空值的数量很大时，使用模式填充分类列可能会扭曲结果分布。只有两个空值，所以我们的分布不会受到影响。另一个选项包括用'<code>unknown</code>'字符串替换分类空值，这可能在一次性编码后成为它自己的列。请注意，XGBoost 需要数字输入，因此从 2020 年起，<code>missing</code>超参数不能直接应用于分类列。</p>
+
+			<p>以下代码将<code>'sex'</code>和<code>'guardian'</code>分类列转换为<code>mode</code>:</p>
+
+			<pre>df['sex'] = df['sex'].fillna(df['sex'].mode())
+df['guardian'] = df['guardian'].fillna(df['guardian'].mode())</pre>
+
+			<p>由于我们的空值在前两行<a id="_idIndexMarker638"/>中，我们可以发现它们已经使用<code>df.head()</code>进行了更改:</p>
+
+			<pre>df.head()</pre>
+
+			<p>以下是预期的输出:</p>
+
+			<div><div><img src="img/B15551_10_06.jpg" alt="Figure 10.6 – The Student Performance dataset with the null values removed (first five rows only)"/>
+
+				</div>
+
+			</div>
+
+			<p class="figure-caption">图 10.6–删除空值后的学生成绩数据集(仅前五行)</p>
+
+			<p>空值已经如预期的那样全部被清除。</p>
+
+			<p>接下来，我们将使用 one-hot 编码将所有分类列转换为数字列。</p>
+
+			<h2 id="_idParaDest-220"><a id="_idTextAnchor235"/>一键编码</h2>
+
+			<p>之前，我们使用<code>pd.get_dummies</code>将所有分类变量<a id="_idIndexMarker639"/>转换为<code>0</code>和<code>1</code>的数值<a id="_idIndexMarker640"/>，其中<code>0</code>表示不存在，<code>1</code>表示存在。虽然这种方法是可以接受的，但是它有一些缺点。</p>
+
+			<p>第一个缺点是<code>pd.get_dummies</code>的计算开销很大，正如你在前面章节中等待代码运行时发现的那样。第二个缺点是<code>pd.get_dummies</code>不能很好地转化为 scikit-learn 的管道，这个概念我们将在下一节探讨。</p>
+
+			<p>scikit-learn 的<code>OneHotEncoder</code>是<code>pd.get_dummies</code>的一个很好的替代品。像<code>pd.get_dummies</code>一样，一键编码将所有分类值转换为<code>0</code>和<code>1</code>，其中<code>0</code>表示不存在，<code>1</code>表示存在，但与<code>pd.get_dummies</code>不同，它的计算开销并不大。<code>OneHotEncoder</code>使用稀疏矩阵代替密集矩阵，节省空间和时间。</p>
+
+			<p>稀疏矩阵<a id="_idIndexMarker641"/>通过只存储值不包括 0 的数据来节省空间。通过使用更少的比特，同样数量的信息得以保存。</p>
+
+			<p>此外，<code>OneHotEncoder</code>是一个 scikit-learn 转换器，这意味着它是专门设计用于机器学习管道的。</p>
+
+			<p>在 scikit-learn 的过去版本中，<code>OneHotEncoder</code>只接受数字输入。在这种情况下，使用<code>LabelEncoder</code>进行中间步骤，首先将所有分类列转换为<a id="_idIndexMarker642"/>数字列。</p>
+
+			<p>要在特定列上使用<code>OneHotEncoder</code>,您可以使用以下步骤:</p>
+
+			<ol>
+
+				<li value="1"><p>将<code>dtype</code>对象的所有分类列转换成一个列表:</p><pre>categorical_columns = df.columns[df.dtypes==object].tolist()</pre></li>
+
+				<li><p>导入并初始化<code>OneHotEncoder</code>:</p><pre>from sklearn.preprocessing import OneHotEncoder
+ohe = OneHotEncoder()</pre></li>
+
+				<li><p>在列上使用<code>fit_transform</code>方法:</p><pre>hot = ohe.fit_transform(df[categorical_columns])</pre></li>
+
+				<li><p><code>0</code>或<code>1</code>。</p></li>
+
+				<li><p>如果你想<a id="_idIndexMarker643"/>看到<code>hot</code>稀疏矩阵的实际样子，你可以<a id="_idIndexMarker644"/>打印出来如下:</p><pre>print(hot)</pre><p>以下是调查结果的摘录:</p><pre>  (0, 0)		1.0
+  (0, 2)		1.0
+  (0, 5)		1.0
+  (0, 6)		1.0
+  (0, 8)		1.0
+…  
+<code>0</code> have been skipped. For instance, the 0th row and the 1st column, denoted by (<code>0, 1</code>), has a value of <code>0.0</code> in the dense matrix, but it's skipped over in the one-hot matrix.</pre></li>
+
+			</ol>
+
+			<p>如果你想要更多关于<a id="_idIndexMarker645"/>稀疏矩阵的信息，只需输入下面的<a id="_idIndexMarker646"/>变量:</p>
+
+			<pre>hot</pre>
+
+			<p>结果如下:</p>
+
+			<pre>&lt;649x43 sparse matrix of type '&lt;class 'numpy.float64'&gt;'
+	with 11033 stored elements in Compressed Sparse Row format&gt;</pre>
+
+			<p>这告诉我们矩阵是由<code>43</code>乘以<code>649</code>，但是只有<code>11033</code>的值被存储，节省了大量的空间。请注意，对于有许多零的文本数据，稀疏矩阵非常常见。</p>
+
+			<h2 id="_idParaDest-221"><a id="_idTextAnchor236"/>组合独热编码矩阵和数字列</h2>
+
+			<p>既然我们已经有了一个<a id="_idIndexMarker647"/>一键编码的<a id="_idIndexMarker648"/>稀疏矩阵，我们必须将它与原始数据帧的数字列结合起来。</p>
+
+			<p>首先，让我们隔离数字列。这可以通过将<code>exclude=["object"]</code>参数作为<code>df.select_dtypes</code>的输入来完成，T1 选择特定类型的列，如下所示:</p>
+
+			<pre>cold_df = df.select_dtypes(exclude=["object"])
+cold_df.head()</pre>
+
+			<p>以下是预期的输出:</p>
+
+			<div><div><img src="img/B15551_10_08.jpg" alt="Figure 10.8 – The Student Performance dataset's numerical columns"/>
+
+				</div>
+
+			</div>
+
+			<p class="figure-caption">图 10.8–学生成绩数据集的数字列</p>
+
+			<p>这些是我们正在寻找的列。</p>
+
+			<p>对于这种大小的数据，我们有一个<a id="_idIndexMarker649"/>选择，即<a id="_idIndexMarker650"/>将稀疏矩阵转换为常规数据帧，如前面的屏幕截图所示，或者将该数据帧转换为稀疏矩阵。让我们追求后者，考虑到工业中的数据帧可能变得巨大，节省空间可能是有利的:</p>
+
+			<ol>
+
+				<li value="1"><p>要将<code>cold_df</code>数据帧转换为压缩的稀疏矩阵，从<code>scipy.sparse</code>导入<code>csr_matrix</code>并将数据帧放入其中，如下所示:</p><pre>from scipy.sparse import csr_matrix
+cold = csr_matrix(cold_df)</pre></li>
+
+				<li><p>最后，通过导入和使用<code>hstack</code>来堆叠热和冷两个矩阵，这水平地组合了稀疏矩阵:</p><pre>from scipy.sparse import hstack
+final_sparse_matrix = hstack((hot, cold))</pre></li>
+
+				<li><p>通过将稀疏矩阵转换为密集矩阵并照常显示数据帧，验证<code>final_sparse_matrix</code>是否按预期工作:</p><pre>final_df = pd.DataFrame(final_sparse_matrix.toarray())
+final_df.head()</pre><p>以下是预期的输出:</p></li>
+
+			</ol>
+
+			<div><div><img src="img/B15551_10_09.jpg" alt="Figure 10.9 – The DataFrame of the final sparse matrix"/>
+
+				</div>
+
+			</div>
+
+			<p class="figure-caption">图 10.9–最终稀疏矩阵的数据框架</p>
+
+			<p>输出向右移动到<a id="_idIndexMarker651"/>一起显示一位热码和数字列。</p>
+
+			<p>既然数据已经为机器学习做好了准备，让我们使用转换器和管道来自动化这个过程。</p>
+
+			<h1 id="_idParaDest-222"><a id="_idTextAnchor237"/>定制 scikit-学习变形金刚</h1>
+
+			<p>既然我们有了将数据帧转换成机器学习就绪的稀疏矩阵的<a id="_idIndexMarker653"/>过程，那么用转换器来概括该过程将是有利的，这样就可以很容易地为新数据的到来重复该过程。</p>
+
+			<p>Scikit-learn 转换器通过使用一种用于查找模型参数的<code>fit</code>方法和一种用于将这些参数应用于数据的<code>transform</code>方法，与机器学习算法一起工作。这些方法可以组合成一个单一的<code>fit_transform</code>方法，在一行代码中适应和转换数据。</p>
+
+			<p>当一起使用时，各种转换器，包括机器学习算法，可以在同一管道中一起工作，以便于使用。然后将数据放入管道中，对其进行拟合和转换，以获得所需的输出。</p>
+
+			<p>Scikit-learn 附带了许多优秀的转换器，比如分别用于标准化和规范化数据的<code>StandardScaler</code>和<code>Normalizer</code>，以及用于转换空值的<code>SimpleImputer</code>。但是，当数据包含分类列和数字列的混合时，就像这里的情况一样，您必须小心。在某些情况下，scikit-learn 选项可能不是自动化的最佳选项。在这种情况下，创建您自己的变形金刚来做您想做的事情是值得的。</p>
+
+			<h2 id="_idParaDest-223"><a id="_idTextAnchor238"/>定制变压器</h2>
+
+			<p>创建你自己的<a id="_idIndexMarker654"/>变形金刚的关键是使用 scikit-learn 的<code>TransformerMixin</code>作为你的超类。</p>
+
+			<p>下面是在 scikit-learn 中创建定制转换器的一般代码大纲:</p>
+
+			<pre>class YourClass(TransformerMixin):
+    def __init__(self):
+        None
+    def fit(self, X, y=None):
+        return self
+    def transform(self, X, y=None):
+        # insert code to transform X
+        return X</pre>
+
+			<p>如你所见，你不需要初始化任何东西，<code>fit</code>总是可以返回<code>self</code>。简单地说，您可以将所有用于转换数据的代码放在<code>transform</code>方法下。</p>
+
+			<p>现在您已经了解了定制的一般工作方式，让我们创建一个定制的转换器来处理不同类型的空值。</p>
+
+			<h3>自定义混合空值估算器</h3>
+
+			<p>让我们通过创建一个定制的混合空值估算器来看看这是如何工作的。这里，定制的原因是用不同的方法处理不同类型的列，以纠正空值。</p>
+
+			<p>以下是步骤:</p>
+
+			<ol>
+
+				<li value="1"><p>导入<code>TransformerMixin</code>并定义一个以<code>TransformerMixin</code>为超类的新类:</p><pre>from sklearn.base import TransformerMixin 
+class NullValueImputer(TransformerMixin):</pre></li>
+
+				<li><p>用<code>self</code>作为输入初始化类。如果这没什么用也没关系:</p><pre>def __init__(self):
+None</pre></li>
+
+				<li><p>创建一个以<code>self</code>和<code>X</code>为输入的<code>fit</code>方法，带<code>y=None</code>，返回<code>self</code>:</p><pre>def fit(self, X, y=None):
+return self</pre></li>
+
+				<li><p>创建一个<code>transform</code>方法，将<code>self</code>和<code>X</code>作为输入，使用<code>y=None</code>，通过返回一个新的<code>X</code>来转换数据，如下所示:</p><pre>def transform(self, X, y=None):</pre><p>我们需要根据列分别处理空值。</p><p>下面是根据列类型将 null 值<a id="_idIndexMarker656"/>转换为 mode 或<code>-999.0</code>的步骤:</p><p>a)通过将列转换为列表来循环遍历这些列:</p><pre>for column in X.columns.tolist():</pre><p>b)在循环中，通过检查哪些列属于<code>object</code>数据类型来访问字符串列:</p><pre>    if column in X.columns[X.dtypes==object].tolist():</pre><p>c)将字符串(<code>object</code>)列的空值转换为模式:</p><pre>        X[column] = X[column].fillna(X[column].mode())</pre><p>d)否则，用<code>-999.0</code>填充栏:</p><pre>    else:
+        X[column]=X[column].fillna(-999.0)
+      return X</pre></li>
+
+			</ol>
+
+			<p>在前面的代码中，您可能想知道为什么要使用<code>y=None</code>。原因是当在流水线中包括机器学习算法时，将需要<code>y</code>作为输入。通过将<code>y</code>设置为<code>None</code>，将仅按照预期对预测器列进行更改。</p>
+
+			<p>既然已经定义了定制的估算器，就可以通过对数据调用<code>fit_transform</code>方法来使用它。</p>
+
+			<p>让我们通过从 CSV 文件建立一个新的 DataFrame 来重置数据，并使用定制的<code>NullValueImputer</code>在一行代码<a id="_idIndexMarker657"/>中转换空值:</p>
+
+			<pre>df = pd.read_csv('student-por.csv', sep=';')
+nvi = NullValueImputer().fit_transform(df)
+nvi.head()</pre>
+
+			<p>以下是预期的输出:</p>
+
+			<div><div><img src="img/B15551_10_10.jpg" alt="Figure 10.10 – The Student Performance DataFrame after NullValueImputer()"/>
+
+				</div>
+
+			</div>
+
+			<p class="figure-caption">图 10.10-nullvalueinputr()后的学生成绩数据帧</p>
+
+			<p>如您所见，所有空值都已被清除。</p>
+
+			<p>接下来，让我们像以前一样将数据转换成一个一键编码的稀疏矩阵。</p>
+
+			<h3>一键编码混合数据</h3>
+
+			<p>我们将在这里将类似的步骤<a id="_idIndexMarker658"/>应用于上一节中的步骤，通过创建一个定制的转换器，在将分类列与数字列作为稀疏矩阵连接之前，对分类列进行一次性编码(对于这种大小的数据集，密集矩阵也是可以的):</p>
+
+			<ol>
+
+				<li value="1"><p>用<code>TransformerMixin</code>作为超类定义一个新类:</p><pre>class SparseMatrix(TransformerMixin):</pre></li>
+
+				<li><p>用<code>self</code>作为输入初始化类。如果这没什么用也没关系:</p><pre>def __init__(self):
+    		None</pre></li>
+
+				<li><p>创建一个将<code>self</code>和<code>X</code>作为输入并返回<code>self</code>的<code>fit</code>方法:</p><pre>def fit(self, X, y=None):
+    		return self</pre></li>
+
+				<li><p>创建一个<code>transform</code>方法，将<code>self</code>和<code>X</code>作为输入，转换数据，并返回一个新的<code>X</code>:</p><pre>def transform(self, X, y=None):</pre><p>下面是<a id="_idIndexMarker659"/>完成转换的步骤；首先只访问<code>object</code>类型的分类列，如下所示:</p><p>a)将分类列放入列表中:</p><pre>    		categorical_columns= X.columns[X.dtypes==object].tolist()</pre><p>b)初始化<code>OneHotEncoder</code>:</p><pre>    		ohe = OneHotEncoder() </pre><p>c)用<code>OneHotEncoder</code>转换分类列:</p><pre>hot = ohe.fit_transform(X[categorical_columns])</pre><p>d)仅通过排除字符串来创建数字列的数据框架:</p><pre>cold_df = X.select_dtypes(exclude=["object"])</pre><p>e)将数字数据帧转换成稀疏矩阵:</p><pre>        	cold = csr_matrix(cold_df)</pre><p>f)将两个稀疏矩阵合并成一个:</p><pre>         final_sparse_matrix = hstack((hot, cold))</pre><p>g)将其转换为<a id="_idIndexMarker660"/> a <strong class="bold">压缩稀疏行</strong> ( <strong class="bold"> CSR </strong>)矩阵以限制误差。请注意，XGBoost 需要 CSR 矩阵，这种转换可能会根据您的 XGBoost 版本自动进行:</p><pre>         final_csr_matrix = final_sparse_matrix.tocsr()
+         return final_csr_matrix</pre></li>
+
+				<li><p>现在我们可以通过在<code>SparseMatrix</code>上使用强大的<code>fit_transform</code>方法来转换没有空值的<code>nvi</code>数据:</p><pre>sm = SparseMatrix().fit_transform(nvi)
+print(sm)</pre><p>这里给出的预期输出被截断<a id="_idIndexMarker661"/>以节省空间:</p><pre>  (0, 0)	1.0
+  (0, 2)	1.0
+  (0, 5)	1.0
+  (0, 6)	1.0
+  (0, 8)	1.0
+  (0, 10)	1.0
+  :	:
+  (648, 53)	4.0
+  (648, 54)	5.0
+  (648, 55)	4.0
+  (648, 56)	10.0
+  (648, 57)	11.0
+  (648, 58)	11.0</pre></li>
+
+				<li><p>您可以通过将稀疏矩阵转换回密集矩阵来验证数据是否符合预期，如下所示:</p><pre>sm_df = pd.DataFrame(sm.toarray())
+sm_df.head()</pre><p>以下是预期的密集输出:</p></li>
+
+			</ol>
+
+			<div><div><img src="img/B15551_10_11.jpg" alt="Figure 10.11 – The sparse matrix converted into a dense matrix"/>
+
+				</div>
+
+			</div>
+
+			<p class="figure-caption">图 10.11–稀疏矩阵转换成密集矩阵</p>
+
+			<p>这似乎是正确的。该图显示了第 27 列的<code>0.0</code>的<a id="_idIndexMarker662"/>值和第 28 列的<code>1.0</code>值。前面的一位热码编码输出不包括(<code>0</code>、<code>27</code>)，并显示(<code>0</code>、<code>28</code>)的值<code>1.0</code>，与密集输出匹配。</p>
+
+			<p>既然已经转换了数据，让我们将两个预处理步骤合并到一个管道中。</p>
+
+			<h2 id="_idParaDest-224"><a id="_idTextAnchor239"/>预处理流水线</h2>
+
+			<p>在建立机器学习<a id="_idIndexMarker663"/>模型的时候，标准的做法是先把数据分成<code>X</code>和<code>y</code>。当考虑管道时，转换预测列<code>X</code>，而不是目标列<code>y</code>，是有意义的。此外，为以后提供测试集也很重要。</p>
+
+			<p>在将数据放入机器学习管道之前，让我们将数据分成训练集和测试集，并将测试集留在后面。我们从顶部开始，如下所示:</p>
+
+			<ol>
+
+				<li value="1"><p>首先，将 CSV 文件作为数据帧读取:</p><pre>df = pd.read_csv('student-por.csv', sep=';')</pre><p>为学生成绩数据集选择<code>X</code>和<code>y</code>时，需要注意的是最后三列都包括学生成绩。这里有两个潜在的研究是有价值的:</p><p>a)将以前的成绩作为预测值列</p><p>b)不包括以前的成绩作为预测列</p><p>假设您的 EdTech 公司希望根据社会经济变量进行预测，而不是根据以前获得的分数，因此忽略前两个分数列，索引为- <code>2</code>和- <code>3</code>。</p></li>
+
+				<li><p>选择最后一列为<code>y</code>，除最后三列外的所有列<a id="_idIndexMarker664"/>为<code>X</code>:</p><pre>y = df.iloc[:, -1]
+X = df.iloc[:, :-3]</pre></li>
+
+				<li><p>现在导入<code>train_test_split</code>并将<code>X</code>和<code>y</code>分成一个训练集和一个测试集:</p><pre>from sklearn.model_selection import train_test_split
+X_train, X_test, y_train, y_test = train_test_split(X, y, random_state=2)</pre></li>
+
+			</ol>
+
+			<p>现在，让我们使用以下步骤来构建管道:</p>
+
+			<ol>
+
+				<li value="1"><p>从<code>sklearn.pipeline</code>第一次导入<code>Pipeline</code>:</p><pre>from sklearn.pipeline import Pipeline</pre></li>
+
+				<li><p>接下来，按顺序使用语法(name，transformer)作为<code>Pipeline</code>的参数来分配元组:</p><pre>data_pipeline = Pipeline([('null_imputer', NullValueImputer()), ('sparse', SparseMatrix())])</pre></li>
+
+				<li><p>最后，通过将<code>X_train</code>放在<code>data_pipeline</code>的<code>fit_transform</code>方法中，转换<code>X_train</code>，我们的预测器列:</p><pre>X_train_transformed = data_pipeline.fit_transform(X_train)</pre></li>
+
+			</ol>
+
+			<p>现在，您有了一个没有空值的数值稀疏矩阵，可以用作机器学习的预测器列。</p>
+
+			<p>此外，您有一个<a id="_idIndexMarker665"/>管道，可以用来在一行代码中转换任何传入的数据！现在让我们最终确定一个 XGBoost 模型来进行预测。</p>
+
+			<h1 id="_idParaDest-225"><a id="_idTextAnchor240"/>最终确定 XGBoost 模型</h1>
+
+			<p>是时候构建一个健壮的 XGBoost 模型来添加到<a id="_idIndexMarker666"/>管道中了。继续导入<code>XGBRegressor</code>、<code>numpy</code>、<code>GridSearchCV</code>、<code>cross_val_score</code>、<code>KFold</code>和<code>mean_squared_error</code>，如下所示:</p>
+
+			<pre>import numpy as np
+from sklearn.model_selection import GridSearchCV
+from sklearn.model_selection import cross_val_score, KFold
+from sklearn.metrics import mean_squared_error as MSE
+from xgboost import XGBRegressor</pre>
+
+			<p>现在让我们建立模型。</p>
+
+			<h2 id="_idParaDest-226"><a id="_idTextAnchor241"/>第一个 XGBoost 模型</h2>
+
+			<p>该学生成绩数据集的预测值列<code>y_train</code>有一个有趣的值范围<a id="_idIndexMarker667"/>，如下所示:</p>
+
+			<pre>y_train.value_counts()</pre>
+
+			<p>结果是这样的:</p>
+
+			<pre>11    82
+10    75
+13    58
+12    53
+14    42
+15    36
+9     29
+16    27
+8     26
+17    24
+18    14
+0     10
+7      7
+19     1
+6      1
+5      1</pre>
+
+			<p>如你所见，数值范围从<code>5</code> - <code>19</code>，包括<code>0</code>。</p>
+
+			<p>因为 target <a id="_idIndexMarker668"/>列是有序的，这意味着值是按数字顺序排列的，所以回归比分类更可取，即使输出是有限的。在通过回归训练模型之后，最终结果可以被舍入以给出最终预测。</p>
+
+			<p>以下是使用该数据集对<code>XGBRegressor</code>评分的步骤:</p>
+
+			<ol>
+
+				<li value="1"><p>首先使用<code>KFold</code>设置交叉验证:</p><pre>kfold = KFold(n_splits=5, shuffle=True, random_state=2)</pre></li>
+
+				<li><p>现在定义一个交叉验证函数，使<a id="_idIndexMarker669"/>返回<code>cross_val_score</code>:</p><pre>def cross_val(model):
+    scores = cross_val_score(model, X_train_transformed, y_train, scoring='neg_root_mean_squared_error', cv=kfold)
+    rmse = (-scores.mean())
+    return rmse</pre></li>
+
+				<li><p>通过使用<code>XGBRegressor</code>调用<code>cross_val</code>并使用<code>missing=-999.0</code>作为输入来建立基本分数，以便 XGBoost 可以找到最佳替代:</p><pre>cross_val(XGBRegressor(missing=-999.0))</pre><p>比分是这样的:</p><pre>2.9702248207546296</pre></li>
+
+			</ol>
+
+			<p>这是一个令人尊敬的起始分数。19 种可能性中<code>2.97</code>的均方根误差<a id="_idIndexMarker670"/>表示等级在几个精确度以内。这几乎是 15%，使用美国 A-B-C-D-F 系统，这在一个字母等级内是准确的。在行业中，你甚至可以使用统计数据包括一个置信区间来提供一个预测区间，这是一个推荐的策略，超出了本书的范围。</p>
+
+			<p>现在您有了一个基线分数，让我们微调超参数来改进模型。</p>
+
+			<h2 id="_idParaDest-227"><a id="_idTextAnchor242"/>微调 XGBoost 超参数</h2>
+
+			<p>让我们从检查<code>n_estimators</code>提前<a id="_idIndexMarker671"/>停止开始。回想一下，为了使用提前停止，我们可以检查一个测试文件夹。创建测试折叠需要进一步拆分<code>X_train</code>和<code>y_train</code>:</p>
+
+			<ol>
+
+				<li value="1"><p>这里是第二个<code>train_test_split</code>,可用于创建验证目的的测试集，确保隐藏真实的测试集以备后用:</p><pre>X_train_2, X_test_2, y_train_2, y_test_2 = train_test_split(X_train_transformed, y_train, random_state=2)</pre></li>
+
+				<li><p>现在定义一个函数，该函数使用提前停止来返回回归变量的最佳估计数(参见<a href="B15551_06_Final_NM_ePUB.xhtml#_idTextAnchor136"> <em class="italic">第 6 章</em> </a> <em class="italic">，XGBoost 超参数</em>):</p><pre>def n_estimators(model):
+    eval_set = [(X_test_2, y_test_2)]
+    eval_metric="rmse"
+    model.fit(X_train_2, y_train_2, eval_metric=eval_metric, eval_set=eval_set, early_stopping_rounds=100)
+    y_pred = model.predict(X_test_2)
+    rmse = MSE(y_test_2, y_pred)**0.5
+    return rmse  </pre></li>
+
+				<li><p>现在运行<code>n_estimators</code>功能，将<a id="_idIndexMarker672"/>设置为<code>5000</code>的最大值:</p><pre>n_estimators(XGBRegressor(n_estimators=5000, missing=-999.0))</pre><p>以下是输出的最后五行:</p><pre>[128]	validation_0-rmse:3.10450
+[129]	validation_0-rmse:3.10450
+[130]	validation_0-rmse:3.10450
+[131]	validation_0-rmse:3.10450
+Stopping. Best iteration:
+[31]	validation_0-rmse:3.09336</pre><p>分数如下:</p><pre>3.0933612343143153</pre></li>
+
+			</ol>
+
+			<p>使用我们的默认模型，31 估计目前给出最好的估计。那将是我们的起点。</p>
+
+			<p>接下来，这里有一个<code>grid_search</code>函数，我们已经多次使用过，它搜索超参数网格并显示最佳参数和最佳分数:</p>
+
+			<pre>def grid_search(params, reg=XGBRegressor(missing=-999.0)):
+    grid_reg = GridSearchCV(reg, params, scoring='neg_mean_squared_error', cv=kfold)
+    grid_reg.fit(X_train_transformed, y_train)
+    best_params = grid_reg.best_params_
+    print("Best params:", best_params)
+    best_score = np.sqrt(-grid_reg.best_score_)
+    print("Best score:", best_score)</pre>
+
+			<p>这里有几个<a id="_idIndexMarker673"/>推荐的微调模型的步骤:</p>
+
+			<ol>
+
+				<li value="1"><p>从<code>1</code>到<code>8</code>范围内的<code>max_depth</code>开始，同时将<code>n_estimators</code>设置为<code>31</code>:</p><pre>grid_search(params={'max_depth':[1, 2, 3, 4, 6, 7, 8], 
+                    'n_estimators':[31]})</pre><p>结果是这样的:</p><pre>Best params: {'max_depth': 1, 'n_estimators': 31}
+Best score: 2.6634430373079425</pre></li>
+
+				<li><p>将<code>max_depth</code>从<code>1</code>缩小到<code>3</code>，同时将<code>min_child_weight</code>从<code>1</code>调整到<code>5 </code>并将<code>n_esimtators</code>保持在<code>31</code>:</p><pre>grid_search(params={'max_depth':[1, 2, 3], 
+                    'min_child_weight':[1,2,3,4,5], 
+                    'n_estimators':[31]})</pre><p>结果是这样的:</p><pre>Best params: {'max_depth': 1, 'min_child_weight': 1, 'n_estimators': 31}
+Best score: 2.6634430373079425</pre><p>没有任何改善。</p></li>
+
+				<li><p>你可以通过强制<code>min_child_weight</code>取值为<code>2</code>或<code>3</code>，同时包含从<code>0.5</code>到<code>0.9</code>的<code>subsample</code>，来保证一些改变。此外，增加<code>n_estimators</code>可能有助于给模型更多的学习时间:</p><pre>grid_search(params={'max_depth':[2],
+                    'min_child_weight':[2,3],
+                    'subsample':[0.5, 0.6, 0.7, 0.8, 0.9],
+                   'n_estimators':[31, 50]})</pre><p>结果如下:</p><pre>Best params: {'max_depth': 1, 'min_child_weight': 2, 'n_estimators': 50, 'subsample': 0.9}
+Best score: 2.665209161229433</pre><p>分数几乎相同，但稍差。</p></li>
+
+				<li><p>缩小<code>min_child_weight</code>和<code>subsample</code>，同时将<code>0.5</code>到<code>0.9</code>的范围用于<code>colsample_bytree</code>:</p><pre>grid_search(params={'max_depth':[1],
+                    'min_child_weight':[1, 2, 3], 
+                    'subsample':[0.6, 0.7, 0.8], 
+                    'colsample_bytree':[0.5, 0.6, 0.7, 0.8, 0.9, 1],
+                   'n_estimators':[50]})</pre><p>结果是这样的:</p><pre>Best params: {'colsample_bytree': 0.9, 'max_depth': 1, 'min_child_weight': 3, 'n_estimators': 50, 'subsample': 0.8}
+Best score: 2.659649642579931</pre><p>这是迄今为止最好的成绩。</p></li>
+
+				<li><p>保持最佳电流值，用<code>colsample_bynode</code>和<code>colsample_bylevel</code>尝试从<code>0.6</code>到<code>1.0</code>的范围:</p><pre> grid_search(params={'max_depth':[1],
+                    'min_child_weight':[3], 
+                    'subsample':[.8], 
+                    'colsample_bytree':[0.9],
+                    'colsample_bylevel':[0.6, 0.7, 0.8, 0.9, 1],
+                    'colsample_bynode':[0.6, 0.7, 0.8, 0.9, 1],
+                    'n_estimators':[50]})</pre><p>这里给出的结果是<a id="_idIndexMarker675"/>:</p><pre>Best params: {'colsample_bylevel': 0.9, 'colsample_bynode': 0.8, 'colsample_bytree': 0.9, 'max_depth': 1, 'min_child_weight': 3, 'n_estimators': 50, 'subsample': 0.8}
+Best score: 2.64172735526102</pre><p>分数又提高了。</p></li>
+
+			</ol>
+
+			<p>对基础学习者到<code>dart</code>和<code>gamma</code>的进一步实验没有产生新的收获。</p>
+
+			<p>根据时间和项目的范围，进一步调优超参数，甚至在<code>RandomizedSearch</code>中一起尝试它们是值得的。在工业界，你很有可能会接触到云计算，在那里便宜的、可抢占的<strong class="bold">虚拟机</strong> ( <strong class="bold">虚拟机</strong>)将允许<a id="_idIndexMarker676"/>更多的超参数搜索来找到更好的结果。请注意，scikit-learn 目前没有提供一种方法来停止耗时的搜索，以便在代码完成之前保存最佳参数。</p>
+
+			<p>现在我们有了一个健壮的模型，我们可以继续前进并测试这个模型。</p>
+
+			<h2 id="_idParaDest-228"><a id="_idTextAnchor243"/>测试模型</h2>
+
+			<p>现在您已经有了一个<a id="_idIndexMarker677"/>潜在的最终模型，根据测试集测试它是很重要的。</p>
+
+			<p>回想一下，测试集没有在我们的管道中进行转换。幸运的是，在这一点上，只需要一行代码来转换它:</p>
+
+			<pre>X_test_transformed = data_pipeline.fit_transform(X_test)</pre>
+
+			<p>现在，我们可以使用上一节中选择的最佳调整的超参数来初始化模型，使其适合训练集，并根据被阻止的测试集对其进行测试:</p>
+
+			<pre>model = XGBRegressor(max_depth=2, min_child_weight=3, subsample=0.9, colsample_bytree=0.8, gamma=2, missing=-999.0)
+model.fit(X_train_transformed, y_train)
+y_pred = model.predict(X_test_transformed)
+rmse = MSE(y_pred, y_test)**0.5
+rmse</pre>
+
+			<p>分数如下:</p>
+
+			<pre>2.7908972630881435</pre>
+
+			<p>分数会高一点，虽然这可能是因为翻牌的缘故。</p>
+
+			<p>如果不是，我们的模型与验证集拟合得有点过紧，这可能发生在微调超参数并密切调整它们以改进验证集的时候。该模型概括得相当好，但它可以概括得更好。</p>
+
+			<p>对于接下来的步骤，当考虑分数是否可以提高时，有以下选项可用:</p>
+
+			<ul>
+
+				<li><p>返回超参数微调。</p></li>
+
+				<li><p>保持模型不变。</p></li>
+
+				<li><p>基于超参数知识进行快速调整。</p></li>
+
+			</ul>
+
+			<p>快速调整超参数是可行的，因为模型可能过拟合。例如，增加<code>min_child_weight</code>和降低<code>subsample</code>应该有助于模型更好地概括。</p>
+
+			<p>让我们为最终模型做最后调整:</p>
+
+			<pre>model = XGBRegressor(max_depth=1,
+                       min_child_weight=5,
+                       subsample=0.6, 
+                       colsample_bytree=0.9, 
+                       colsample_bylevel=0.9,
+                       colsample_bynode=0.8,
+                     n_estimators=50,
+                       missing=-999.0)
+model.fit(X_train_transformed, y_train)
+y_pred = model.predict(X_test_transformed)
+rmse = MSE(y_pred, y_test)**0.5
+rmse</pre>
+
+			<p>结果如下:</p>
+
+			<pre>2.730601403138633</pre>
+
+			<p>注意，分数提高了。</p>
+
+			<p>此外，你绝对不应该来回尝试提高坚持测试分数。然而，在收到测试分数后，做一些调整是可以接受的；否则，你永远不会比第一个结果更好。</p>
+
+			<p>现在剩下的就是完成管道。</p>
+
+			<h1 id="_idParaDest-229"><a id="_idTextAnchor244"/>构建机器学习管道</h1>
+
+			<p>完成机器学习管道<a id="_idIndexMarker680"/>需要将机器学习模型添加到之前的管道中。在<code>NullValueImputer</code>和<code>SparseMatrix</code>之后需要一个机器学习元组，如下:</p>
+
+			<pre>full_pipeline = Pipeline([('null_imputer', NullValueImputer()),  ('sparse', SparseMatrix()), 
+('xgb', XGBRegressor(max_depth=1, min_child_weight=5, subsample=0.6, colsample_bytree=0.9, colsample_bylevel=0.9, colsample_bynode=0.8, missing=-999.0))]) </pre>
+
+			<p>这个流水线现在已经完成了一个机器学习模型，它可以适用于任何<code>X</code>、<code>y</code>组合，如下所示:</p>
+
+			<pre>full_pipeline.fit(X, y)</pre>
+
+			<p>现在，您可以对目标列未知的任何数据进行预测:</p>
+
+			<pre>new_data = X_test
+full_pipeline.predict(new_data)</pre>
+
+			<p>以下是预期输出的前几行:</p>
+
+			<pre>array([13.55908  ,  8.314051 , 11.078157 , 14.114085 , 12.2938385, 11.374797 , 13.9611025, 12.025812 , 10.80344  , 13.479145 , 13.02319  ,  9.428679 , 12.57761  , 12.405045 , 14.284043 , 8.549758 , 10.158956 ,  9.972576 , 15.502667 , 10.280028 , ...</pre>
+
+			<p>为了获得现实的预测，数据可以四舍五入如下:</p>
+
+			<pre>np.round(full_pipeline.predict(new_data))</pre>
+
+			<p>预期输出如下所示:</p>
+
+			<pre>array([14.,  8., 11., 14., 12., 11., 14., 12., 11., 13., 13.,  9., 13., 12., 14.,  9., 10., 10., 16., 10., 13., 13.,  7., 12.,  7.,  8., 10., 13., 14., 12., 11., 12., 15.,  9., 11., 13., 12., 11.,  8.,
+...
+11., 13., 12., 13.,  9., 13., 10., 14., 12., 15., 15., 11., 14., 10., 14.,  9.,  9., 12., 13.,  9., 11., 14., 13., 11., 13., 13., 13., 13., 11., 13., 14., 15., 13.,  9., 10., 13.,  8.,  8., 12., 15., 14., 13., 10., 12., 13.,  9.], dtype=float32)</pre>
+
+			<p>最后，如果新数据到来，它可以与以前的数据<a id="_idIndexMarker681"/>连接，并通过相同的管道放置，以获得更强的模型，因为新模型可能适合更多的数据，如下所示:</p>
+
+			<pre>new_df = pd.read_csv('student-por.csv')
+new_X = df.iloc[:, :-3]
+new_y = df.iloc[:, -1]
+new_model = full_pipeline.fit(new_X, new_y)</pre>
+
+			<p>现在，此模型可用于对新数据进行预测，如以下代码所示:</p>
+
+			<pre>more_new_data = X_test[:25]
+np.round(new_model.predict(more_new_data))</pre>
+
+			<p>预期产出如下:</p>
+
+			<pre>array([14.,  8., 11., 14., 12., 11., 14., 12., 11., 13., 13.,  9., 13., 12., 14.,  9., 10., 10., 16., 10., 13., 13.,  7., 12.,  7.],
+      dtype=float32)</pre>
+
+			<p>有一个小问题。</p>
+
+			<p>如果您只想对一行数据进行预测，该怎么办？如果在管道中运行一行，得到的稀疏矩阵将不会有正确的列数，因为它只会对单行中出现的类别进行一键编码。这将导致数据中的<em class="italic">不匹配</em>错误，因为机器学习模型已经适合需要更多行数据的稀疏矩阵。</p>
+
+			<p>一个简单的解决方案是将新的数据行与足够多的数据行连接起来，以保证存在完整的稀疏矩阵，其中所有可能的分类列都已转换。我们已经看到这适用于从<code>X_test</code>开始的 25 行，因为没有错误。在这种特殊情况下，使用来自<code>X_test</code>的 20 行或更少行将导致不匹配错误。</p>
+
+			<p>因此，如果您想使用<a id="_idIndexMarker682"/>单行数据进行预测，将单行数据与<code>X_test</code>的前<code>25</code>行连接起来，并按如下方式进行预测:</p>
+
+			<pre>single_row = X_test[:1]
+single_row_plus = pd.concat([single_row, X_test[:25]])
+print(np.round(new_model.predict(single_row_plus))[:1])</pre>
+
+			<p>结果是这样的:</p>
+
+			<pre>[14.]</pre>
+
+			<p>你现在知道机器学习模型如何被包括在管道中，以对新数据进行转换和预测。</p>
+
+			<h1 id="_idParaDest-230"><a id="_idTextAnchor245"/>总结</h1>
+
+			<p>恭喜你坚持到了这本书的结尾！这是一次非凡的旅程，从基本的机器学习和<code>pandas</code>开始，到构建您自己定制的变压器、管道和函数，以在行业场景中部署健壮、微调的 XGBoost 模型，并使用稀疏矩阵对新数据进行预测。</p>
+
+			<p>一路走来，您已经了解了 XGBoost 的故事，从第一个决策树到随机森林和梯度推进，然后发现了使 XGBoost 如此特别的数学细节和复杂性。您一次又一次地看到 XGBoost 优于其他机器学习算法，并且您在调整 XGBoost 的各种超参数方面获得了必要的实践，包括<code>n_estimators</code>、<code>max_depth</code>、<code>gamma</code>、<code>colsample_bylevel</code>、<code>missing</code>和<code>scale_pos_weight</code>。</p>
+
+			<p>您了解了物理学家和天文学家如何在历史上重要的案例研究中获得关于我们宇宙的知识，并且您了解了 XGBoost 通过不平衡数据集和替代基础学习者的应用的广泛范围。你甚至通过高级特征工程、非相关系综和堆叠从 Kaggle 竞赛中学到了交易技巧。最后，您学习了先进的工业自动化流程。</p>
+
+			<p>至此，您对 XGBoost 的了解已经处于高级水平。现在，您可以高效、快速、有力地使用 XGBoost 来解决即将出现的机器学习问题。当然，XGBoost 并不完美。如果你正在处理非结构化数据，比如图像或文本，<strong class="bold">神经网络</strong>可能会为你提供更好的服务。对于大多数机器学习任务，尤其是那些有表格数据的任务，XGBoost 通常会给你带来优势。</p>
+
+			<p>如果你有兴趣在 XGBoost 继续深造，我个人推荐你参加 Kaggle 比赛。原因是 Kaggle 比赛由经验丰富的机器学习从业者组成，与他们竞争会让你变得更好。此外，Kaggle 竞赛提供了一个结构化的机器学习环境，由许多致力于同一问题的从业者组成，这导致了共享的笔记本和论坛讨论，可以进一步推动教育过程。正如本书所概述的，XGBoost 也是在这里首次因希格斯玻色子竞赛而声名鹊起。</p>
+
+			<p>现在，您可以满怀信心地进入 XGBoost 的大数据世界，推进研究，参加竞赛，并构建可用于生产的机器学习模型。</p>
+
+		</div>
+
+	
+
+
+
+</body></html>

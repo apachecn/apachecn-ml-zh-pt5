@@ -1,0 +1,287 @@
+<html><head/><body>
+
+
+
+
+
+
+<style type="text/css" title="ibis-book">
+    #sbo-rt-content .chapter-number{font-weight:bold;font-size:8.3em;text-align:right;font-family:symbol}#sbo-rt-content .chapter-title{font-size:30pt;text-align:right}#sbo-rt-content h1,#sbo-rt-content .packt_head1{font-size:16pt;font-weight:bold}#sbo-rt-content h2,#sbo-rt-content .packt_head2{font-size:14pt;font-weight:bold}#sbo-rt-content h3,#sbo-rt-content .packt_head3{font-size:13pt;font-weight:bold}#sbo-rt-content h4,#sbo-rt-content .packt_head4{font-size:11pt;font-weight:normal;font-style:italic}#sbo-rt-content ul,#sbo-rt-content .packt_bullet{font-weight:normal;list-style-type:disc}#sbo-rt-content ol,#sbo-rt-content .packt_numbered{font-weight:normal}#sbo-rt-content .packt_normal{font-weight:normal}#sbo-rt-content code,#sbo-rt-content .packt_code,#sbo-rt-content .packt_codeblock,#sbo-rt-content pre{font-family:monospace;font-size:9pt;font-weight:normal;border-left:1px solid black;margin-left:20px;padding-left:5px;display:block;margin-bottom:.12in}#sbo-rt-content .packt_figref{font-size:10pt;font-weight:normal}#sbo-rt-content q,#sbo-rt-content .packt_quote{font-size:11pt;font-weight:normal;color:black;font-style:italic}#sbo-rt-content .packt_tip{font-size:11pt;font-weight:normal;color:black;font-style:italic;background-image:url(../assets/0a79c387-fdee-4347-a587-034cf8cf4f7f.png);background-position:left center;background-repeat:no-repeat;background-size:.6in;margin-left:20px;margin-right:20px;padding-left:.7in;min-height:.75in;}#sbo-rt-content .packt_infobox{font-size:11pt;font-weight:normal;color:black;font-style:italic;background-image:url(../assets/6f2eee5d-61a6-4ff8-8b44-493a0b8e545b.png);background-position:left center;background-repeat:no-repeat;background-size:.6in;margin-left:20px;margin-right:20px;padding-left:.7in;min-height:.75in;}#sbo-rt-content kbd,#sbo-rt-content .packt_action{font-family:monospace;font-size:9pt;font-weight:normal}#sbo-rt-content .packt_italics{font-size:11pt;font-weight:normal;color:black;font-style:italic}#sbo-rt-content a,#sbo-rt-content .packt_url{font-family:monospace;font-size:9pt;font-weight:normal;text-decoration:none;word-break:break-all}#sbo-rt-content var,#sbo-rt-content .packt_inlinemsgid{display:none}#sbo-rt-content p,#sbo-rt-content .packt_para{text-align:left;font-size:11pt;line-height:17px}#sbo-rt-content .underline{text-decoration:underline}#sbo-rt-content .CDPImageAlign{width:100%;display:block}#sbo-rt-content div.CDPAlign,#sbo-rt-content p.CDPAlign{width:100%;display:block;margin-top:.18in;margin-bottom:.18in}#sbo-rt-content .CDPAlignCenter{text-align:center}#sbo-rt-content .CDPAlignLeft{text-align:left}#sbo-rt-content .CDPAlignRight{text-align:right}#sbo-rt-content .fm-editor-equation{border:none}#sbo-rt-content nav a.section{border-bottom:1px solid black;width:100%;display:block}#sbo-rt-content body table{border-collapse:collapse}#sbo-rt-content body table td{border:1px solid black;padding:.31em .62em}#sbo-rt-content .header-title{font-size:2.5em}#sbo-rt-content img.inline-image{height:1em}#sbo-rt-content .chapter-title{font-size:2.5em}#sbo-rt-content h1,#sbo-rt-content .packt_head1{font-size:2em}#sbo-rt-content h2,#sbo-rt-content .packt_head2{font-size:1.5em}#sbo-rt-content h3,#sbo-rt-content .packt_head3{font-size:1.17em}#sbo-rt-content h4,#sbo-rt-content .packt_head4{font-size:1em}#sbo-rt-content code,#sbo-rt-content .packt_code,#sbo-rt-content .packt_codeblock,#sbo-rt-content pre{font-size:.8em;margin-left:1.25em;padding-left:.3em;margin-bottom:.01em}#sbo-rt-content .packt_figref{font-size:.62em}#sbo-rt-content q,#sbo-rt-content .packt_quote{font-size:.68em}#sbo-rt-content .packt_tip{font-size:.68em;background-size:2.5em;margin-left:1.25em;margin-right:1.25em;padding-left:3em;min-height:2.5em}#sbo-rt-content .packt_infobox{font-size:.68em;background-size:2.5em;margin-left:1.25em;margin-right:1.25em;padding-left:3em;min-height:2.5em}#sbo-rt-content kbd,#sbo-rt-content .packt_action{font-size:.75em}#sbo-rt-content .packt_italics{font-size:.9em}#sbo-rt-content a,#sbo-rt-content .packt_url{font-size:.7em}#sbo-rt-content p,#sbo-rt-content .packt_para{font-size:1em;line-height:1.06em}#sbo-rt-content .CDPImageAlign{max-width:100%;max-height:100%}#sbo-rt-content div.CDPAlign,#sbo-rt-content p.CDPAlign{margin-top:.01em;margin-bottom:.01em}
+    </style>
+<style type="text/css" id="font-styles">#sbo-rt-content, #sbo-rt-content p, #sbo-rt-content div { font-size: &amp;lt;%= font_size %&amp;gt; !important; }</style>
+<style type="text/css" id="font-family">#sbo-rt-content, #sbo-rt-content p, #sbo-rt-content div { font-family: &amp;lt;%= font_family %&amp;gt; !important; }</style>
+<style type="text/css" id="column-width">#sbo-rt-content { max-width: &amp;lt;%= column_width %&amp;gt;% !important; margin: 0 auto !important; }</style>
+
+<style type="text/css">body{margin:1em;}#sbo-rt-content *{text-indent:0pt!important;}#sbo-rt-content .bq{margin-right:1em!important;}body{background-color:transparent!important;}#sbo-rt-content *{word-wrap:break-word!important;word-break:break-word!important;}#sbo-rt-content table,#sbo-rt-content pre{overflow-x:unset!important;overflow:unset!important;overflow-y:unset!important;white-space:pre-wrap!important;}</style>
+<div><h1 class="header-title">前言</h1>
+                
+            
+            
+                
+<p>这本书将教你如何以一种非常廉价的方式在云中执行高级机器学习。你会学到更多关于 Azure 机器学习过程作为一种企业级方法的知识。这本书让你探索 Azure Machine Learning Studio 的预构建模板，并使用可以作为 web 服务部署的固定算法构建一个模型。它将帮助您发现利用云进行机器学习和人工智能的不同好处，在人工智能开发场景中部署虚拟机，以及如何在 Azure 中应用 R、Python、SQL Server 和 Spark。</p>
+<p class="mce-root">到本书结束时，你将能够在你的模型中实现机器学习和人工智能概念，以解决现实世界的问题。</p>
+
+
+            
+
+            
+        
+    </div>
+
+
+
+  
+
+
+
+
+
+
+
+
+<style type="text/css" title="ibis-book">
+    #sbo-rt-content .chapter-number{font-weight:bold;font-size:8.3em;text-align:right;font-family:symbol}#sbo-rt-content .chapter-title{font-size:30pt;text-align:right}#sbo-rt-content h1,#sbo-rt-content .packt_head1{font-size:16pt;font-weight:bold}#sbo-rt-content h2,#sbo-rt-content .packt_head2{font-size:14pt;font-weight:bold}#sbo-rt-content h3,#sbo-rt-content .packt_head3{font-size:13pt;font-weight:bold}#sbo-rt-content h4,#sbo-rt-content .packt_head4{font-size:11pt;font-weight:normal;font-style:italic}#sbo-rt-content ul,#sbo-rt-content .packt_bullet{font-weight:normal;list-style-type:disc}#sbo-rt-content ol,#sbo-rt-content .packt_numbered{font-weight:normal}#sbo-rt-content .packt_normal{font-weight:normal}#sbo-rt-content code,#sbo-rt-content .packt_code,#sbo-rt-content .packt_codeblock,#sbo-rt-content pre{font-family:monospace;font-size:9pt;font-weight:normal;border-left:1px solid black;margin-left:20px;padding-left:5px;display:block;margin-bottom:.12in}#sbo-rt-content .packt_figref{font-size:10pt;font-weight:normal}#sbo-rt-content q,#sbo-rt-content .packt_quote{font-size:11pt;font-weight:normal;color:black;font-style:italic}#sbo-rt-content .packt_tip{font-size:11pt;font-weight:normal;color:black;font-style:italic;background-image:url(../assets/0a79c387-fdee-4347-a587-034cf8cf4f7f.png);background-position:left center;background-repeat:no-repeat;background-size:.6in;margin-left:20px;margin-right:20px;padding-left:.7in;min-height:.75in;}#sbo-rt-content .packt_infobox{font-size:11pt;font-weight:normal;color:black;font-style:italic;background-image:url(../assets/6f2eee5d-61a6-4ff8-8b44-493a0b8e545b.png);background-position:left center;background-repeat:no-repeat;background-size:.6in;margin-left:20px;margin-right:20px;padding-left:.7in;min-height:.75in;}#sbo-rt-content kbd,#sbo-rt-content .packt_action{font-family:monospace;font-size:9pt;font-weight:normal}#sbo-rt-content .packt_italics{font-size:11pt;font-weight:normal;color:black;font-style:italic}#sbo-rt-content a,#sbo-rt-content .packt_url{font-family:monospace;font-size:9pt;font-weight:normal;text-decoration:none;word-break:break-all}#sbo-rt-content var,#sbo-rt-content .packt_inlinemsgid{display:none}#sbo-rt-content p,#sbo-rt-content .packt_para{text-align:left;font-size:11pt;line-height:17px}#sbo-rt-content .underline{text-decoration:underline}#sbo-rt-content .CDPImageAlign{width:100%;display:block}#sbo-rt-content div.CDPAlign,#sbo-rt-content p.CDPAlign{width:100%;display:block;margin-top:.18in;margin-bottom:.18in}#sbo-rt-content .CDPAlignCenter{text-align:center}#sbo-rt-content .CDPAlignLeft{text-align:left}#sbo-rt-content .CDPAlignRight{text-align:right}#sbo-rt-content .fm-editor-equation{border:none}#sbo-rt-content nav a.section{border-bottom:1px solid black;width:100%;display:block}#sbo-rt-content body table{border-collapse:collapse}#sbo-rt-content body table td{border:1px solid black;padding:.31em .62em}#sbo-rt-content .header-title{font-size:2.5em}#sbo-rt-content img.inline-image{height:1em}#sbo-rt-content .chapter-title{font-size:2.5em}#sbo-rt-content h1,#sbo-rt-content .packt_head1{font-size:2em}#sbo-rt-content h2,#sbo-rt-content .packt_head2{font-size:1.5em}#sbo-rt-content h3,#sbo-rt-content .packt_head3{font-size:1.17em}#sbo-rt-content h4,#sbo-rt-content .packt_head4{font-size:1em}#sbo-rt-content code,#sbo-rt-content .packt_code,#sbo-rt-content .packt_codeblock,#sbo-rt-content pre{font-size:.8em;margin-left:1.25em;padding-left:.3em;margin-bottom:.01em}#sbo-rt-content .packt_figref{font-size:.62em}#sbo-rt-content q,#sbo-rt-content .packt_quote{font-size:.68em}#sbo-rt-content .packt_tip{font-size:.68em;background-size:2.5em;margin-left:1.25em;margin-right:1.25em;padding-left:3em;min-height:2.5em}#sbo-rt-content .packt_infobox{font-size:.68em;background-size:2.5em;margin-left:1.25em;margin-right:1.25em;padding-left:3em;min-height:2.5em}#sbo-rt-content kbd,#sbo-rt-content .packt_action{font-size:.75em}#sbo-rt-content .packt_italics{font-size:.9em}#sbo-rt-content a,#sbo-rt-content .packt_url{font-size:.7em}#sbo-rt-content p,#sbo-rt-content .packt_para{font-size:1em;line-height:1.06em}#sbo-rt-content .CDPImageAlign{max-width:100%;max-height:100%}#sbo-rt-content div.CDPAlign,#sbo-rt-content p.CDPAlign{margin-top:.01em;margin-bottom:.01em}
+    </style>
+<style type="text/css" id="font-styles">#sbo-rt-content, #sbo-rt-content p, #sbo-rt-content div { font-size: &amp;lt;%= font_size %&amp;gt; !important; }</style>
+<style type="text/css" id="font-family">#sbo-rt-content, #sbo-rt-content p, #sbo-rt-content div { font-family: &amp;lt;%= font_family %&amp;gt; !important; }</style>
+<style type="text/css" id="column-width">#sbo-rt-content { max-width: &amp;lt;%= column_width %&amp;gt;% !important; margin: 0 auto !important; }</style>
+
+<style type="text/css">body{margin:1em;}#sbo-rt-content *{text-indent:0pt!important;}#sbo-rt-content .bq{margin-right:1em!important;}body{background-color:transparent!important;}#sbo-rt-content *{word-wrap:break-word!important;word-break:break-word!important;}#sbo-rt-content table,#sbo-rt-content pre{overflow-x:unset!important;overflow:unset!important;overflow-y:unset!important;white-space:pre-wrap!important;}</style>
+<div><h1 class="header-title">这本书是给谁的</h1>
+                
+            
+            
+                
+<p>如果你是一名熟悉 Azure 机器学习和认知服务的数据科学家或开发人员，并希望创建智能模型和理解云中的数据，这本书适合你。如果你想把强大的机器学习服务引入你的云应用，你也会发现这本书很有用。一些数据操作和处理的经验，以及使用 SQL、Python 和 R 等语言的经验，将有助于你理解本书所涵盖的概念</p>
+
+
+            
+
+            
+        
+    </div>
+
+
+
+  
+
+
+
+
+
+
+
+
+<style type="text/css" title="ibis-book">
+    #sbo-rt-content .chapter-number{font-weight:bold;font-size:8.3em;text-align:right;font-family:symbol}#sbo-rt-content .chapter-title{font-size:30pt;text-align:right}#sbo-rt-content h1,#sbo-rt-content .packt_head1{font-size:16pt;font-weight:bold}#sbo-rt-content h2,#sbo-rt-content .packt_head2{font-size:14pt;font-weight:bold}#sbo-rt-content h3,#sbo-rt-content .packt_head3{font-size:13pt;font-weight:bold}#sbo-rt-content h4,#sbo-rt-content .packt_head4{font-size:11pt;font-weight:normal;font-style:italic}#sbo-rt-content ul,#sbo-rt-content .packt_bullet{font-weight:normal;list-style-type:disc}#sbo-rt-content ol,#sbo-rt-content .packt_numbered{font-weight:normal}#sbo-rt-content .packt_normal{font-weight:normal}#sbo-rt-content code,#sbo-rt-content .packt_code,#sbo-rt-content .packt_codeblock,#sbo-rt-content pre{font-family:monospace;font-size:9pt;font-weight:normal;border-left:1px solid black;margin-left:20px;padding-left:5px;display:block;margin-bottom:.12in}#sbo-rt-content .packt_figref{font-size:10pt;font-weight:normal}#sbo-rt-content q,#sbo-rt-content .packt_quote{font-size:11pt;font-weight:normal;color:black;font-style:italic}#sbo-rt-content .packt_tip{font-size:11pt;font-weight:normal;color:black;font-style:italic;background-image:url(../assets/0a79c387-fdee-4347-a587-034cf8cf4f7f.png);background-position:left center;background-repeat:no-repeat;background-size:.6in;margin-left:20px;margin-right:20px;padding-left:.7in;min-height:.75in;}#sbo-rt-content .packt_infobox{font-size:11pt;font-weight:normal;color:black;font-style:italic;background-image:url(../assets/6f2eee5d-61a6-4ff8-8b44-493a0b8e545b.png);background-position:left center;background-repeat:no-repeat;background-size:.6in;margin-left:20px;margin-right:20px;padding-left:.7in;min-height:.75in;}#sbo-rt-content kbd,#sbo-rt-content .packt_action{font-family:monospace;font-size:9pt;font-weight:normal}#sbo-rt-content .packt_italics{font-size:11pt;font-weight:normal;color:black;font-style:italic}#sbo-rt-content a,#sbo-rt-content .packt_url{font-family:monospace;font-size:9pt;font-weight:normal;text-decoration:none;word-break:break-all}#sbo-rt-content var,#sbo-rt-content .packt_inlinemsgid{display:none}#sbo-rt-content p,#sbo-rt-content .packt_para{text-align:left;font-size:11pt;line-height:17px}#sbo-rt-content .underline{text-decoration:underline}#sbo-rt-content .CDPImageAlign{width:100%;display:block}#sbo-rt-content div.CDPAlign,#sbo-rt-content p.CDPAlign{width:100%;display:block;margin-top:.18in;margin-bottom:.18in}#sbo-rt-content .CDPAlignCenter{text-align:center}#sbo-rt-content .CDPAlignLeft{text-align:left}#sbo-rt-content .CDPAlignRight{text-align:right}#sbo-rt-content .fm-editor-equation{border:none}#sbo-rt-content nav a.section{border-bottom:1px solid black;width:100%;display:block}#sbo-rt-content body table{border-collapse:collapse}#sbo-rt-content body table td{border:1px solid black;padding:.31em .62em}#sbo-rt-content .header-title{font-size:2.5em}#sbo-rt-content img.inline-image{height:1em}#sbo-rt-content .chapter-title{font-size:2.5em}#sbo-rt-content h1,#sbo-rt-content .packt_head1{font-size:2em}#sbo-rt-content h2,#sbo-rt-content .packt_head2{font-size:1.5em}#sbo-rt-content h3,#sbo-rt-content .packt_head3{font-size:1.17em}#sbo-rt-content h4,#sbo-rt-content .packt_head4{font-size:1em}#sbo-rt-content code,#sbo-rt-content .packt_code,#sbo-rt-content .packt_codeblock,#sbo-rt-content pre{font-size:.8em;margin-left:1.25em;padding-left:.3em;margin-bottom:.01em}#sbo-rt-content .packt_figref{font-size:.62em}#sbo-rt-content q,#sbo-rt-content .packt_quote{font-size:.68em}#sbo-rt-content .packt_tip{font-size:.68em;background-size:2.5em;margin-left:1.25em;margin-right:1.25em;padding-left:3em;min-height:2.5em}#sbo-rt-content .packt_infobox{font-size:.68em;background-size:2.5em;margin-left:1.25em;margin-right:1.25em;padding-left:3em;min-height:2.5em}#sbo-rt-content kbd,#sbo-rt-content .packt_action{font-size:.75em}#sbo-rt-content .packt_italics{font-size:.9em}#sbo-rt-content a,#sbo-rt-content .packt_url{font-size:.7em}#sbo-rt-content p,#sbo-rt-content .packt_para{font-size:1em;line-height:1.06em}#sbo-rt-content .CDPImageAlign{max-width:100%;max-height:100%}#sbo-rt-content div.CDPAlign,#sbo-rt-content p.CDPAlign{margin-top:.01em;margin-bottom:.01em}
+    </style>
+<style type="text/css" id="font-styles">#sbo-rt-content, #sbo-rt-content p, #sbo-rt-content div { font-size: &amp;lt;%= font_size %&amp;gt; !important; }</style>
+<style type="text/css" id="font-family">#sbo-rt-content, #sbo-rt-content p, #sbo-rt-content div { font-family: &amp;lt;%= font_family %&amp;gt; !important; }</style>
+<style type="text/css" id="column-width">#sbo-rt-content { max-width: &amp;lt;%= column_width %&amp;gt;% !important; margin: 0 auto !important; }</style>
+
+<style type="text/css">body{margin:1em;}#sbo-rt-content *{text-indent:0pt!important;}#sbo-rt-content .bq{margin-right:1em!important;}body{background-color:transparent!important;}#sbo-rt-content *{word-wrap:break-word!important;word-break:break-word!important;}#sbo-rt-content table,#sbo-rt-content pre{overflow-x:unset!important;overflow:unset!important;overflow-y:unset!important;white-space:pre-wrap!important;}</style>
+<div><h1 class="header-title">从这本书中获得最大收益</h1>
+                
+            
+            
+                
+<p>对于这本书，你需要先了解 Azure，并订阅 Azure。</p>
+
+
+
+            
+
+            
+        
+    </div>
+
+
+
+  
+
+
+
+
+
+
+
+
+<style type="text/css" title="ibis-book">
+    #sbo-rt-content .chapter-number{font-weight:bold;font-size:8.3em;text-align:right;font-family:symbol}#sbo-rt-content .chapter-title{font-size:30pt;text-align:right}#sbo-rt-content h1,#sbo-rt-content .packt_head1{font-size:16pt;font-weight:bold}#sbo-rt-content h2,#sbo-rt-content .packt_head2{font-size:14pt;font-weight:bold}#sbo-rt-content h3,#sbo-rt-content .packt_head3{font-size:13pt;font-weight:bold}#sbo-rt-content h4,#sbo-rt-content .packt_head4{font-size:11pt;font-weight:normal;font-style:italic}#sbo-rt-content ul,#sbo-rt-content .packt_bullet{font-weight:normal;list-style-type:disc}#sbo-rt-content ol,#sbo-rt-content .packt_numbered{font-weight:normal}#sbo-rt-content .packt_normal{font-weight:normal}#sbo-rt-content code,#sbo-rt-content .packt_code,#sbo-rt-content .packt_codeblock,#sbo-rt-content pre{font-family:monospace;font-size:9pt;font-weight:normal;border-left:1px solid black;margin-left:20px;padding-left:5px;display:block;margin-bottom:.12in}#sbo-rt-content .packt_figref{font-size:10pt;font-weight:normal}#sbo-rt-content q,#sbo-rt-content .packt_quote{font-size:11pt;font-weight:normal;color:black;font-style:italic}#sbo-rt-content .packt_tip{font-size:11pt;font-weight:normal;color:black;font-style:italic;background-image:url(../assets/0a79c387-fdee-4347-a587-034cf8cf4f7f.png);background-position:left center;background-repeat:no-repeat;background-size:.6in;margin-left:20px;margin-right:20px;padding-left:.7in;min-height:.75in;}#sbo-rt-content .packt_infobox{font-size:11pt;font-weight:normal;color:black;font-style:italic;background-image:url(../assets/6f2eee5d-61a6-4ff8-8b44-493a0b8e545b.png);background-position:left center;background-repeat:no-repeat;background-size:.6in;margin-left:20px;margin-right:20px;padding-left:.7in;min-height:.75in;}#sbo-rt-content kbd,#sbo-rt-content .packt_action{font-family:monospace;font-size:9pt;font-weight:normal}#sbo-rt-content .packt_italics{font-size:11pt;font-weight:normal;color:black;font-style:italic}#sbo-rt-content a,#sbo-rt-content .packt_url{font-family:monospace;font-size:9pt;font-weight:normal;text-decoration:none;word-break:break-all}#sbo-rt-content var,#sbo-rt-content .packt_inlinemsgid{display:none}#sbo-rt-content p,#sbo-rt-content .packt_para{text-align:left;font-size:11pt;line-height:17px}#sbo-rt-content .underline{text-decoration:underline}#sbo-rt-content .CDPImageAlign{width:100%;display:block}#sbo-rt-content div.CDPAlign,#sbo-rt-content p.CDPAlign{width:100%;display:block;margin-top:.18in;margin-bottom:.18in}#sbo-rt-content .CDPAlignCenter{text-align:center}#sbo-rt-content .CDPAlignLeft{text-align:left}#sbo-rt-content .CDPAlignRight{text-align:right}#sbo-rt-content .fm-editor-equation{border:none}#sbo-rt-content nav a.section{border-bottom:1px solid black;width:100%;display:block}#sbo-rt-content body table{border-collapse:collapse}#sbo-rt-content body table td{border:1px solid black;padding:.31em .62em}#sbo-rt-content .header-title{font-size:2.5em}#sbo-rt-content img.inline-image{height:1em}#sbo-rt-content .chapter-title{font-size:2.5em}#sbo-rt-content h1,#sbo-rt-content .packt_head1{font-size:2em}#sbo-rt-content h2,#sbo-rt-content .packt_head2{font-size:1.5em}#sbo-rt-content h3,#sbo-rt-content .packt_head3{font-size:1.17em}#sbo-rt-content h4,#sbo-rt-content .packt_head4{font-size:1em}#sbo-rt-content code,#sbo-rt-content .packt_code,#sbo-rt-content .packt_codeblock,#sbo-rt-content pre{font-size:.8em;margin-left:1.25em;padding-left:.3em;margin-bottom:.01em}#sbo-rt-content .packt_figref{font-size:.62em}#sbo-rt-content q,#sbo-rt-content .packt_quote{font-size:.68em}#sbo-rt-content .packt_tip{font-size:.68em;background-size:2.5em;margin-left:1.25em;margin-right:1.25em;padding-left:3em;min-height:2.5em}#sbo-rt-content .packt_infobox{font-size:.68em;background-size:2.5em;margin-left:1.25em;margin-right:1.25em;padding-left:3em;min-height:2.5em}#sbo-rt-content kbd,#sbo-rt-content .packt_action{font-size:.75em}#sbo-rt-content .packt_italics{font-size:.9em}#sbo-rt-content a,#sbo-rt-content .packt_url{font-size:.7em}#sbo-rt-content p,#sbo-rt-content .packt_para{font-size:1em;line-height:1.06em}#sbo-rt-content .CDPImageAlign{max-width:100%;max-height:100%}#sbo-rt-content div.CDPAlign,#sbo-rt-content p.CDPAlign{margin-top:.01em;margin-bottom:.01em}
+    </style>
+<style type="text/css" id="font-styles">#sbo-rt-content, #sbo-rt-content p, #sbo-rt-content div { font-size: &amp;lt;%= font_size %&amp;gt; !important; }</style>
+<style type="text/css" id="font-family">#sbo-rt-content, #sbo-rt-content p, #sbo-rt-content div { font-family: &amp;lt;%= font_family %&amp;gt; !important; }</style>
+<style type="text/css" id="column-width">#sbo-rt-content { max-width: &amp;lt;%= column_width %&amp;gt;% !important; margin: 0 auto !important; }</style>
+
+<style type="text/css">body{margin:1em;}#sbo-rt-content *{text-indent:0pt!important;}#sbo-rt-content .bq{margin-right:1em!important;}body{background-color:transparent!important;}#sbo-rt-content *{word-wrap:break-word!important;word-break:break-word!important;}#sbo-rt-content table,#sbo-rt-content pre{overflow-x:unset!important;overflow:unset!important;overflow-y:unset!important;white-space:pre-wrap!important;}</style>
+<div><h1 class="header-title">下载示例代码文件</h1>
+                
+            
+            
+                
+<p>你可以从你在<a href="http://www.packt.com" target="_blank">www.packt.com</a>的账户下载本书的示例代码文件。如果你在其他地方购买了这本书，你可以访问 www.packt.com/support 的<a href="http://www.packt.com/support" target="_blank">并注册，让文件直接通过电子邮件发送给你。</a></p>
+<p>您可以按照以下步骤下载代码文件:</p>
+<ol>
+<li>在<a href="http://www.packt.com" target="_blank">www.packt.com</a>登录或注册。</li>
+<li>选择支持选项卡。</li>
+<li>点击代码下载和勘误表。</li>
+<li>在搜索框中输入图书名称，然后按照屏幕指示进行操作。</li>
+</ol>
+<p>下载文件后，请确保使用最新版本的解压缩或解压文件夹:</p>
+<ul>
+<li>WinRAR/7-Zip for Windows</li>
+<li>适用于 Mac 的 Zipeg/iZip/UnRarX</li>
+<li>用于 Linux 的 7-Zip/PeaZip</li>
+</ul>
+<p>该书的代码包也托管在 GitHub 的 https://GitHub . com/packt publishing/Hands-On-Machine-Learning-with-Azure 上。如果代码有更新，它将在现有的 GitHub 库中更新。</p>
+<p>我们在<strong><a href="https://github.com/PacktPublishing/" target="_blank"/></strong>也有丰富的书籍和视频目录中的其他代码包。看看他们！</p>
+
+
+            
+
+            
+        
+    </div>
+
+
+
+  
+
+
+
+
+
+
+
+
+<style type="text/css" title="ibis-book">
+    #sbo-rt-content .chapter-number{font-weight:bold;font-size:8.3em;text-align:right;font-family:symbol}#sbo-rt-content .chapter-title{font-size:30pt;text-align:right}#sbo-rt-content h1,#sbo-rt-content .packt_head1{font-size:16pt;font-weight:bold}#sbo-rt-content h2,#sbo-rt-content .packt_head2{font-size:14pt;font-weight:bold}#sbo-rt-content h3,#sbo-rt-content .packt_head3{font-size:13pt;font-weight:bold}#sbo-rt-content h4,#sbo-rt-content .packt_head4{font-size:11pt;font-weight:normal;font-style:italic}#sbo-rt-content ul,#sbo-rt-content .packt_bullet{font-weight:normal;list-style-type:disc}#sbo-rt-content ol,#sbo-rt-content .packt_numbered{font-weight:normal}#sbo-rt-content .packt_normal{font-weight:normal}#sbo-rt-content code,#sbo-rt-content .packt_code,#sbo-rt-content .packt_codeblock,#sbo-rt-content pre{font-family:monospace;font-size:9pt;font-weight:normal;border-left:1px solid black;margin-left:20px;padding-left:5px;display:block;margin-bottom:.12in}#sbo-rt-content .packt_figref{font-size:10pt;font-weight:normal}#sbo-rt-content q,#sbo-rt-content .packt_quote{font-size:11pt;font-weight:normal;color:black;font-style:italic}#sbo-rt-content .packt_tip{font-size:11pt;font-weight:normal;color:black;font-style:italic;background-image:url(../assets/0a79c387-fdee-4347-a587-034cf8cf4f7f.png);background-position:left center;background-repeat:no-repeat;background-size:.6in;margin-left:20px;margin-right:20px;padding-left:.7in;min-height:.75in;}#sbo-rt-content .packt_infobox{font-size:11pt;font-weight:normal;color:black;font-style:italic;background-image:url(../assets/6f2eee5d-61a6-4ff8-8b44-493a0b8e545b.png);background-position:left center;background-repeat:no-repeat;background-size:.6in;margin-left:20px;margin-right:20px;padding-left:.7in;min-height:.75in;}#sbo-rt-content kbd,#sbo-rt-content .packt_action{font-family:monospace;font-size:9pt;font-weight:normal}#sbo-rt-content .packt_italics{font-size:11pt;font-weight:normal;color:black;font-style:italic}#sbo-rt-content a,#sbo-rt-content .packt_url{font-family:monospace;font-size:9pt;font-weight:normal;text-decoration:none;word-break:break-all}#sbo-rt-content var,#sbo-rt-content .packt_inlinemsgid{display:none}#sbo-rt-content p,#sbo-rt-content .packt_para{text-align:left;font-size:11pt;line-height:17px}#sbo-rt-content .underline{text-decoration:underline}#sbo-rt-content .CDPImageAlign{width:100%;display:block}#sbo-rt-content div.CDPAlign,#sbo-rt-content p.CDPAlign{width:100%;display:block;margin-top:.18in;margin-bottom:.18in}#sbo-rt-content .CDPAlignCenter{text-align:center}#sbo-rt-content .CDPAlignLeft{text-align:left}#sbo-rt-content .CDPAlignRight{text-align:right}#sbo-rt-content .fm-editor-equation{border:none}#sbo-rt-content nav a.section{border-bottom:1px solid black;width:100%;display:block}#sbo-rt-content body table{border-collapse:collapse}#sbo-rt-content body table td{border:1px solid black;padding:.31em .62em}#sbo-rt-content .header-title{font-size:2.5em}#sbo-rt-content img.inline-image{height:1em}#sbo-rt-content .chapter-title{font-size:2.5em}#sbo-rt-content h1,#sbo-rt-content .packt_head1{font-size:2em}#sbo-rt-content h2,#sbo-rt-content .packt_head2{font-size:1.5em}#sbo-rt-content h3,#sbo-rt-content .packt_head3{font-size:1.17em}#sbo-rt-content h4,#sbo-rt-content .packt_head4{font-size:1em}#sbo-rt-content code,#sbo-rt-content .packt_code,#sbo-rt-content .packt_codeblock,#sbo-rt-content pre{font-size:.8em;margin-left:1.25em;padding-left:.3em;margin-bottom:.01em}#sbo-rt-content .packt_figref{font-size:.62em}#sbo-rt-content q,#sbo-rt-content .packt_quote{font-size:.68em}#sbo-rt-content .packt_tip{font-size:.68em;background-size:2.5em;margin-left:1.25em;margin-right:1.25em;padding-left:3em;min-height:2.5em}#sbo-rt-content .packt_infobox{font-size:.68em;background-size:2.5em;margin-left:1.25em;margin-right:1.25em;padding-left:3em;min-height:2.5em}#sbo-rt-content kbd,#sbo-rt-content .packt_action{font-size:.75em}#sbo-rt-content .packt_italics{font-size:.9em}#sbo-rt-content a,#sbo-rt-content .packt_url{font-size:.7em}#sbo-rt-content p,#sbo-rt-content .packt_para{font-size:1em;line-height:1.06em}#sbo-rt-content .CDPImageAlign{max-width:100%;max-height:100%}#sbo-rt-content div.CDPAlign,#sbo-rt-content p.CDPAlign{margin-top:.01em;margin-bottom:.01em}
+    </style>
+<style type="text/css" id="font-styles">#sbo-rt-content, #sbo-rt-content p, #sbo-rt-content div { font-size: &amp;lt;%= font_size %&amp;gt; !important; }</style>
+<style type="text/css" id="font-family">#sbo-rt-content, #sbo-rt-content p, #sbo-rt-content div { font-family: &amp;lt;%= font_family %&amp;gt; !important; }</style>
+<style type="text/css" id="column-width">#sbo-rt-content { max-width: &amp;lt;%= column_width %&amp;gt;% !important; margin: 0 auto !important; }</style>
+
+<style type="text/css">body{margin:1em;}#sbo-rt-content *{text-indent:0pt!important;}#sbo-rt-content .bq{margin-right:1em!important;}body{background-color:transparent!important;}#sbo-rt-content *{word-wrap:break-word!important;word-break:break-word!important;}#sbo-rt-content table,#sbo-rt-content pre{overflow-x:unset!important;overflow:unset!important;overflow-y:unset!important;white-space:pre-wrap!important;}</style>
+<div><h1 class="header-title">下载彩色图像</h1>
+                
+            
+            
+                
+<p>我们还提供了一个 PDF 文件，其中有本书中使用的截图/图表的彩色图像。可以在这里下载:<a href="_ColorImages.pdf" target="_blank">https://www . packtpub . com/sites/default/files/downloads/9781789131956 _ color images . pdf</a>。</p>
+
+
+
+            
+
+            
+        
+    </div>
+
+
+
+  
+
+
+
+
+
+
+
+
+<style type="text/css" title="ibis-book">
+    #sbo-rt-content .chapter-number{font-weight:bold;font-size:8.3em;text-align:right;font-family:symbol}#sbo-rt-content .chapter-title{font-size:30pt;text-align:right}#sbo-rt-content h1,#sbo-rt-content .packt_head1{font-size:16pt;font-weight:bold}#sbo-rt-content h2,#sbo-rt-content .packt_head2{font-size:14pt;font-weight:bold}#sbo-rt-content h3,#sbo-rt-content .packt_head3{font-size:13pt;font-weight:bold}#sbo-rt-content h4,#sbo-rt-content .packt_head4{font-size:11pt;font-weight:normal;font-style:italic}#sbo-rt-content ul,#sbo-rt-content .packt_bullet{font-weight:normal;list-style-type:disc}#sbo-rt-content ol,#sbo-rt-content .packt_numbered{font-weight:normal}#sbo-rt-content .packt_normal{font-weight:normal}#sbo-rt-content code,#sbo-rt-content .packt_code,#sbo-rt-content .packt_codeblock,#sbo-rt-content pre{font-family:monospace;font-size:9pt;font-weight:normal;border-left:1px solid black;margin-left:20px;padding-left:5px;display:block;margin-bottom:.12in}#sbo-rt-content .packt_figref{font-size:10pt;font-weight:normal}#sbo-rt-content q,#sbo-rt-content .packt_quote{font-size:11pt;font-weight:normal;color:black;font-style:italic}#sbo-rt-content .packt_tip{font-size:11pt;font-weight:normal;color:black;font-style:italic;background-image:url(../assets/0a79c387-fdee-4347-a587-034cf8cf4f7f.png);background-position:left center;background-repeat:no-repeat;background-size:.6in;margin-left:20px;margin-right:20px;padding-left:.7in;min-height:.75in;}#sbo-rt-content .packt_infobox{font-size:11pt;font-weight:normal;color:black;font-style:italic;background-image:url(../assets/6f2eee5d-61a6-4ff8-8b44-493a0b8e545b.png);background-position:left center;background-repeat:no-repeat;background-size:.6in;margin-left:20px;margin-right:20px;padding-left:.7in;min-height:.75in;}#sbo-rt-content kbd,#sbo-rt-content .packt_action{font-family:monospace;font-size:9pt;font-weight:normal}#sbo-rt-content .packt_italics{font-size:11pt;font-weight:normal;color:black;font-style:italic}#sbo-rt-content a,#sbo-rt-content .packt_url{font-family:monospace;font-size:9pt;font-weight:normal;text-decoration:none;word-break:break-all}#sbo-rt-content var,#sbo-rt-content .packt_inlinemsgid{display:none}#sbo-rt-content p,#sbo-rt-content .packt_para{text-align:left;font-size:11pt;line-height:17px}#sbo-rt-content .underline{text-decoration:underline}#sbo-rt-content .CDPImageAlign{width:100%;display:block}#sbo-rt-content div.CDPAlign,#sbo-rt-content p.CDPAlign{width:100%;display:block;margin-top:.18in;margin-bottom:.18in}#sbo-rt-content .CDPAlignCenter{text-align:center}#sbo-rt-content .CDPAlignLeft{text-align:left}#sbo-rt-content .CDPAlignRight{text-align:right}#sbo-rt-content .fm-editor-equation{border:none}#sbo-rt-content nav a.section{border-bottom:1px solid black;width:100%;display:block}#sbo-rt-content body table{border-collapse:collapse}#sbo-rt-content body table td{border:1px solid black;padding:.31em .62em}#sbo-rt-content .header-title{font-size:2.5em}#sbo-rt-content img.inline-image{height:1em}#sbo-rt-content .chapter-title{font-size:2.5em}#sbo-rt-content h1,#sbo-rt-content .packt_head1{font-size:2em}#sbo-rt-content h2,#sbo-rt-content .packt_head2{font-size:1.5em}#sbo-rt-content h3,#sbo-rt-content .packt_head3{font-size:1.17em}#sbo-rt-content h4,#sbo-rt-content .packt_head4{font-size:1em}#sbo-rt-content code,#sbo-rt-content .packt_code,#sbo-rt-content .packt_codeblock,#sbo-rt-content pre{font-size:.8em;margin-left:1.25em;padding-left:.3em;margin-bottom:.01em}#sbo-rt-content .packt_figref{font-size:.62em}#sbo-rt-content q,#sbo-rt-content .packt_quote{font-size:.68em}#sbo-rt-content .packt_tip{font-size:.68em;background-size:2.5em;margin-left:1.25em;margin-right:1.25em;padding-left:3em;min-height:2.5em}#sbo-rt-content .packt_infobox{font-size:.68em;background-size:2.5em;margin-left:1.25em;margin-right:1.25em;padding-left:3em;min-height:2.5em}#sbo-rt-content kbd,#sbo-rt-content .packt_action{font-size:.75em}#sbo-rt-content .packt_italics{font-size:.9em}#sbo-rt-content a,#sbo-rt-content .packt_url{font-size:.7em}#sbo-rt-content p,#sbo-rt-content .packt_para{font-size:1em;line-height:1.06em}#sbo-rt-content .CDPImageAlign{max-width:100%;max-height:100%}#sbo-rt-content div.CDPAlign,#sbo-rt-content p.CDPAlign{margin-top:.01em;margin-bottom:.01em}
+    </style>
+<style type="text/css" id="font-styles">#sbo-rt-content, #sbo-rt-content p, #sbo-rt-content div { font-size: &amp;lt;%= font_size %&amp;gt; !important; }</style>
+<style type="text/css" id="font-family">#sbo-rt-content, #sbo-rt-content p, #sbo-rt-content div { font-family: &amp;lt;%= font_family %&amp;gt; !important; }</style>
+<style type="text/css" id="column-width">#sbo-rt-content { max-width: &amp;lt;%= column_width %&amp;gt;% !important; margin: 0 auto !important; }</style>
+
+<style type="text/css">body{margin:1em;}#sbo-rt-content *{text-indent:0pt!important;}#sbo-rt-content .bq{margin-right:1em!important;}body{background-color:transparent!important;}#sbo-rt-content *{word-wrap:break-word!important;word-break:break-word!important;}#sbo-rt-content table,#sbo-rt-content pre{overflow-x:unset!important;overflow:unset!important;overflow-y:unset!important;white-space:pre-wrap!important;}</style>
+<div><h1 class="header-title">使用的惯例</h1>
+                
+            
+            
+                
+<p>本书通篇使用了许多文本约定。</p>
+<p><kbd>CodeInText</kbd>:表示文本中的码字、数据库表名、文件夹名、文件名、文件扩展名、路径名、伪 URL、用户输入和 Twitter 句柄。下面是一个例子:“或者，你可以在 Azure 门户中搜索<kbd>Computer Vision</kbd>”。</p>
+<p>代码块设置如下:</p>
+<pre style="padding-left: 60px">vision_base_url = "https://westus.api.cognitive.microsoft.com/vision/v1.0/"<br/><br/>vision_analyze_url = vision_base_url + "analyze"</pre>
+<p><strong>粗体</strong>:表示一个新术语、一个重要单词或您在屏幕上看到的单词。例如，菜单或对话框中的单词出现在文本中，如下所示。这里有一个例子:“点击创建一个资源，然后点击 AI +机器学习，然后点击计算机视觉”。</p>
+<p>警告或重要提示如下所示。</p>
+<p>提示和技巧是这样出现的。</p>
+
+
+            
+
+            
+        
+    </div>
+
+
+
+  
+
+
+
+
+
+
+
+
+<style type="text/css" title="ibis-book">
+    #sbo-rt-content .chapter-number{font-weight:bold;font-size:8.3em;text-align:right;font-family:symbol}#sbo-rt-content .chapter-title{font-size:30pt;text-align:right}#sbo-rt-content h1,#sbo-rt-content .packt_head1{font-size:16pt;font-weight:bold}#sbo-rt-content h2,#sbo-rt-content .packt_head2{font-size:14pt;font-weight:bold}#sbo-rt-content h3,#sbo-rt-content .packt_head3{font-size:13pt;font-weight:bold}#sbo-rt-content h4,#sbo-rt-content .packt_head4{font-size:11pt;font-weight:normal;font-style:italic}#sbo-rt-content ul,#sbo-rt-content .packt_bullet{font-weight:normal;list-style-type:disc}#sbo-rt-content ol,#sbo-rt-content .packt_numbered{font-weight:normal}#sbo-rt-content .packt_normal{font-weight:normal}#sbo-rt-content code,#sbo-rt-content .packt_code,#sbo-rt-content .packt_codeblock,#sbo-rt-content pre{font-family:monospace;font-size:9pt;font-weight:normal;border-left:1px solid black;margin-left:20px;padding-left:5px;display:block;margin-bottom:.12in}#sbo-rt-content .packt_figref{font-size:10pt;font-weight:normal}#sbo-rt-content q,#sbo-rt-content .packt_quote{font-size:11pt;font-weight:normal;color:black;font-style:italic}#sbo-rt-content .packt_tip{font-size:11pt;font-weight:normal;color:black;font-style:italic;background-image:url(../assets/0a79c387-fdee-4347-a587-034cf8cf4f7f.png);background-position:left center;background-repeat:no-repeat;background-size:.6in;margin-left:20px;margin-right:20px;padding-left:.7in;min-height:.75in;}#sbo-rt-content .packt_infobox{font-size:11pt;font-weight:normal;color:black;font-style:italic;background-image:url(../assets/6f2eee5d-61a6-4ff8-8b44-493a0b8e545b.png);background-position:left center;background-repeat:no-repeat;background-size:.6in;margin-left:20px;margin-right:20px;padding-left:.7in;min-height:.75in;}#sbo-rt-content kbd,#sbo-rt-content .packt_action{font-family:monospace;font-size:9pt;font-weight:normal}#sbo-rt-content .packt_italics{font-size:11pt;font-weight:normal;color:black;font-style:italic}#sbo-rt-content a,#sbo-rt-content .packt_url{font-family:monospace;font-size:9pt;font-weight:normal;text-decoration:none;word-break:break-all}#sbo-rt-content var,#sbo-rt-content .packt_inlinemsgid{display:none}#sbo-rt-content p,#sbo-rt-content .packt_para{text-align:left;font-size:11pt;line-height:17px}#sbo-rt-content .underline{text-decoration:underline}#sbo-rt-content .CDPImageAlign{width:100%;display:block}#sbo-rt-content div.CDPAlign,#sbo-rt-content p.CDPAlign{width:100%;display:block;margin-top:.18in;margin-bottom:.18in}#sbo-rt-content .CDPAlignCenter{text-align:center}#sbo-rt-content .CDPAlignLeft{text-align:left}#sbo-rt-content .CDPAlignRight{text-align:right}#sbo-rt-content .fm-editor-equation{border:none}#sbo-rt-content nav a.section{border-bottom:1px solid black;width:100%;display:block}#sbo-rt-content body table{border-collapse:collapse}#sbo-rt-content body table td{border:1px solid black;padding:.31em .62em}#sbo-rt-content .header-title{font-size:2.5em}#sbo-rt-content img.inline-image{height:1em}#sbo-rt-content .chapter-title{font-size:2.5em}#sbo-rt-content h1,#sbo-rt-content .packt_head1{font-size:2em}#sbo-rt-content h2,#sbo-rt-content .packt_head2{font-size:1.5em}#sbo-rt-content h3,#sbo-rt-content .packt_head3{font-size:1.17em}#sbo-rt-content h4,#sbo-rt-content .packt_head4{font-size:1em}#sbo-rt-content code,#sbo-rt-content .packt_code,#sbo-rt-content .packt_codeblock,#sbo-rt-content pre{font-size:.8em;margin-left:1.25em;padding-left:.3em;margin-bottom:.01em}#sbo-rt-content .packt_figref{font-size:.62em}#sbo-rt-content q,#sbo-rt-content .packt_quote{font-size:.68em}#sbo-rt-content .packt_tip{font-size:.68em;background-size:2.5em;margin-left:1.25em;margin-right:1.25em;padding-left:3em;min-height:2.5em}#sbo-rt-content .packt_infobox{font-size:.68em;background-size:2.5em;margin-left:1.25em;margin-right:1.25em;padding-left:3em;min-height:2.5em}#sbo-rt-content kbd,#sbo-rt-content .packt_action{font-size:.75em}#sbo-rt-content .packt_italics{font-size:.9em}#sbo-rt-content a,#sbo-rt-content .packt_url{font-size:.7em}#sbo-rt-content p,#sbo-rt-content .packt_para{font-size:1em;line-height:1.06em}#sbo-rt-content .CDPImageAlign{max-width:100%;max-height:100%}#sbo-rt-content div.CDPAlign,#sbo-rt-content p.CDPAlign{margin-top:.01em;margin-bottom:.01em}
+    </style>
+<style type="text/css" id="font-styles">#sbo-rt-content, #sbo-rt-content p, #sbo-rt-content div { font-size: &amp;lt;%= font_size %&amp;gt; !important; }</style>
+<style type="text/css" id="font-family">#sbo-rt-content, #sbo-rt-content p, #sbo-rt-content div { font-family: &amp;lt;%= font_family %&amp;gt; !important; }</style>
+<style type="text/css" id="column-width">#sbo-rt-content { max-width: &amp;lt;%= column_width %&amp;gt;% !important; margin: 0 auto !important; }</style>
+
+<style type="text/css">body{margin:1em;}#sbo-rt-content *{text-indent:0pt!important;}#sbo-rt-content .bq{margin-right:1em!important;}body{background-color:transparent!important;}#sbo-rt-content *{word-wrap:break-word!important;word-break:break-word!important;}#sbo-rt-content table,#sbo-rt-content pre{overflow-x:unset!important;overflow:unset!important;overflow-y:unset!important;white-space:pre-wrap!important;}</style>
+<div><h1 class="header-title">取得联系</h1>
+                
+            
+            
+                
+<p>我们随时欢迎读者的反馈。</p>
+<p class="mce-root"><strong>总体反馈</strong>:如果您对这本书的任何方面有疑问，请在邮件主题中提及书名，并在<kbd>customercare@packtpub.com</kbd>发送电子邮件给我们。</p>
+<p><strong>勘误表</strong>:虽然我们已经尽力确保内容的准确性，但错误还是会发生。如果你在这本书里发现了一个错误，请告诉我们，我们将不胜感激。请访问 www.packt.com/submit-errata<a href="http://www.packt.com/submit-errata" target="_blank"/>，选择您的图书，点击勘误表提交表格链接，并输入详细信息。</p>
+
+
+<p><strong>盗版</strong>:如果您在互联网上遇到我们作品的任何形式的非法拷贝，如果您能提供我们的地址或网站名称，我们将不胜感激。请联系...</p></div>
+
+
+
+  
+
+
+
+
+
+
+
+
+<style type="text/css" title="ibis-book">
+    #sbo-rt-content .chapter-number{font-weight:bold;font-size:8.3em;text-align:right;font-family:symbol}#sbo-rt-content .chapter-title{font-size:30pt;text-align:right}#sbo-rt-content h1,#sbo-rt-content .packt_head1{font-size:16pt;font-weight:bold}#sbo-rt-content h2,#sbo-rt-content .packt_head2{font-size:14pt;font-weight:bold}#sbo-rt-content h3,#sbo-rt-content .packt_head3{font-size:13pt;font-weight:bold}#sbo-rt-content h4,#sbo-rt-content .packt_head4{font-size:11pt;font-weight:normal;font-style:italic}#sbo-rt-content ul,#sbo-rt-content .packt_bullet{font-weight:normal;list-style-type:disc}#sbo-rt-content ol,#sbo-rt-content .packt_numbered{font-weight:normal}#sbo-rt-content .packt_normal{font-weight:normal}#sbo-rt-content code,#sbo-rt-content .packt_code,#sbo-rt-content .packt_codeblock,#sbo-rt-content pre{font-family:monospace;font-size:9pt;font-weight:normal;border-left:1px solid black;margin-left:20px;padding-left:5px;display:block;margin-bottom:.12in}#sbo-rt-content .packt_figref{font-size:10pt;font-weight:normal}#sbo-rt-content q,#sbo-rt-content .packt_quote{font-size:11pt;font-weight:normal;color:black;font-style:italic}#sbo-rt-content .packt_tip{font-size:11pt;font-weight:normal;color:black;font-style:italic;background-image:url(../assets/0a79c387-fdee-4347-a587-034cf8cf4f7f.png);background-position:left center;background-repeat:no-repeat;background-size:.6in;margin-left:20px;margin-right:20px;padding-left:.7in;min-height:.75in;}#sbo-rt-content .packt_infobox{font-size:11pt;font-weight:normal;color:black;font-style:italic;background-image:url(../assets/6f2eee5d-61a6-4ff8-8b44-493a0b8e545b.png);background-position:left center;background-repeat:no-repeat;background-size:.6in;margin-left:20px;margin-right:20px;padding-left:.7in;min-height:.75in;}#sbo-rt-content kbd,#sbo-rt-content .packt_action{font-family:monospace;font-size:9pt;font-weight:normal}#sbo-rt-content .packt_italics{font-size:11pt;font-weight:normal;color:black;font-style:italic}#sbo-rt-content a,#sbo-rt-content .packt_url{font-family:monospace;font-size:9pt;font-weight:normal;text-decoration:none;word-break:break-all}#sbo-rt-content var,#sbo-rt-content .packt_inlinemsgid{display:none}#sbo-rt-content p,#sbo-rt-content .packt_para{text-align:left;font-size:11pt;line-height:17px}#sbo-rt-content .underline{text-decoration:underline}#sbo-rt-content .CDPImageAlign{width:100%;display:block}#sbo-rt-content div.CDPAlign,#sbo-rt-content p.CDPAlign{width:100%;display:block;margin-top:.18in;margin-bottom:.18in}#sbo-rt-content .CDPAlignCenter{text-align:center}#sbo-rt-content .CDPAlignLeft{text-align:left}#sbo-rt-content .CDPAlignRight{text-align:right}#sbo-rt-content .fm-editor-equation{border:none}#sbo-rt-content nav a.section{border-bottom:1px solid black;width:100%;display:block}#sbo-rt-content body table{border-collapse:collapse}#sbo-rt-content body table td{border:1px solid black;padding:.31em .62em}#sbo-rt-content .header-title{font-size:2.5em}#sbo-rt-content img.inline-image{height:1em}#sbo-rt-content .chapter-title{font-size:2.5em}#sbo-rt-content h1,#sbo-rt-content .packt_head1{font-size:2em}#sbo-rt-content h2,#sbo-rt-content .packt_head2{font-size:1.5em}#sbo-rt-content h3,#sbo-rt-content .packt_head3{font-size:1.17em}#sbo-rt-content h4,#sbo-rt-content .packt_head4{font-size:1em}#sbo-rt-content code,#sbo-rt-content .packt_code,#sbo-rt-content .packt_codeblock,#sbo-rt-content pre{font-size:.8em;margin-left:1.25em;padding-left:.3em;margin-bottom:.01em}#sbo-rt-content .packt_figref{font-size:.62em}#sbo-rt-content q,#sbo-rt-content .packt_quote{font-size:.68em}#sbo-rt-content .packt_tip{font-size:.68em;background-size:2.5em;margin-left:1.25em;margin-right:1.25em;padding-left:3em;min-height:2.5em}#sbo-rt-content .packt_infobox{font-size:.68em;background-size:2.5em;margin-left:1.25em;margin-right:1.25em;padding-left:3em;min-height:2.5em}#sbo-rt-content kbd,#sbo-rt-content .packt_action{font-size:.75em}#sbo-rt-content .packt_italics{font-size:.9em}#sbo-rt-content a,#sbo-rt-content .packt_url{font-size:.7em}#sbo-rt-content p,#sbo-rt-content .packt_para{font-size:1em;line-height:1.06em}#sbo-rt-content .CDPImageAlign{max-width:100%;max-height:100%}#sbo-rt-content div.CDPAlign,#sbo-rt-content p.CDPAlign{margin-top:.01em;margin-bottom:.01em}
+    </style>
+<style type="text/css" id="font-styles">#sbo-rt-content, #sbo-rt-content p, #sbo-rt-content div { font-size: &amp;lt;%= font_size %&amp;gt; !important; }</style>
+<style type="text/css" id="font-family">#sbo-rt-content, #sbo-rt-content p, #sbo-rt-content div { font-family: &amp;lt;%= font_family %&amp;gt; !important; }</style>
+<style type="text/css" id="column-width">#sbo-rt-content { max-width: &amp;lt;%= column_width %&amp;gt;% !important; margin: 0 auto !important; }</style>
+
+<style type="text/css">body{margin:1em;}#sbo-rt-content *{text-indent:0pt!important;}#sbo-rt-content .bq{margin-right:1em!important;}body{background-color:transparent!important;}#sbo-rt-content *{word-wrap:break-word!important;word-break:break-word!important;}#sbo-rt-content table,#sbo-rt-content pre{overflow-x:unset!important;overflow:unset!important;overflow-y:unset!important;white-space:pre-wrap!important;}</style>
+<div><h1 class="header-title">复习</h1>
+                
+            
+            
+                
+<p>请留下评论。一旦你阅读并使用了这本书，为什么不在你购买它的网站上留下评论呢？潜在的读者可以看到并使用您不带偏见的意见来做出购买决定，我们 Packt 可以了解您对我们产品的看法，我们的作者可以看到您对他们的书的反馈。谢谢大家！</p>
+<p>更多关于 Packt 的信息，请访问<a href="http://www.packt.com/" target="_blank">packt.com</a>。<a href="https://www.packtpub.com/" target="_blank"/></p>
+
+
+            
+
+            
+        
+    </div>
+
+
+
+  
+</body></html>

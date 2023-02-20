@@ -1,0 +1,323 @@
+<html><head/><body>
+
+
+
+
+
+
+<style type="text/css" title="ibis-book">
+    #sbo-rt-content .chapter-number{font-weight:bold;font-size:8.3em;text-align:right;font-family:symbol}#sbo-rt-content .chapter-title{font-size:30pt;text-align:right}#sbo-rt-content h1,#sbo-rt-content .packt_head1{font-size:16pt;font-weight:bold}#sbo-rt-content h2,#sbo-rt-content .packt_head2{font-size:14pt;font-weight:bold}#sbo-rt-content h3,#sbo-rt-content .packt_head3{font-size:13pt;font-weight:bold}#sbo-rt-content h4,#sbo-rt-content .packt_head4{font-size:11pt;font-weight:normal;font-style:italic}#sbo-rt-content ul,#sbo-rt-content .packt_bullet{font-weight:normal;list-style-type:disc}#sbo-rt-content ol,#sbo-rt-content .packt_numbered{font-weight:normal}#sbo-rt-content .packt_normal{font-weight:normal}#sbo-rt-content code,#sbo-rt-content .packt_code,#sbo-rt-content .packt_codeblock,#sbo-rt-content pre{font-family:monospace;font-size:9pt;font-weight:normal;border-left:1px solid black;margin-left:20px;padding-left:5px;display:block;margin-bottom:.12in}#sbo-rt-content .packt_figref{font-size:10pt;font-weight:normal}#sbo-rt-content q,#sbo-rt-content .packt_quote{font-size:11pt;font-weight:normal;color:black;font-style:italic}#sbo-rt-content .packt_tip{font-size:11pt;font-weight:normal;color:black;font-style:italic;background-image:url(../assets/0a79c387-fdee-4347-a587-034cf8cf4f7f.png);background-position:left center;background-repeat:no-repeat;background-size:.6in;margin-left:20px;margin-right:20px;padding-left:.7in;min-height:.75in;}#sbo-rt-content .packt_infobox{font-size:11pt;font-weight:normal;color:black;font-style:italic;background-image:url(../assets/6f2eee5d-61a6-4ff8-8b44-493a0b8e545b.png);background-position:left center;background-repeat:no-repeat;background-size:.6in;margin-left:20px;margin-right:20px;padding-left:.7in;min-height:.75in;}#sbo-rt-content kbd,#sbo-rt-content .packt_action{font-family:monospace;font-size:9pt;font-weight:normal}#sbo-rt-content .packt_italics{font-size:11pt;font-weight:normal;color:black;font-style:italic}#sbo-rt-content a,#sbo-rt-content .packt_url{font-family:monospace;font-size:9pt;font-weight:normal;text-decoration:none;word-break:break-all}#sbo-rt-content var,#sbo-rt-content .packt_inlinemsgid{display:none}#sbo-rt-content p,#sbo-rt-content .packt_para{text-align:left;font-size:11pt;line-height:17px}#sbo-rt-content .underline{text-decoration:underline}#sbo-rt-content .CDPImageAlign{width:100%;display:block}#sbo-rt-content div.CDPAlign,#sbo-rt-content p.CDPAlign{width:100%;display:block;margin-top:.18in;margin-bottom:.18in}#sbo-rt-content .CDPAlignCenter{text-align:center}#sbo-rt-content .CDPAlignLeft{text-align:left}#sbo-rt-content .CDPAlignRight{text-align:right}#sbo-rt-content .fm-editor-equation{border:none}#sbo-rt-content nav a.section{border-bottom:1px solid black;width:100%;display:block}#sbo-rt-content body table{border-collapse:collapse}#sbo-rt-content body table td{border:1px solid black;padding:.31em .62em}#sbo-rt-content .header-title{font-size:2.5em}#sbo-rt-content img.inline-image{height:1em}#sbo-rt-content .chapter-title{font-size:2.5em}#sbo-rt-content h1,#sbo-rt-content .packt_head1{font-size:2em}#sbo-rt-content h2,#sbo-rt-content .packt_head2{font-size:1.5em}#sbo-rt-content h3,#sbo-rt-content .packt_head3{font-size:1.17em}#sbo-rt-content h4,#sbo-rt-content .packt_head4{font-size:1em}#sbo-rt-content code,#sbo-rt-content .packt_code,#sbo-rt-content .packt_codeblock,#sbo-rt-content pre{font-size:.8em;margin-left:1.25em;padding-left:.3em;margin-bottom:.01em}#sbo-rt-content .packt_figref{font-size:.62em}#sbo-rt-content q,#sbo-rt-content .packt_quote{font-size:.68em}#sbo-rt-content .packt_tip{font-size:.68em;background-size:2.5em;margin-left:1.25em;margin-right:1.25em;padding-left:3em;min-height:2.5em}#sbo-rt-content .packt_infobox{font-size:.68em;background-size:2.5em;margin-left:1.25em;margin-right:1.25em;padding-left:3em;min-height:2.5em}#sbo-rt-content kbd,#sbo-rt-content .packt_action{font-size:.75em}#sbo-rt-content .packt_italics{font-size:.9em}#sbo-rt-content a,#sbo-rt-content .packt_url{font-size:.7em}#sbo-rt-content p,#sbo-rt-content .packt_para{font-size:1em;line-height:1.06em}#sbo-rt-content .CDPImageAlign{max-width:100%;max-height:100%}#sbo-rt-content div.CDPAlign,#sbo-rt-content p.CDPAlign{margin-top:.01em;margin-bottom:.01em}
+    </style>
+<style type="text/css" id="font-styles">#sbo-rt-content, #sbo-rt-content p, #sbo-rt-content div { font-size: &amp;lt;%= font_size %&amp;gt; !important; }</style>
+<style type="text/css" id="font-family">#sbo-rt-content, #sbo-rt-content p, #sbo-rt-content div { font-family: &amp;lt;%= font_family %&amp;gt; !important; }</style>
+<style type="text/css" id="column-width">#sbo-rt-content { max-width: &amp;lt;%= column_width %&amp;gt;% !important; margin: 0 auto !important; }</style>
+
+<style type="text/css">body{margin:1em;}#sbo-rt-content *{text-indent:0pt!important;}#sbo-rt-content .bq{margin-right:1em!important;}body{background-color:transparent!important;}#sbo-rt-content *{word-wrap:break-word!important;word-break:break-word!important;}#sbo-rt-content table,#sbo-rt-content pre{overflow-x:unset!important;overflow:unset!important;overflow-y:unset!important;white-space:pre-wrap!important;}</style>
+<div><h1 class="header-title">Bot 框架</h1>
+                
+            
+            
+                
+<p>在前一章中，我们学习了认知服务，它可以帮助我们创建一个人工智能应用程序。在这一章中，我们将学习使用各种 Azure 服务构建机器人。微软提供了一个强大的平台，包括以下组件来帮助构建和部署机器人:</p>
+<ul>
+<li>Bot builder SDK</li>
+<li>Bot 框架</li>
+<li>QnA 制造商</li>
+<li>Bot 服务</li>
+</ul>
+
+
+            
+
+            
+        
+    </div>
+
+
+
+  
+
+
+
+
+
+
+
+
+<style type="text/css" title="ibis-book">
+    #sbo-rt-content .chapter-number{font-weight:bold;font-size:8.3em;text-align:right;font-family:symbol}#sbo-rt-content .chapter-title{font-size:30pt;text-align:right}#sbo-rt-content h1,#sbo-rt-content .packt_head1{font-size:16pt;font-weight:bold}#sbo-rt-content h2,#sbo-rt-content .packt_head2{font-size:14pt;font-weight:bold}#sbo-rt-content h3,#sbo-rt-content .packt_head3{font-size:13pt;font-weight:bold}#sbo-rt-content h4,#sbo-rt-content .packt_head4{font-size:11pt;font-weight:normal;font-style:italic}#sbo-rt-content ul,#sbo-rt-content .packt_bullet{font-weight:normal;list-style-type:disc}#sbo-rt-content ol,#sbo-rt-content .packt_numbered{font-weight:normal}#sbo-rt-content .packt_normal{font-weight:normal}#sbo-rt-content code,#sbo-rt-content .packt_code,#sbo-rt-content .packt_codeblock,#sbo-rt-content pre{font-family:monospace;font-size:9pt;font-weight:normal;border-left:1px solid black;margin-left:20px;padding-left:5px;display:block;margin-bottom:.12in}#sbo-rt-content .packt_figref{font-size:10pt;font-weight:normal}#sbo-rt-content q,#sbo-rt-content .packt_quote{font-size:11pt;font-weight:normal;color:black;font-style:italic}#sbo-rt-content .packt_tip{font-size:11pt;font-weight:normal;color:black;font-style:italic;background-image:url(../assets/0a79c387-fdee-4347-a587-034cf8cf4f7f.png);background-position:left center;background-repeat:no-repeat;background-size:.6in;margin-left:20px;margin-right:20px;padding-left:.7in;min-height:.75in;}#sbo-rt-content .packt_infobox{font-size:11pt;font-weight:normal;color:black;font-style:italic;background-image:url(../assets/6f2eee5d-61a6-4ff8-8b44-493a0b8e545b.png);background-position:left center;background-repeat:no-repeat;background-size:.6in;margin-left:20px;margin-right:20px;padding-left:.7in;min-height:.75in;}#sbo-rt-content kbd,#sbo-rt-content .packt_action{font-family:monospace;font-size:9pt;font-weight:normal}#sbo-rt-content .packt_italics{font-size:11pt;font-weight:normal;color:black;font-style:italic}#sbo-rt-content a,#sbo-rt-content .packt_url{font-family:monospace;font-size:9pt;font-weight:normal;text-decoration:none;word-break:break-all}#sbo-rt-content var,#sbo-rt-content .packt_inlinemsgid{display:none}#sbo-rt-content p,#sbo-rt-content .packt_para{text-align:left;font-size:11pt;line-height:17px}#sbo-rt-content .underline{text-decoration:underline}#sbo-rt-content .CDPImageAlign{width:100%;display:block}#sbo-rt-content div.CDPAlign,#sbo-rt-content p.CDPAlign{width:100%;display:block;margin-top:.18in;margin-bottom:.18in}#sbo-rt-content .CDPAlignCenter{text-align:center}#sbo-rt-content .CDPAlignLeft{text-align:left}#sbo-rt-content .CDPAlignRight{text-align:right}#sbo-rt-content .fm-editor-equation{border:none}#sbo-rt-content nav a.section{border-bottom:1px solid black;width:100%;display:block}#sbo-rt-content body table{border-collapse:collapse}#sbo-rt-content body table td{border:1px solid black;padding:.31em .62em}#sbo-rt-content .header-title{font-size:2.5em}#sbo-rt-content img.inline-image{height:1em}#sbo-rt-content .chapter-title{font-size:2.5em}#sbo-rt-content h1,#sbo-rt-content .packt_head1{font-size:2em}#sbo-rt-content h2,#sbo-rt-content .packt_head2{font-size:1.5em}#sbo-rt-content h3,#sbo-rt-content .packt_head3{font-size:1.17em}#sbo-rt-content h4,#sbo-rt-content .packt_head4{font-size:1em}#sbo-rt-content code,#sbo-rt-content .packt_code,#sbo-rt-content .packt_codeblock,#sbo-rt-content pre{font-size:.8em;margin-left:1.25em;padding-left:.3em;margin-bottom:.01em}#sbo-rt-content .packt_figref{font-size:.62em}#sbo-rt-content q,#sbo-rt-content .packt_quote{font-size:.68em}#sbo-rt-content .packt_tip{font-size:.68em;background-size:2.5em;margin-left:1.25em;margin-right:1.25em;padding-left:3em;min-height:2.5em}#sbo-rt-content .packt_infobox{font-size:.68em;background-size:2.5em;margin-left:1.25em;margin-right:1.25em;padding-left:3em;min-height:2.5em}#sbo-rt-content kbd,#sbo-rt-content .packt_action{font-size:.75em}#sbo-rt-content .packt_italics{font-size:.9em}#sbo-rt-content a,#sbo-rt-content .packt_url{font-size:.7em}#sbo-rt-content p,#sbo-rt-content .packt_para{font-size:1em;line-height:1.06em}#sbo-rt-content .CDPImageAlign{max-width:100%;max-height:100%}#sbo-rt-content div.CDPAlign,#sbo-rt-content p.CDPAlign{margin-top:.01em;margin-bottom:.01em}
+    </style>
+<style type="text/css" id="font-styles">#sbo-rt-content, #sbo-rt-content p, #sbo-rt-content div { font-size: &amp;lt;%= font_size %&amp;gt; !important; }</style>
+<style type="text/css" id="font-family">#sbo-rt-content, #sbo-rt-content p, #sbo-rt-content div { font-family: &amp;lt;%= font_family %&amp;gt; !important; }</style>
+<style type="text/css" id="column-width">#sbo-rt-content { max-width: &amp;lt;%= column_width %&amp;gt;% !important; margin: 0 auto !important; }</style>
+
+<style type="text/css">body{margin:1em;}#sbo-rt-content *{text-indent:0pt!important;}#sbo-rt-content .bq{margin-right:1em!important;}body{background-color:transparent!important;}#sbo-rt-content *{word-wrap:break-word!important;word-break:break-word!important;}#sbo-rt-content table,#sbo-rt-content pre{overflow-x:unset!important;overflow:unset!important;overflow-y:unset!important;white-space:pre-wrap!important;}</style>
+<div><h1 class="header-title">什么是机器人？</h1>
+                
+            
+            
+                
+<p>聊天机器人是一种允许你通过文本、图像或语音进行类似人类对话的应用程序。机器人可以集成到 web 应用程序或移动应用程序中。不同的应用程序，如 Facebook Messenger、Kik、微信或 Skype，支持各种类型的机器人，这些机器人可能会帮助你找到特定问题的答案，在沙龙预约，或在餐厅预订桌子。与机器人聊天应该像与客户服务代理或朋友聊天一样。这是一个机器人的例子，它在 Facebook Messenger 中帮助回答关于天气的问题。这个机器人是由微软制造的，被称为 Zo 机器人:</p>
+<p class="CDPAlignCenter CDPAlign"><img class="aligncenter size-full wp-image-981 image-border" src="img/a108e5b2-c9b3-48c5-a13c-deb0b14ace85.png" style="width:29.75em;height:51.50em;" width="565" height="978"/></p>
+<p class="mce-root"/>
+<p class="mce-root"/>
+<p>可以在云中部署一个机器人，以帮助根据用户需求扩展它可以处理的流量。为了让您了解创建智能和强大的机器人有多容易，我们将使用 bot 服务创建一个机器人，它将涵盖上述所有组件。</p>
+<p>在接下来的章节中，我们将快速描述 Azure 中可用的每个组件，以帮助我们构建机器人。</p>
+
+
+            
+
+            
+        
+    </div>
+
+
+
+  
+
+
+
+
+
+
+
+
+<style type="text/css" title="ibis-book">
+    #sbo-rt-content .chapter-number{font-weight:bold;font-size:8.3em;text-align:right;font-family:symbol}#sbo-rt-content .chapter-title{font-size:30pt;text-align:right}#sbo-rt-content h1,#sbo-rt-content .packt_head1{font-size:16pt;font-weight:bold}#sbo-rt-content h2,#sbo-rt-content .packt_head2{font-size:14pt;font-weight:bold}#sbo-rt-content h3,#sbo-rt-content .packt_head3{font-size:13pt;font-weight:bold}#sbo-rt-content h4,#sbo-rt-content .packt_head4{font-size:11pt;font-weight:normal;font-style:italic}#sbo-rt-content ul,#sbo-rt-content .packt_bullet{font-weight:normal;list-style-type:disc}#sbo-rt-content ol,#sbo-rt-content .packt_numbered{font-weight:normal}#sbo-rt-content .packt_normal{font-weight:normal}#sbo-rt-content code,#sbo-rt-content .packt_code,#sbo-rt-content .packt_codeblock,#sbo-rt-content pre{font-family:monospace;font-size:9pt;font-weight:normal;border-left:1px solid black;margin-left:20px;padding-left:5px;display:block;margin-bottom:.12in}#sbo-rt-content .packt_figref{font-size:10pt;font-weight:normal}#sbo-rt-content q,#sbo-rt-content .packt_quote{font-size:11pt;font-weight:normal;color:black;font-style:italic}#sbo-rt-content .packt_tip{font-size:11pt;font-weight:normal;color:black;font-style:italic;background-image:url(../assets/0a79c387-fdee-4347-a587-034cf8cf4f7f.png);background-position:left center;background-repeat:no-repeat;background-size:.6in;margin-left:20px;margin-right:20px;padding-left:.7in;min-height:.75in;}#sbo-rt-content .packt_infobox{font-size:11pt;font-weight:normal;color:black;font-style:italic;background-image:url(../assets/6f2eee5d-61a6-4ff8-8b44-493a0b8e545b.png);background-position:left center;background-repeat:no-repeat;background-size:.6in;margin-left:20px;margin-right:20px;padding-left:.7in;min-height:.75in;}#sbo-rt-content kbd,#sbo-rt-content .packt_action{font-family:monospace;font-size:9pt;font-weight:normal}#sbo-rt-content .packt_italics{font-size:11pt;font-weight:normal;color:black;font-style:italic}#sbo-rt-content a,#sbo-rt-content .packt_url{font-family:monospace;font-size:9pt;font-weight:normal;text-decoration:none;word-break:break-all}#sbo-rt-content var,#sbo-rt-content .packt_inlinemsgid{display:none}#sbo-rt-content p,#sbo-rt-content .packt_para{text-align:left;font-size:11pt;line-height:17px}#sbo-rt-content .underline{text-decoration:underline}#sbo-rt-content .CDPImageAlign{width:100%;display:block}#sbo-rt-content div.CDPAlign,#sbo-rt-content p.CDPAlign{width:100%;display:block;margin-top:.18in;margin-bottom:.18in}#sbo-rt-content .CDPAlignCenter{text-align:center}#sbo-rt-content .CDPAlignLeft{text-align:left}#sbo-rt-content .CDPAlignRight{text-align:right}#sbo-rt-content .fm-editor-equation{border:none}#sbo-rt-content nav a.section{border-bottom:1px solid black;width:100%;display:block}#sbo-rt-content body table{border-collapse:collapse}#sbo-rt-content body table td{border:1px solid black;padding:.31em .62em}#sbo-rt-content .header-title{font-size:2.5em}#sbo-rt-content img.inline-image{height:1em}#sbo-rt-content .chapter-title{font-size:2.5em}#sbo-rt-content h1,#sbo-rt-content .packt_head1{font-size:2em}#sbo-rt-content h2,#sbo-rt-content .packt_head2{font-size:1.5em}#sbo-rt-content h3,#sbo-rt-content .packt_head3{font-size:1.17em}#sbo-rt-content h4,#sbo-rt-content .packt_head4{font-size:1em}#sbo-rt-content code,#sbo-rt-content .packt_code,#sbo-rt-content .packt_codeblock,#sbo-rt-content pre{font-size:.8em;margin-left:1.25em;padding-left:.3em;margin-bottom:.01em}#sbo-rt-content .packt_figref{font-size:.62em}#sbo-rt-content q,#sbo-rt-content .packt_quote{font-size:.68em}#sbo-rt-content .packt_tip{font-size:.68em;background-size:2.5em;margin-left:1.25em;margin-right:1.25em;padding-left:3em;min-height:2.5em}#sbo-rt-content .packt_infobox{font-size:.68em;background-size:2.5em;margin-left:1.25em;margin-right:1.25em;padding-left:3em;min-height:2.5em}#sbo-rt-content kbd,#sbo-rt-content .packt_action{font-size:.75em}#sbo-rt-content .packt_italics{font-size:.9em}#sbo-rt-content a,#sbo-rt-content .packt_url{font-size:.7em}#sbo-rt-content p,#sbo-rt-content .packt_para{font-size:1em;line-height:1.06em}#sbo-rt-content .CDPImageAlign{max-width:100%;max-height:100%}#sbo-rt-content div.CDPAlign,#sbo-rt-content p.CDPAlign{margin-top:.01em;margin-bottom:.01em}
+    </style>
+<style type="text/css" id="font-styles">#sbo-rt-content, #sbo-rt-content p, #sbo-rt-content div { font-size: &amp;lt;%= font_size %&amp;gt; !important; }</style>
+<style type="text/css" id="font-family">#sbo-rt-content, #sbo-rt-content p, #sbo-rt-content div { font-family: &amp;lt;%= font_family %&amp;gt; !important; }</style>
+<style type="text/css" id="column-width">#sbo-rt-content { max-width: &amp;lt;%= column_width %&amp;gt;% !important; margin: 0 auto !important; }</style>
+
+<style type="text/css">body{margin:1em;}#sbo-rt-content *{text-indent:0pt!important;}#sbo-rt-content .bq{margin-right:1em!important;}body{background-color:transparent!important;}#sbo-rt-content *{word-wrap:break-word!important;word-break:break-word!important;}#sbo-rt-content table,#sbo-rt-content pre{overflow-x:unset!important;overflow:unset!important;overflow-y:unset!important;white-space:pre-wrap!important;}</style>
+<div><h1 class="header-title">Bot Builder SDK</h1>
+                
+            
+            
+                
+<p>Bot Builder SDK 使您能够创建 Bot。两者都支持。NET 和 Node.js 语言，以覆盖广大的开发人员。</p>
+
+
+            
+
+            
+        
+    </div>
+
+
+
+  
+
+
+
+
+
+
+
+
+<style type="text/css" title="ibis-book">
+    #sbo-rt-content .chapter-number{font-weight:bold;font-size:8.3em;text-align:right;font-family:symbol}#sbo-rt-content .chapter-title{font-size:30pt;text-align:right}#sbo-rt-content h1,#sbo-rt-content .packt_head1{font-size:16pt;font-weight:bold}#sbo-rt-content h2,#sbo-rt-content .packt_head2{font-size:14pt;font-weight:bold}#sbo-rt-content h3,#sbo-rt-content .packt_head3{font-size:13pt;font-weight:bold}#sbo-rt-content h4,#sbo-rt-content .packt_head4{font-size:11pt;font-weight:normal;font-style:italic}#sbo-rt-content ul,#sbo-rt-content .packt_bullet{font-weight:normal;list-style-type:disc}#sbo-rt-content ol,#sbo-rt-content .packt_numbered{font-weight:normal}#sbo-rt-content .packt_normal{font-weight:normal}#sbo-rt-content code,#sbo-rt-content .packt_code,#sbo-rt-content .packt_codeblock,#sbo-rt-content pre{font-family:monospace;font-size:9pt;font-weight:normal;border-left:1px solid black;margin-left:20px;padding-left:5px;display:block;margin-bottom:.12in}#sbo-rt-content .packt_figref{font-size:10pt;font-weight:normal}#sbo-rt-content q,#sbo-rt-content .packt_quote{font-size:11pt;font-weight:normal;color:black;font-style:italic}#sbo-rt-content .packt_tip{font-size:11pt;font-weight:normal;color:black;font-style:italic;background-image:url(../assets/0a79c387-fdee-4347-a587-034cf8cf4f7f.png);background-position:left center;background-repeat:no-repeat;background-size:.6in;margin-left:20px;margin-right:20px;padding-left:.7in;min-height:.75in;}#sbo-rt-content .packt_infobox{font-size:11pt;font-weight:normal;color:black;font-style:italic;background-image:url(../assets/6f2eee5d-61a6-4ff8-8b44-493a0b8e545b.png);background-position:left center;background-repeat:no-repeat;background-size:.6in;margin-left:20px;margin-right:20px;padding-left:.7in;min-height:.75in;}#sbo-rt-content kbd,#sbo-rt-content .packt_action{font-family:monospace;font-size:9pt;font-weight:normal}#sbo-rt-content .packt_italics{font-size:11pt;font-weight:normal;color:black;font-style:italic}#sbo-rt-content a,#sbo-rt-content .packt_url{font-family:monospace;font-size:9pt;font-weight:normal;text-decoration:none;word-break:break-all}#sbo-rt-content var,#sbo-rt-content .packt_inlinemsgid{display:none}#sbo-rt-content p,#sbo-rt-content .packt_para{text-align:left;font-size:11pt;line-height:17px}#sbo-rt-content .underline{text-decoration:underline}#sbo-rt-content .CDPImageAlign{width:100%;display:block}#sbo-rt-content div.CDPAlign,#sbo-rt-content p.CDPAlign{width:100%;display:block;margin-top:.18in;margin-bottom:.18in}#sbo-rt-content .CDPAlignCenter{text-align:center}#sbo-rt-content .CDPAlignLeft{text-align:left}#sbo-rt-content .CDPAlignRight{text-align:right}#sbo-rt-content .fm-editor-equation{border:none}#sbo-rt-content nav a.section{border-bottom:1px solid black;width:100%;display:block}#sbo-rt-content body table{border-collapse:collapse}#sbo-rt-content body table td{border:1px solid black;padding:.31em .62em}#sbo-rt-content .header-title{font-size:2.5em}#sbo-rt-content img.inline-image{height:1em}#sbo-rt-content .chapter-title{font-size:2.5em}#sbo-rt-content h1,#sbo-rt-content .packt_head1{font-size:2em}#sbo-rt-content h2,#sbo-rt-content .packt_head2{font-size:1.5em}#sbo-rt-content h3,#sbo-rt-content .packt_head3{font-size:1.17em}#sbo-rt-content h4,#sbo-rt-content .packt_head4{font-size:1em}#sbo-rt-content code,#sbo-rt-content .packt_code,#sbo-rt-content .packt_codeblock,#sbo-rt-content pre{font-size:.8em;margin-left:1.25em;padding-left:.3em;margin-bottom:.01em}#sbo-rt-content .packt_figref{font-size:.62em}#sbo-rt-content q,#sbo-rt-content .packt_quote{font-size:.68em}#sbo-rt-content .packt_tip{font-size:.68em;background-size:2.5em;margin-left:1.25em;margin-right:1.25em;padding-left:3em;min-height:2.5em}#sbo-rt-content .packt_infobox{font-size:.68em;background-size:2.5em;margin-left:1.25em;margin-right:1.25em;padding-left:3em;min-height:2.5em}#sbo-rt-content kbd,#sbo-rt-content .packt_action{font-size:.75em}#sbo-rt-content .packt_italics{font-size:.9em}#sbo-rt-content a,#sbo-rt-content .packt_url{font-size:.7em}#sbo-rt-content p,#sbo-rt-content .packt_para{font-size:1em;line-height:1.06em}#sbo-rt-content .CDPImageAlign{max-width:100%;max-height:100%}#sbo-rt-content div.CDPAlign,#sbo-rt-content p.CDPAlign{margin-top:.01em;margin-bottom:.01em}
+    </style>
+<style type="text/css" id="font-styles">#sbo-rt-content, #sbo-rt-content p, #sbo-rt-content div { font-size: &amp;lt;%= font_size %&amp;gt; !important; }</style>
+<style type="text/css" id="font-family">#sbo-rt-content, #sbo-rt-content p, #sbo-rt-content div { font-family: &amp;lt;%= font_family %&amp;gt; !important; }</style>
+<style type="text/css" id="column-width">#sbo-rt-content { max-width: &amp;lt;%= column_width %&amp;gt;% !important; margin: 0 auto !important; }</style>
+
+<style type="text/css">body{margin:1em;}#sbo-rt-content *{text-indent:0pt!important;}#sbo-rt-content .bq{margin-right:1em!important;}body{background-color:transparent!important;}#sbo-rt-content *{word-wrap:break-word!important;word-break:break-word!important;}#sbo-rt-content table,#sbo-rt-content pre{overflow-x:unset!important;overflow:unset!important;overflow-y:unset!important;white-space:pre-wrap!important;}</style>
+<div><h1 class="header-title">Bot 框架</h1>
+                
+            
+            
+                
+<p>机器人框架使您能够将机器人连接到各种社交媒体渠道。您可以连接任意数量的频道，包括 Facebook Messenger、Skype、Teams、Kik 或自定义频道。</p>
+<p>除了 SDK 和框架，我们还有 Bot 框架仿真器和 Bot 框架通道仿真器。bot 框架模拟器是一个桌面应用程序，用于测试您的 bot，而 Bot 框架通道模拟器可以帮助您测试您的 Bot 在不同通道上的外观和工作方式。</p>
+
+
+            
+
+            
+        
+    </div>
+
+
+
+  
+
+
+
+
+
+
+
+
+<style type="text/css" title="ibis-book">
+    #sbo-rt-content .chapter-number{font-weight:bold;font-size:8.3em;text-align:right;font-family:symbol}#sbo-rt-content .chapter-title{font-size:30pt;text-align:right}#sbo-rt-content h1,#sbo-rt-content .packt_head1{font-size:16pt;font-weight:bold}#sbo-rt-content h2,#sbo-rt-content .packt_head2{font-size:14pt;font-weight:bold}#sbo-rt-content h3,#sbo-rt-content .packt_head3{font-size:13pt;font-weight:bold}#sbo-rt-content h4,#sbo-rt-content .packt_head4{font-size:11pt;font-weight:normal;font-style:italic}#sbo-rt-content ul,#sbo-rt-content .packt_bullet{font-weight:normal;list-style-type:disc}#sbo-rt-content ol,#sbo-rt-content .packt_numbered{font-weight:normal}#sbo-rt-content .packt_normal{font-weight:normal}#sbo-rt-content code,#sbo-rt-content .packt_code,#sbo-rt-content .packt_codeblock,#sbo-rt-content pre{font-family:monospace;font-size:9pt;font-weight:normal;border-left:1px solid black;margin-left:20px;padding-left:5px;display:block;margin-bottom:.12in}#sbo-rt-content .packt_figref{font-size:10pt;font-weight:normal}#sbo-rt-content q,#sbo-rt-content .packt_quote{font-size:11pt;font-weight:normal;color:black;font-style:italic}#sbo-rt-content .packt_tip{font-size:11pt;font-weight:normal;color:black;font-style:italic;background-image:url(../assets/0a79c387-fdee-4347-a587-034cf8cf4f7f.png);background-position:left center;background-repeat:no-repeat;background-size:.6in;margin-left:20px;margin-right:20px;padding-left:.7in;min-height:.75in;}#sbo-rt-content .packt_infobox{font-size:11pt;font-weight:normal;color:black;font-style:italic;background-image:url(../assets/6f2eee5d-61a6-4ff8-8b44-493a0b8e545b.png);background-position:left center;background-repeat:no-repeat;background-size:.6in;margin-left:20px;margin-right:20px;padding-left:.7in;min-height:.75in;}#sbo-rt-content kbd,#sbo-rt-content .packt_action{font-family:monospace;font-size:9pt;font-weight:normal}#sbo-rt-content .packt_italics{font-size:11pt;font-weight:normal;color:black;font-style:italic}#sbo-rt-content a,#sbo-rt-content .packt_url{font-family:monospace;font-size:9pt;font-weight:normal;text-decoration:none;word-break:break-all}#sbo-rt-content var,#sbo-rt-content .packt_inlinemsgid{display:none}#sbo-rt-content p,#sbo-rt-content .packt_para{text-align:left;font-size:11pt;line-height:17px}#sbo-rt-content .underline{text-decoration:underline}#sbo-rt-content .CDPImageAlign{width:100%;display:block}#sbo-rt-content div.CDPAlign,#sbo-rt-content p.CDPAlign{width:100%;display:block;margin-top:.18in;margin-bottom:.18in}#sbo-rt-content .CDPAlignCenter{text-align:center}#sbo-rt-content .CDPAlignLeft{text-align:left}#sbo-rt-content .CDPAlignRight{text-align:right}#sbo-rt-content .fm-editor-equation{border:none}#sbo-rt-content nav a.section{border-bottom:1px solid black;width:100%;display:block}#sbo-rt-content body table{border-collapse:collapse}#sbo-rt-content body table td{border:1px solid black;padding:.31em .62em}#sbo-rt-content .header-title{font-size:2.5em}#sbo-rt-content img.inline-image{height:1em}#sbo-rt-content .chapter-title{font-size:2.5em}#sbo-rt-content h1,#sbo-rt-content .packt_head1{font-size:2em}#sbo-rt-content h2,#sbo-rt-content .packt_head2{font-size:1.5em}#sbo-rt-content h3,#sbo-rt-content .packt_head3{font-size:1.17em}#sbo-rt-content h4,#sbo-rt-content .packt_head4{font-size:1em}#sbo-rt-content code,#sbo-rt-content .packt_code,#sbo-rt-content .packt_codeblock,#sbo-rt-content pre{font-size:.8em;margin-left:1.25em;padding-left:.3em;margin-bottom:.01em}#sbo-rt-content .packt_figref{font-size:.62em}#sbo-rt-content q,#sbo-rt-content .packt_quote{font-size:.68em}#sbo-rt-content .packt_tip{font-size:.68em;background-size:2.5em;margin-left:1.25em;margin-right:1.25em;padding-left:3em;min-height:2.5em}#sbo-rt-content .packt_infobox{font-size:.68em;background-size:2.5em;margin-left:1.25em;margin-right:1.25em;padding-left:3em;min-height:2.5em}#sbo-rt-content kbd,#sbo-rt-content .packt_action{font-size:.75em}#sbo-rt-content .packt_italics{font-size:.9em}#sbo-rt-content a,#sbo-rt-content .packt_url{font-size:.7em}#sbo-rt-content p,#sbo-rt-content .packt_para{font-size:1em;line-height:1.06em}#sbo-rt-content .CDPImageAlign{max-width:100%;max-height:100%}#sbo-rt-content div.CDPAlign,#sbo-rt-content p.CDPAlign{margin-top:.01em;margin-bottom:.01em}
+    </style>
+<style type="text/css" id="font-styles">#sbo-rt-content, #sbo-rt-content p, #sbo-rt-content div { font-size: &amp;lt;%= font_size %&amp;gt; !important; }</style>
+<style type="text/css" id="font-family">#sbo-rt-content, #sbo-rt-content p, #sbo-rt-content div { font-family: &amp;lt;%= font_family %&amp;gt; !important; }</style>
+<style type="text/css" id="column-width">#sbo-rt-content { max-width: &amp;lt;%= column_width %&amp;gt;% !important; margin: 0 auto !important; }</style>
+
+<style type="text/css">body{margin:1em;}#sbo-rt-content *{text-indent:0pt!important;}#sbo-rt-content .bq{margin-right:1em!important;}body{background-color:transparent!important;}#sbo-rt-content *{word-wrap:break-word!important;word-break:break-word!important;}#sbo-rt-content table,#sbo-rt-content pre{overflow-x:unset!important;overflow:unset!important;overflow-y:unset!important;white-space:pre-wrap!important;}</style>
+<div><h1 class="header-title">QnA 制造商</h1>
+                
+            
+            
+                
+<p>QnA Maker 服务帮助我们快速创建基本的对话机器人。它可以与<strong>语言理解智能服务</strong> ( <strong>路易斯</strong>)集成，创建更多智能机器人。QnA Maker 和 LUIS 都是认知服务，我们在<a href="89299379-0f5e-4602-ad78-9d3d46a0710e.xhtml" target="_blank">第 3 章</a>、<em>认知服务中简单提到过。</em></p>
+
+
+            
+
+            
+        
+    </div>
+
+
+
+  
+
+
+
+
+
+
+
+
+<style type="text/css" title="ibis-book">
+    #sbo-rt-content .chapter-number{font-weight:bold;font-size:8.3em;text-align:right;font-family:symbol}#sbo-rt-content .chapter-title{font-size:30pt;text-align:right}#sbo-rt-content h1,#sbo-rt-content .packt_head1{font-size:16pt;font-weight:bold}#sbo-rt-content h2,#sbo-rt-content .packt_head2{font-size:14pt;font-weight:bold}#sbo-rt-content h3,#sbo-rt-content .packt_head3{font-size:13pt;font-weight:bold}#sbo-rt-content h4,#sbo-rt-content .packt_head4{font-size:11pt;font-weight:normal;font-style:italic}#sbo-rt-content ul,#sbo-rt-content .packt_bullet{font-weight:normal;list-style-type:disc}#sbo-rt-content ol,#sbo-rt-content .packt_numbered{font-weight:normal}#sbo-rt-content .packt_normal{font-weight:normal}#sbo-rt-content code,#sbo-rt-content .packt_code,#sbo-rt-content .packt_codeblock,#sbo-rt-content pre{font-family:monospace;font-size:9pt;font-weight:normal;border-left:1px solid black;margin-left:20px;padding-left:5px;display:block;margin-bottom:.12in}#sbo-rt-content .packt_figref{font-size:10pt;font-weight:normal}#sbo-rt-content q,#sbo-rt-content .packt_quote{font-size:11pt;font-weight:normal;color:black;font-style:italic}#sbo-rt-content .packt_tip{font-size:11pt;font-weight:normal;color:black;font-style:italic;background-image:url(../assets/0a79c387-fdee-4347-a587-034cf8cf4f7f.png);background-position:left center;background-repeat:no-repeat;background-size:.6in;margin-left:20px;margin-right:20px;padding-left:.7in;min-height:.75in;}#sbo-rt-content .packt_infobox{font-size:11pt;font-weight:normal;color:black;font-style:italic;background-image:url(../assets/6f2eee5d-61a6-4ff8-8b44-493a0b8e545b.png);background-position:left center;background-repeat:no-repeat;background-size:.6in;margin-left:20px;margin-right:20px;padding-left:.7in;min-height:.75in;}#sbo-rt-content kbd,#sbo-rt-content .packt_action{font-family:monospace;font-size:9pt;font-weight:normal}#sbo-rt-content .packt_italics{font-size:11pt;font-weight:normal;color:black;font-style:italic}#sbo-rt-content a,#sbo-rt-content .packt_url{font-family:monospace;font-size:9pt;font-weight:normal;text-decoration:none;word-break:break-all}#sbo-rt-content var,#sbo-rt-content .packt_inlinemsgid{display:none}#sbo-rt-content p,#sbo-rt-content .packt_para{text-align:left;font-size:11pt;line-height:17px}#sbo-rt-content .underline{text-decoration:underline}#sbo-rt-content .CDPImageAlign{width:100%;display:block}#sbo-rt-content div.CDPAlign,#sbo-rt-content p.CDPAlign{width:100%;display:block;margin-top:.18in;margin-bottom:.18in}#sbo-rt-content .CDPAlignCenter{text-align:center}#sbo-rt-content .CDPAlignLeft{text-align:left}#sbo-rt-content .CDPAlignRight{text-align:right}#sbo-rt-content .fm-editor-equation{border:none}#sbo-rt-content nav a.section{border-bottom:1px solid black;width:100%;display:block}#sbo-rt-content body table{border-collapse:collapse}#sbo-rt-content body table td{border:1px solid black;padding:.31em .62em}#sbo-rt-content .header-title{font-size:2.5em}#sbo-rt-content img.inline-image{height:1em}#sbo-rt-content .chapter-title{font-size:2.5em}#sbo-rt-content h1,#sbo-rt-content .packt_head1{font-size:2em}#sbo-rt-content h2,#sbo-rt-content .packt_head2{font-size:1.5em}#sbo-rt-content h3,#sbo-rt-content .packt_head3{font-size:1.17em}#sbo-rt-content h4,#sbo-rt-content .packt_head4{font-size:1em}#sbo-rt-content code,#sbo-rt-content .packt_code,#sbo-rt-content .packt_codeblock,#sbo-rt-content pre{font-size:.8em;margin-left:1.25em;padding-left:.3em;margin-bottom:.01em}#sbo-rt-content .packt_figref{font-size:.62em}#sbo-rt-content q,#sbo-rt-content .packt_quote{font-size:.68em}#sbo-rt-content .packt_tip{font-size:.68em;background-size:2.5em;margin-left:1.25em;margin-right:1.25em;padding-left:3em;min-height:2.5em}#sbo-rt-content .packt_infobox{font-size:.68em;background-size:2.5em;margin-left:1.25em;margin-right:1.25em;padding-left:3em;min-height:2.5em}#sbo-rt-content kbd,#sbo-rt-content .packt_action{font-size:.75em}#sbo-rt-content .packt_italics{font-size:.9em}#sbo-rt-content a,#sbo-rt-content .packt_url{font-size:.7em}#sbo-rt-content p,#sbo-rt-content .packt_para{font-size:1em;line-height:1.06em}#sbo-rt-content .CDPImageAlign{max-width:100%;max-height:100%}#sbo-rt-content div.CDPAlign,#sbo-rt-content p.CDPAlign{margin-top:.01em;margin-bottom:.01em}
+    </style>
+<style type="text/css" id="font-styles">#sbo-rt-content, #sbo-rt-content p, #sbo-rt-content div { font-size: &amp;lt;%= font_size %&amp;gt; !important; }</style>
+<style type="text/css" id="font-family">#sbo-rt-content, #sbo-rt-content p, #sbo-rt-content div { font-family: &amp;lt;%= font_family %&amp;gt; !important; }</style>
+<style type="text/css" id="column-width">#sbo-rt-content { max-width: &amp;lt;%= column_width %&amp;gt;% !important; margin: 0 auto !important; }</style>
+
+<style type="text/css">body{margin:1em;}#sbo-rt-content *{text-indent:0pt!important;}#sbo-rt-content .bq{margin-right:1em!important;}body{background-color:transparent!important;}#sbo-rt-content *{word-wrap:break-word!important;word-break:break-word!important;}#sbo-rt-content table,#sbo-rt-content pre{overflow-x:unset!important;overflow:unset!important;overflow-y:unset!important;white-space:pre-wrap!important;}</style>
+<div><h1 class="header-title">Bot 服务</h1>
+                
+            
+            
+                
+<p>Bot 服务通过结合 Bot Builder SDK 和我们前面讨论的 Bot 框架，使得创建 Bot 变得很容易。两者都支持。NET 和 Node.js 开发者。有五种模板可用于快速创建机器人:</p>
+<ul>
+<li>基本机器人</li>
+<li>表单 bot</li>
+<li>语言理解机器人</li>
+<li>问答机器人</li>
+<li>主动机器人</li>
+</ul>
+<p>以下是说明如何使用 bot 服务创建和运行 Bot 的高级步骤:</p>
+<p class="CDPAlignCenter CDPAlign"><img src="img/c7fba680-872d-4325-af0d-fd644e9e66a4.png" style="width:31.75em;height:18.58em;" width="1353" height="792"/></p>
+
+
+            
+
+            
+        
+    </div>
+
+
+
+  
+
+
+
+
+
+
+
+
+<style type="text/css" title="ibis-book">
+    #sbo-rt-content .chapter-number{font-weight:bold;font-size:8.3em;text-align:right;font-family:symbol}#sbo-rt-content .chapter-title{font-size:30pt;text-align:right}#sbo-rt-content h1,#sbo-rt-content .packt_head1{font-size:16pt;font-weight:bold}#sbo-rt-content h2,#sbo-rt-content .packt_head2{font-size:14pt;font-weight:bold}#sbo-rt-content h3,#sbo-rt-content .packt_head3{font-size:13pt;font-weight:bold}#sbo-rt-content h4,#sbo-rt-content .packt_head4{font-size:11pt;font-weight:normal;font-style:italic}#sbo-rt-content ul,#sbo-rt-content .packt_bullet{font-weight:normal;list-style-type:disc}#sbo-rt-content ol,#sbo-rt-content .packt_numbered{font-weight:normal}#sbo-rt-content .packt_normal{font-weight:normal}#sbo-rt-content code,#sbo-rt-content .packt_code,#sbo-rt-content .packt_codeblock,#sbo-rt-content pre{font-family:monospace;font-size:9pt;font-weight:normal;border-left:1px solid black;margin-left:20px;padding-left:5px;display:block;margin-bottom:.12in}#sbo-rt-content .packt_figref{font-size:10pt;font-weight:normal}#sbo-rt-content q,#sbo-rt-content .packt_quote{font-size:11pt;font-weight:normal;color:black;font-style:italic}#sbo-rt-content .packt_tip{font-size:11pt;font-weight:normal;color:black;font-style:italic;background-image:url(../assets/0a79c387-fdee-4347-a587-034cf8cf4f7f.png);background-position:left center;background-repeat:no-repeat;background-size:.6in;margin-left:20px;margin-right:20px;padding-left:.7in;min-height:.75in;}#sbo-rt-content .packt_infobox{font-size:11pt;font-weight:normal;color:black;font-style:italic;background-image:url(../assets/6f2eee5d-61a6-4ff8-8b44-493a0b8e545b.png);background-position:left center;background-repeat:no-repeat;background-size:.6in;margin-left:20px;margin-right:20px;padding-left:.7in;min-height:.75in;}#sbo-rt-content kbd,#sbo-rt-content .packt_action{font-family:monospace;font-size:9pt;font-weight:normal}#sbo-rt-content .packt_italics{font-size:11pt;font-weight:normal;color:black;font-style:italic}#sbo-rt-content a,#sbo-rt-content .packt_url{font-family:monospace;font-size:9pt;font-weight:normal;text-decoration:none;word-break:break-all}#sbo-rt-content var,#sbo-rt-content .packt_inlinemsgid{display:none}#sbo-rt-content p,#sbo-rt-content .packt_para{text-align:left;font-size:11pt;line-height:17px}#sbo-rt-content .underline{text-decoration:underline}#sbo-rt-content .CDPImageAlign{width:100%;display:block}#sbo-rt-content div.CDPAlign,#sbo-rt-content p.CDPAlign{width:100%;display:block;margin-top:.18in;margin-bottom:.18in}#sbo-rt-content .CDPAlignCenter{text-align:center}#sbo-rt-content .CDPAlignLeft{text-align:left}#sbo-rt-content .CDPAlignRight{text-align:right}#sbo-rt-content .fm-editor-equation{border:none}#sbo-rt-content nav a.section{border-bottom:1px solid black;width:100%;display:block}#sbo-rt-content body table{border-collapse:collapse}#sbo-rt-content body table td{border:1px solid black;padding:.31em .62em}#sbo-rt-content .header-title{font-size:2.5em}#sbo-rt-content img.inline-image{height:1em}#sbo-rt-content .chapter-title{font-size:2.5em}#sbo-rt-content h1,#sbo-rt-content .packt_head1{font-size:2em}#sbo-rt-content h2,#sbo-rt-content .packt_head2{font-size:1.5em}#sbo-rt-content h3,#sbo-rt-content .packt_head3{font-size:1.17em}#sbo-rt-content h4,#sbo-rt-content .packt_head4{font-size:1em}#sbo-rt-content code,#sbo-rt-content .packt_code,#sbo-rt-content .packt_codeblock,#sbo-rt-content pre{font-size:.8em;margin-left:1.25em;padding-left:.3em;margin-bottom:.01em}#sbo-rt-content .packt_figref{font-size:.62em}#sbo-rt-content q,#sbo-rt-content .packt_quote{font-size:.68em}#sbo-rt-content .packt_tip{font-size:.68em;background-size:2.5em;margin-left:1.25em;margin-right:1.25em;padding-left:3em;min-height:2.5em}#sbo-rt-content .packt_infobox{font-size:.68em;background-size:2.5em;margin-left:1.25em;margin-right:1.25em;padding-left:3em;min-height:2.5em}#sbo-rt-content kbd,#sbo-rt-content .packt_action{font-size:.75em}#sbo-rt-content .packt_italics{font-size:.9em}#sbo-rt-content a,#sbo-rt-content .packt_url{font-size:.7em}#sbo-rt-content p,#sbo-rt-content .packt_para{font-size:1em;line-height:1.06em}#sbo-rt-content .CDPImageAlign{max-width:100%;max-height:100%}#sbo-rt-content div.CDPAlign,#sbo-rt-content p.CDPAlign{margin-top:.01em;margin-bottom:.01em}
+    </style>
+<style type="text/css" id="font-styles">#sbo-rt-content, #sbo-rt-content p, #sbo-rt-content div { font-size: &amp;lt;%= font_size %&amp;gt; !important; }</style>
+<style type="text/css" id="font-family">#sbo-rt-content, #sbo-rt-content p, #sbo-rt-content div { font-family: &amp;lt;%= font_family %&amp;gt; !important; }</style>
+<style type="text/css" id="column-width">#sbo-rt-content { max-width: &amp;lt;%= column_width %&amp;gt;% !important; margin: 0 auto !important; }</style>
+
+<style type="text/css">body{margin:1em;}#sbo-rt-content *{text-indent:0pt!important;}#sbo-rt-content .bq{margin-right:1em!important;}body{background-color:transparent!important;}#sbo-rt-content *{word-wrap:break-word!important;word-break:break-word!important;}#sbo-rt-content table,#sbo-rt-content pre{overflow-x:unset!important;overflow:unset!important;overflow-y:unset!important;white-space:pre-wrap!important;}</style>
+<div><h1 class="header-title">使用 bot 服务创建 Bot</h1>
+                
+            
+            
+                
+<p>当我们用 Azure bot 服务创建一个 Bot 时，Azure 为我们做了很多工作。它提供 bot，基于 bot builder SDK 创建 bot 项目，并发布 bot。以这种方式创建一个机器人只需要一个 Azure 订阅。</p>
+<ol>
+<li>首先，去 https://dev.botframework.com 的机器人框架网站，它会带你去 Azure 门户网站:</li>
+</ol>
+<p class="CDPAlignCenter CDPAlign"><img class="aligncenter size-full wp-image-982 image-border" src="img/8f45012d-265e-4c02-bfab-f16272b602e2.png" style="width:44.42em;height:24.83em;" width="1950" height="1089"/></p>
+<ol start="2">
+<li>或者，我们可以直接进入位于 https://portal.azure.com 的 Azure 门户网站，搜索<kbd>Bot Service</kbd>:</li>
+</ol>
+<p class="CDPAlignCenter CDPAlign"><img src="img/b4498945-95da-4f33-b2cd-4b38234d1634.png" style="width:55.67em;height:31.25em;" width="3000" height="1683"/></p>
+
+<ol start="3">
+<li>对于本例，选择...</li></ol></div>
+
+
+
+  
+
+
+
+
+
+
+
+
+<style type="text/css" title="ibis-book">
+    #sbo-rt-content .chapter-number{font-weight:bold;font-size:8.3em;text-align:right;font-family:symbol}#sbo-rt-content .chapter-title{font-size:30pt;text-align:right}#sbo-rt-content h1,#sbo-rt-content .packt_head1{font-size:16pt;font-weight:bold}#sbo-rt-content h2,#sbo-rt-content .packt_head2{font-size:14pt;font-weight:bold}#sbo-rt-content h3,#sbo-rt-content .packt_head3{font-size:13pt;font-weight:bold}#sbo-rt-content h4,#sbo-rt-content .packt_head4{font-size:11pt;font-weight:normal;font-style:italic}#sbo-rt-content ul,#sbo-rt-content .packt_bullet{font-weight:normal;list-style-type:disc}#sbo-rt-content ol,#sbo-rt-content .packt_numbered{font-weight:normal}#sbo-rt-content .packt_normal{font-weight:normal}#sbo-rt-content code,#sbo-rt-content .packt_code,#sbo-rt-content .packt_codeblock,#sbo-rt-content pre{font-family:monospace;font-size:9pt;font-weight:normal;border-left:1px solid black;margin-left:20px;padding-left:5px;display:block;margin-bottom:.12in}#sbo-rt-content .packt_figref{font-size:10pt;font-weight:normal}#sbo-rt-content q,#sbo-rt-content .packt_quote{font-size:11pt;font-weight:normal;color:black;font-style:italic}#sbo-rt-content .packt_tip{font-size:11pt;font-weight:normal;color:black;font-style:italic;background-image:url(../assets/0a79c387-fdee-4347-a587-034cf8cf4f7f.png);background-position:left center;background-repeat:no-repeat;background-size:.6in;margin-left:20px;margin-right:20px;padding-left:.7in;min-height:.75in;}#sbo-rt-content .packt_infobox{font-size:11pt;font-weight:normal;color:black;font-style:italic;background-image:url(../assets/6f2eee5d-61a6-4ff8-8b44-493a0b8e545b.png);background-position:left center;background-repeat:no-repeat;background-size:.6in;margin-left:20px;margin-right:20px;padding-left:.7in;min-height:.75in;}#sbo-rt-content kbd,#sbo-rt-content .packt_action{font-family:monospace;font-size:9pt;font-weight:normal}#sbo-rt-content .packt_italics{font-size:11pt;font-weight:normal;color:black;font-style:italic}#sbo-rt-content a,#sbo-rt-content .packt_url{font-family:monospace;font-size:9pt;font-weight:normal;text-decoration:none;word-break:break-all}#sbo-rt-content var,#sbo-rt-content .packt_inlinemsgid{display:none}#sbo-rt-content p,#sbo-rt-content .packt_para{text-align:left;font-size:11pt;line-height:17px}#sbo-rt-content .underline{text-decoration:underline}#sbo-rt-content .CDPImageAlign{width:100%;display:block}#sbo-rt-content div.CDPAlign,#sbo-rt-content p.CDPAlign{width:100%;display:block;margin-top:.18in;margin-bottom:.18in}#sbo-rt-content .CDPAlignCenter{text-align:center}#sbo-rt-content .CDPAlignLeft{text-align:left}#sbo-rt-content .CDPAlignRight{text-align:right}#sbo-rt-content .fm-editor-equation{border:none}#sbo-rt-content nav a.section{border-bottom:1px solid black;width:100%;display:block}#sbo-rt-content body table{border-collapse:collapse}#sbo-rt-content body table td{border:1px solid black;padding:.31em .62em}#sbo-rt-content .header-title{font-size:2.5em}#sbo-rt-content img.inline-image{height:1em}#sbo-rt-content .chapter-title{font-size:2.5em}#sbo-rt-content h1,#sbo-rt-content .packt_head1{font-size:2em}#sbo-rt-content h2,#sbo-rt-content .packt_head2{font-size:1.5em}#sbo-rt-content h3,#sbo-rt-content .packt_head3{font-size:1.17em}#sbo-rt-content h4,#sbo-rt-content .packt_head4{font-size:1em}#sbo-rt-content code,#sbo-rt-content .packt_code,#sbo-rt-content .packt_codeblock,#sbo-rt-content pre{font-size:.8em;margin-left:1.25em;padding-left:.3em;margin-bottom:.01em}#sbo-rt-content .packt_figref{font-size:.62em}#sbo-rt-content q,#sbo-rt-content .packt_quote{font-size:.68em}#sbo-rt-content .packt_tip{font-size:.68em;background-size:2.5em;margin-left:1.25em;margin-right:1.25em;padding-left:3em;min-height:2.5em}#sbo-rt-content .packt_infobox{font-size:.68em;background-size:2.5em;margin-left:1.25em;margin-right:1.25em;padding-left:3em;min-height:2.5em}#sbo-rt-content kbd,#sbo-rt-content .packt_action{font-size:.75em}#sbo-rt-content .packt_italics{font-size:.9em}#sbo-rt-content a,#sbo-rt-content .packt_url{font-size:.7em}#sbo-rt-content p,#sbo-rt-content .packt_para{font-size:1em;line-height:1.06em}#sbo-rt-content .CDPImageAlign{max-width:100%;max-height:100%}#sbo-rt-content div.CDPAlign,#sbo-rt-content p.CDPAlign{margin-top:.01em;margin-bottom:.01em}
+    </style>
+<style type="text/css" id="font-styles">#sbo-rt-content, #sbo-rt-content p, #sbo-rt-content div { font-size: &amp;lt;%= font_size %&amp;gt; !important; }</style>
+<style type="text/css" id="font-family">#sbo-rt-content, #sbo-rt-content p, #sbo-rt-content div { font-family: &amp;lt;%= font_family %&amp;gt; !important; }</style>
+<style type="text/css" id="column-width">#sbo-rt-content { max-width: &amp;lt;%= column_width %&amp;gt;% !important; margin: 0 auto !important; }</style>
+
+<style type="text/css">body{margin:1em;}#sbo-rt-content *{text-indent:0pt!important;}#sbo-rt-content .bq{margin-right:1em!important;}body{background-color:transparent!important;}#sbo-rt-content *{word-wrap:break-word!important;word-break:break-word!important;}#sbo-rt-content table,#sbo-rt-content pre{overflow-x:unset!important;overflow:unset!important;overflow-y:unset!important;white-space:pre-wrap!important;}</style>
+<div><h1 class="header-title">路易斯应用</h1>
+                
+            
+            
+                
+<p>我们的机器人还可以接收音频作为输入，门户允许我们集成 LUIS 应用程序。如果您已经有 LUIS 申请，您可以在此处提供信息:</p>
+<p class="CDPAlignCenter CDPAlign"><img class="aligncenter size-full wp-image-998 image-border" src="img/28c5fdbe-9b58-4e76-932b-de944022212f.png" style="width:162.50em;height:82.92em;" width="1950" height="995"/></p>
+
+
+            
+
+            
+        
+    </div>
+
+
+
+  
+
+
+
+
+
+
+
+
+<style type="text/css" title="ibis-book">
+    #sbo-rt-content .chapter-number{font-weight:bold;font-size:8.3em;text-align:right;font-family:symbol}#sbo-rt-content .chapter-title{font-size:30pt;text-align:right}#sbo-rt-content h1,#sbo-rt-content .packt_head1{font-size:16pt;font-weight:bold}#sbo-rt-content h2,#sbo-rt-content .packt_head2{font-size:14pt;font-weight:bold}#sbo-rt-content h3,#sbo-rt-content .packt_head3{font-size:13pt;font-weight:bold}#sbo-rt-content h4,#sbo-rt-content .packt_head4{font-size:11pt;font-weight:normal;font-style:italic}#sbo-rt-content ul,#sbo-rt-content .packt_bullet{font-weight:normal;list-style-type:disc}#sbo-rt-content ol,#sbo-rt-content .packt_numbered{font-weight:normal}#sbo-rt-content .packt_normal{font-weight:normal}#sbo-rt-content code,#sbo-rt-content .packt_code,#sbo-rt-content .packt_codeblock,#sbo-rt-content pre{font-family:monospace;font-size:9pt;font-weight:normal;border-left:1px solid black;margin-left:20px;padding-left:5px;display:block;margin-bottom:.12in}#sbo-rt-content .packt_figref{font-size:10pt;font-weight:normal}#sbo-rt-content q,#sbo-rt-content .packt_quote{font-size:11pt;font-weight:normal;color:black;font-style:italic}#sbo-rt-content .packt_tip{font-size:11pt;font-weight:normal;color:black;font-style:italic;background-image:url(../assets/0a79c387-fdee-4347-a587-034cf8cf4f7f.png);background-position:left center;background-repeat:no-repeat;background-size:.6in;margin-left:20px;margin-right:20px;padding-left:.7in;min-height:.75in;}#sbo-rt-content .packt_infobox{font-size:11pt;font-weight:normal;color:black;font-style:italic;background-image:url(../assets/6f2eee5d-61a6-4ff8-8b44-493a0b8e545b.png);background-position:left center;background-repeat:no-repeat;background-size:.6in;margin-left:20px;margin-right:20px;padding-left:.7in;min-height:.75in;}#sbo-rt-content kbd,#sbo-rt-content .packt_action{font-family:monospace;font-size:9pt;font-weight:normal}#sbo-rt-content .packt_italics{font-size:11pt;font-weight:normal;color:black;font-style:italic}#sbo-rt-content a,#sbo-rt-content .packt_url{font-family:monospace;font-size:9pt;font-weight:normal;text-decoration:none;word-break:break-all}#sbo-rt-content var,#sbo-rt-content .packt_inlinemsgid{display:none}#sbo-rt-content p,#sbo-rt-content .packt_para{text-align:left;font-size:11pt;line-height:17px}#sbo-rt-content .underline{text-decoration:underline}#sbo-rt-content .CDPImageAlign{width:100%;display:block}#sbo-rt-content div.CDPAlign,#sbo-rt-content p.CDPAlign{width:100%;display:block;margin-top:.18in;margin-bottom:.18in}#sbo-rt-content .CDPAlignCenter{text-align:center}#sbo-rt-content .CDPAlignLeft{text-align:left}#sbo-rt-content .CDPAlignRight{text-align:right}#sbo-rt-content .fm-editor-equation{border:none}#sbo-rt-content nav a.section{border-bottom:1px solid black;width:100%;display:block}#sbo-rt-content body table{border-collapse:collapse}#sbo-rt-content body table td{border:1px solid black;padding:.31em .62em}#sbo-rt-content .header-title{font-size:2.5em}#sbo-rt-content img.inline-image{height:1em}#sbo-rt-content .chapter-title{font-size:2.5em}#sbo-rt-content h1,#sbo-rt-content .packt_head1{font-size:2em}#sbo-rt-content h2,#sbo-rt-content .packt_head2{font-size:1.5em}#sbo-rt-content h3,#sbo-rt-content .packt_head3{font-size:1.17em}#sbo-rt-content h4,#sbo-rt-content .packt_head4{font-size:1em}#sbo-rt-content code,#sbo-rt-content .packt_code,#sbo-rt-content .packt_codeblock,#sbo-rt-content pre{font-size:.8em;margin-left:1.25em;padding-left:.3em;margin-bottom:.01em}#sbo-rt-content .packt_figref{font-size:.62em}#sbo-rt-content q,#sbo-rt-content .packt_quote{font-size:.68em}#sbo-rt-content .packt_tip{font-size:.68em;background-size:2.5em;margin-left:1.25em;margin-right:1.25em;padding-left:3em;min-height:2.5em}#sbo-rt-content .packt_infobox{font-size:.68em;background-size:2.5em;margin-left:1.25em;margin-right:1.25em;padding-left:3em;min-height:2.5em}#sbo-rt-content kbd,#sbo-rt-content .packt_action{font-size:.75em}#sbo-rt-content .packt_italics{font-size:.9em}#sbo-rt-content a,#sbo-rt-content .packt_url{font-size:.7em}#sbo-rt-content p,#sbo-rt-content .packt_para{font-size:1em;line-height:1.06em}#sbo-rt-content .CDPImageAlign{max-width:100%;max-height:100%}#sbo-rt-content div.CDPAlign,#sbo-rt-content p.CDPAlign{margin-top:.01em;margin-bottom:.01em}
+    </style>
+<style type="text/css" id="font-styles">#sbo-rt-content, #sbo-rt-content p, #sbo-rt-content div { font-size: &amp;lt;%= font_size %&amp;gt; !important; }</style>
+<style type="text/css" id="font-family">#sbo-rt-content, #sbo-rt-content p, #sbo-rt-content div { font-family: &amp;lt;%= font_family %&amp;gt; !important; }</style>
+<style type="text/css" id="column-width">#sbo-rt-content { max-width: &amp;lt;%= column_width %&amp;gt;% !important; margin: 0 auto !important; }</style>
+
+<style type="text/css">body{margin:1em;}#sbo-rt-content *{text-indent:0pt!important;}#sbo-rt-content .bq{margin-right:1em!important;}body{background-color:transparent!important;}#sbo-rt-content *{word-wrap:break-word!important;word-break:break-word!important;}#sbo-rt-content table,#sbo-rt-content pre{overflow-x:unset!important;overflow:unset!important;overflow-y:unset!important;white-space:pre-wrap!important;}</style>
+<div><h1 class="header-title">摘要</h1>
+                
+            
+            
+                
+<p>在这一章中，我们已经学习了使用各种基于 Azure 的服务，这些服务帮助我们创建可以快速轻松地集成到不同 messenger 服务中的机器人。在下一章中，我们将了解 Azure Machine Learning Studio，我们可以使用它来创建自定义的机器学习模型。</p>
+
+
+            
+
+            
+        
+    </div>
+
+
+
+  
+</body></html>

@@ -1,0 +1,699 @@
+<html><head/><body>
+    
+        <title>Principles and Foundations of IoT and AI</title>
+        
+        <meta charset="utf-8"/>
+    
+<!-- kobo-style -->
+<script type="text/javascript" src="img/kobo.js"/>
+<style type="text/css" id="koboSpanStyle">.koboSpan { -webkit-text-combine: inherit; }</style>
+
+
+
+    
+        
+
+                            
+                    <h1 class="header-title">物联网和人工智能的原理和基础</h1>
+                
+            
+            
+                
+<p class="mce-root">恭喜你购买了这本书；这表明你对让自己跟上最新的技术进步非常感兴趣。本书论述了当前商业场景中的三大趋势，<strong>物联网</strong> ( <strong> IoT </strong>)、大数据、<strong>人工智能</strong> ( <strong> AI </strong>)。连接到互联网的设备数量的指数级增长，以及它们创建的数据量的指数级增长，使得使用人工智能和<strong>深度学习</strong> ( <strong> DL </strong>)的分析和预测技术成为必要。这本书专门针对第三个组成部分，即针对物联网产生的大数据，在 AI 领域可用的各种分析和预测方法或模型。</p>
+<p class="mce-root">这一章将向你简要介绍这三种趋势，并详述它们是如何相互依存的。物联网设备生成的数据被上传到云端，因此您还将了解各种物联网云平台及其提供的数据服务。</p>
+<p class="mce-root">本章将涵盖以下几点:</p>
+<ul>
+<li>了解什么是物联网中的<em>事物</em>，什么设备构成了事物，不同的物联网平台是什么，以及什么是物联网垂直市场</li>
+<li>知道什么是大数据，了解物联网产生的数据量如何位于大数据范围内</li>
+<li>理解人工智能如何以及为什么有助于理解物联网生成的海量数据</li>
+<li>借助插图，了解物联网、大数据和人工智能如何共同帮助我们塑造一个更美好的世界</li>
+<li>了解执行分析所需的一些工具</li>
+</ul>
+
+
+            
+
+            
+        
+    
+
+
+
+    
+        <title>What is IoT 101?</title>
+        
+        <meta charset="utf-8"/>
+    
+<!-- kobo-style -->
+<script type="text/javascript" src="img/kobo.js"/>
+<style type="text/css" id="koboSpanStyle">.koboSpan { -webkit-text-combine: inherit; }</style>
+
+
+
+    
+        
+
+                            
+                    <h1 class="header-title">什么是物联网 101？</h1>
+                
+            
+            
+                
+<p>物联网一词是 Kevin Ashton 在 1999 年创造的。那时，输入计算机的大部分数据都是由人类生成的；他提出，最好的方法是让计算机直接获取数据，不需要人类的任何干预。因此，他提出了 RFID 和传感器等收集数据的东西，应该连接到网络，并直接馈送到计算机。</p>
+<p>你可以在这里阅读阿什顿谈到他所说的物联网的完整文章:<a href="http://www.itrco.jp/libraries/RFIDjournal-That%20Internet%20of%20Things%20Thing.pdf">http://www . it rco . jp/libraries/RFID journal-That % 20 internet % 20 of % 20 things % 20 things . pdf</a>。</p>
+<p>今天，物联网(也称为<strong>万物互联</strong>，有时也称为雾网)指的是连接到互联网的传感器、执行器和智能手机等广泛的事物。这些东西可以是任何东西:一个拥有可穿戴设备(甚至是手机)的人，一个贴有 RFID 标签的动物，甚至是我们的日常设备，如冰箱、洗衣机，甚至是咖啡机。这些事物可以是物理事物，即存在于物理世界中并可以被感知、驱动和连接的事物，也可以是信息世界(虚拟事物)，即不是有形存在的事物，而是作为信息(数据)存在并可以被存储、处理和访问的事物。这些东西必然具有与互联网直接沟通的能力；可选地，它们可能具有感测、驱动、数据捕获、数据存储和数据处理的潜力。</p>
+<p>联合国机构<strong>国际电信组织</strong> ( <strong> ITU </strong>)将物联网定义为:</p>
+<p>“信息社会的全球基础设施，基于现有的和不断发展的可互操作的信息和通信技术，通过互连(物理和虚拟)事物来实现高级服务。”</p>
+<p>你可以在 https://www.itu.int/en/ITU-T/gsi/iot/Pages/default.aspx 了解更多信息。</p>
+<p>广阔的 ICT 已经为我们提供了随时随地的沟通；物联网增加了任何事物通信的新维度:</p>
+<div><img src="img/b2684b96-3079-4316-aa12-95e408ca38e3.png" style="width:32.17em;height:23.33em;"/></div>
+<p>物联网引入新维度(改编自 b-ITU-T Y.2060 报告)</p>
+<p>据预测，物联网作为一项技术将对我们生活的人类和社会产生深远的影响。为了让您对其深远影响有所了解，请考虑以下场景:</p>
+<ul>
+<li>你和我一样，住在高楼里，非常喜欢植物。经过大量的努力和照料，你用盆栽植物打造了一个属于自己的室内小花园。你的老板邀请你去旅行一周，你担心你的植物没有水活不了一周。物联网解决方案是为你的植物添加土壤湿度传感器，将它们连接到互联网，并添加执行器来远程打开或关闭供水和人工阳光。现在，你可以在世界上的任何地方，但你的植物不会死，你可以检查单个植物的土壤水分状况，并根据需要浇水。</li>
+<li>你在办公室度过了非常疲惫的一天；你只想回家，让别人给你煮咖啡，整理床铺，加热洗澡水，但遗憾的是你一个人在家。不再是了；物联网能帮上忙。您支持物联网的家庭助理可以从咖啡机中准备合适口味的咖啡，命令您的智能热水器按照您想要的方式打开并保持水温，并要求您的智能空调打开并冷却房间。</li>
+</ul>
+<p>选择只受你想象力的限制。前面两个场景对应于消费者物联网，即侧重于面向消费者的应用的物联网。还存在大范围的<strong>行业物联网</strong> ( <strong> IIoT </strong>)，其中制造商和行业优化流程并实施远程监控功能，以提高生产率和效率。在本书中，您将找到这两种物联网应用的实践经验。</p>
+
+
+            
+
+            
+        
+    
+
+
+
+    
+        <title>IoT reference model</title>
+        
+        <meta charset="utf-8"/>
+    
+<!-- kobo-style -->
+<script type="text/javascript" src="img/kobo.js"/>
+<style type="text/css" id="koboSpanStyle">.koboSpan { -webkit-text-combine: inherit; }</style>
+
+
+
+    
+        
+
+                            
+                    <h1 class="header-title">物联网参考模型</h1>
+                
+            
+            
+                
+<p>就像互联网的 OSI 参考模型一样，物联网架构是通过六层定义的:四个水平层和两个垂直层。两个垂直层是<strong>管理</strong>和<strong>安全</strong>，它们遍布所有四个水平层，如下图所示:</p>
+<div><img src="img/ec928810-f7c8-4fa2-8f00-7012b9d5de9d.png" style="width:39.58em;height:31.75em;"/></div>
+<p>物联网层</p>
+<p class="mce-root"/>
+<p class="mce-root"/>
+<p><strong>设备层</strong>:在堆栈的底部，我们有设备层，也称为<strong>感知层</strong>。这一层包含了感知或控制物理世界和获取数据(即通过感知物理世界)所需的物理事物。传感器、RFID 和执行器等现有硬件构成了感知层。</p>
+<p><strong>网络层</strong>:该层通过有线或无线网络提供网络支持和数据传输。该层将信息从设备层中的设备安全地传输到信息处理系统。传输<strong>介质</strong> <strong>和</strong> <strong>技术</strong>都属于网络层。例子包括 3G、UMTS、ZigBee、蓝牙、Wi-Fi 等等。</p>
+<p><strong>服务层</strong>:该层负责服务管理。它从网络层接收信息，将其存储到数据库中，处理该信息，并可以根据结果做出自动决策。</p>
+<p><strong>应用层</strong>:该层根据服务层中处理的信息管理应用程序。物联网可以实现广泛的应用:智能城市、智能农业和智能家居等等。</p>
+
+
+            
+
+            
+        
+    
+
+
+
+    
+        <title>IoT platforms</title>
+        
+        <meta charset="utf-8"/>
+    
+<!-- kobo-style -->
+<script type="text/javascript" src="img/kobo.js"/>
+<style type="text/css" id="koboSpanStyle">.koboSpan { -webkit-text-combine: inherit; }</style>
+
+
+
+    
+        
+
+                            
+                    <h1 class="header-title">物联网平台</h1>
+                
+            
+            
+                
+<p>来自网络层的信息通常借助物联网平台进行管理。如今，许多公司都提供物联网平台服务，它们不仅帮助处理数据，还支持与不同硬件的无缝集成。由于物联网平台充当硬件和应用层之间的中介，因此也称为物联网中间件，是物联网参考堆栈中服务层的一部分。物联网平台提供了与世界任何地方的事物连接和通信的能力。在本书中，我们将简要介绍一些流行的物联网平台，如谷歌云平台、Azure 物联网、亚马逊 AWS 物联网、Predix 和 H2O。</p>
+<p>您可以根据以下标准选择最适合您的物联网平台:</p>
+<ul>
+<li><strong>可扩展性</strong>:可以向现有物联网网络添加和删除新设备</li>
+<li><strong>易用性</strong>:系统应该在最少干预的情况下完美运行并交付其所有规格</li>
+<li><strong>第三方集成</strong>:异构设备和协议应该能够相互联网</li>
+<li><strong>部署选项</strong>:它应该可以在多种硬件设备和软件平台上工作</li>
+<li><strong>数据安全</strong>:确保数据和设备的安全</li>
+</ul>
+
+
+            
+
+            
+        
+    
+
+
+
+    
+        <title>IoT verticals</title>
+        
+        <meta charset="utf-8"/>
+    
+<!-- kobo-style -->
+<script type="text/javascript" src="img/kobo.js"/>
+<style type="text/css" id="koboSpanStyle">.koboSpan { -webkit-text-combine: inherit; }</style>
+
+
+
+    
+        
+
+                            
+                    <h1 class="header-title">IoT verticals</h1>
+                
+            
+            
+                
+<p>纵向市场是这样一个市场，其中供应商提供特定于某个行业、贸易、专业或其他有特殊需求的客户群的商品和服务。物联网使许多此类垂直行业成为可能，一些顶级物联网垂直行业如下:</p>
+<ul>
+<li>智能建筑:采用物联网技术的建筑不仅有助于减少资源消耗，还能提高居住或工作在其中的人们的满意度。这些建筑有智能传感器，不仅可以监控资源消耗，还可以主动检测居民的需求。通过这些智能设备和传感器收集数据，以远程监控建筑、能源、安全、景观、HVAC、照明等。然后，这些数据用于预测行动，这些行动可以根据事件自动执行，因此可以优化效率，从而节省时间、资源和成本。</li>
+<li><strong>智能农业</strong>:物联网可以让地方和商业农业变得更加环保、经济高效和高效。遍布农场的传感器有助于灌溉过程的自动化。据预测，智能农业实践将使生产力成倍增长，从而增加粮食资源。</li>
+<li>智慧城市:智慧城市可以是拥有智能停车场、智能公共交通系统等等的城市。智能城市能够为政府和市民解决交通、公共安全、能源管理等问题。通过使用先进的物联网技术，它可以优化城市基础设施的使用和市民的生活质量。</li>
+<li><strong>互联医疗</strong>:物联网支持远程实时做出关键业务和患者监控决策。个人携带医疗传感器来监测身体参数，例如心跳、体温、葡萄糖水平等等。加速度计和陀螺仪等可穿戴传感器可用于监控一个人的日常活动。</li>
+</ul>
+<p>我们将在本书中介绍其中的一些作为案例研究。本书的内容侧重于信息处理和在物联网上实施的应用，因此我们不再深入讨论物联网参考堆栈中涉及的设备、架构和协议的细节。</p>
+<p>感兴趣的读者可以参考以下参考资料，了解更多关于物联网架构和不同协议的信息:</p><ul>
+<li>大徐，李，吴和，李善仓。工业中的物联网:一项调查。 IEEE 工业信息学汇刊 10.4 (2014): 2233-2243。</li>
+<li>Khan，Rafiullah 等人<em>未来互联网:物联网架构、可能的应用和关键挑战</em>。<strong>信息技术前沿</strong> ( <strong>飞腾</strong>)，2012 年第十届国际信息技术会议。IEEE，2012 年。</li>
+<li>本网站提供物联网所涉及的协议概述:<br/><a href="https://www.postscapes.com/internet-of-things-protocols/">【https://www.postscapes.com/internet-of-things-protocols/】</a>。</li>
+</ul>
+
+<p class="mce-root"/>
+<p class="mce-root"/>
+
+
+            
+
+            
+        
+    
+
+
+
+    
+        <title>Big data and IoT</title>
+        
+        <meta charset="utf-8"/>
+    
+<!-- kobo-style -->
+<script type="text/javascript" src="img/kobo.js"/>
+<style type="text/css" id="koboSpanStyle">.koboSpan { -webkit-text-combine: inherit; }</style>
+
+
+
+    
+        
+
+                            
+                    <h1 class="header-title">大数据和物联网</h1>
+                
+            
+            
+                
+<p>物联网连接了以前从未连接到互联网的事物，如汽车发动机，导致大量连续数据流的产生。下面的屏幕截图显示了 IHS 对未来几年数十亿台联网设备数量的探索性数据。他们的估计显示，到 2025 年，物联网设备的数量将达到 754.4 亿:</p>
+<div><img src="img/c0349962-e420-4475-8de1-ca83843cabc1.png" style="width:51.83em;height:30.42em;"/></div>
+<p>对 2025 年物联网设备增长的预测</p>
+<p>IHS 的白皮书《物联网平台:实现物联网》全文可从 https://cdn.ihs.com/www/pdf/enabling-IOT.pdf<a href="https://cdn.ihs.com/www/pdf/enabling-IOT.pdf">获得。</a></p>
+<p>传感器成本的降低、高效的功耗技术、大范围的连接(红外、NFC、蓝牙、Wi-Fi 等)以及支持物联网部署和开发的云平台的可用性是物联网在我们的家庭、个人生活和行业中普及的主要原因。这也促使公司考虑提供新的服务和开发新的商业模式。一些例子包括如下:</p>
+<ul>
+<li>Airbnb:它把人们联系起来，这样他们就可以互相出租多余的房间和小屋，它还赚取佣金。</li>
+<li>优步:它连接了出租车司机和旅行者。旅行者的位置用于将他们分配给最近的司机。</li>
+</ul>
+<p>在此过程中生成的数据量既庞大又复杂，因此需要大数据。大数据方法和物联网几乎是天生一对；两者协同工作。</p>
+<p>事物不断产生大量的数据流，提供它们的状态，如温度、污染程度、地理位置和邻近度。生成的数据是时间序列格式，并且是自相关的。这项任务变得很有挑战性，因为数据本质上是动态的。此外，可以在边缘(传感器或网关)或云上分析生成的数据。在将数据发送到云之前，会执行某种形式的物联网数据转换。这可能涉及以下内容:</p>
+<ul>
+<li>时间或空间分析</li>
+<li>在边缘汇总数据</li>
+<li>数据汇总</li>
+<li>关联多个物联网流中的数据</li>
+<li>清理数据</li>
+<li>填充缺失的值</li>
+<li>标准化数据</li>
+<li>将其转换为云可接受的不同格式</li>
+</ul>
+<p>在边缘，<strong>复杂事件处理</strong> ( <strong> CEP </strong>)用于组合来自多个来源的数据并推断事件或模式。</p>
+<p>使用流分析来分析数据，例如，将分析工具应用于数据流，但开发离线模式下外部使用的洞察力和规则。模型是离线构建的，然后应用于生成的数据流。数据可以用不同的方式处理:</p>
+<ul>
+<li><strong>原子</strong>:一次使用一个数据</li>
+<li><strong>微量配料</strong>:每批的一组数据</li>
+<li><strong>开窗</strong>:每批一个时间段内的数据</li>
+</ul>
+<p>流分析可以与 CEP 相结合，以组合一段时间内的事件，并关联模式以检测特殊模式(例如，异常或故障)。</p>
+
+
+            
+
+            
+        
+    
+
+
+
+    
+        <title>Infusion of AI – data science in IoT</title>
+        
+        <meta charset="utf-8"/>
+    
+<!-- kobo-style -->
+<script type="text/javascript" src="img/kobo.js"/>
+<style type="text/css" id="koboSpanStyle">.koboSpan { -webkit-text-combine: inherit; }</style>
+
+
+
+    
+        
+
+                            
+                    <h1 class="header-title">人工智能的融合——物联网中的数据科学</h1>
+                
+            
+            
+                
+<p class="mce-root">数据科学家和机器学习工程师中非常流行的一句话是<q>“人工智能是新的电力”</q>吴恩达教授在 NIPS 2017 中说的，我们可以扩展如下:<em>如果人工智能是新的电力，数据是新的煤炭，物联网是新的煤矿</em>。</p>
+<p>物联网产生海量数据；目前，生成的数据中有 90%甚至没有被捕获，而在捕获的 10%中，大部分是时间相关的，在几毫秒内就会失去其价值。持续手动监控这些数据既麻烦又昂贵。这就需要一种方法来智能地分析这些数据并从中获得洞察力；人工智能的工具和模型为我们提供了一种在最少人工干预的情况下做到这一点的方法。这本书的主要重点将是理解可以应用于物联网数据的各种人工智能模型和技术。我们将同时使用<strong>机器学习</strong> ( <strong> ML </strong>)和 DL 算法。以下截图解释了<strong>人工智能</strong>、<strong>机器学习</strong>、<strong>深度学习</strong>的关系:</p>
+<div><img src="img/7d2abd8c-2ccb-455f-bbf0-435a3d226c49.png" style="width:33.83em;height:25.00em;"/></div>
+<p>AI、ML 和 DL</p>
+<p>通过观察多个事物的行为，物联网(借助大数据和人工智能)旨在洞察数据并优化底层流程。这涉及到多重挑战:</p>
+<ul>
+<li>存储实时生成的事件</li>
+<li>对存储的事件运行分析查询</li>
+<li>使用 AI/ML/DL 技术对数据进行分析，以获得洞察力并做出预测</li>
+</ul>
+
+
+            
+
+            
+        
+    
+
+
+
+    
+        <title>Cross-industry standard process for data mining</title>
+        
+        <meta charset="utf-8"/>
+    
+<!-- kobo-style -->
+<script type="text/javascript" src="img/kobo.js"/>
+<style type="text/css" id="koboSpanStyle">.koboSpan { -webkit-text-combine: inherit; }</style>
+
+
+
+    
+        
+
+                            
+                    <h1 class="header-title">数据挖掘的跨行业标准流程</h1>
+                
+            
+            
+                
+<p>对于物联网问题，最常用的<strong>数据管理</strong> ( <strong> DM </strong>)方法是由 Chapman 等人提出的 c <strong>跨行业数据挖掘标准流程</strong> ( <strong> CRISP-DM </strong>)。这是一个陈述成功完成 DM 需要执行的任务的流程模型。这是一种独立于供应商的方法，分为以下六个不同的阶段:</p>
+<ol>
+<li><strong>业务理解</strong></li>
+<li><strong>数据理解</strong></li>
+<li><strong>数据准备</strong></li>
+<li><strong>建模</strong></li>
+<li><strong>评估</strong></li>
+<li><strong>部署</strong></li>
+</ol>
+<p>下图显示了不同的阶段:</p>
+<div><img src="img/bb167134-4c5a-4c2e-a7a5-a9054b6698b4.png" style="width:24.83em;height:17.42em;"/></div>
+<p>CRISP-DM 的不同阶段</p>
+<p>正如我们所见，这是一个持续的流程模型，数据科学和人工智能在第 2-5 步中扮演着重要角色。</p>
+<p>有关 CRISP-DM 及其所有阶段的详细信息，请参阅以下内容:</p><div>Marbán, Óscar, Gonzalo Mariscal, and Javier Segovia. <em>A data mining &amp; knowledge discovery process model</em>. <em>Data Mining and Knowledge Discovery in Real Life Applications</em>. InTech, 2009.
+</div>
+
+
+            
+
+            
+        
+    
+
+
+
+    
+        <title>AI platforms and IoT platforms</title>
+        
+        <meta charset="utf-8"/>
+    
+<!-- kobo-style -->
+<script type="text/javascript" src="img/kobo.js"/>
+<style type="text/css" id="koboSpanStyle">.koboSpan { -webkit-text-combine: inherit; }</style>
+
+
+
+    
+        
+
+                            
+                    <h1 class="header-title">人工智能平台和物联网平台</h1>
+                
+            
+            
+                
+<p>如今有大量兼具人工智能和物联网功能的云平台。这些平台能够集成传感器和设备，并在云上执行分析。全球市场上有 30 多个云平台，每个平台针对不同的物联网垂直行业和服务。以下截图列出了 AI/IoT 平台支持的各种服务:</p>
+<p class="CDPAlignCenter CDPAlign"><img class="aligncenter size-full wp-image-1078 image-border" src="img/5b3dbdcc-4b9b-44e5-802a-76aaabcedbf9.png" style="width:36.25em;height:37.33em;"/></p>
+<p>不同人工智能/物联网平台支持的服务</p>
+<p class="mce-root"/>
+<p class="mce-root"/>
+<p>下面我们简单了解一下一些流行的云平台。在第 12 章<em/><em>中，我们将学习如何使用最流行的。以下是一些流行的云平台列表:</em></p>
+<ul>
+<li><strong> IBM Watson 物联网平台</strong>:由 IBM 托管，平台提供设备管理；它使用 MQTT 协议来连接物联网设备和应用程序。它提供实时可扩展的连接。数据可以存储一段时间并实时访问。IBM Watson 还提供 Bluemix <strong>平台即服务</strong> ( <strong> PaaS </strong>)用于分析和可视化。我们可以编写代码来构建和管理与数据和连接设备交互的应用程序。它支持 Python 以及 C#、Java 和 Node.js。</li>
+<li><strong>微软物联网-Azure 物联网套件</strong>:它提供了一系列基于 Azure PaaS 构建的预配置解决方案。它支持物联网设备和云之间可靠、安全的双向通信。预配置的解决方案包括数据可视化、远程监控以及通过实时物联网遥测配置规则和警报。它还提供 Azure 流分析来实时处理数据。Azure 流分析允许我们使用 Visual Studio。它支持 Python、Node.js、C 和 Arduino，具体取决于物联网设备。</li>
+<li><strong>谷歌云物联网</strong>:谷歌云物联网为安全连接和管理物联网设备提供全面管理的服务。它支持 MQTT 和 HTTP 协议。它还提供物联网设备和云之间的双向通信。它提供了对 Go、PHP、Ruby、JS、.NET、Java、Objective-C 和 Python。它还有 BigQuery，允许用户进行数据分析和可视化。</li>
+<li><strong>亚马逊 AWS 物联网</strong>:亚马逊 AWS 物联网允许物联网设备通过 MQTT、HTTP 和 WebSockets 进行通信。它在物联网设备和云之间提供安全的双向通信。它还有一个规则引擎，可用于将数据与其他 AWS 服务集成并转换数据。可以在 Java、Python 或 Node.js 中定义触发用户代码执行的规则。AWS Lambda 允许我们使用自己定制的训练模型。</li>
+</ul>
+<p class="mce-root"/>
+
+
+            
+
+            
+        
+    
+
+
+
+    
+        <title>Tools used in this book</title>
+        
+        <meta charset="utf-8"/>
+    
+<!-- kobo-style -->
+<script type="text/javascript" src="img/kobo.js"/>
+<style type="text/css" id="koboSpanStyle">.koboSpan { -webkit-text-combine: inherit; }</style>
+
+
+
+    
+        
+
+                            
+                    <h1 class="header-title">本书中使用的工具</h1>
+                
+            
+            
+                
+<p>对于基于物联网的服务的实施，我们需要遵循自下而上的方法。对于每个物联网垂直行业，我们需要找到分析和数据，并最终用代码实现它。</p>
+<p>由于 Python 在几乎所有人工智能和物联网平台中的可用性，它将在本书中用于编码。除了 Python，一些有帮助的库如 NumPy、pandas、SciPy、Keras 和 TensorFlow 将用于对数据执行 AI/ML 分析。为了可视化，我们将使用 Matplotlib 和 Seaborn。</p>
+
+
+            
+
+            
+        
+    
+
+
+
+    
+        <title>TensorFlow</title>
+        
+        <meta charset="utf-8"/>
+    
+<!-- kobo-style -->
+<script type="text/javascript" src="img/kobo.js"/>
+<style type="text/css" id="koboSpanStyle">.koboSpan { -webkit-text-combine: inherit; }</style>
+
+
+
+    
+        
+
+                            
+                    <h1 class="header-title">TensorFlow</h1>
+                
+            
+            
+                
+<p>TensorFlow 是 Google Brain 团队开发的开源软件库；它具有用于实现深度神经网络的函数和 API。它适用于 Python、C++、Java、R 和 Go。它可以用于在多个平台上工作，CPU，GPU，移动，甚至分布式。TensorFlow 允许在生产中部署模型并易于使用。TensorFlow 中的优化器通过自动计算梯度并应用它们来更新权重和偏差，使训练深度神经网络的任务变得更容易。</p>
+<p>在 TensorFlow 中，程序有两个不同的组成部分:</p>
+<ul>
+<li><strong>计算图</strong>是节点和边的网络。这里定义了所有的数据、变量、占位符和要执行的计算。TensorFlow 支持三种类型的数据对象:常量、变量和占位符。</li>
+<li><strong>执行图</strong>实际上使用一个<kbd>Session</kbd>对象来计算网络。从一层到另一层的实际计算和信息传输发生在<kbd>Session</kbd>对象中。</li>
+</ul>
+<p>让我们看看在 TensorFlow 中执行矩阵乘法的代码。整个代码可以从 GitHub 存储库(<a href="https://github.com/PacktPublishing/Hands-On-Artificial-Intelligence-for-IoT">https://GitHub . com/packt publishing/Hands-On-Artificial-Intelligence-for-IoT</a>)文件名，<kbd>matrix_multiplication.ipynb</kbd>:</p>
+<pre>import tensorflow as tf<br/>import numpy as np</pre>
+<p class="mce-root"/>
+<p class="mce-root"/>
+<p>这部分导入 TensorFlow 模块。接下来，我们定义计算图。<kbd>mat1</kbd>和<kbd>mat2</kbd>是我们需要相乘的两个矩阵:</p>
+<pre># A random matrix of size [3,5]<br/>mat1 = np.random.rand(3,5)  <br/># A random matrix of size [5,2]<br/>mat2 = np.random.rand(5,2)  <br/></pre>
+<p>我们声明了两个占位符，<kbd>A</kbd>和<kbd>B</kbd>，这样我们就可以在运行时传递它们的值。在计算图中，我们声明了所有的数据和计算对象:</p>
+<pre># Declare placeholders for the two matrices <br/>A = tf.placeholder(tf.float32, None, name='A')<br/>B = tf.placeholder(tf.float32, None, name='B')  </pre>
+<p>这声明了两个名为<kbd>A</kbd>和<kbd>B</kbd>的占位符；<kbd>tf.placeholder</kbd>方法的参数指定占位符的数据类型为<kbd>float32</kbd>。由于指定的形状是<kbd>None</kbd>，我们可以给它一个任意形状的张量和一个可选的操作名称。接下来，我们使用矩阵乘法方法<kbd>tf.matmul</kbd>定义要执行的操作:</p>
+<pre>C = tf.matmul(A,B)</pre>
+<p>执行图被声明为一个<kbd>Session</kbd>对象，为其提供两个矩阵<kbd>mat1</kbd>和<kbd>mat2</kbd>，分别用于占位符<kbd>A</kbd>和<kbd>B</kbd>:</p>
+<pre>with tf.Session() as sess:<br/>    result = sess.run(C, feed_dict={A: mat1, B:mat2})<br/>    print(result)</pre>
+
+
+            
+
+            
+        
+    
+
+
+
+    
+        <title>Keras</title>
+        
+        <meta charset="utf-8"/>
+    
+<!-- kobo-style -->
+<script type="text/javascript" src="img/kobo.js"/>
+<style type="text/css" id="koboSpanStyle">.koboSpan { -webkit-text-combine: inherit; }</style>
+
+
+
+    
+        
+
+                            
+                    <h1 class="header-title">Keras</h1>
+                
+            
+            
+                
+<p>Keras 是运行在 TensorFlow 之上的高级 API。它允许快速简单的原型制作。它支持卷积和递归神经网络，甚至两者的组合。它可以在 CPU 和 GPU 上运行。以下代码使用 Keras 执行矩阵乘法:</p>
+<pre># Import the libraries<br/>import keras.backend as K<br/>import numpy as np<br/><br/># Declare the data<br/>A = np.random.rand(20,500)<br/>B = np.random.rand(500,3000)<br/><br/>#Create Variable<br/>x = K.variable(value=A)<br/>y = K.variable(value=B)<br/>z = K.dot(x,y)<br/>print(K.eval(z))</pre>
+
+
+            
+
+            
+        
+    
+
+
+
+    
+        <title>Datasets</title>
+        
+        <meta charset="utf-8"/>
+    
+<!-- kobo-style -->
+<script type="text/javascript" src="img/kobo.js"/>
+<style type="text/css" id="koboSpanStyle">.koboSpan { -webkit-text-combine: inherit; }</style>
+
+
+
+    
+        
+
+                            
+                    <h1 class="header-title">资料组</h1>
+                
+            
+            
+                
+<p class="mce-root">在接下来的章节中，我们将学习不同的 DL 模型和 ML 方法。他们都处理数据；虽然有大量数据集可用于演示这些模型如何工作，但在本书中，我们将通过无线传感器和其他物联网设备免费使用数据集。以下是本书中使用的一些数据集及其来源。</p>
+
+
+            
+
+            
+        
+    
+
+
+
+    
+        <title>The combined cycle power plant dataset</title>
+        
+        <meta charset="utf-8"/>
+    
+<!-- kobo-style -->
+<script type="text/javascript" src="img/kobo.js"/>
+<style type="text/css" id="koboSpanStyle">.koboSpan { -webkit-text-combine: inherit; }</style>
+
+
+
+    
+        
+
+                            
+                    <h1 class="header-title">联合循环发电厂数据集</h1>
+                
+            
+            
+                
+<p>该数据集包含从一个<strong>联合循环发电厂</strong> ( <strong> CCPP </strong>)在六年期间(2006-2011)收集的 9568 个数据点。CCPP 使用两种涡轮机发电，燃气涡轮机和蒸汽涡轮机。CCPP 工厂有三个主要组成部分:燃气轮机、热回收系统和蒸汽轮机。该数据集可在 UCI ML(<a href="http://archive.ics.uci.edu/ml/datasets/combined+cycle+power+plant">http://archive . ics . UCI . edu/ML/datasets/combined+cycle+power+plant</a>)获得，由 Namik Kemal 大学的 Pinar Tufekci 和 Bogazici 大学的 Heysem Kaya 收集。该数据由决定平均环境变量的四个特征组成。平均值取自位于工厂周围的各种传感器，这些传感器每秒记录环境变量。目的是预测每小时净电能输出。数据有<kbd>xls</kbd>和<kbd>ods</kbd>两种格式。</p>
+<p>数据集中的要素如下:</p>
+<ul>
+<li><strong>环境温度</strong>(时的<strong>)在 1.81℃和 37.11℃之间</strong></li>
+<li><strong>环境压力</strong> ( <strong> AP </strong>)在 992.89—1033.30 毫巴范围内</li>
+<li><strong>相对湿度</strong> ( <strong> RH </strong>)在 25.56%到 100.16%之间</li>
+<li>排气<strong>真空</strong> ( <strong> V </strong>)在 25.36 到 81.56 厘米汞柱的范围内</li>
+<li>净每小时电能输出(PE)在 420.26 到 495.76 MW 的范围内</li>
+</ul>
+<p>关于数据和问题的更多细节可从以下内容中阅读:<br/></p><ul>
+<li>pnar tüfek ci，<em>使用机器学习方法</em>预测基本负荷运行的联合循环发电厂的满负荷电力输出，国际电力杂志&amp;能源系统，第 60 卷，2014 年 9 月，第 126-140 页，ISSN 0142-0615。</li>
+<li>Heysem Kaya，p NAR tüfek ci，sadk fik ret gürgen:<em>预测混合气体&amp;汽轮机</em>功率的本地和全球学习方法，计算机和电子工程新兴趋势国际会议会议录，2012 年，第 13-18 页(2012 年 3 月，迪拜)。</li>
+</ul>
+
+
+
+            
+
+            
+        
+    
+
+
+
+    
+        <title>Wine quality dataset</title>
+        
+        <meta charset="utf-8"/>
+    
+<!-- kobo-style -->
+<script type="text/javascript" src="img/kobo.js"/>
+<style type="text/css" id="koboSpanStyle">.koboSpan { -webkit-text-combine: inherit; }</style>
+
+
+
+    
+        
+
+                            
+                    <h1 class="header-title">葡萄酒质量数据集</h1>
+                
+            
+            
+                
+<p>世界各地的葡萄酒酿造厂必须接受葡萄酒认证和质量评估，以保障人类健康。葡萄酒认证是在理化分析和感官测试的帮助下进行的。随着技术的进步，可以通过体外设备进行常规的理化分析。</p>
+<p>在本书中，我们使用该数据集作为分类示例。数据集可以从 https://archive.ics.uci.edu/ml/datasets/Wine+Quality 的 UCI-ML 知识库下载。葡萄酒质量数据集包含不同红葡萄酒和白葡萄酒样品的理化测试结果。每一个样品都由专业品酒师按照 0-10 的等级进一步评定质量。</p>
+<p>数据集总共包含 4，898 个实例；它总共有 12 个属性。这 12 个属性如下:</p>
+<ul>
+<li>固定酸度</li>
+<li>挥发性酸度</li>
+<li>柠檬酸</li>
+<li>残糖</li>
+<li>氯化物</li>
+<li>游离二氧化硫</li>
+<li>二氧化硫总量</li>
+<li>密度</li>
+<li>pH 值</li>
+<li>硫酸盐化</li>
+<li>酒精</li>
+<li>质量</li>
+</ul>
+<p>数据集以 CSV 格式提供。</p>
+<p>关于数据集的细节可以从这篇论文中读到:Cortez，Paulo，et al. <em>通过从物理化学性质中进行数据挖掘对葡萄酒偏好进行建模</em>。决策支持系统 47.4(2009):547-553(<a href="https://repositorium.sdum.uminho.pt/bitstream/1822/10029/1/wine5.pdf">https://repository . sdum . uminho . pt/bitstream/1822/10029/1/wine 5 . pdf</a>)。</p>
+
+
+            
+
+            
+        
+    
+
+
+
+    
+        <title>Air quality data</title>
+        
+        <meta charset="utf-8"/>
+    
+<!-- kobo-style -->
+<script type="text/javascript" src="img/kobo.js"/>
+<style type="text/css" id="koboSpanStyle">.koboSpan { -webkit-text-combine: inherit; }</style>
+
+
+
+    
+        
+
+                            
+                    <h1 class="header-title">空气质量数据</h1>
+                
+            
+            
+                
+<p>空气污染对人类健康构成了重大的环境风险。人们发现，改善空气质量与改善各种健康问题(如呼吸道感染、心血管疾病和肺癌)之间存在关联。各个国家的气象组织在世界各地建立了广泛的传感器网络，为我们提供实时空气质量数据。可以通过这些组织各自的 web APIs 访问这些数据。</p>
+<p>在本书中，我们将使用历史空气质量数据来训练我们的网络并预测死亡率。英国的历史数据可以在 ka ggle(<a href="https://www.kaggle.com/c/predict-impact-of-air-quality-on-death-rates">https://www . ka ggle . com/c/predict-impact-of-air-quality-on-death-rates</a>)上免费获得，空气质量数据包括<strong>臭氧</strong> ( <strong> O3 </strong>)、<strong>二氧化氮</strong> ( <strong> NO2 </strong>)、直径小于或等于 10 微米的颗粒物(PM10)和 PM25 (2.5 微米或更小)以及温度的日均值。英格兰地区的死亡率(每 100，000 人的死亡人数)由英国国家统计局提供的数据获得。</p>
+<p class="mce-root"/>
+<p class="mce-root"/>
+
+
+            
+
+            
+        
+    
+
+
+
+    
+        <title>Summary</title>
+        
+        <meta charset="utf-8"/>
+    
+<!-- kobo-style -->
+<script type="text/javascript" src="img/kobo.js"/>
+<style type="text/css" id="koboSpanStyle">.koboSpan { -webkit-text-combine: inherit; }</style>
+
+
+
+    
+        
+
+                            
+                    <h1 class="header-title">摘要</h1>
+                
+            
+            
+                
+<p>在这一章中，我们学习了物联网、大数据和人工智能。本章介绍了物联网中使用的常用术语。我们了解了用于数据管理和数据分析的物联网架构。物联网设备生成的大量数据需要特殊的方法来处理。</p>
+<p>我们了解了数据科学和人工智能如何帮助许多物联网设备产生的分析和预测。本章简要介绍了各种物联网平台，以及一些流行的物联网垂直行业。我们还学习了特殊的 DL 库:TensorFlow 和 Keras。最后，介绍了我们将在整本书中使用的一些数据集。</p>
+<p>下一章将介绍如何访问各种格式的数据集。</p>
+
+
+            
+
+            
+        
+    
+
+</body></html>

@@ -1,0 +1,706 @@
+<html><head/><body>
+
+
+    
+        <title>Setting Up the ML.NET Environment</title>
+        
+        <meta charset="utf-8"/>
+    
+
+    
+        
+
+                            
+                    <h1 class="header-title">设置 ML.NET 环境</h1>
+                
+            
+            
+                
+<p>现在，您已经牢牢掌握了机器学习的基础知识，了解了什么是微软的 model，以及它提供了什么，是时候训练和创建您的第一个机器学习模型了！我们将基于评论建立一个简单的餐馆情绪分析模型，并将这个模型集成到一个简单的。NET 核心应用程序。在我们开始训练和创建我们的模型之前，我们首先必须配置开发环境。</p>
+<p>在本章中，我们将讨论以下主题:</p>
+<ul>
+<li>设置您的开发环境</li>
+<li>和 model 一起从头到尾创造你的第一个模型</li>
+<li>评估模型</li>
+</ul>
+
+
+            
+
+            
+        
+    
+
+
+
+
+
+
+    
+        <title>Setting up your development environment</title>
+        
+        <meta charset="utf-8"/>
+    
+
+    
+        
+
+                            
+                    <h1 class="header-title">设置您的开发环境</h1>
+                
+            
+            
+                
+<p>幸运的是，为 ML.NET 配置您的环境相对容易。在本节中，我们将安装 Visual Studio 2019 和。网芯 3。如果您不确定是否已经安装，请遵循以下步骤。此外，在我们阅读这本书的过程中，有一些组织元素和流程需要尽早建立，你也可以开始自己尝试。</p>
+
+
+            
+
+            
+        
+    
+
+
+
+
+
+
+    
+        <title>Installing Visual Studio</title>
+        
+        <meta charset="utf-8"/>
+    
+
+    
+        
+
+                            
+                    <h1 class="header-title">安装 Visual Studio</h1>
+                
+            
+            
+                
+<p>ML.NET 开发的核心是 Microsoft Visual Studio。对于本书通篇使用的所有示例和截图，将使用 Windows 10 19H2 上的 Microsoft Visual Studio 2019 Professional。在撰写本文时，16.3.0 是最新版本。请使用可用的最新版本。如果你没有 Visual Studio 2019，可以在<a href="http://www.visualstudio.com">www.visualstudio.com</a>上免费获得一个全功能社区版本。</p>
+<p>对于本书的范围，正如在<a href="b8d873e1-9234-4f11-ad94-76df5ffbb228.xhtml">第 1 章</a>、<em>机器学习入门和 ML.NET</em>、<em>T5】中提到的，我们将创建广泛的应用类型，以在特定应用平台上的各种问题领域中展示 ML.NET。因此，我们将提前安装几个可用的工作负载，以避免在后面的章节中返回安装程序:</em></p>
+<ol>
+<li>首先，确保<strong>。NET 桌面开发</strong>、<strong>通用 Windows 平台开发</strong>、<strong>ASP.NET 和 web 开发</strong>被勾选。这些工作负载将使您能够创建我们将在后面的章节中使用的 ASP.NET、UWP 和 WPF 应用程序:</li>
+</ol>
+<p class="CDPAlignCenter CDPAlign"><img class="alignnone size-full wp-image-574 image-border" src="img/f155b5c9-7175-43c2-b406-ff163fdf625b.png" style="width:65.92em;height:36.75em;"/></p>
+<ol start="2">
+<li>另外，确保<strong>。NET Core 跨平台开发</strong>也是检查。这将使。NET 核心开发命令行和桌面应用程序，例如我们将在本章后面制作的应用程序:</li>
+</ol>
+<p class="CDPAlignCenter CDPAlign"><img class="alignnone size-full wp-image-575 image-border" src="img/b00ccd5b-b95d-450e-be33-a9e28239b89c.png" style="width:69.67em;height:39.33em;"/></p>
+
+
+            
+
+            
+        
+    
+
+
+
+
+
+
+    
+        <title>Installing .NET Core 3</title>
+        
+        <meta charset="utf-8"/>
+    
+
+    
+        
+
+                            
+                    <h1 class="header-title">正在安装。网络核心 3</h1>
+                
+            
+            
+                
+<p>正如在<a href="b8d873e1-9234-4f11-ad94-76df5ffbb228.xhtml">第一章</a>、【机器学习入门】和 ML.NET 中提到的。网芯 3 是首选。NET 框架时，由于在开发过程中实现的优化工作。网芯 3。在写这篇文章的时候。NET Core 3 在 16.3.0 版本之前没有捆绑 Visual Studio 安装程序，需要单独下载，这里:【https://dotnet.microsoft.com/download/dotnet-core/3.0<a href="https://dotnet.microsoft.com/download/dotnet-core/3.0"/>。本书范围内专门使用的下载版本是 3.0.100，但是在您阅读本文时可能会有更新的版本。对于那些好奇的读者来说，运行时是与 SDK 捆绑在一起的。</p>
+<p>您可以通过打开 PowerShell 或命令提示符并执行以下命令来验证安装是否成功:</p>
+<pre><strong>dotnet --version</strong><br/>3.0.100</pre>
+<p>输出应该从<em> 3 </em>开始，如下所示。在撰写本文时，3.0.100 是可用的最新生产版本。</p>
+<p>确保安装 32 位和 64 位版本，以避免在本书后面部分和您将来的实验中针对 32 位和 64 位平台时出现问题。</p>
+
+
+            
+
+            
+        
+    
+
+
+
+
+
+
+    
+        <title>Creating a process</title>
+        
+        <meta charset="utf-8"/>
+    
+
+    
+        
+
+                            
+                    <h1 class="header-title">创建流程</h1>
+                
+            
+            
+                
+<p>在本书和您自己的探索过程中，您将收集样本数据，构建模型，并尝试各种应用程序。从长远来看，尽早建立一个过程来组织这些元素会使事情变得更容易。以下是一些需要记住的建议:</p>
+<ul>
+<li>始终对所有代码使用源代码管理。</li>
+<li>确保测试集和定型集在它们自己的文件夹中正确命名(如果可能，进行版本化)。</li>
+<li>具有命名和源代码控制的版本控制模型。</li>
+<li>在电子表格中保留评估指标和使用的参数。</li>
+</ul>
+<p>随着您开发自己的技能集并创建更复杂的问题，很可能需要更多的工具，如 Apache Spark 或其他集群平台。我们将在第 11 章、<strong>、</strong>、<em>培训和建立生产模型</em>中讨论这一点，以及关于大规模培训的其他建议。</p>
+
+
+            
+
+            
+        
+    
+
+
+
+
+
+
+    
+        <title>Creating your first ML.NET application</title>
+        
+        <meta charset="utf-8"/>
+    
+
+    
+        
+
+                            
+                    <h1 class="header-title">创建您的第一个 ML.NET 应用程序</h1>
+                
+            
+            
+                
+<p>是时候开始创建您的第一个 ML.NET 应用程序了。对于第一个应用程序，我们将创建一个. NET 核心控制台应用程序。这个应用程序将把一句话分为肯定陈述或否定陈述，在提供的小样本数据集上进行训练。对于本项目，我们将使用二元逻辑回归分类模型，使用<strong>随机对偶坐标上升</strong> ( <strong> SDCA </strong>)方法。在<a href="8bcfc000-9adc-4eda-a91a-e09f676eac85.xhtml">第三章</a>、<em>回归模型</em>中，我们将对这种方法进行更深入的探讨。</p>
+
+
+            
+
+            
+        
+    
+
+
+
+
+
+
+    
+        <title>Creating the project in Visual Studio</title>
+        
+        <meta charset="utf-8"/>
+    
+
+    
+        
+
+                            
+                    <h1 class="header-title">在 Visual Studio 中创建项目</h1>
+                
+            
+            
+                
+<p>打开后，根据您在 Visual Studio 中的配置，它将直接在项目创建屏幕上打开，或者将是一个空的 Visual Studio 窗口。如果您的环境显示后者，只需点击<strong>文件</strong>，然后<strong>新建</strong>，然后<strong>项目</strong>:</p>
+<ol>
+<li>当窗口打开时，在搜索栏中键入<kbd>console app</kbd>以查找<strong>控制台应用程序(。【T2 网核心】。确定语言类型是 C#(有同名的 Visual Basic 模板)，高亮显示这个模板，然后点击<strong>下一个</strong>:</strong></li>
+</ol>
+<p class="CDPAlignCenter CDPAlign"><img class="alignnone size-full wp-image-576 image-border" src="img/597d9e75-4c16-48cc-bec9-9f2a1b4a6f05.png" style="width:53.75em;height:38.58em;"/></p>
+<ol start="2">
+<li>我建议给项目起一个你可以回头参考的名字，比如<kbd>Chapter02</kbd>，以帮助你以后找到这个项目:</li>
+</ol>
+<p class="CDPAlignCenter CDPAlign"><img class="alignnone size-full wp-image-577 image-border" src="img/4a2a7bc0-6834-49ad-86d8-a1b239db193c.png" style="width:47.50em;height:36.25em;"/></p>
+<ol start="3">
+<li>至此，您已经有了一个. NET Core 3 控制台应用程序，所以现在让我们添加<kbd>ML.NET</kbd> NuGet 包。右键点击项目，点击<strong>管理 NuGet 包</strong>:</li>
+</ol>
+<p class="CDPAlignCenter CDPAlign"><img class="alignnone size-full wp-image-578 image-border" src="img/23558c59-1a57-46d2-895f-d68fcb12d343.png" style="width:25.83em;height:28.83em;"/></p>
+<ol start="4">
+<li>在搜索字段中键入<kbd>microsoft ml</kbd>。您应该会看到可用的最新<kbd>Microsoft.ML</kbd>版本:</li>
+</ol>
+<p class="CDPAlignCenter CDPAlign"><img style="font-size: 1em;width:68.42em;height:12.42em;" class="alignnone size-full wp-image-579 image-border" src="img/25864161-c542-4cab-a55d-b4085469a101.png"/></p>
+<ol start="5">
+<li>一旦找到，点击<strong>安装</strong>按钮。简单！</li>
+</ol>
+<p>在撰写本文时，1.3.1 是可用的最新版本，本书中的所有示例都将使用该版本。在 1.0 之前，语法变化很大，但从那以后就一直保持一致，所以使用新版本应该功能相同。</p>
+<p>至此，项目已经为 ML 配置好了。所有未来的项目都将以这种方式引用 ML.NET，并让您回到这些步骤。</p>
+
+
+            
+
+            
+        
+    
+
+
+
+
+
+
+    
+        <title>Project architecture</title>
+        
+        <meta charset="utf-8"/>
+    
+
+    
+        
+
+                            
+                    <h1 class="header-title">项目架构</h1>
+                
+            
+            
+                
+<p>这个简单的项目将分为两个主要功能:</p>
+<ul>
+<li>培训和评估</li>
+<li>模型运行</li>
+</ul>
+<p>这种功能之间的划分模拟了利用机器学习的现实生产应用程序，因为通常有团队专门负责每一项。</p>
+<p>对于那些希望从一个完整的项目开始并遵循本节剩余部分的人，您可以从这里获得代码:<a href="https://github.com/PacktPublishing/Hands-On-Machine-Learning-With-ML.NET/tree/master/chapter02">https://github . com/packt publishing/Hands-On-Machine-Learning-With-ML。NET/tree/master/chapter02 </a></p>
+<p>下面的屏幕截图显示了 Visual Studio 的解决方案资源管理器中的项目分解。如前所述，该项目分为两个主要类别— <kbd>Predictor</kbd>和<kbd>Trainer</kbd>:</p>
+<p class="CDPAlignCenter CDPAlign"><img class="alignnone size-full wp-image-580 image-border" src="img/b4131596-ad64-4b3c-b897-e5b8a14cb398.png" style="width:17.58em;height:26.83em;"/></p>
+<p><kbd>Trainer</kbd>类包含所有的模型构建和评估代码，而<kbd>Predictor</kbd>类，顾名思义，包含使用训练好的模型运行预测的代码。</p>
+<p>这个类是我们将在随后的章节中使用的，并在本书的剩余部分中扩展。这个类背后的想法是减少对<strong>干</strong> ( <strong>不要</strong> <strong>重复</strong> <strong>你自己</strong>)的违反，并创建一个有凝聚力且易于迭代的框架。<kbd>Constants</kbd>类进一步帮助了这个想法——当我们进入更复杂的应用程序时，减少神奇的字符串；这种设计将用于所有未来的章节项目。</p>
+<p>最后，<kbd>Program</kbd>类是我们的控制台应用程序的主要入口点。</p>
+
+
+            
+
+            
+        
+    
+
+
+
+
+
+
+    
+        <title>Running the code</title>
+        
+        <meta charset="utf-8"/>
+    
+
+    
+        
+
+                            
+                    <h1 class="header-title">运行代码</h1>
+                
+            
+            
+                
+<p>现在，我们将深入探讨该项目中使用的各种类，包括以下类:</p>
+<ul>
+<li><kbd>RestaurantFeedback</kbd></li>
+<li><kbd>RestaurantPrediction</kbd></li>
+<li><kbd>Trainer</kbd></li>
+<li><kbd>Predictor</kbd></li>
+<li><kbd>BaseML</kbd></li>
+<li><kbd>Program</kbd></li>
+</ul>
+
+
+            
+
+            
+        
+    
+
+
+
+
+
+
+    
+        <title>The RestaurantFeedback class</title>
+        
+        <meta charset="utf-8"/>
+    
+
+    
+        
+
+                            
+                    <h1 class="header-title">RestaurantFeedback 类</h1>
+                
+            
+            
+                
+<p><kbd>RestaurantFeedback</kbd>类为我们的模型提供输入类。在 model(和其他框架)中，传统的方法是将结构化的输入输入到您的数据管道中，这些数据管道又被传递到训练阶段，并最终传递到您训练好的模型中。</p>
+<p>下面的类定义了我们的容器类来保存我们的预测值。这是我们将在本书其余部分使用的方法:</p>
+<pre>using Microsoft.ML.Data;<br/><br/>namespace chapter02.ML.Objects<br/>{<br/>     public class RestaurantFeedback<br/>     {<br/>          [LoadColumn(0)]<br/>          public bool Label { get; set; }<br/><br/>          [LoadColumn(1)]<br/>          public string Text { get; set; }<br/>     }<br/>}</pre>
+<p>乍一看，您可能想知道<kbd>RestarauntFeedback</kbd>类中的<kbd>Label</kbd>和<kbd>Text</kbd>属性与源数据之间的关联。在<kbd>Data</kbd>文件夹中，有一个名为<kbd>sampledata.csv</kbd>的文件。该文件包含以下内容:</p>
+<pre>0    "Great Pizza"<br/>0    "Awesome customer service"<br/>1    "Dirty floors"<br/>1    "Very expensive"<br/>0    "Toppings are good"<br/>1    "Parking is terrible"<br/>0    "Bathrooms are clean"<br/>1    "Management is unhelpful"<br/>0    "Lighting and atmosphere are romantic"<br/>1    "Crust was burnt"<br/>0    "Pineapple was fresh"<br/>1    "Lack of garlic cloves is upsetting"<br/>0    "Good experience, would come back"<br/>0    "Friendly staff"<br/>1    "Rude customer service"<br/>1    "Waiters never came back"<br/>1    "Could not believe the napkins were $10!"<br/>0    "Supersized Pizza is a great deal"<br/>0    "$5 all you can eat deal is good"<br/>1    "Overpriced and was shocked that utensils were an upcharge"</pre>
+<p>第一列映射到<kbd>Label</kbd>属性。你可能还记得在<a href="b8d873e1-9234-4f11-ad94-76df5ffbb228.xhtml">第一章</a>、<em>机器学习入门和 ML.NET</em>中，像这个例子中执行的监督学习需要标记。在这个项目中，我们的标签是一个布尔值。数据集中的 False (0)表示正反馈，True (1)表示负反馈。</p>
+<p>第二列映射到<kbd>Text</kbd>属性来传播情感(也就是要输入到模型中的句子)。</p>
+
+
+            
+
+            
+        
+    
+
+
+
+
+
+
+    
+        <title>The RestaurantPrediction class</title>
+        
+        <meta charset="utf-8"/>
+    
+
+    
+        
+
+                            
+                    <h1 class="header-title">restaurant 预测类</h1>
+                
+            
+            
+                
+<p><kbd>RestaurantPrediction</kbd>类包含我们的模型运行将产生的输出属性。根据所使用的算法，输出类将包含更多的属性，您将在后面的章节中看到:</p>
+<pre>using Microsoft.ML.Data;<br/><br/>namespace chapter02.ML.Objects<br/>{<br/>    public class RestaurantPrediction<br/>    {<br/>        [ColumnName("PredictedLabel")]<br/>        public bool Prediction { get; set; }<br/><br/>        public float Probability { get; set; }<br/><br/>        public float Score { get; set; }<br/>    }<br/>}</pre>
+<p>类似于<kbd>RestaurantFeedback Label</kbd>属性，<kbd>Prediction</kbd>属性包含正面或负面反馈的总体结果。<kbd>Probability</kbd>属性包含了我们的决策模型的置信度。<kbd>Score</kbd>属性用于评估我们的模型。</p>
+
+
+            
+
+            
+        
+    
+
+
+
+
+
+
+    
+        <title>The Trainer class</title>
+        
+        <meta charset="utf-8"/>
+    
+
+    
+        
+
+                            
+                    <h1 class="header-title">培训师课程</h1>
+                
+            
+            
+                
+<p>在下面的内容中，您将找到<kbd>Trainer</kbd>类中的唯一方法。<kbd>Trainer</kbd>方法在高层次上执行以下操作:</p>
+<ul>
+<li>它将训练数据(在本例中是我们的 CSV)加载到内存中。</li>
+<li>它建立了一个训练集和一个测试集。</li>
+<li>它创建了管道。</li>
+<li>它训练并保存模型。</li>
+<li>它对模型进行评估。</li>
+</ul>
+<p>这是我们将在本书其余部分遵循的结构和流程。现在，让我们深入研究一下<kbd>Train</kbd>方法背后的代码:</p>
+<ol>
+<li>首先，我们检查以确保训练数据文件名存在:</li>
+</ol>
+<pre style="padding-left: 60px">if (!File.Exists(trainingFileName)) {<br/>    Console.WriteLine($"Failed to find training data file ({trainingFileName}");<br/><br/>    return;<br/>}</pre>
+<p style="padding-left: 60px">尽管这是一个简单的测试应用程序，但是将它作为产品级应用程序来对待总是一个好的做法。此外，由于这是一个控制台应用程序，您可能会错误地传入定型数据的路径，这可能会导致方法中进一步出现异常。</p>
+<ol start="2">
+<li>使用 ML.NET 提供的<kbd>LoadFromTextFile</kbd>辅助方法来帮助将文本文件加载到<kbd>IDataView</kbd>对象中:</li>
+</ol>
+<pre style="padding-left: 60px">IDataView trainingDataView = MlContext.Data.LoadFromTextFile&lt;RestaurantFeedback&gt;(trainingFileName);</pre>
+<p style="padding-left: 60px">如您所见，我们传入了训练文件名和类型；在这种情况下，就是前面提到的<kbd>RestaurantFeedback</kbd>类。应该注意的是，该方法具有几个其他参数，包括以下参数:</p>
+<ul>
+<li style="padding-left: 60px"><kbd>separatorChar</kbd>:这是列分隔符；默认为<kbd>\t</kbd>(换句话说，一个 tab)。</li>
+<li style="padding-left: 60px"><kbd>hasHeader</kbd>:如果设置为<kbd>true</kbd>，数据集的第一行有表头；默认为<kbd>false</kbd>。</li>
+<li style="padding-left: 60px"><kbd>allowQuoting</kbd>:定义源文件中是否可以包含由带引号的字符串定义的列；它默认为 false。</li>
+<li style="padding-left: 60px"><kbd>trimWhitespace</kbd>:这将删除行中的尾随空格；它默认为 false。</li>
+<li style="padding-left: 60px"><kbd>allowSparse</kbd>:定义文件是否可以包含稀疏格式的数值向量；它默认为 false。稀疏格式要求新列具有要素的数量。</li>
+</ul>
+<p style="padding-left: 60px">对于本书中使用的大多数项目，我们将使用默认设置。</p>
+<ol start="3">
+<li>给定我们之前创建的<kbd>IDataView</kbd>对象，使用 ML.NET 提供的<kbd>TrainTestSplit</kbd>方法从主训练数据创建一个测试集:</li>
+</ol>
+<pre style="padding-left: 60px">DataOperationsCatalog.TrainTestData dataSplit = MlContext.Data.TrainTestSplit(trainingDataView, testFraction: 0.2);</pre>
+<p style="padding-left: 60px">正如在<a href="b8d873e1-9234-4f11-ad94-76df5ffbb228.xhtml">第一章</a>、<em>机器学习入门和 ML.NET</em>中提到的，样本数据被分成两组——训练和测试。参数<kbd>testFraction</kbd>指定了为测试而保留的数据集的百分比，在我们的例子中是 20%。默认情况下，该参数设置为 0.2。</p>
+<ol start="4">
+<li>首先，我们创建管道:</li>
+</ol>
+<pre style="padding-left: 60px">TextFeaturizingEstimator dataProcessPipeline = MlContext.Transforms.Text.FeaturizeText(outputColumnName: "Features",<br/>        inputColumnName: nameof(RestaurantFeedback.Text));</pre>
+<p style="padding-left: 60px">未来的例子将有更复杂的管道。在这个例子中，我们只是将前面讨论的<kbd>Text</kbd>属性映射到<kbd>Features</kbd>输出列。</p>
+<ol start="5">
+<li>接下来，我们实例化我们的<kbd>Trainer</kbd>类:</li>
+</ol>
+<pre style="padding-left: 60px">SdcaLogisticRegressionBinaryTrainer sdcaRegressionTrainer = MlContext.BinaryClassification.Trainers.SdcaLogisticRegression(<br/>        labelColumnName: nameof(RestaurantFeedback.Label),<br/>        featureColumnName: "Features");<br/></pre>
+<p style="padding-left: 60px">你可能还记得<a href="b8d873e1-9234-4f11-ad94-76df5ffbb228.xhtml">第一章</a>、<em>机器学习入门和 might</em>，在 ML.NET 发现的各种算法被称为训练器。在这个项目中，我们使用 SCDA 教练。</p>
+<ol start="6">
+<li>然后，我们通过追加之前实例化的训练器来完成管道:</li>
+</ol>
+<pre style="padding-left: 60px">EstimatorChain&lt;BinaryPredictionTransformer&lt;CalibratedModelParametersBase&lt;LinearBinaryModelParameters, PlattCalibrator&gt;&gt;&gt; trainingPipeline = dataProcessPipeline.Append(sdcaRegressionTrainer);</pre>
+<ol start="7">
+<li>接下来，我们使用本章前面创建的数据集来训练模型:</li>
+</ol>
+<pre style="padding-left: 60px">ITransformer trainedModel = trainingPipeline.Fit(dataSplit.TrainSet);</pre>
+<ol start="8">
+<li>我们将新创建的模型保存到指定的文件名，与训练集的模式相匹配:</li>
+</ol>
+<pre style="padding-left: 60px">MlContext.Model.Save(trainedModel, dataSplit.TrainSet.Schema, ModelPath);</pre>
+<ol start="9">
+<li>现在，我们用之前创建的测试集来转换我们新创建的模型:</li>
+</ol>
+<pre style="padding-left: 60px">IDataView testSetTransform = trainedModel.Transform(dataSplit.TestSet);</pre>
+<ol start="10">
+<li>最后，我们将使用之前创建的<kbd>testSetTransform</kbd>函数，并将其传递给<kbd>BinaryClassification</kbd>类的<kbd>Evaluate</kbd>方法:</li>
+</ol>
+<pre style="padding-left: 60px">CalibratedBinaryClassificationMetrics modelMetrics = MlContext.BinaryClassification.Evaluate(<br/>        data: testSetTransform,<br/>        labelColumnName: nameof(RestaurantFeedback.Label),<br/>        scoreColumnName: nameof(RestaurantPrediction.Score));<br/><br/>Console.WriteLine($"Area Under Curve: {modelMetrics.AreaUnderRocCurve:P2}{Environment.NewLine}" +<br/>        $"Area Under Precision Recall Curve: {modelMetrics.AreaUnderPrecisionRecallCurve:P2}" +                    $"{Environment.NewLine}" +<br/>        $"Accuracy: {modelMetrics.Accuracy:P2}{Environment.NewLine}" +<br/>        $"F1Score: {modelMetrics.F1Score:P2}{Environment.NewLine}" +<br/>        $"Positive Recall: {modelMetrics.PositiveRecall:#.##}{Environment.NewLine}" +<br/>        $"Negative Recall: {modelMetrics.NegativeRecall:#.##}{Environment.NewLine}");</pre>
+<p>这个方法允许我们生成模型度量。然后，我们使用经过训练的模型和测试集打印主要指标。我们将在本章的<em>评估模型</em>部分深入研究这些特性。</p>
+
+
+            
+
+            
+        
+    
+
+
+
+
+
+
+    
+        <title>The Predictor class</title>
+        
+        <meta charset="utf-8"/>
+    
+
+    
+        
+
+                            
+                    <h1 class="header-title">预测器类</h1>
+                
+            
+            
+                
+<p>如前所述，<kbd>Predictor</kbd>类是在我们的项目中提供预测支持的类。这种方法背后的思想是提供一个简单的接口来运行模型，给定相对简单的输入。在以后的章节中，我们将扩展这种方法结构，以支持更复杂的集成，例如那些托管在 web 应用程序中的集成:</p>
+<ol>
+<li>类似于在<kbd>Trainer</kbd>类中所做的，我们在读取模型之前验证它是否存在:</li>
+</ol>
+<pre style="padding-left: 60px">if (!File.Exists(ModelPath)) {<br/>    Console.WriteLine($"Failed to find model at {ModelPath}");<br/><br/>    return;<br/>}</pre>
+<ol start="2">
+<li>然后，我们定义<kbd>ITransformer</kbd>对象:</li>
+</ol>
+<pre style="padding-left: 60px">ITransformer mlModel;<br/><br/>using (var stream = new FileStream(ModelPath, FileMode.Open, FileAccess.Read, FileShare.Read)) {<br/>    mlModel = MlContext.Model.Load(stream, out _);<br/>}<br/><br/>if (mlModel == null) {<br/>    Console.WriteLine("Failed to load model");<br/><br/>    return;<br/>}</pre>
+<p style="padding-left: 60px">一旦我们通过<kbd>Model.Load</kbd>方法加载，这个对象将包含我们的模型。此方法也可以采用直接文件路径。然而，流方法有助于支持我们将在后面章节中使用的非磁盘方法。</p>
+<ol start="3">
+<li>接下来，给定我们之前加载的模型，创建一个<kbd>PredictionEngine</kbd>对象:</li>
+</ol>
+<pre style="padding-left: 60px">var predictionEngine = MlContext.Model.CreatePredictionEngine&lt;RestaurantFeedback,                        RestaurantPrediction&gt;(mlModel);</pre>
+<p style="padding-left: 60px">我们同时传入 TSrc 和 TDst，在这个项目中，分别是<kbd>RestaurantFeedback</kbd>和<kbd>RestaurantPrediction</kbd>。</p>
+<ol start="4">
+<li>然后，调用<kbd>PredictionEngine</kbd>类上的<kbd>Predict</kbd>方法:</li>
+</ol>
+<pre style="padding-left: 60px">var prediction = predictionEngine.Predict(new RestaurantFeedback { Text = inputData });</pre>
+<p style="padding-left: 60px">因为，当我们用 TSrc 创建对象时，类型被设置为<kbd>RestaurantFeedback</kbd>，我们的模型有一个强类型接口。然后，我们创建带有<kbd>inputData</kbd>变量的<kbd>RestaurantFeedback</kbd>对象，该变量包含我们将要运行模型的句子的字符串。</p>
+<ol start="5">
+<li>最后，显示预测输出和概率:</li>
+</ol>
+<pre style="padding-left: 60px">Console.WriteLine($"Based on \"{inputData}\", the feedback is predicted to be:{Environment.NewLine}" +<br/>        "{(prediction.Prediction ? "Negative" : "Positive")} at a {prediction.Probability:P0}" +                 " confidence");</pre>
+
+
+            
+
+            
+        
+    
+
+
+
+
+
+
+    
+        <title>The BaseML class</title>
+        
+        <meta charset="utf-8"/>
+    
+
+    
+        
+
+                            
+                    <h1 class="header-title">BaseML 类</h1>
+                
+            
+            
+                
+<p>如前所述，<kbd>BaseML</kbd>类将包含我们的<kbd>Trainer</kbd>和<kbd>Predictor</kbd>类之间的公共代码，从本章开始。在本书的剩余部分，我们将在如下定义的<kbd>BaseML</kbd>类之上构建:</p>
+<pre>using System;<br/>using System.IO;<br/><br/>using chapter02.Common;<br/><br/>using Microsoft.ML;<br/><br/>namespace chapter02.ML.Base<br/>{<br/>    public class BaseML<br/>    {<br/>        protected static string ModelPath =&gt; Path.Combine(AppContext.BaseDirectory,                                                           Constants.MODEL_FILENAME);<br/><br/>        protected readonly MLContext MlContext;<br/><br/>        protected BaseML()<br/>        {<br/>            MlContext = new MLContext(2020);<br/>        }<br/>    }<br/>}</pre>
+<p>对于训练和预测中的所有 ML.NET 应用程序，都需要一个<kbd>MLContext</kbd>对象。需要用特定的种子值初始化对象，以便在测试组件期间创建更加一致的结果。一旦模型被加载，种子值(或缺少种子值)不会影响输出。</p>
+
+
+            
+
+            
+        
+    
+
+
+
+
+
+
+    
+        <title>The Program class</title>
+        
+        <meta charset="utf-8"/>
+    
+
+    
+        
+
+                            
+                    <h1 class="header-title">程序类</h1>
+                
+            
+            
+                
+<p>那些创建过控制台应用程序的人应该熟悉里面的<kbd>Program</kbd>类和<kbd>Main</kbd>方法。在本书的其余部分，我们将按照这种结构开发其他基于控制台的应用程序。下面的代码块包含程序类，应用程序将从该类开始执行:</p>
+<pre class="mce-root">using System;<br/><br/>using chapter02.ML;<br/><br/>namespace chapter02<br/>{<br/>    class Program<br/>    {<br/>        static void Main(string[] args)<br/>        {<br/>            if (args.Length != 2)<br/>            {<br/>                Console.WriteLine($"Invalid arguments passed in, exiting.{Environment.NewLine}" +                            $"{Environment.NewLine}Usage: {Environment.NewLine}" +<br/>                    $"predict &lt;sentence of text to predict against&gt;{Environment.NewLine}" +<br/>                    $"or {Environment.NewLine}" +<br/>                    $"train &lt;path to training data file&gt;{Environment.NewLine}");<br/><br/>                return;<br/>            }<br/><br/>            switch (args[0])<br/>            {<br/>                case "predict":<br/>                    new Predictor().Predict(args[1]);<br/>                    break;<br/>                case "train":<br/>                    new Trainer().Train(args[1]);<br/>                    break;<br/>                default:<br/>                    Console.WriteLine($"{args[0]} is an invalid option");<br/>                    break;<br/>            }<br/>        }<br/>    }<br/>}</pre>
+<p>对于熟悉解析命令行参数的人来说，这是一个相当简单的方法实现。如帮助文本所示，使用一个简单的双参数方法。</p>
+<p>当执行一个需要几个参数(可选和必需)的更复杂的命令行应用程序时，微软提供了一个简单易用的 NuGet 包，可以在这里找到:<a href="https://github.com/dotnet/command-line-api">https://github.com/dotnet/command-line-api</a></p>
+
+
+            
+
+            
+        
+    
+
+
+
+
+
+
+    
+        <title>Running the example</title>
+        
+        <meta charset="utf-8"/>
+    
+
+    
+        
+
+                            
+                    <h1 class="header-title">运行示例</h1>
+                
+            
+            
+                
+<p>要运行定型和预测，只需构建项目，然后传入适当的数据。</p>
+<p>对于培训，您可以使用附带的<kbd>sampledata.csv</kbd>文件或创建自己的文件。为此，我们将打开一个 PowerShell 窗口，并传入相对路径:</p>
+<pre><strong>.\chapter02.exe train ..\..\..\Data\sampledata.csv</strong><br/>Area Under Curve: 100.00%<br/>Area Under Precision Recall Curve: 100.00%<br/>Accuracy: 100.00%<br/>F1Score: 100.00%<br/>Positive Recall: 1<br/>Negative Recall: 1</pre>
+<p>模型建立后，您可以按如下方式运行预测:</p>
+<pre><strong>.\chapter02.exe predict "bad"</strong><br/>Based on "bad", the feedback is predicted to be:<br/>Negative at a 64% confidence</pre>
+<p>请随意尝试各种短语来测试模型的功效，并祝贺您训练了第一个模型！</p>
+
+
+            
+
+            
+        
+    
+
+
+
+
+
+
+    
+        <title>Evaluating the model</title>
+        
+        <meta charset="utf-8"/>
+    
+
+    
+        
+
+                            
+                    <h1 class="header-title">评估模型</h1>
+                
+            
+            
+                
+<p>正如您在运行示例项目的培训师组件时所看到的，有各种各样的模型评估元素。对于每种模型类型，在分析模型的性能时，都有不同的指标可以查看。</p>
+<p>在二进制分类模型中，比如在示例项目中发现的模型，下面的属性在调用<kbd>Evaluate</kbd>方法后设置的<kbd>CalibratedBiniaryClassificationMetrics</kbd>中公开。但是，首先，我们需要定义二元分类中的四种预测类型:</p>
+<ul>
+<li>真阴性:正确归类为阴性</li>
+<li>真正积极的:正确地归类为积极的</li>
+<li>假阴性:不恰当地归类为阴性</li>
+<li>假阳性:不正确地归类为阳性</li>
+</ul>
+<p>要理解的第一个指标是<strong>准确性</strong>。顾名思义，准确性是评估模型时最常用的指标之一。该指标简单地计算为正确分类的预测与总分类的比率。</p>
+<p>下一个需要理解的指标是<strong>精度</strong>。精度定义为模型中真实结果与所有正面结果的比例。例如，精度为 1 意味着没有误报，这是一个理想的情况。如前所述，误报是将应该归类为阴性的东西归类为阳性。误报的一个常见例子是将文件误分类为恶意文件，而实际上它是良性的。</p>
+<p>下一个需要理解的指标是<strong>召回</strong>。召回率是模型返回的所有正确结果的分数。例如，召回 1 意味着没有假阴性，这是另一个理想的情况。假阴性是指将本应被归类为阳性的东西归类为阴性。</p>
+<p>下一个需要理解的指标是<strong> F-score </strong>，它利用精确度和召回率，根据误报和漏报得出加权平均值。与简单地查看准确性相比，f 分数提供了模型性能的另一个视角。值的范围在 0 到 1 之间，理想值为 1。</p>
+<p><strong>曲线下面积</strong>，也称为 AUC，顾名思义，是以 y 轴为真阳性，x 轴为假阳性绘制的曲线下面积。对于分类器，如我们在本章前面训练的模型，如您所见，它返回 0 到 1 之间的值。</p>
+<p>最后，<strong>平均测井损失</strong>和<strong>训练测井损失</strong>都用来进一步解释模型的性能。平均对数损失通过计算真实分类和模型预测分类之间的差异，有效地表达了单个数字中错误结果的损失。训练对数损失代表使用概率相对于已知值的模型的不确定性。当您训练您的模型时，您将会看到一个较低的数字(数字越低越好)。</p>
+<p>至于其他模型类型，我们将在它们各自的章节中深入探讨如何评估它们，在这些章节中，我们将涵盖回归和聚类指标。</p>
+
+
+            
+
+            
+        
+    
+
+
+
+
+
+
+    
+        <title>Summary</title>
+        
+        <meta charset="utf-8"/>
+    
+
+    
+        
+
+                            
+                    <h1 class="header-title">摘要</h1>
+                
+            
+            
+                
+<p>在本章的过程中，我们已经建立了我们的开发环境，并学习了文件的正确组织。除了针对新模型进行训练、评估和运行预测之外，我们还创建了第一个 ML.NET 应用程序。最后，我们探讨了如何评估一个模型以及各种属性的含义。</p>
+<p>在下一章，我们将深入研究逻辑回归算法。</p>
+
+
+            
+
+            
+        
+    
+
+
+</body></html>

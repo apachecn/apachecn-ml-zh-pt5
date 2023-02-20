@@ -1,0 +1,1193 @@
+<html><head/><body>
+    
+        <title>Machine Learning for IoT</title>
+        
+        <meta charset="utf-8"/>
+    
+<!-- kobo-style -->
+<script type="text/javascript" src="img/kobo.js"/>
+<style type="text/css" id="koboSpanStyle">.koboSpan { -webkit-text-combine: inherit; }</style>
+
+
+
+    
+        
+
+                            
+                    <h1 class="header-title">面向物联网的机器学习</h1>
+                
+            
+            
+                
+<p>术语<strong>机器学习</strong> ( <strong> ML </strong>)指的是能够自动检测数据中有意义的模式并随着经验进行改进的计算机程序。虽然这不是一个新领域，但目前正处于其炒作周期的顶峰。本章向读者介绍标准 ML 算法及其在物联网领域的应用。</p>
+<p>阅读本章后，您将了解以下内容:</p>
+<ul>
+<li>什么是 ML 以及它在物联网管道中扮演的角色</li>
+<li>监督和非监督学习范例</li>
+<li>回归以及如何使用 TensorFlow 和 Keras 执行线性回归</li>
+<li>流行的 ML 分类器及其在 TensorFlow 和 Keras 中的实现</li>
+<li>决策树、随机森林、执行增强的技术以及如何为它们编写代码</li>
+<li>改善系统性能和模型限制的提示和技巧</li>
+</ul>
+
+
+            
+
+            
+        
+    
+
+
+
+    
+        <title>ML and IoT</title>
+        
+        <meta charset="utf-8"/>
+    
+<!-- kobo-style -->
+<script type="text/javascript" src="img/kobo.js"/>
+<style type="text/css" id="koboSpanStyle">.koboSpan { -webkit-text-combine: inherit; }</style>
+
+
+
+    
+        
+
+                            
+                    <h1 class="header-title">ML 和 IoT</h1>
+                
+            
+            
+                
+<p>ML 是人工智能的一个子集，旨在建立具有自动学习和根据经验改进的能力的计算机程序，而无需显式编程。在这个大数据时代，数据以惊人的速度生成，人类不可能手动浏览所有数据并理解它们。根据 IT 和网络领域的领先公司思科的估计，到 2018 年，物联网每年将产生 400 的数据。这表明我们需要寻找理解这些巨大数据的自动方法，这就是 ML 的用武之地。</p>
+<p>完整的思科报告于 2018 年 2 月 1 日发布，可通过<a href="https://www.cisco.com/c/en/us/solutions/collateral/service-provider/global-cloud-index-gci/white-paper-c11-738085.html">https://www . Cisco . com/c/en/us/solutions/parallels/service-provider/global-cloud-index-gci/white-paper-c11-738085 . html</a>访问。它预测了物联网、机器人、人工智能和电信融合后的数据流量和云服务趋势。</p>
+<p class="mce-root"/>
+<p>研究和咨询公司 Gartner 每年都会发布一个图形表示，通过五个阶段从视觉和概念上展示新兴技术的成熟度。</p>
+<p>你可以在<a href="https://www.gartner.com/smarterwithgartner/5-trends-emerge-in-gartner-hype-cycle-for-emerging-technologies-2018/">https://www . Gartner . com/smarterwithgartner/5-trends-emerge-in-Gartner-Hype-Cycle-for-Emerging-Technologies-2018/</a>找到 2018 年<em> Gartner 新兴技术炒作周期</em>的图片。</p>
+<p>我们可以看到，物联网平台和 ML 都处于膨胀预期的顶峰。这是什么意思？膨胀的期望的顶峰是在技术的生命周期中对技术有过度热情的阶段。大量的厂商和创业公司投资于巅峰时期的技术。越来越多的商业机构探索新技术如何适应他们的商业战略。简而言之，是时候投身于这项技术了。你可以在风险基金活动中听到投资者开玩笑说<em>如果你只是在你的推销中包括机器学习，你就可以在你的估值后面加一个零</em>。</p>
+<p>所以，系好安全带，让我们一起深入 ML 技术。</p>
+
+
+            
+
+            
+        
+    
+
+
+
+    
+        <title>Learning paradigms</title>
+        
+        <meta charset="utf-8"/>
+    
+<!-- kobo-style -->
+<script type="text/javascript" src="img/kobo.js"/>
+<style type="text/css" id="koboSpanStyle">.koboSpan { -webkit-text-combine: inherit; }</style>
+
+
+
+    
+        
+
+                            
+                    <h1 class="header-title">学习范式</h1>
+                
+            
+            
+                
+<p>ML 算法可以根据它们使用的方法分类如下:</p>
+<ul>
+<li>概率与非概率</li>
+<li>建模与优化</li>
+<li>有人监督还是无人监督</li>
+</ul>
+<p>在本书中，我们将我们的 ML 算法分为有监督的和无监督的。这两者之间的区别取决于模型的学习方式以及提供给模型学习的数据类型:</p>
+<ul>
+<li><strong>监督学习</strong>:假设我给你一个序列，让你预测下一个元素:</li>
+</ul>
+<div><em>(1, 4, 9, 16, 25</em>,...)</div>
+<p style="padding-left: 60px">你猜对了:下一个数字将是 36，接下来是 49，以此类推。这就是监督学习，也叫<strong>通过例子学习</strong>；没有人告诉你这个数列代表正整数的平方——你可以从提供的五个例子中猜出来。</p>
+<p class="mce-root"/>
+<p style="padding-left: 60px">以类似的方式，在监督学习中，机器从示例中学习。它具有由一组对(<em> X </em>，<em> Y </em>)组成的训练数据，其中<em> X </em>是输入(它可以是单个数字或具有大量特征的输入值)，而<em> Y </em>是给定输入的期望输出。一旦对示例数据进行了训练，当呈现新数据时，模型应该能够得出准确的结论。</p>
+<p style="padding-left: 60px">监督学习用于预测给定输入集的实值输出(回归)或离散标签(分类)。我们将在接下来的章节中探讨回归和分类算法。</p>
+<ul>
+<li><strong>无监督学习</strong>:假设给你八个不同半径和颜色的圆形块，要求你将它们按顺序排列或分组。你会怎么做？</li>
+</ul>
+<p style="padding-left: 60px">有些人可能按照半径的递增或递减顺序排列它们，有些人可能按照颜色将它们分组。有很多方法，对我们每个人来说，这取决于分组时数据的内部表示。这是无监督的学习，人类的大部分学习都属于这一类。</p>
+<p style="padding-left: 60px">在无监督学习中，模型只是被给定了数据(<em> X </em>)，但没有被告知任何相关信息；模型自己学习数据中的潜在模式和关系。无监督学习通常用于聚类和降维。</p>
+<p>尽管我们在本书的大部分算法中使用 TensorFlow，但在本章中，由于为 ML 算法高效构建的 scikit 库，我们将使用 scikit 提供的函数和方法，只要它们提供更多的灵活性和特性。目的是为读者提供在物联网生成的数据上使用人工智能/人工智能技术，而不是重新发明轮子。</p>
+
+
+            
+
+            
+        
+    
+
+
+
+    
+        <title>Prediction using linear regression</title>
+        
+        <meta charset="utf-8"/>
+    
+<!-- kobo-style -->
+<script type="text/javascript" src="img/kobo.js"/>
+<style type="text/css" id="koboSpanStyle">.koboSpan { -webkit-text-combine: inherit; }</style>
+
+
+
+    
+        
+
+                            
+                    <h1 class="header-title">使用线性回归进行预测</h1>
+                
+            
+            
+                
+<p>我的一个朋友亚伦在花钱方面有点马虎，他从来不会估计自己每月的信用卡账单会有多少。我们能做些什么来帮助他吗？是的，如果我们有足够的数据，线性回归可以帮助我们预测每月的信用卡账单。多亏了数字经济，他过去五年的所有货币交易都可以在网上查到。我们提取了他每月在食品杂货、文具和旅行上的支出以及他的月收入。线性回归不仅有助于预测他每月的信用卡账单，还能洞察哪个因素对他的支出最有影响。</p>
+<p>这只是一个例子；线性回归可用于许多类似的任务。在本节中，我们将学习如何对数据进行线性回归。</p>
+<p>线性回归是一项监督学习任务。这是预测中最基本、最简单、最广泛使用的 ML 技术之一。回归的目标是找到一个函数<em> F </em> ( <em> x，W </em>)，对于给定的输入输出对(<em> x </em>，<em> y </em>)，使得<em> y </em> = <em> F </em> ( <em> x，W </em>)。(<em> x </em>，<em> y </em>)对中，<em> x </em>为自变量，<em> y </em>为因变量，两者均为连续变量。它帮助我们找到因变量<em> y </em>和自变量<em> x </em>之间的关系。</p>
+<p>输入<em> x </em>可以是单个输入变量或多个输入变量。当<em> F </em> ( <em> x，W </em>)映射单个输入变量<em> x </em>时，称为<strong>简单线性回归</strong>；对于多个输入变量，称为<strong>多元线性回归</strong>。</p>
+<p class="mce-root CDPAlignLeft CDPAlign">使用以下表达式来近似函数<em> F </em> ( <em> x，W </em>):</p>
+<div><img class="fm-editor-equation" src="img/b866dc12-794c-4ae7-804a-5e1d8ef703e5.png" style="width:18.00em;height:4.17em;"/></div>
+<p>在这个表达式中，<em> d </em>是<em> x </em>(自变量个数)的维数，<em> W </em>是<em> x </em>的各个分量关联的权重。为了找到函数<em> F </em> ( <em> x，W </em>)，我们需要确定权重。自然的选择是找到减少平方误差的权重，因此我们的目标函数如下:</p>
+<div><img class="fm-editor-equation" src="img/c2da2354-6889-4776-96d6-062c18f9b2cf.png" style="width:13.42em;height:3.92em;"/></div>
+<p class="mce-root"/>
+<p class="mce-root"/>
+<p>在前面的函数中，<em> N </em>是输入输出对的总数。为了找到权重，我们对关于权重的目标函数进行微分，并将其等同于<em> 0 </em>。用矩阵表示法，我们可以写出列向量<em> W </em> = ( <em> W </em> <sub> 0 </sub>，<em> W </em> <sub> 1 </sub>，<em> W </em> <sub> 2 </sub>，...、<em>W</em>T20】d)<sup>T</sup>如下:</p>
+<div><img class="fm-editor-equation" src="img/9d0fdad2-b84a-4896-868c-3718dc47f9af.png" style="width:5.17em;height:1.25em;"/></div>
+<p>通过区分和简化，我们得到以下结果:</p>
+<div><img class="fm-editor-equation" src="img/d758faaa-14ab-4347-8655-6c3ed714d269.png" style="width:10.25em;height:1.58em;"/></div>
+<p><em> X </em>是大小为[ <em> N </em>、<em> d </em>、<em> Y </em>的输入向量，大小为[ <em> N </em>，1]的输出向量。如果(<em>X<sup>T</sup>X</em>)<sup>-1</sup>存在，即<em> X </em>的所有行和列线性无关，则可以找到权重。为了确保这一点，输入-输出样本的数量(<em> N </em>)应该远大于输入特征的数量(<em> d </em>)。</p>
+<p>需要记住的一件重要事情是，因变量<em> Y </em>相对于因变量 X 不是线性的；相反，它相对于模型参数<em> W </em>、权重是线性的。因此，我们可以使用线性回归来模拟诸如指数关系甚至正弦关系(在<em> Y </em>和<em> X </em>之间)。在这种情况下，我们将问题概括为求权重<em> W </em>，这样<em>y</em>=<em>F</em>(<em>g</em>(<em>x</em>)，<em> W </em>，其中<em> g </em> ( <em> x </em>)是<em> X. </em>的非线性函数</p>
+
+
+            
+
+            
+        
+    
+
+
+
+    
+        <title>Electrical power output prediction using regression</title>
+        
+        <meta charset="utf-8"/>
+    
+<!-- kobo-style -->
+<script type="text/javascript" src="img/kobo.js"/>
+<style type="text/css" id="koboSpanStyle">.koboSpan { -webkit-text-combine: inherit; }</style>
+
+
+
+    
+        
+
+                            
+                    <h1 class="header-title">使用回归的电功率输出预测</h1>
+                
+            
+            
+                
+<p>既然你已经理解了线性回归的基础，让我们用它来预测联合循环发电厂的电力输出。我们在<a href="fa0444a6-ce5c-4bed-8d9d-ddab846fe571.xhtml">第一章</a>、<em>人工智能和物联网的原理和基础</em>中描述了这个数据集；这里，我们将使用 TensorFlow 及其自动梯度来求解。该数据集可从 UCI ML 档案馆下载(<a href="http://archive.ics.uci.edu/ml/datasets/combined+cycle+power+plant">http://archive . ics . UCI . edu/ML/datasets/combined+cycle+power+plant</a>)。完整的代码可以在 GitHub(<a href="https://github.com/PacktPublishing/Hands-On-Artificial-Intelligence-for-IoT">https://GitHub . com/packt publishing/Hands-On-Artificial-Intelligence-for-IoT</a>)上获得，文件名为<kbd>ElectricalPowerOutputPredictionUsingRegression.ipynb</kbd>。</p>
+<p class="mce-root"/>
+<p>让我们通过下面的步骤来理解代码的执行:</p>
+<ol>
+<li>我们导入<kbd>tensorflow</kbd>、<kbd>numpy</kbd>、<kbd>pandas</kbd>、<kbd>matplotlib</kbd>，以及 scikit-learn 的一些有用的函数:</li>
+</ol>
+<pre style="padding-left: 60px"># Import the modules<br/>import tensorflow as tf<br/>import numpy as np<br/>import pandas as pd<br/>import matplotlib.pyplot as plt<br/>from sklearn.preprocessing import MinMaxScaler<br/>from sklearn.metrics import mean_squared_error, r2_score<br/>from sklearn.model_selection import train_test_split<br/>%matplotlib inline # The data file is loaded and analyzed</pre>
+<ol start="2">
+<li>加载并分析数据文件:</li>
+</ol>
+<pre style="padding-left: 60px">filename = 'Folds5x2_pp.xlsx' # download the data file from UCI ML repository<br/>df = pd.read_excel(filename, sheet_name='Sheet1')<br/>df.describe()</pre>
+<ol start="3">
+<li>因为数据没有被规范化，所以在使用它之前，我们需要使用<kbd>sklearn</kbd>的<kbd>MinMaxScaler</kbd>将其规范化:</li>
+</ol>
+<pre style="padding-left: 60px">X, Y = df[['AT', 'V','AP','RH']], df['PE']<br/>scaler = MinMaxScaler()<br/>X_new = scaler.fit_transform(X)<br/>target_scaler = MinMaxScaler()<br/>Y_new = target_scaler.fit_transform(Y.values.reshape(-1,1))<br/>X_train, X_test, Y_train, y_test = \<br/> train_test_split(X_new, Y_new, test_size=0.4, random_state=333)</pre>
+<ol start="4">
+<li>现在，我们定义一个类，<kbd>LinearRegressor</kbd>；这是所有实际工作发生的类。类初始化定义了计算图，并初始化所有的<kbd>Variables</kbd>(权重和偏差)。该类有<kbd>function</kbd>方法，对函数<em> y </em> = <em> F </em> ( <em> X </em>，<em> W </em>)进行建模；<kbd>fit</kbd>方法执行自动梯度并更新权重和偏差，<kbd>predict</kbd>方法用于获得给定输入<em> X </em>的输出<em>y</em>,<kbd>get_weights</kbd>方法返回学习到的权重和偏差:</li>
+</ol>
+<pre style="padding-left: 60px">class LinearRegressor:<br/> def __init__(self,d, lr=0.001 ):<br/> # Placeholders for input-output training data<br/> self.X = tf.placeholder(tf.float32,\<br/> shape=[None,d], name='input')<br/> self.Y = tf.placeholder(tf.float32,\<br/> name='output')<br/> # Variables for weight and bias<br/> self.b = tf.Variable(0.0, dtype=tf.float32)<br/> self.W = tf.Variable(tf.random_normal([d,1]),\<br/> dtype=tf.float32)<br/><br/> # The Linear Regression Model<br/> self.F = self.function(self.X)<br/><br/> # Loss function<br/> self.loss = tf.reduce_mean(tf.square(self.Y \<br/> - self.F, name='LSE'))<br/> # Gradient Descent with learning <br/> # rate of 0.05 to minimize loss<br/> optimizer = tf.train.GradientDescentOptimizer(lr)<br/> self.optimize = optimizer.minimize(self.loss)<br/> <br/> # Initializing Variables<br/> init_op = tf.global_variables_initializer()<br/> self.sess = tf.Session()<br/> self.sess.run(init_op)<br/><br/> def function(self, X):<br/> return tf.matmul(X, self.W) + self.b<br/><br/> def fit(self, X, Y,epochs=500):<br/> total = []<br/> for i in range(epochs):<br/> _, l = self.sess.run([self.optimize,self.loss],\<br/> feed_dict={self.X: X, self.Y: Y})<br/> total.append(l)<br/> if i%100==0:<br/> print('Epoch {0}/{1}: Loss {2}'.format(i,epochs,l))<br/> return total<br/> <br/> def predict(self, X):<br/> return self.sess.run(self.function(X), feed_dict={self.X:X})<br/> <br/> def get_weights(self):<br/> return self.sess.run([self.W, self.b])</pre>
+<ol start="5">
+<li>我们使用前面的类来创建线性回归模型并对其进行训练:</li>
+</ol>
+<pre style="padding-left: 60px">N, d = X_train.shape<br/>model = LinearRegressor(d)<br/>loss = model.fit(X_train, Y_train, 20000) #Epochs = 20000</pre>
+<p>让我们看看经过训练的线性回归器的性能。具有<strong>个时期</strong>的均方误差图显示网络试图达到均方误差的最小值:</p>
+<p class="CDPAlignCenter CDPAlign"><img class="aligncenter size-full wp-image-1081 image-border" src="img/08d71db2-d508-4a8a-a136-ca9176a05f18.png" style="width:33.50em;height:22.17em;"/></p>
+<p>在测试数据集上，我们实现了<em>R<sup>2</sup>T3<em>0.768</em>的值和<em> 0.011 </em>的均方误差。</em></p>
+
+
+            
+
+            
+        
+    
+
+
+
+    
+        <title>Logistic regression for classification</title>
+        
+        <meta charset="utf-8"/>
+    
+<!-- kobo-style -->
+<script type="text/javascript" src="img/kobo.js"/>
+<style type="text/css" id="koboSpanStyle">.koboSpan { -webkit-text-combine: inherit; }</style>
+
+
+
+    
+        
+
+                            
+                    <h1 class="header-title">分类的逻辑回归</h1>
+                
+            
+            
+                
+<p>在上一节中，我们学习了如何预测。在 ML 中还有另一个常见的任务:分类任务。区分狗和猫，垃圾邮件和非垃圾邮件，甚至识别房间或场景中的不同物体——所有这些都是分类任务。</p>
+<p>逻辑回归是一种古老的分类技术。在给定输入值的情况下，它提供事件发生的概率。事件表示为分类因变量，特定因变量为<em> 1 </em>的概率使用 logit 函数给出:</p>
+<div><img class="fm-editor-equation" src="img/13aab929-f33c-4e8b-8bdc-33726bf818d8.png" style="width:27.92em;height:3.17em;"/></div>
+<p class="mce-root"/>
+<p class="mce-root">在详细介绍如何使用逻辑回归进行分类之前，我们先来看看 logit 函数(也称为<strong> sigmoid </strong>函数，因为其曲线呈 S 形)。下图显示了 logit 函数及其导数随输入<em> X、</em>变化的情况，Sigmoidal 函数(蓝色)及其导数(橙色):</p>
+<p class="CDPAlignCenter CDPAlign"><img class="aligncenter size-full wp-image-1082 image-border" src="img/ae962533-66ec-4952-997b-524596c97b5f.png" style="width:34.08em;height:23.17em;"/></p>
+<p>该图中需要注意的一些重要事项如下:</p>
+<ul>
+<li>sigmoid 的值(以及由此而来的<em> Y <sub> pred </sub> </em>)位于(<em> 0 </em>，<em> 1 </em>)之间</li>
+<li>当<em> W <sup> T </sup> X + b = 0.0 </em>时，乙状结肠的导数最高，导数的最高值仅为<em> 0.25 </em>(同一位置的乙状结肠的值为<em> 0.5 </em>)</li>
+<li>sigmoid 变化的斜率取决于权重，导数峰值的位置取决于偏差</li>
+</ul>
+<p>我建议你使用本书 GitHub 库中的<kbd>Sigmoid_function.ipynb</kbd>程序，感受一下 sigmoid 函数是如何随着权重和偏差的变化而变化的。</p>
+
+
+            
+
+            
+        
+    
+
+
+
+    
+        <title>Cross-entropy loss function</title>
+        
+        <meta charset="utf-8"/>
+    
+<!-- kobo-style -->
+<script type="text/javascript" src="img/kobo.js"/>
+<style type="text/css" id="koboSpanStyle">.koboSpan { -webkit-text-combine: inherit; }</style>
+
+
+
+    
+        
+
+                            
+                    <h1 class="header-title">交叉熵损失函数</h1>
+                
+            
+            
+                
+<p>逻辑回归旨在找到权重<em> W </em>和偏差<em> b </em>，使得输入特征空间中的每个输入向量<em>X<sub>I</sub>T7】被正确分类到其类别<em>y<sub>I</sub>T11】中。换句话说，<em> y <sub> i </sub> </em>和<em> <img class="fm-editor-equation" src="img/e1e5c9a3-577d-4910-997f-dbdb5cd0cd59.png" style="width:3.58em;height:1.67em;"/> </em>对于给定的<em> x <sub> i </sub> </em>应该有相似的分布。我们首先考虑一个二元分类问题；在这种情况下，数据点<em>y<sub>I</sub>T26】可以有值<em> 1 </em>或<em> 0 </em>。由于逻辑回归是监督学习算法，我们给出训练数据对(<em> X <sub> i </sub> </em>，<em> Y <sub> i </sub> </em>)作为输入，并且让<em> <img class="fm-editor-equation" src="img/62f0973e-bd28-4c44-9a70-93a322422a4a.png" style="width:2.83em;height:1.33em;"/> </em>是<em>P</em>(<em>Y</em>=<em>1</em>|<em>X</em>=<em>X<sub>I</sub></em>的概率然后，对于<em> p </em>训练数据点，总平均损失定义如下:</em></em></em></p>
+<div><img class="fm-editor-equation" src="img/f45cc770-d660-465d-bf48-ed5d7d8eef35.png" style="width:28.67em;height:3.92em;"/></div>
+<p>因此，对于每个数据对，对于<em>Y<sub>I</sub>T3】=<em>1</em>，第一项将对损失项有贡献，随着<img class="fm-editor-equation" src="img/05c8ae04-6675-4cc7-b35a-5caa58800101.png" style="width:2.83em;height:1.33em;"/>分别从<em> 0 </em>变到<em> 1 </em>，贡献从无穷大变到<em> 0 </em>。类似地，对于<em>Y<sub>I</sub></em>=<em>0</em>，第二项将对损失项做出贡献，随着<img class="fm-editor-equation" src="img/4295ffc5-6a17-4ece-b58d-ea27a6688761.png" style="width:2.83em;height:1.33em;"/>分别从<em> 1 </em>变化到<em> 0 </em>，其贡献从无穷大变化到零。</em></p>
+<p>对于多类分类，损失项概括如下:</p>
+<div><img class="fm-editor-equation" src="img/0f18ab66-73bb-4fd7-ac3d-3015a548ef93.png" style="width:15.33em;height:4.17em;"/></div>
+<p>在前面，<em> K </em>是类的数量。需要注意的重要一点是，对于二进制分类，输出<em>Y<sub>I</sub>T5】和<em> Y <sub> pred </sub> </em>是单值，而对于多类问题，<em> Y <sub> i </sub> </em>和<em>Y</em><sub><em>pred</em></sub>现在都是<em> K </em>维度的向量，每个类别有一个分量。</em></p>
+<p class="mce-root"/>
+<p class="mce-root"/>
+
+
+            
+
+            
+        
+    
+
+
+
+    
+        <title>Classifying wine using logistic regressor</title>
+        
+        <meta charset="utf-8"/>
+    
+<!-- kobo-style -->
+<script type="text/javascript" src="img/kobo.js"/>
+<style type="text/css" id="koboSpanStyle">.koboSpan { -webkit-text-combine: inherit; }</style>
+
+
+
+    
+        
+
+                            
+                    <h1 class="header-title">用逻辑回归器对葡萄酒进行分类</h1>
+                
+            
+            
+                
+<p>现在让我们用我们所学的来给葡萄酒质量分类。听得出来你在想:<em>什么酒质？不会吧！</em>让我们看看与专业品酒师相比，我们的逻辑回归器表现如何。我们将使用葡萄酒质量数据集(<a href="https://archive.ics.uci.edu/ml/datasets/wine+quality">https://archive.ics.uci.edu/ml/datasets/wine+quality</a>)；关于数据集的详细信息在<a href="fa0444a6-ce5c-4bed-8d9d-ddab846fe571.xhtml">第 1 章</a>、<em>人工智能和物联网的原理和基础</em>中给出。完整的代码在 GitHub 库的文件<kbd>Wine_quality_using_logistic_regressor.ipynb</kbd>中。让我们一步一步地理解代码:</p>
+<ol>
+<li>第一步是加载所有模块:</li>
+</ol>
+<pre style="padding-left: 60px"># Import the modules<br/>import tensorflow as tf<br/>import numpy as np<br/>import pandas as pd<br/>import matplotlib.pyplot as plt<br/>from sklearn.preprocessing import MinMaxScaler<br/>from sklearn.metrics import mean_squared_error, r2_score<br/>from sklearn.model_selection import train_test_split<br/>%matplotlib inline</pre>
+<ol start="2">
+<li>我们读取数据；在当前代码中，我们只分析红酒，所以我们从<kbd>winequality-red.csv</kbd>文件中读取数据。该文件包含的数据值不是用逗号分隔，而是用分号分隔，因此我们需要指定分隔符参数:</li>
+</ol>
+<pre style="padding-left: 60px">filename = 'winequality-red.csv' # Download the file from UCI ML Repo <br/>df = pd.read_csv(filename, sep=';')</pre>
+<ol start="3">
+<li>我们从数据文件中分离出输入特性和目标质量。在该文件中，目标葡萄酒质量的等级为 0-10。这里，为了简单起见，我们将其分为三类，因此，如果初始质量小于 5，我们将其设为第三类(表示不好)；五到八之间，我们认为是<kbd>ok</kbd>(二等)；而八级以上，我们认为是<kbd>good</kbd>(一级)。我们还对输入要素进行归一化，并将数据分为训练数据集和测试数据集:</li>
+</ol>
+<pre style="padding-left: 60px">X, Y = df[columns[0:-1]], df[columns[-1]]<br/>scaler = MinMaxScaler()<br/>X_new = scaler.fit_transform(X)<br/>Y.loc[(Y&lt;3)]=3<br/>Y.loc[(Y&lt;6.5) &amp; (Y&gt;=3 )] = 2<br/>Y.loc[(Y&gt;=6.5)] = 1<br/>Y_new = pd.get_dummies(Y) # One hot encode<br/>X_train, X_test, Y_train, y_test = \<br/>train_test_split(X_new, Y_new, test_size=0.4, random_state=333)</pre>
+<ol start="4">
+<li>代码的主要部分是<kbd>LogisticRegressor</kbd>类；乍一看，你会认为它类似于我们之前制作的<kbd>LinearRegressor</kbd>类。该类在 Python 文件<kbd>LogisticRegressor.py</kbd>中定义。确实是这样，但是有一些重要的区别:<kbd>Y</kbd> <kbd>output</kbd>被<kbd>Y<sub>pred</sub></kbd>取代，它不再是一个单一的值，而是一个三维的分类值，每个维度指定三个类别的概率。这里的权重的维度为<em> d × n </em>，其中<kbd>d</kbd>是输入特征的数量，<kbd>n</kbd>是输出类别的数量。这种偏见现在也是三维的。另一个重要变化是损失函数的变化:</li>
+</ol>
+<pre style="padding-left: 60px">class LogisticRegressor:<br/>    def __init__(self, d, n, lr=0.001 ):<br/>        # Place holders for input-output training data<br/>        self.X = tf.placeholder(tf.float32,\<br/>              shape=[None,d], name='input')<br/>        self.Y = tf.placeholder(tf.float32,\<br/>              name='output')<br/>        # Variables for weight and bias<br/>        self.b = tf.Variable(tf.zeros(n), dtype=tf.float32)<br/>        self.W = tf.Variable(tf.random_normal([d,n]),\<br/>              dtype=tf.float32)<br/>        # The Logistic Regression Model<br/>        h = tf.matmul(self.X, self.W) + self.b<br/>        self.Ypred = tf.nn.sigmoid(h)<br/>        # Loss function<br/>        self.loss = cost = tf.reduce_mean(-tf.reduce_sum(self.Y*tf.log(self.Ypred),\<br/>                 reduction_indices=1), name = 'cross-entropy-loss')<br/>        # Gradient Descent with learning <br/>        # rate of 0.05 to minimize loss<br/>        optimizer = tf.train.GradientDescentOptimizer(lr)<br/>        self.optimize = optimizer.minimize(self.loss)<br/>        # Initializing Variables<br/>        init_op = tf.global_variables_initializer()<br/>        self.sess = tf.Session()<br/>        self.sess.run(init_op)<br/><br/>    def fit(self, X, Y,epochs=500):<br/>        total = []<br/>        for i in range(epochs):<br/>            _, l = self.sess.run([self.optimize,self.loss],\<br/>                  feed_dict={self.X: X, self.Y: Y})<br/>            total.append(l)<br/>            if i%1000==0:<br/>                print('Epoch {0}/{1}: Loss {2}'.format(i,epochs,l))<br/>        return total<br/><br/>   def predict(self, X):<br/>        return self.sess.run(self.Ypred, feed_dict={self.X:X})<br/><br/>    def get_weights(self):<br/>        return self.sess.run([self.W, self.b])</pre>
+<ol start="5">
+<li>现在我们简单地训练我们的模型并预测输出。学习后的模型在测试数据集上给了我们大约 85%的准确率。相当令人印象深刻！</li>
+</ol>
+<p>使用 ML，我们还可以确定哪些成分使葡萄酒质量好。一家名为 IntelligentX 的公司最近开始根据用户反馈酿造啤酒；它使用人工智能来获得最好喝的啤酒的配方。你可以在这篇<em>福布斯</em>文章中了解这项工作:<a href="https://www.forbes.com/sites/emmasandler/2016/07/07/you-can-now-drink-beer-brewed-by-artificial-intelligence/#21fd11cc74c3">https://www . Forbes . com/sites/Emma Sandler/2016/07/07/you-can-now-drink-beer-brewed-by-artificial-intelligence/# 21fd 11 cc 74 c 3</a>。</p>
+
+
+            
+
+            
+        
+    
+
+
+
+    
+        <title>Classification using support vector machines</title>
+        
+        <meta charset="utf-8"/>
+    
+<!-- kobo-style -->
+<script type="text/javascript" src="img/kobo.js"/>
+<style type="text/css" id="koboSpanStyle">.koboSpan { -webkit-text-combine: inherit; }</style>
+
+
+
+    
+        
+
+                            
+                    <h1 class="header-title">使用支持向量机的分类</h1>
+                
+            
+            
+                
+<p><strong>支持向量机</strong> ( <strong>支持向量机</strong>)可以说是分类中最常用的 ML 技术。SVM 背后的主要思想是，我们找到一个具有最大间隔的最优超平面来分离这两个类。如果数据是线性可分的，寻找超平面的过程是直接的，但是如果它不是线性可分的，那么使用核技巧使数据在一些变换的高维特征空间中是线性可分的。</p>
+<p>SVM 被认为是非参数监督学习算法。SVM 的主要思想是找到一个<strong>最大间隔分隔符</strong>:一个离给出的训练样本最远的分离超平面。</p>
+<p>考虑下图；红点表示输出应为 1 的类 1，蓝点表示输出应为-1 的类 2。可以有许多线条将红点和蓝点分开；该图展示了三条这样的线:分别是<strong> A </strong>、<strong> B </strong>和<strong> C </strong>。你认为三条线中哪一条会是最好的选择？直觉上，最佳选择是行 B，因为它离两个类的例子最远，因此确保分类中的错误最小:</p>
+<p class="CDPAlignCenter CDPAlign"><img class="aligncenter size-full wp-image-1083 image-border" src="img/900315da-37fc-4a5b-a32f-78220b239342.png" style="width:19.83em;height:19.83em;"/></p>
+<p>在下一节中，我们将学习寻找最大分离超平面背后的基本数学。虽然这里的数学大部分是基础的，如果你不喜欢数学，你可以直接跳到实现部分，在那里我们再次使用 SVM 葡萄酒分类！干杯！</p>
+
+
+            
+
+            
+        
+    
+
+
+
+    
+        <title>Maximum margin hyperplane</title>
+        
+        <meta charset="utf-8"/>
+    
+<!-- kobo-style -->
+<script type="text/javascript" src="img/kobo.js"/>
+<style type="text/css" id="koboSpanStyle">.koboSpan { -webkit-text-combine: inherit; }</style>
+
+
+
+    
+        
+
+                            
+                    <h1 class="header-title">最大边缘超平面</h1>
+                
+            
+            
+                
+<p>从我们的线性代数知识中，我们知道平面的方程由下式给出:</p>
+<div><img class="fm-editor-equation" src="img/9f9a231d-0111-405f-9996-da15704d42da.png" style="width:7.08em;height:1.25em;"/></div>
+<p>在 SVM，这个平面要把正类(<em> y </em> = <em> 1 </em>)和负类(<em> y </em> = <em> -1 </em>)分开，还有一个附加约束:这个超平面到最近的正负训练向量(<em> X <sub> pos </sub> </em>和<em> X <sub> neg </sub> </em>)的距离(margin)要最大。因此，该平面被称为最大边距分隔符。</p>
+<p class="mce-root"/>
+<p>向量<em> X </em> <sub> <em> pos </em> </sub>和<em> X </em> <sub> <em> neg </em> </sub>被称为<strong>支持向量</strong>，它们在定义 SVM 模型中起着重要的作用。</p>
+<p>从数学上讲，这意味着以下情况成立:</p>
+<div><img class="fm-editor-equation" src="img/297a2f4c-fa15-4849-b82f-6966b1dd6eb9.png" style="width:9.50em;height:1.58em;"/></div>
+<p>还有，这也是:</p>
+<div><img class="fm-editor-equation" src="img/1203bf35-5600-4a16-8e6c-1a320d09f32a.png" style="width:10.50em;height:1.58em;"/></div>
+<p class="mce-root CDPAlignLeft CDPAlign">从这两个等式中，我们得到以下结果:</p>
+<div><img class="fm-editor-equation" src="img/5a6caae8-8666-4d86-a2fe-409fdb573500.png" style="width:10.58em;height:1.50em;"/></div>
+<p>除以两边的权重向量长度，我们得到如下结果:</p>
+<div><img class="fm-editor-equation" src="img/fee17cdc-d92b-4cab-a6bd-bb1b5093899d.png" style="width:13.83em;height:3.17em;"/></div>
+<p>所以我们需要找到一个分隔符，使得正负支持向量之间的间隔最大，也就是:<img class="fm-editor-equation" src="img/825f71a2-a026-4d06-9122-5a60ef4e70ee.png" style="width:1.92em;height:2.00em;"/>最大，同时所有的点都被正确分类，比如下面这样:</p>
+<div><img class="fm-editor-equation" src="img/0a4af9f3-b099-47f9-867e-d1003b8823ae.png" style="width:9.33em;height:1.58em;"/></div>
+<p>使用一点数学知识，我们不会在本书中深入讨论，前面的条件可以表示为找到下面的最优解:</p>
+<div><img class="fm-editor-equation" src="img/bef553ea-90e1-4f0b-a4e8-3bfae275d27a.png" style="width:20.33em;height:3.33em;"/></div>
+<p class="mce-root"/>
+<p>受到以下限制:</p>
+<div><img class="fm-editor-equation" src="img/4fe746d0-2a30-48cd-9ed6-783275dd1486.png" style="width:3.50em;height:1.33em;"/></div>
+<div><img class="fm-editor-equation" src="img/f7738f34-ca7f-4970-80ff-2439f0bf2464.png" style="width:5.92em;height:2.67em;"/></div>
+<p>根据α的值，我们可以使用下面的等式从系数的向量<em> α </em>获得权重<em> W </em>:</p>
+<div><img class="fm-editor-equation" src="img/4098e849-68a2-46d8-8c8a-6ce87f78a05b.png" style="width:6.83em;height:2.67em;"/></div>
+<p>这是一个标准的二次规划优化问题。大多数 ML 库都有内置的函数来解决这个问题，所以你不用担心如何去做。</p>
+<p>对于有兴趣了解更多关于支持向量机及其背后的数学知识的读者来说，Vladimir Vapnik 的书<em>The Nature of Statistical Learning Theory</em>，由<em>Springer Science+Business Media</em>于 2013 年出版，是一个很好的参考。</p>
+
+
+            
+
+            
+        
+    
+
+
+
+    
+        <title>Kernel trick</title>
+        
+        <meta charset="utf-8"/>
+    
+<!-- kobo-style -->
+<script type="text/javascript" src="img/kobo.js"/>
+<style type="text/css" id="koboSpanStyle">.koboSpan { -webkit-text-combine: inherit; }</style>
+
+
+
+    
+        
+
+                            
+                    <h1 class="header-title">内核技巧</h1>
+                
+            
+            
+                
+<p>当输入特征空间是线性可分的时，前一种方法工作良好。如果不是，我们该怎么办？一种简单的方法是将数据(<em> X </em>)转换到一个高维空间中，在该空间中数据是线性可分的，并在该高维空间中找到一个最大边缘超平面。让我们看看如何；我们用<em> α </em>表示的超平面如下:</p>
+<div><em><img class="fm-editor-equation" src="img/1cfc0edb-71e9-44d3-9b6d-500bfccdbac2.png" style="width:10.00em;height:2.75em;"/></em></div>
+<p>设<em> φ </em>为变换，那么我们可以将<em> X </em>替换为<em> φ </em> ( <em> X </em>)，因此它的点积<em>X<sup>T</sup>X<sup>(I)</sup></em>与函数 K( <em> X <sup> T </sup> </em>，<em>X</em><sup>(<em>I</em>)</sup>=【T】所以我们现在只是通过应用变换<em> φ </em>来预处理数据，然后像以前一样在变换后的空间中找到一个线性分隔符。</p>
+<p class="mce-root"/>
+<p>最常用的核函数是<strong>高斯核</strong>，也称为<strong>径向基函数</strong>，定义如下:</p>
+<div><img class="fm-editor-equation" src="img/1c95c021-9f0e-4d3f-8f22-7f0425e2e684.png" style="width:17.25em;height:1.83em;"/></div>
+
+
+            
+
+            
+        
+    
+
+
+
+    
+        <title>Classifying wine using SVM</title>
+        
+        <meta charset="utf-8"/>
+    
+<!-- kobo-style -->
+<script type="text/javascript" src="img/kobo.js"/>
+<style type="text/css" id="koboSpanStyle">.koboSpan { -webkit-text-combine: inherit; }</style>
+
+
+
+    
+        
+
+                            
+                    <h1 class="header-title">用 SVM 对葡萄酒进行分类</h1>
+                
+            
+            
+                
+<p>我们将使用 scikit 库为该任务提供的<kbd>svm.SVC</kbd>函数。这样做的原因是，在撰写本文时，TensorFlow 库只为我们提供了 SVM 的线性实现，并且它只适用于二进制分类。我们可以使用之前在 TensorFlow 中学到的数学知识制作自己的 SVM，GitHub 存储库中的<kbd>SVM_TensorFlow.ipynb</kbd>包含了 TensorFlow 中的实现。下面的代码可以在<kbd>Wine_quality_using_SVM.ipynb</kbd>中找到。</p>
+<p>scikit 的 SVC 分类器是一个支持向量分类器。它还可以使用一对一方案来处理多类支持。该方法的一些可选参数如下:<br/> <br/></p><ul>
+<li><kbd>C</kbd>:指定惩罚期限的参数(默认值为<kbd>1.0</kbd>)。</li>
+</ul>
+<ul>
+<li><kbd>kernel</kbd>:指定要使用的内核(默认为<kbd>rbf</kbd>)。可能的选择有<kbd>linear</kbd>、<kbd>poly</kbd>、<kbd>rbf</kbd>、<kbd>sigmoid</kbd>、<kbd>precomputed</kbd>和<kbd>callable</kbd>。</li>
+</ul>
+<ul>
+<li><kbd>gamma</kbd>:指定<kbd>rbf</kbd>、<kbd>poly</kbd>、<kbd>sigmoid</kbd>的核系数和默认值(默认为<kbd>auto</kbd>)。</li>
+</ul>
+<ul>
+<li><kbd>random_state</kbd>:设置混洗数据时使用的伪随机数发生器的种子。</li>
+</ul>
+
+<p class="mce-root"/>
+<p class="mce-root">按照给定的步骤创建我们的 SVM 模型:</p>
+<ol>
+<li>让我们加载代码所需的所有模块。注意，我们在这里没有导入 TensorFlow，而是从<kbd>scikit</kbd>库中导入了某些模块:</li>
+</ol>
+<pre style="padding-left: 60px"># Import the modules<br/>import numpy as np<br/>import pandas as pd<br/>import matplotlib.pyplot as plt<br/>from sklearn.preprocessing import MinMaxScaler, LabelEncoder<br/>from sklearn.model_selection import train_test_split<br/>from sklearn.metrics import confusion_matrix, accuracy_score<br/>from sklearn.svm import SVC # The SVM Classifier from scikit<br/>import seaborn as sns<br/>%matplotlib inline</pre>
+<ol start="2">
+<li>我们读取数据文件，对其进行预处理，并将其分成测试和训练数据集。这一次，为了简单起见，我们分成两类，<kbd>good</kbd>和<kbd>bad</kbd>:</li>
+</ol>
+<pre style="padding-left: 60px">filename = 'winequality-red.csv' #Download the file from UCI ML Repo<br/>df = pd.read_csv(filename, sep=';')<br/><br/>#categorize wine quality in two levels<br/>bins = (0,5.5,10)<br/>categories = pd.cut(df['quality'], bins, labels = ['bad','good'])<br/>df['quality'] = categories<br/><br/>#PreProcessing and splitting data to X and y<br/>X = df.drop(['quality'], axis = 1)<br/>scaler = MinMaxScaler()<br/>X_new = scaler.fit_transform(X)<br/>y = df['quality']<br/>labelencoder_y = LabelEncoder()<br/>y = labelencoder_y.fit_transform(y)<br/>X_train, X_test, y_train, y_test = train_test_split(X, y, \<br/>        test_size = 0.2, random_state = 323)</pre>
+<ol start="3">
+<li>现在我们使用<kbd>SVC</kbd>分类器，并用<kbd>fit</kbd>方法在我们的训练数据集上训练它:</li>
+</ol>
+<pre style="padding-left: 60px">classifier = SVC(kernel = 'rbf', random_state = 45)<br/>classifier.fit(X_train, y_train)</pre>
+<ol start="4">
+<li>现在让我们预测测试数据集的输出:</li>
+</ol>
+<pre style="padding-left: 60px">y_pred = classifier.predict(X_test)</pre>
+<ol start="5">
+<li>该模型给出了<kbd>67.5%</kbd>的精确度，混淆矩阵如下:</li>
+</ol>
+<pre style="padding-left: 60px">print("Accuracy is {}".format(accuracy_score(y_test, y_pred)))<br/>## Gives a value ~ 67.5%<br/>cm = confusion_matrix(y_test, y_pred)<br/>sns.heatmap(cm,annot=True,fmt='2.0f')</pre>
+<div><img class="aligncenter size-full wp-image-1084 image-border" src="img/a5309c9f-56b6-401b-9897-c3259f565a76.png" style="width:31.50em;height:22.58em;"/></div>
+<p style="padding-left: 90px">前面的代码使用二进制分类；我们也可以修改代码来支持两个以上的类。例如，在第二步中，我们可以将代码替换为以下内容:</p>
+<pre style="padding-left: 90px">bins = (0,3.5,5.5,10)<br/>categories = pd.cut(df['quality'], bins, labels = ['bad','ok','good'])<br/>df['quality'] = categories</pre>
+<ol start="6">
+<li>然后，我们有三个类别，就像我们之前的逻辑分类器一样，准确率为 65.9%。混淆矩阵如下:</li>
+</ol>
+<p class="CDPAlignLeft CDPAlign">在三类情况下，训练数据分布如下:</p>
+<ul>
+<li><kbd>good</kbd> <kbd>855</kbd></li>
+<li><kbd>ok</kbd> <kbd>734</kbd></li>
+<li><kbd>bad</kbd> <kbd>10</kbd></li>
+</ul>
+<p class="CDPAlignLeft CDPAlign">由于<kbd>bad</kbd>类中的样本数量(对应于混淆矩阵中的<kbd>0</kbd>)只有<kbd>10</kbd>，该模型无法学习哪些参数导致了糟糕的葡萄酒质量。因此，数据应该均匀地分布在我们在本章探讨的所有分类器类中。</p>
+
+
+            
+
+            
+        
+    
+
+
+
+    
+        <title>Naive Bayes</title>
+        
+        <meta charset="utf-8"/>
+    
+<!-- kobo-style -->
+<script type="text/javascript" src="img/kobo.js"/>
+<style type="text/css" id="koboSpanStyle">.koboSpan { -webkit-text-combine: inherit; }</style>
+
+
+
+    
+        
+
+                            
+                    <h1 class="header-title">朴素贝叶斯</h1>
+                
+            
+            
+                
+<p>朴素贝叶斯是最简单和最快的 ML 算法之一。这也属于监督学习算法的范畴。它基于贝叶斯概率定理。在朴素贝叶斯分类器的情况下，我们做出的一个重要假设是，输入向量的所有特征都是<strong>独立且同分布的</strong> ( <strong> iid </strong>)。目标是学习训练数据集中每个类别<em> C </em> <sub> <em> k </em> </sub>的条件概率模型:</p>
+<div><img class="fm-editor-equation" src="img/9796dc8e-c201-401f-b6a8-4427c915c783.png" style="width:17.17em;height:1.50em;"/></div>
+<p>在 iid 假设下，使用贝叶斯定理，这可以用联合概率分布<em>p</em>(<em>C<sub>k</sub>T5，<em> X </em>)来表示:</em></p>
+<div><img class="fm-editor-equation" src="img/11e80a0f-f697-4acb-bc36-98b77039a6bf.png" style="width:22.00em;height:3.58em;"/></div>
+<p>我们挑选最大化这个项<strong> <em>最大后验概率</em> </strong> ( <strong>图</strong>)的类:</p>
+<div><img class="fm-editor-equation" src="img/4981d980-6d92-4ae7-8acf-a96f36da3805.png" style="width:15.67em;height:4.00em;"/></div>
+<p>根据<em>p</em>(<em>x<sub>I</sub></em>|<em>C<sub>k</sub></em>)的分布，可以有不同的朴素贝叶斯算法。对于实值数据，常见的选择是高斯型；对于二进制数据，常见的选择是伯努利型；对于包含特定事件(如文档分类)频率的数据，常见的选择是多项式型。</p>
+<p>现在让我们看看是否可以使用朴素贝叶斯对葡萄酒进行分类。为了简单和高效，我们将使用 scikit 内置的朴素贝叶斯分布。由于我们数据中的特征值是连续值——我们将假设它们具有高斯分布，我们将使用 scikit-learn 的<kbd>GaussianNB</kbd>。</p>
+
+
+            
+
+            
+        
+    
+
+
+
+    
+        <title>Gaussian Naive Bayes for wine quality</title>
+        
+        <meta charset="utf-8"/>
+    
+<!-- kobo-style -->
+<script type="text/javascript" src="img/kobo.js"/>
+<style type="text/css" id="koboSpanStyle">.koboSpan { -webkit-text-combine: inherit; }</style>
+
+
+
+    
+        
+
+                            
+                    <h1 class="header-title">葡萄酒质量的高斯朴素贝叶斯分析</h1>
+                
+            
+            
+                
+<p>scikit-learn 朴素贝叶斯模块支持三种朴素贝叶斯分布。我们可以根据输入要素数据类型选择其中之一。scikit-learn 中可用的三个朴素贝叶斯如下:</p>
+<ul>
+<li><kbd>GaussianNB</kbd></li>
+<li><kbd>MultinomialNB</kbd></li>
+<li><kbd>BernoulliNB</kbd></li>
+</ul>
+<p>正如我们已经看到的，葡萄酒数据是一种连续的数据类型。因此，如果我们对<em>p</em>(<em>x<sub>I</sub></em>|<em>C<sub>k</sub></em>)也就是<kbd>GaussianNB</kbd>模块使用高斯分布就好了，所以我们将在笔记本的导入单元格中添加<kbd>from sklearn.naive_bayes import GaussianNB</kbd>。你可以从 is scikit-learn 链接阅读更多关于<kbd>GaussianNB</kbd>模块的细节:<a href="http://scikit-learn.org/stable/modules/generated/sklearn.naive_bayes.GaussianNB.html#sklearn.naive_bayes.GaussianNB">http://sci kit-learn . org/stable/modules/generated/sk learn . naive _ Bayes。gaussiannb . html # sk learn . naive _ Bayes。高斯安布</a>。</p>
+<p class="mce-root"/>
+<p>前两步与 SVM 的情况相同。但是现在，我们将声明一个<kbd>GaussianNB</kbd>分类器，而不是声明一个<kbd>SVM</kbd>分类器，我们将使用它的<kbd>fit</kbd>方法来学习训练示例。使用<kbd>predict</kbd>方法获得学习模型的结果。因此，请遵循以下步骤:</p>
+<ol>
+<li>导入必要的模块。注意，现在我们正在从<kbd>scikit</kbd>库导入<kbd>GaussianNB</kbd>:</li>
+</ol>
+<pre style="padding-left: 60px"># Import the modules<br/>import numpy as np<br/>import pandas as pd<br/>import matplotlib.pyplot as plt<br/>from sklearn.preprocessing import MinMaxScaler, LabelEncoder<br/>from sklearn.model_selection import train_test_split<br/>from sklearn.metrics import confusion_matrix, accuracy_score<br/>from sklearn.naive_bayes import GaussianNB # The SVM Classifier from scikit<br/>import seaborn as sns<br/>%matplotlib inline</pre>
+<ol start="2">
+<li>读取数据文件并对其进行预处理:</li>
+</ol>
+<pre style="padding-left: 60px">filename = 'winequality-red.csv' #Download the file from UCI ML Repo<br/>df = pd.read_csv(filename, sep=';')<br/><br/>#categorize wine quality in two levels<br/>bins = (0,5.5,10)<br/>categories = pd.cut(df['quality'], bins, labels = ['bad','good'])<br/>df['quality'] = categories<br/><br/>#PreProcessing and splitting data to X and y<br/>X = df.drop(['quality'], axis = 1)<br/>scaler = MinMaxScaler()<br/>X_new = scaler.fit_transform(X)<br/>y = df['quality']<br/>labelencoder_y = LabelEncoder()<br/>y = labelencoder_y.fit_transform(y)<br/>X_train, X_test, y_train, y_test = train_test_split(X, y, \<br/>        test_size = 0.2, random_state = 323)</pre>
+<p class="mce-root"/>
+<ol start="3">
+<li>现在，我们声明一个高斯朴素贝叶斯，在训练数据集上对其进行训练，并使用训练好的模型在测试数据集上预测葡萄酒质量:</li>
+</ol>
+<pre style="padding-left: 60px">classifier = GaussianNB()<br/>classifier.fit(X_train, y_train)<br/>#Predicting the Test Set<br/>y_pred = classifier.predict(X_test)</pre>
+<p style="padding-left: 60px">仅此而已，乡亲们；我们的模型已经准备好了。对于二元分类情况，该模型的准确率为 71.25%。在下面的屏幕截图中，您可以看到混淆矩阵的热图:</p>
+<div><img src="img/556bf535-7318-4f9b-9ee5-78f824c7035e.png"/></div>
+<p>在您断定朴素贝叶斯是最好的之前，让我们了解一下它的一些陷阱:</p>
+<ul>
+<li>朴素贝叶斯基于基于频率的概率进行预测；因此，它强烈依赖于我们用于训练的数据。</li>
+<li>另一个问题是我们做了关于输入特征空间的 iid 假设；这并不总是正确的。</li>
+</ul>
+<p class="mce-root"/>
+
+
+            
+
+            
+        
+    
+
+
+
+    
+        <title>Decision trees</title>
+        
+        <meta charset="utf-8"/>
+    
+<!-- kobo-style -->
+<script type="text/javascript" src="img/kobo.js"/>
+<style type="text/css" id="koboSpanStyle">.koboSpan { -webkit-text-combine: inherit; }</style>
+
+
+
+    
+        
+
+                            
+                    <h1 class="header-title">决策树</h1>
+                
+            
+            
+                
+<p>在本节中，您将了解另一种非常流行且快速的 ML 算法——决策树。在决策树中，我们建立一个树状的决策结构；我们从根开始，选择一个特征并分成分支，继续直到到达叶子，叶子代表预测的类或值。决策树的算法包括两个主要步骤:</p>
+<ul>
+<li>决定选择哪些要素以及使用什么条件进行分割</li>
+<li>知道什么时候停下来</li>
+</ul>
+<p>我们用一个例子来理解一下。考虑 40 名学生的样本；我们有三个变量:性别(男孩或女孩；离散)、类(XI 或十二；离散的)和高度(5 到 6 英尺；连续)。18 名学生喜欢在业余时间去图书馆，其余的喜欢玩。我们可以建立一个决策树来预测谁会去图书馆，谁会在闲暇时间去操场。为了构建决策树，我们需要根据三个输入变量中非常重要的输入变量来区分去图书馆/操场的学生。下图给出了基于每个输入变量的分割:</p>
+<p class="CDPAlignCenter CDPAlign"><img class="aligncenter size-full wp-image-1086 image-border" src="img/2bebf484-66d9-4936-83c1-79dd982f6e57.png" style="width:54.42em;height:25.92em;"/></p>
+<p>我们会考虑所有的特征，并选择能给我们提供最多信息的特征。在前面的示例中，我们可以看到对特征高度的分割生成了最同质的组，组<strong>身高&gt; 5.5 英尺</strong>包含 80%在闲暇时间玩耍的学生和 20%去图书馆的学生，组<strong>身高&lt; 5.5 英尺</strong>包含 13%在闲暇时间玩耍的学生和 86%去图书馆的学生。因此，我们将在特征高度上进行第一次分割。我们将继续以这种方式进行拆分，并最终得出决定(叶节点),告诉我们学生是否会在业余时间玩耍或去图书馆。下图显示了决策树的结构；黑色圆圈是<strong>根</strong> <strong>节点</strong>，蓝色圆圈是<strong>决策</strong> <strong>节点</strong>，绿色圆圈是<strong>叶</strong> <strong>节点</strong>:</p>
+<p class="CDPAlignCenter CDPAlign"><img class="aligncenter size-full wp-image-1155 image-border" src="img/cc3007bb-01fb-4b84-ac7c-9a850c58f8bb.png" style="width:21.25em;height:20.42em;"/></p>
+<p>决策树属于贪婪算法家族。为了找到最均匀的分割，我们定义了我们的成本函数，使得它试图最大化特定组中的相同类输入值。对于回归，我们通常使用均方误差成本函数:</p>
+<div><img class="fm-editor-equation" src="img/89ebe80b-22b8-431f-a110-be4f8f7ce105.png" style="width:17.92em;height:2.25em;"/></div>
+<p>这里，<em> y </em>和<em>y<sub>pred</sub>T5】代表输入值(<em> i </em>)的给定和预测输出值；我们找到了使这种损失最小化的分割。</em></p>
+<p>对于分类，我们使用<em> gini </em>杂质或交叉熵作为损失函数:</p>
+<div><img class="fm-editor-equation" src="img/51381f73-fa84-40ff-bf3f-6c81da1bea53.png" style="width:13.92em;height:2.00em;"/></div>
+<div><img class="fm-editor-equation" src="img/104b5b6f-3a29-4cbd-a8af-358bc8d9e867.png" style="width:17.50em;height:2.00em;"/></div>
+<p>在前面的例子中，<em>c<sub>k</sub>T3】定义了特定组中相同类别输入值的比例。</em></p>
+<p>了解更多关于决策树的一些好资源如下:<br/></p><ul>
+<li>长度 Breiman，J. Friedman，R. Olshen 和 C. Stone: <em>分类和回归树，</em> Wadsworth，Belmont，CA，1984</li>
+<li>昆兰:<em> C4。摩根·考夫曼，1993 年</em></li>
+<li>T.Hastie，R. Tibshirani 和 J. Friedman: <em>统计学习的要素</em>，Springer，2009 年</li>
+</ul>
+
+
+
+            
+
+            
+        
+    
+
+
+
+    
+        <title>Decision trees in scikit</title>
+        
+        <meta charset="utf-8"/>
+    
+<!-- kobo-style -->
+<script type="text/javascript" src="img/kobo.js"/>
+<style type="text/css" id="koboSpanStyle">.koboSpan { -webkit-text-combine: inherit; }</style>
+
+
+
+    
+        
+
+                            
+                    <h1 class="header-title">scikit 中的决策树</h1>
+                
+            
+            
+                
+<p><kbd>scikit</kbd>库提供了<kbd>DecisionTreeRegressor</kbd>和<kbd>DecisionTreeClassifier</kbd>来实现回归和分类。都可以从<kbd>sklearn.tree</kbd>导入。<kbd>DecisionTreeRegressor</kbd>定义如下:</p>
+<pre><em>c</em>lass sklearn.tree.<strong>DecisionTreeRegressor </strong>(criterion=’mse’, splitter=’best’, max_depth=None, min_samples_split=2, min_samples_leaf=1, min_weight_fraction_leaf=0.0, max_features=None, random_state=None, max_leaf_nodes=None, min_impurity_decrease=0.0, min_impurity_split=None, presort=False)<a href="http://scikit-learn.org/stable/modules/generated/sklearn.tree.DecisionTreeRegressor.html#sklearn.tree.DecisionTreeRegressor"/></pre>
+<p>不同的论点如下:</p>
+<ul>
+<li><kbd>criterion</kbd>:定义使用哪个损失函数来确定分割。默认值为均方误差(<kbd>mse</kbd>)。该库支持使用<kbd>friedman_mse</kbd>和平均绝对误差(<kbd>mae</kbd>)作为损失函数。</li>
+<li><kbd>splitter</kbd>:我们用这个来决定是否使用贪婪策略并选择最佳分割(默认)，或者我们可以使用 random <kbd>splitter</kbd>来选择最佳随机分割。</li>
+<li><kbd>max_depth</kbd>:定义了树的最大深度。</li>
+<li><kbd>min_samples_split</kbd>:定义分割一个内部节点所需的最小样本数。它可以是整数或浮点数(在这种情况下，它定义了分割所需的最小样本的百分比)。</li>
+</ul>
+<p><kbd>DecisionTreeClassifier</kbd>定义如下:</p>
+<pre>class sklearn.tree.<strong>DecisionTreeClassifier</strong>(criterion=’gini’, splitter=’best’, max_depth=None, min_samples_split=2, min_samples_leaf=1, min_weight_fraction_leaf=0.0, max_features=None, random_state=None, max_leaf_nodes=None, min_impurity_decrease=0.0, min_impurity_split=None, class_weight=None, presort=False)<a href="http://scikit-learn.org/stable/modules/generated/sklearn.tree.DecisionTreeClassifier.html#sklearn.tree.DecisionTreeClassifier"/></pre>
+<p>不同的论点如下:</p>
+<ul>
+<li><kbd>criterion</kbd>:告知使用哪个损失函数来确定分割。分类器的默认值是<kbd>gini</kbd>。本库支持使用<kbd>entropy</kbd>作为损失函数。</li>
+<li><kbd>splitter</kbd>:我们用这个来决定如何选择分割(默认值是最佳分割)，或者我们可以用 random <kbd>splitter</kbd>来选择最佳随机分割。</li>
+<li><kbd>max_depth</kbd>:定义了树的最大深度。当输入特征空间很大时，我们使用它来限制最大深度并处理过拟合。</li>
+<li><kbd>min_samples_split</kbd>:定义分割一个内部节点所需的最小样本数。它可以是整数或浮点数(在这种情况下，它表示分割所需的最小样本的百分比)。</li>
+</ul>
+<p>我们只列出了常用的前面的参数；关于这两个的其余参数的详细信息可以在 scikit-learn 网站上阅读:<a href="http://scikit-learn.org/stable/modules/generated/sklearn.tree.DecisionTreeRegressor.html">http://sci kit-learn . org/stable/modules/generated/sk learn . tree . decision tree regressor . html</a>和<a href="http://scikit-learn.org/stable/modules/generated/sklearn.tree.DecisionTreeClassifier.html">http://sci kit-learn . org/stable/modules/generated/sk learn . tree . decision tree classifier . html</a></p>
+<p class="mce-root"/>
+
+
+            
+
+            
+        
+    
+
+
+
+    
+        <title>Decision trees in action</title>
+        
+        <meta charset="utf-8"/>
+    
+<!-- kobo-style -->
+<script type="text/javascript" src="img/kobo.js"/>
+<style type="text/css" id="koboSpanStyle">.koboSpan { -webkit-text-combine: inherit; }</style>
+
+
+
+    
+        
+
+                            
+                    <h1 class="header-title">决策树在起作用</h1>
+                
+            
+            
+                
+<p>我们将首先使用决策树回归器来预测电力输出。数据集及其描述已经在<a href="fa0444a6-ce5c-4bed-8d9d-ddab846fe571.xhtml">第一章</a>、<em>物联网和人工智能的原理和基础</em>中介绍。这些代码可以在 GitHub 存储库中的文件<kbd>ElectricalPowerOutputPredictionUsingDecisionTrees.ipynb</kbd>中找到:</p>
+<pre># Import the modules<br/>import tensorflow as tf<br/>import numpy as np<br/>import pandas as pd<br/>import matplotlib.pyplot as plt<br/>from sklearn.preprocessing import MinMaxScaler<br/>from sklearn.metrics import mean_squared_error, r2_score<br/>from sklearn.model_selection import train_test_split<br/>from sklearn.tree import DecisionTreeRegressor<br/>%matplotlib inline<br/><br/># Read the data <br/>filename = 'Folds5x2_pp.xlsx' # The file can be downloaded from UCI ML repo<br/>df = pd.read_excel(filename, sheet_name='Sheet1')<br/>df.describe()<br/><br/># Preprocess the data and split in test/train<br/>X, Y = df[['AT', 'V','AP','RH']], df['PE']<br/>scaler = MinMaxScaler()<br/>X_new = scaler.fit_transform(X)<br/>target_scaler = MinMaxScaler()<br/>Y_new = target_scaler.fit_transform(Y.values.reshape(-1,1))<br/>X_train, X_test, Y_train, y_test = \<br/> train_test_split(X_new, Y_new, test_size=0.4, random_state=333)<br/><br/><br/># Define the decision tree regressor<br/>model = DecisionTreeRegressor(max_depth=3)<br/>model.fit(X_train, Y_train)<br/><br/># Make the prediction over the test data<br/>Y_pred = model.predict(np.float32(X_test))<br/>print("R2 Score is {} and MSE {}".format(\<br/> r2_score(y_test, Y_pred),\<br/> mean_squared_error(y_test, Y_pred)))</pre>
+<p>我们在测试数据上得到 0.90 的 R 平方值和 0.0047 的均方误差；与使用线性回归器(R-square: <kbd>0.77</kbd>)获得的预测结果相比，这是一个显著的改进；mse: <kbd>0.012</kbd>)。</p>
+<p class="mce-root"/>
+<p class="mce-root"/>
+<p>我们也来看看决策树在分类任务中的表现；我们像以前一样用它来进行葡萄酒质量分类。该代码可以在 GitHub 存储库中的<kbd>Wine_quality_using_DecisionTrees.ipynb</kbd>文件中找到:</p>
+<pre># Import the modules<br/>import numpy as np<br/>import pandas as pd<br/>import matplotlib.pyplot as plt<br/>from sklearn.preprocessing import MinMaxScaler, LabelEncoder<br/>from sklearn.metrics import mean_squared_error, r2_score<br/>from sklearn.model_selection import train_test_split<br/>from sklearn.tree import DecisionTreeClassifier<br/>%matplotlib inline<br/><br/># Read the data <br/>filename = 'winequality-red.csv' #Download the file from https://archive.ics.uci.edu/ml/datasets/wine+quality df = pd.read_csv(filename, sep=';')<br/><br/><br/><br/># categorize the data into three classes<br/>bins = (0,3.5,5.5,10)<br/>categories = pd.cut(df['quality'], bins, labels = ['bad','ok','good'])<br/>df['quality'] = categories<br/><br/># Preprocessing and splitting data to X and y X = df.drop(['quality'], axis = 1) scaler = MinMaxScaler() X_new = scaler.fit_transform(X) y = df['quality'] from sklearn.preprocessing import LabelEncoder labelencoder_y = LabelEncoder() y = labelencoder_y.fit_transform(y) X_train, X_test, y_train, y_test = train_test_split(X, y, test_size = 0.2, random_state = 323)<br/><br/><br/># Define the decision tree classifier<br/>classifier = DecisionTreeClassifier(max_depth=3)<br/>classifier.fit(X_train, y_train)<br/><br/># Make the prediction over the test data<br/>Y_pred = classifier.predict(np.float32(X_test))<br/>print("Accuracy is {}".format(accuracy_score(y_test, y_pred)))</pre>
+<p>决策树产生大约 70%的分类准确率。我们可以看到，对于小数据量，我们可以使用决策树和朴素贝叶斯几乎同样成功。决策树受到过度拟合的影响，这可以通过限制最大深度或设置最小数量的训练输入来解决。像朴素贝叶斯一样，它们是不稳定的——数据中的一点变化都会导致完全不同的树；这可以通过利用装袋和增压技术来解决。最后，但同样重要的是，因为这是一个贪婪算法，所以不能保证它返回一个全局最优解。</p>
+
+
+            
+
+            
+        
+    
+
+
+
+    
+        <title>Ensemble learning</title>
+        
+        <meta charset="utf-8"/>
+    
+<!-- kobo-style -->
+<script type="text/javascript" src="img/kobo.js"/>
+<style type="text/css" id="koboSpanStyle">.koboSpan { -webkit-text-combine: inherit; }</style>
+
+
+
+    
+        
+
+                            
+                    <h1 class="header-title">集成学习</h1>
+                
+            
+            
+                
+<p>在我们的日常生活中，当我们不得不做出决定时，我们不是从一个人那里获得指导，而是从许多我们信任其智慧的个人那里获得指导。同样可以应用于 ML；我们可以使用一组模型(集合)来进行预测或分类决策，而不是依赖一个单一的模型。这种学习形式被称为<strong>集成学习</strong>。</p>
+<p>传统上，集成学习被用作许多 ML 项目的最后一步。当模型尽可能相互独立时，效果最好。下图给出了集成学习的图形表示:</p>
+<div><img class="aligncenter size-full wp-image-1087 image-border" src="img/73af0f0f-00be-4082-a4a5-7d4540b67e24.png" style="width:39.17em;height:19.83em;"/></div>
+<p>不同模型的训练可以顺序进行，也可以并行进行。集成学习有多种实现方式:投票、打包粘贴、随机森林。让我们看看这些技术是什么，以及如何实现它们。</p>
+
+
+            
+
+            
+        
+    
+
+
+
+    
+        <title>Voting classifier</title>
+        
+        <meta charset="utf-8"/>
+    
+<!-- kobo-style -->
+<script type="text/javascript" src="img/kobo.js"/>
+<style type="text/css" id="koboSpanStyle">.koboSpan { -webkit-text-combine: inherit; }</style>
+
+
+
+    
+        
+
+                            
+                    <h1 class="header-title">投票分类器</h1>
+                
+            
+            
+                
+<p>投票分类器遵循多数原则；它聚集所有分类器的预测，并选择具有最多投票的类。例如，在下面的屏幕截图中，投票分类器将预测输入实例属于类<strong> 1 </strong>:</p>
+<div><img src="img/2f60022e-2236-4291-a411-268ed5152367.png" style="width:38.00em;height:26.75em;"/></div>
+<p>scikit 有<kbd>VotingClassifier</kbd>类来实现这一点。使用集成学习对葡萄酒质量分类，我们达到了 74%的准确率，高于任何单独考虑的模型。完整的代码在<kbd>Wine_quality_using_Ensemble_learning.ipynb</kbd>文件中。以下是使用投票执行集成学习的主要代码:</p>
+<pre># import the different classifiers<br/>from sklearn.svm import SVC <br/>from sklearn.naive_bayes import GaussianNB <br/>from sklearn.tree import DecisionTreeClassifier<br/>from sklearn.ensemble import VotingClassifier<br/><br/># Declare each classifier<br/>clf1 = SVC(random_state=22)<br/>clf2 = DecisionTreeClassifier(random_state=23)<br/>clf3 = GaussianNB()<br/>X = np.array(X_train)<br/>y = np.array(y_train)<br/><br/>#Employ Ensemble learning<br/>eclf = VotingClassifier(estimators=[<br/>('lr', clf1), ('rf', clf2), ('gnb', clf3)], voting='hard')<br/>eclf = eclf.fit(X, y)<br/><br/># Make prediction on test data<br/>y_pred = eclf.predict(X_test)</pre>
+
+
+            
+
+            
+        
+    
+
+
+
+    
+        <title>Bagging and pasting</title>
+        
+        <meta charset="utf-8"/>
+    
+<!-- kobo-style -->
+<script type="text/javascript" src="img/kobo.js"/>
+<style type="text/css" id="koboSpanStyle">.koboSpan { -webkit-text-combine: inherit; }</style>
+
+
+
+    
+        
+
+                            
+                    <h1 class="header-title">装袋和粘贴</h1>
+                
+            
+            
+                
+<p>在投票中，我们在同一个数据集上使用不同的算法进行训练。我们也可以通过使用具有相同学习算法的不同模型来实现集成学习，但是我们在不同的训练数据子集上训练它们。训练子集是随机抽样的。取样可以在替换(装袋)或不替换(粘贴)的情况下进行:</p>
+<ul>
+<li><strong> Bagging </strong>:在其中，使用具有重复的组合从原始数据集生成用于训练的附加数据。这有助于减少不同模型的差异。</li>
+<li><strong>粘贴</strong>:由于粘贴是不替换的，训练数据的每个子集最多只能使用一次。如果原始数据集比较大，就比较合适。</li>
+</ul>
+<p><kbd>scikit</kbd>库有一个进行装袋粘贴的方法；从<kbd>sklearn.ensemble</kbd>开始，我们可以导入<kbd>BaggingClassifier</kbd>并使用它。下面的代码估计<kbd>500</kbd>决策树分类器，每个用<kbd>1000</kbd>训练样本使用 bagging(为了粘贴，保留<kbd>bootstrap=False</kbd>):</p>
+<pre>from sklearn.ensemble import BaggingClassifier<br/>bag_classifier = BaggingClassifier(<br/>        DecisionTreeClassifier(), n_estimators=500, max_samples=1000,\<br/>        bootstrap=True, n_jobs=-1)    <br/>bag_classifier.fit(X_train, y_train)<br/>y_pred = bag_classifier.predict(X_test)</pre>
+<p class="mce-root">这使得葡萄酒质量分类的准确率达到 77%。<kbd>BaggingClassifier</kbd>、<kbd>n_jobs</kbd>的最后一个参数定义了要使用多少个 CPU 内核(这是并行运行的作业的数量)；当它的值设置为<kbd>-1</kbd>时，它会使用所有可用的 CPU 内核。</p>
+<p class="mce-root"/>
+<p>只有决策树的集合被称为<strong>随机森林</strong>。我们之前实现的是一个随机森林。我们可以使用<kbd>RandomForestClassifier</kbd>类在 scikit 中直接实现随机森林。使用类的优点是它在构建树时引入了额外的随机性。分割时，它会在随机的要素子集中搜索要分割的最佳要素。</p>
+
+
+            
+
+            
+        
+    
+
+
+
+    
+        <title>Improving your model – tips and tricks</title>
+        
+        <meta charset="utf-8"/>
+    
+<!-- kobo-style -->
+<script type="text/javascript" src="img/kobo.js"/>
+<style type="text/css" id="koboSpanStyle">.koboSpan { -webkit-text-combine: inherit; }</style>
+
+
+
+    
+        
+
+                            
+                    <h1 class="header-title">改进您的模型——技巧和诀窍</h1>
+                
+            
+            
+                
+<p>在这一章中，我们已经学习了大量的最大似然算法，每一种算法都有其优缺点。在这一节中，我们将研究一些常见的问题以及解决它们的方法。</p>
+
+
+            
+
+            
+        
+    
+
+
+
+    
+        <title>Feature scaling to resolve uneven data scale</title>
+        
+        <meta charset="utf-8"/>
+    
+<!-- kobo-style -->
+<script type="text/javascript" src="img/kobo.js"/>
+<style type="text/css" id="koboSpanStyle">.koboSpan { -webkit-text-combine: inherit; }</style>
+
+
+
+    
+        
+
+                            
+                    <h1 class="header-title">特征缩放以解决不均匀的数据缩放</h1>
+                
+            
+            
+                
+<p>通常收集的数据没有相同的规模；例如，一个特征可能在 10-100 的范围内变化，而另一个特征可能只分布在 2-5 的范围内。这种不均衡的数据规模会对学习产生不利影响。为了解决这个问题，我们使用特征缩放(归一化)的方法。已经发现归一化的选择极大地影响某些算法的性能。两种常见的标准化方法(在某些书中也称为标准化)如下:</p>
+<ul>
+<li><strong> Z-score 归一化</strong>:在 Z-score 归一化中，对每个个体特征进行缩放，使其具有标准正态分布的性质，即<em> 0 </em>的均值和<em> 1 </em>的方差。若<em> μ </em>为均值，<em> σ </em>为方差，则对每个特征进行如下线性变换，即可计算 Z 评分归一化:</li>
+</ul>
+<div><img class="fm-editor-equation" src="img/40dddd5e-f8af-4ab1-8b59-5a708d51b61b.png" style="width:9.83em;height:3.00em;"/></div>
+<ul>
+<li><strong>最小-最大归一化</strong>:最小-最大归一化重新缩放输入特征，使其位于<em> 0 </em>和<em> 1 </em>之间的范围内。它导致数据中标准偏差的减少，从而抑制了异常值的影响。为了实现最小-最大归一化，我们找到特征的最大值和最小值(分别为<em> x <sub> max </sub> </em>和<em> x <sub> min </sub> </em>)，并执行以下线性变换:</li>
+</ul>
+<div><img class="fm-editor-equation" src="img/724c7e3c-3d4d-4643-a5b5-bf3c29c82b30.png" style="width:12.42em;height:3.17em;"/></div>
+<p>我们可以使用<kbd>scikit</kbd>库<kbd>StandardScaler</kbd>或<kbd>MinMaxscaler</kbd>方法来规范化数据。在本章的所有例子中，我们都使用了<kbd>MinMaxScaler</kbd>；你可以试试把它改成<kbd>StandardScalar</kbd>，观察性能有没有变化。在下一章，我们还将学习如何在 TensorFlow 中执行这些规格化。</p>
+
+
+            
+
+            
+        
+    
+
+
+
+    
+        <title>Overfitting</title>
+        
+        <meta charset="utf-8"/>
+    
+<!-- kobo-style -->
+<script type="text/javascript" src="img/kobo.js"/>
+<style type="text/css" id="koboSpanStyle">.koboSpan { -webkit-text-combine: inherit; }</style>
+
+
+
+    
+        
+
+                            
+                    <h1 class="header-title">过度拟合</h1>
+                
+            
+            
+                
+<p>有时，模型试图过度拟合训练数据集；这样做，它失去了归纳的能力，因此在验证数据集上表现很差；这反过来会影响它在看不见的数据值上的性能。有两种处理过度拟合的标准方法:正则化和交叉验证。</p>
+
+
+            
+
+            
+        
+    
+
+
+
+    
+        <title>Regularization</title>
+        
+        <meta charset="utf-8"/>
+    
+<!-- kobo-style -->
+<script type="text/javascript" src="img/kobo.js"/>
+<style type="text/css" id="koboSpanStyle">.koboSpan { -webkit-text-combine: inherit; }</style>
+
+
+
+    
+        
+
+                            
+                    <h1 class="header-title">正规化</h1>
+                
+            
+            
+                
+<p>正则化在损失函数中添加了一项，以确保成本随着模型中要素数量的增加而增加。因此，我们强迫模型保持简单。如果<em> L(X </em>，<em> Y) </em>是早先的损失函数，我们用下面的替换它:</p>
+<div><img class="fm-editor-equation" src="img/7c6cd641-a45d-4cb1-abc4-902e2e23e1ac.png" style="width:15.58em;height:1.50em;"/></div>
+<p>在前文中，<em> N </em>可以是<em> L </em> <sub> 1 </sub>范数，<em>L</em>T8】2 范数，或者两者的组合，<em> λ </em>为正则化系数。正则化有助于减少模型方差，而不会丢失数据分布的任何重要属性:</p>
+<ul>
+<li><strong>套索正则化</strong>:在这种情况下，<em> N </em>就是<em>L</em>T6】1 范数。它使用重量模数作为罚项<em> N: </em></li>
+</ul>
+<div><img class="fm-editor-equation" src="img/76d82420-39b8-4956-bc07-a4fc8d6c1000.png" style="width:9.08em;height:3.75em;"/></div>
+<ul>
+<li><strong>岭正则化</strong>:在这种情况下，<em> N </em>是<em> L2 </em>范数，由下式给出:</li>
+</ul>
+<div><img class="fm-editor-equation" src="img/c03bc8ca-e933-4a96-bd00-4bfc0c492b73.png" style="width:9.00em;height:3.92em;"/></div>
+<p class="mce-root"/>
+
+
+            
+
+            
+        
+    
+
+
+
+    
+        <title>Cross-validation</title>
+        
+        <meta charset="utf-8"/>
+    
+<!-- kobo-style -->
+<script type="text/javascript" src="img/kobo.js"/>
+<style type="text/css" id="koboSpanStyle">.koboSpan { -webkit-text-combine: inherit; }</style>
+
+
+
+    
+        
+
+                            
+                    <h1 class="header-title">交叉验证</h1>
+                
+            
+            
+                
+<p>使用交叉验证也有助于减少过度拟合的问题。在<em> k </em>折叠交叉验证中，数据被分成<em> k </em>子集，称为<strong>折叠</strong>。然后对模型进行训练和评估<em>k</em>-次；每次，它选择其中一个折叠进行验证，其余的用于训练模型。当数据较少，训练时间较短时，可以进行交叉验证。scikit 提供了一个<kbd>cross_val_score</kbd>方法来实现 k 折叠。假设<kbd>classifier</kbd>是我们要交叉验证的模型，那么我们可以使用下面的代码对<kbd>10</kbd>褶皱进行交叉验证:</p>
+<pre>from sklearn.model_selection import cross_val_score <br/>accuracies = cross_val_score(estimator = classifier, X = X_train,\<br/>     y = y_train, cv = 10)<br/>print("Accuracy Mean {} Accuracy Variance \<br/>     {}".format(accuracies.mean(),accuracies.std()))</pre>
+<p>这样做的结果是一个平均值和方差值。一个好的模型应该具有高的平均值和低的方差。</p>
+
+
+            
+
+            
+        
+    
+
+
+
+    
+        <title>No Free Lunch theorem</title>
+        
+        <meta charset="utf-8"/>
+    
+<!-- kobo-style -->
+<script type="text/javascript" src="img/kobo.js"/>
+<style type="text/css" id="koboSpanStyle">.koboSpan { -webkit-text-combine: inherit; }</style>
+
+
+
+    
+        
+
+                            
+                    <h1 class="header-title">没有免费的午餐定理</h1>
+                
+            
+            
+                
+<p>有这么多模型，人们总是不知道该用哪一个。Wolpert 在他的著名论文<em>学习之间缺乏先验区分</em>中，探讨了这个问题，并表明如果我们没有对输入数据进行预先假设，那么就没有理由选择一个模型而不是其他模型。这就是所谓的<strong>没有免费的午餐</strong> <strong>定理</strong>。</p>
+<p>这意味着没有一个模型能够保证更好的工作。我们确定哪个模型是最好的唯一方法是对它们进行评估。但是，实际上，不可能评估所有的模型，因此，在实践中，我们对数据做出合理的假设，并评估一些相关的模型。</p>
+
+
+            
+
+            
+        
+    
+
+
+
+    
+        <title>Hyperparameter tuning and grid search</title>
+        
+        <meta charset="utf-8"/>
+    
+<!-- kobo-style -->
+<script type="text/javascript" src="img/kobo.js"/>
+<style type="text/css" id="koboSpanStyle">.koboSpan { -webkit-text-combine: inherit; }</style>
+
+
+
+    
+        
+
+                            
+                    <h1 class="header-title">超参数调谐和网格搜索</h1>
+                
+            
+            
+                
+<p>不同的模型有不同的超参数；例如，在线性回归中，学习率是一个超参数；如果我们使用正则化，那么正则化参数λ是一个超参数。它们的价值应该是什么？虽然对于一些超参数有一个经验法则，但大多数时候我们要么进行猜测，要么使用网格搜索来执行最佳超参数的顺序搜索。在下文中，我们给出了使用<kbd>scikit</kbd>库在 SVM 的情况下执行超参数搜索的代码；在下一章中，我们将了解如何使用 TensorFlow 来执行超参数调整:</p>
+<pre>Grid search for best model and parameters<br/>from sklearn.model_selection import GridSearchCV<br/>#parameters = {'kernel':('linear', 'rbf'), 'C':[1, 10]}<br/>classifier = SVC()<br/>parameters = [{'C': [1, 10], 'kernel': ['linear']},<br/>    {'C': [1, 10], 'kernel': ['rbf'],<br/>    'gamma': [0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9]}]<br/>    grid_search = GridSearchCV(estimator = classifier,<br/>    param_grid = parameters,<br/>    scoring = 'accuracy',<br/>    cv = 10,)<br/>grid_search.fit(X_train, y_train)<br/>best_accuracy = grid_search.best_score_<br/>best_parameters = grid_search.best_params_<br/>#here is the best accuracy<br/>best_accuracy</pre>
+<div><div><div><div><p><kbd>GridSearchCV</kbd>将为我们提供为 SVM 分类器产生最佳结果的超参数。</p>
+</div>
+</div>
+</div>
+</div>
+<p class="mce-root"/>
+<p class="mce-root"/>
+
+
+            
+
+            
+        
+    
+
+
+
+    
+        <title>Summary</title>
+        
+        <meta charset="utf-8"/>
+    
+<!-- kobo-style -->
+<script type="text/javascript" src="img/kobo.js"/>
+<style type="text/css" id="koboSpanStyle">.koboSpan { -webkit-text-combine: inherit; }</style>
+
+
+
+    
+        
+
+                            
+                    <h1 class="header-title">摘要</h1>
+                
+            
+            
+                
+<p>本章的目的是让你对不同的标准 ML 算法有一个直观的了解，这样你就可以做出明智的选择。我们讨论了用于分类和回归的流行的 ML 算法。我们还学习了监督学习和非监督学习的不同之处。介绍了线性回归、逻辑回归、SVM、朴素贝叶斯和决策树以及每种方法的基本原理。我们使用回归方法来预测热力站的电力生产，并使用分类方法来将葡萄酒分类为好酒或劣酒。最后，我们讨论了不同 ML 算法的常见问题以及解决这些问题的一些技巧和诀窍。</p>
+<p>在下一章中，我们将研究不同的深度学习模型，并学习如何使用它们来分析我们的数据并进行预测。</p>
+
+
+            
+
+            
+        
+    
+
+</body></html>

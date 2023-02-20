@@ -1,0 +1,336 @@
+<html><head/><body>
+<html xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:epub="http://www.idpf.org/2007/ops" lang="en" xml:lang="en" xsi:schemaLocation="http://www.w3.org/2002/06/xhtml2/ http://www.w3.org/MarkUp/SCHEMA/xhtml2.xsd">
+  <head>
+    <title>Unknown</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+  
+
+</head>
+  <body class="calibre"><div><h1 class="header-title">创建自动管道</h1>
+                
+            
+            
+                
+<p class="mce-root">前面的章节集中在一个<strong class="calibre7">机器学习</strong> ( <strong class="calibre7"> ML </strong>)项目中需要执行的不同阶段。为了成功地执行和产生结果，ML 模型的许多移动部分必须被捆绑在一起。将 ML 流程的不同部分结合在一起的过程被称为<strong class="calibre7">管道</strong>。管道是一个广义的概念，但对数据科学家来说是一个非常重要的概念。在软件工程中，人们建立管道来开发从源代码到部署的软件。类似地，在 ML 中，创建管道以允许数据从其原始格式流向一些有用的信息。它提供了构造多 ML 并行流水线系统的机制，以便比较几种 ML 方法的结果。</p>
+<p class="mce-root">流水线的每一级都被馈送来自其前一级的已处理数据；也就是说，处理单元的输出作为输入提供给下一个步骤。数据在管道中流动，就像水在管道中流动一样。掌握管道概念是创建无错误 ML 模型的一种强有力的方法，而管道是构建 AutoML 系统的一个重要元素。在本章中，我们将讨论以下主题:</p>
+<ul class="calibre13">
+<li class="calibre14">ML 管道简介</li>
+<li class="calibre14">建立一个简单的管道</li>
+<li class="calibre14">功能变压器</li>
+<li class="calibre14">使用弱学习者和集合构建复杂的管道</li>
+</ul>
+<p class="mce-root">在下一节中，我们将首先介绍 ML 管道。</p>
+
+
+            
+
+            
+        
+    </div>
+
+
+
+  </body>
+</html>
+
+
+<html xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:epub="http://www.idpf.org/2007/ops" lang="en" xml:lang="en" xsi:schemaLocation="http://www.w3.org/2002/06/xhtml2/ http://www.w3.org/MarkUp/SCHEMA/xhtml2.xsd">
+  <head>
+    <title>Unknown</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+  
+
+</head>
+  <body class="calibre"><div><h1 class="header-title">技术要求</h1>
+                
+            
+            
+                
+<p class="mce-root">所有代码示例都可以在本章的 GitHub 链接的<kbd class="calibre16">Chapter 06</kbd>文件夹中找到。</p>
+
+
+            
+
+            
+        
+    </div>
+
+
+
+  </body>
+</html>
+
+
+<html xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:epub="http://www.idpf.org/2007/ops" lang="en" xml:lang="en" xsi:schemaLocation="http://www.w3.org/2002/06/xhtml2/ http://www.w3.org/MarkUp/SCHEMA/xhtml2.xsd">
+  <head>
+    <title>Unknown</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+  
+
+</head>
+  <body class="calibre"><div><h1 class="header-title">机器学习流水线介绍</h1>
+                
+            
+            
+                
+<p class="mce-root">通常，ML 算法需要干净的数据来检测数据中的一些模式，并对新的数据集进行预测。然而，在现实世界的应用中，数据通常不准备直接馈入 ML 算法。类似地，ML 模型的输出只是数字或字符，需要对它们进行处理，以便在现实世界中执行一些操作。为了实现这一点，ML 模型必须部署在生产环境中。将原始数据转换成可用信息的整个框架是使用 ML 管道来执行的。</p>
+<p class="mce-root">以下是 ML 管道的高级图示:</p>
+<div><img src="img/b77651b4-f0bf-4f3a-82ff-bd314ea66460.png" width="997" height="413" class="calibre150"/></div>
+<p class="mce-root">我们将分解上图中所示的块，如下所示:</p>
+<ul class="calibre13">
+<li class="calibre14"><strong class="calibre3">数据摄取</strong>:获取数据，导入数据使用的过程。数据可以来源于多个系统，如<strong class="calibre3">企业资源规划</strong> ( <strong class="calibre3"> ERP </strong>)软件、<strong class="calibre3">客户关系管理</strong> ( <strong class="calibre3"> CRM </strong>)软件、web 应用等。数据提取可以是实时的或分批的。有时，获取数据是一个棘手的部分，也是最具挑战性的步骤之一，因为我们需要有良好的业务和数据理解能力。</li>
+</ul>
+<ul class="calibre13">
+<li class="calibre14"><strong class="calibre3">数据准备</strong>:我们在<a href="e3a416dc-5d27-4057-be55-60f837956f54.xhtml" target="_blank" class="pcalibre pcalibre3 pcalibre1 calibre12 pcalibre2">第三章</a>、<em class="calibre42">数据预处理</em>中学习了各种数据准备技术。有几种方法可以将数据预处理成适合构建模型的形式。真实世界的数据通常是不准确的——有缺失的数据，有时会有噪音。因此，有必要对数据进行预处理，使其干净并经过转换，以便可以通过 ML 算法运行。</li>
+<li class="calibre14"><strong class="calibre3"> ML 模型训练</strong>:它涉及使用各种 ML 技术来理解数据中的基本特征，做出预测，或从中获得洞察力。通常，ML 算法已经被编码并作为 API 或编程接口可用。我们需要承担的最重要的责任是调整超参数。使用超参数并优化它们以创建最佳拟合模型是模型训练阶段最关键和最复杂的部分。</li>
+<li class="calibre14"><strong class="calibre3">模型评估</strong>:模型评估有多种标准。它是统计方法和商业规则的结合。在 AutoML 流水线中，评估主要基于各种统计和数学度量。如果 AutoML 系统是为一些特定的业务领域或用例开发的，那么业务规则也可以嵌入到系统中，以评估模型的正确性。</li>
+<li class="calibre14"><strong class="calibre3">再培训</strong>:我们为用例创建的第一个模型通常不是最好的模型。它被认为是一个基线模型，我们试图通过反复训练来提高模型的准确性。</li>
+<li class="calibre14"><strong class="calibre3">部署</strong>:最后一步是部署模型，包括将模型应用和迁移到业务操作中以供使用。部署阶段高度依赖于组织拥有的 IT 基础设施和软件功能。</li>
+</ul>
+<p class="mce-root">正如我们所看到的，我们需要执行几个阶段来从 ML 模型中获得结果。scikit-learn 为我们提供了一个管道功能，可以用来创建几个复杂的管道。在构建 AutoML 系统时，管道将会非常复杂，因为必须捕获许多不同的场景。然而，如果我们知道如何对数据进行预处理，利用 ML 算法并应用各种评估指标，那么管道就是给这些部分一个形状的问题。</p>
+<p class="mce-root">让我们使用 scikit-learn 设计一个非常简单的管道。</p>
+
+
+            
+
+            
+        
+    </div>
+
+
+
+  </body>
+</html>
+
+
+<html xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:epub="http://www.idpf.org/2007/ops" lang="en" xml:lang="en" xsi:schemaLocation="http://www.w3.org/2002/06/xhtml2/ http://www.w3.org/MarkUp/SCHEMA/xhtml2.xsd">
+  <head>
+    <title>Unknown</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+  
+
+</head>
+  <body class="calibre"><div><h1 class="header-title">简单的管道</h1>
+                
+            
+            
+                
+<p class="mce-root">我们将首先导入一个名为<kbd class="calibre16">Iris</kbd>的数据集，它已经存在于 scikit-learn 的样本数据集库中(<a href="http://scikit-learn.org/stable/auto_examples/datasets/plot_iris_dataset.html" target="_blank" class="pcalibre pcalibre3 pcalibre1 calibre12 pcalibre2">http://scikit-learn . org/stable/auto _ examples/datasets/plot _ iris _ dataset . html</a>)。数据集由四个要素组成，有 150 行。我们将在管道中开发以下步骤，以使用<kbd class="calibre16">Iris</kbd>数据集训练我们的模型。问题陈述是使用四个不同的特征来预测一个<kbd class="calibre16">Iris</kbd>数据的种类:</p>
+<div><img src="img/d6c7abda-9a11-4718-93f2-6c5b1f9be3d4.png" width="767" height="107" class="calibre151"/></div>
+<p class="mce-root">在这个管道中，我们将使用一个<kbd class="calibre16">MinMaxScaler</kbd>方法来缩放输入数据，并使用逻辑回归来预测<kbd class="calibre16">Iris</kbd>的种类。然后，将基于精度测量对模型进行评估:</p>
+<ol class="calibre19">
+<li class="chapter">第一步是从 scikit-learn 导入各种库，这些库将提供完成我们任务的方法。我们在前面的章节中已经了解了所有这些。唯一增加的是来自<kbd class="calibre16">sklearn.pipeline</kbd>的<kbd class="calibre16">Pipeline</kbd>方法。这将为我们提供创建 ML 管道所需的必要方法:</li>
+</ol>
+<pre class="calibre79">from sklearn.datasets import load_iris<br class="calibre2"/>from sklearn.preprocessing import MinMaxScaler<br class="calibre2"/>from sklearn.linear_model import LogisticRegression<br class="calibre2"/>from sklearn.model_selection import train_test_split<br class="calibre2"/>from sklearn.pipeline import Pipeline</pre>
+<ol start="2" class="calibre19">
+<li class="chapter">下一步是加载<kbd class="calibre16">iris</kbd>数据，并将其分成训练和测试数据集。在此示例中，我们将使用 80%的数据集来训练模型，剩余的 20%用于测试模型的准确性。我们可以使用<kbd class="calibre16">shape</kbd>函数来查看数据集的维度:</li>
+</ol>
+<pre class="calibre79"># Load and split the data<br class="calibre2"/>iris = load_iris()<br class="calibre2"/>X_train, X_test, y_train, y_test = train_test_split(iris.data, iris.target, test_size=0.2, random_state=42)<br class="calibre2"/>X_train.shape</pre>
+<ol start="3" class="calibre19">
+<li class="chapter">以下结果显示了具有<kbd class="calibre16">4</kbd>列和<kbd class="calibre16">120</kbd>行的训练数据集，这相当于<kbd class="calibre16">Iris</kbd>数据集的 80%,符合预期:</li>
+</ol>
+<div><img src="img/a37950dd-1b3e-4320-aa88-08a9314284b4.png" width="160" height="24" class="calibre152"/></div>
+<ol start="4" class="calibre19">
+<li class="chapter">接下来，我们打印数据集以浏览数据:</li>
+</ol>
+<pre class="calibre79">print(X_train)</pre>
+<p class="calibre91">上述代码提供了以下输出:</p>
+<div><img src="img/377f2e0b-037e-4750-afdc-be3a5c6fbde6.png" width="169" height="255" class="calibre153"/></div>
+<ol start="5" class="calibre19">
+<li class="chapter">下一步是创建管道。管道对象是(键，值)对的形式。Key 是具有特定步骤名称的字符串，value 是函数或实际方法的名称。在下面的代码片段中，我们将<kbd class="calibre16">MinMaxScaler()</kbd>方法命名为<kbd class="calibre16">minmax</kbd>，将<kbd class="calibre16">LogisticRegression(random_state=42)</kbd>命名为<kbd class="calibre16">lr</kbd>:</li>
+</ol>
+<pre class="calibre79">pipe_lr = Pipeline([('minmax', MinMaxScaler()),<br class="calibre2"/> ('lr', LogisticRegression(random_state=42))])</pre>
+<ol start="6" class="calibre19">
+<li class="chapter">然后，我们将管道对象<kbd class="calibre16">pipe_lr</kbd>拟合到训练数据集:</li>
+</ol>
+<pre class="calibre79">pipe_lr.fit(X_train, y_train)</pre>
+<ol start="7" class="calibre19">
+<li class="chapter">当我们执行前面的代码时，我们得到以下输出，它显示了构建的拟合模型的最终结构:</li>
+</ol>
+<div><img src="img/806b2aef-69ee-41d6-a15a-839a111b5ed1.png" class="calibre154"/></div>
+<ol start="8" class="calibre19">
+<li class="chapter">最后一步是使用<kbd class="calibre16">score</kbd>方法对<kbd class="calibre16">test</kbd>数据集上的模型进行评分:</li>
+</ol>
+<pre class="calibre79">score = pipe_lr.score(X_test, y_test)<br class="calibre2"/>print('Logistic Regression pipeline test accuracy: %.3f' % score)</pre>
+<p class="mce-root">从以下结果可以看出，模型的准确度为<kbd class="calibre16">0.900</kbd>，为 90%:</p>
+<div><img src="img/871f38f7-479c-470f-9b1d-4fc0e87afc32.png" width="427" height="26" class="calibre155"/></div>
+<p class="mce-root">在前面的例子中，我们创建了一个管道，它由两个步骤组成，即<kbd class="calibre16">minmax</kbd>缩放和<kbd class="calibre16">LogisticRegression</kbd>。当我们在<kbd class="calibre16">pipe_lr</kbd>管道上执行<kbd class="calibre16">fit</kbd>方法时，<kbd class="calibre16">MinMaxScaler</kbd>对输入数据执行<kbd class="calibre16">fit</kbd>和<kbd class="calibre16">transform</kbd>方法，并将其传递给估计器，这是一个逻辑回归模型。流水线中的这些中间步骤被称为<strong class="calibre7">变压器</strong>，最后一步是估算器。</p>
+<p class="mce-root">变压器用于数据预处理，有<kbd class="calibre16">fit</kbd>和<kbd class="calibre16">transform</kbd>两种方法。<kbd class="calibre16">fit</kbd>方法用于从训练数据中寻找参数，而<kbd class="calibre16">transform</kbd>方法用于将数据预处理技术应用于数据集。</p>
+<p class="mce-root">估计器用于创建机器学习模型，有两种方法，<kbd class="calibre16">fit</kbd>和<kbd class="calibre16">predict</kbd>。<kbd class="calibre16">fit</kbd>方法用于训练 ML 模型，而<kbd class="calibre16">predict</kbd>方法用于将训练好的模型应用于测试或新数据集。</p>
+<p class="mce-root">下图总结了这一概念:</p>
+<div><img src="img/2b2a4221-7156-495c-bd34-6472b595a0d0.png" class="calibre156"/></div>
+<p class="mce-root">我们必须只调用管道的<strong class="calibre7"> fit </strong>方法来训练模型，并调用<strong class="calibre7"> predict </strong>方法来创建预测。其余所有函数，即<strong class="calibre7"> Fit </strong>和<strong class="calibre7"> Transform </strong>都封装在管道的功能中，并如上图所示执行。</p>
+<p class="mce-root">有时，我们需要编写一些自定义函数来执行自定义转换。下一节是关于 function transformer 的，它可以帮助我们实现这个定制功能。</p>
+
+
+            
+
+            
+        
+    </div>
+
+
+
+  </body>
+</html>
+
+
+<html xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:epub="http://www.idpf.org/2007/ops" lang="en" xml:lang="en" xsi:schemaLocation="http://www.w3.org/2002/06/xhtml2/ http://www.w3.org/MarkUp/SCHEMA/xhtml2.xsd">
+  <head>
+    <title>Unknown</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+  
+
+</head>
+  <body class="calibre"><div><h1 class="header-title">功能变压器</h1>
+                
+            
+            
+                
+<p class="mce-root">一个<kbd class="calibre16">FunctionTransformer</kbd>用于定义一个用户定义的函数，该函数使用来自管道的数据，并将该函数的结果返回给管道的下一级。这用于无状态转换，例如取数字的平方或对数，定义自定义缩放函数，等等。</p>
+<p class="mce-root">在下面的例子中，我们将使用<kbd class="calibre16">CustomLog</kbd>函数和预定义的预处理方法<kbd class="calibre16">StandardScaler</kbd>构建一个管道:</p>
+<ol class="calibre19">
+<li class="chapter">我们像在前面的例子中一样导入所有需要的库。这里唯一增加的是来自<kbd class="calibre16">sklearn.preprocessing</kbd>库的<kbd class="calibre16">FunctionTransformer</kbd>方法。此方法用于执行自定义转换器功能，并将其与管道中的其他阶段结合在一起:</li>
+</ol>
+<pre class="calibre79">import numpy as np<br class="calibre2"/>from sklearn.datasets import load_iris<br class="calibre2"/>from sklearn.model_selection import train_test_split<br class="calibre2"/>from sklearn import preprocessing<br class="calibre2"/>from sklearn.pipeline import make_pipeline<br class="calibre2"/>from sklearn.preprocessing import FunctionTransformer<br class="calibre2"/>from sklearn.preprocessing import StandardScaler<br class="calibre2"/></pre>
+<ol start="2" class="calibre19">
+<li class="chapter">在下面的代码片段中，我们将定义一个自定义函数，该函数返回一个数字<kbd class="calibre16">X</kbd>的日志:</li>
+</ol>
+<pre class="calibre79">def CustomLog(X):<br class="calibre2"/>    return np.log(X)</pre>
+<ol start="3" class="calibre19">
+<li class="chapter">接下来，我们将定义一个名为<kbd class="calibre16">PreprocData</kbd>的数据预处理函数，它接受数据集的输入数据(<kbd class="calibre16">X</kbd>和目标(<kbd class="calibre16">Y</kbd>)。对于这个例子，<kbd class="calibre16">Y</kbd>是不必要的，因为我们不打算构建一个监督模型，而只是演示一个数据预处理管道。然而，在现实世界中，我们可以直接使用该函数来创建有监督的 ML 模型。</li>
+</ol>
+<ol start="4" class="calibre19">
+<li class="chapter">这里，我们使用一个<kbd class="calibre16">make_pipeline</kbd>函数来创建一个管道。我们在前面的例子中使用了<kbd class="calibre16">pipeline</kbd>函数，我们必须为数据预处理或 ML 函数定义名称。使用<kbd class="calibre16">make_pipeline</kbd>函数的优点是它能自动生成函数的名字或键:</li>
+</ol>
+<pre class="calibre79">def PreprocData(X, Y):<br class="calibre2"/>pipe = make_pipeline(<br class="calibre2"/> FunctionTransformer(CustomLog),StandardScaler()<br class="calibre2"/> )<br class="calibre2"/> X_train, X_test, Y_train, Y_test = train_test_split(X, Y)<br class="calibre2"/> pipe.fit(X_train, Y_train)<br class="calibre2"/> return pipe.transform(X_test), Y_test</pre>
+<ol start="5" class="calibre19">
+<li class="chapter">当我们准备好管道时，我们可以加载<kbd class="calibre16">Iris</kbd>数据集。我们打印输入数据<kbd class="calibre16">X</kbd>来看看数据:</li>
+</ol>
+<pre class="calibre79">iris = load_iris()<br class="calibre2"/>X, Y = iris.data, iris.target<br class="calibre2"/>print(X)</pre>
+<p class="calibre91">前面的代码打印了以下输出:</p>
+<div><img src="img/7cd3515e-cc86-4309-b830-bc42ba6c9775.png" width="166" height="327" class="calibre157"/></div>
+<ol start="6" class="calibre19">
+<li class="chapter">接下来，我们将通过传递<kbd class="calibre16">iris</kbd>数据来调用<kbd class="calibre16">PreprocData</kbd>函数。返回的结果是一个转换后的数据集，该数据集首先使用我们的<kbd class="calibre16">CustomLog</kbd>函数进行处理，然后使用<kbd class="calibre16">StandardScaler</kbd>数据预处理方法:</li>
+</ol>
+<pre class="calibre79">X_transformed, Y_transformed = PreprocData(X, Y)<br class="calibre2"/>print(X_transformed)</pre>
+<ol start="7" class="calibre19">
+<li class="chapter">上述数据转换任务会产生以下转换后的数据结果:</li>
+</ol>
+<div><img src="img/064e1375-cc18-47e7-9c26-e94b4d74b243.png" width="451" height="377" class="calibre158"/></div>
+<p class="mce-root">我们现在需要为 AutoML 系统构建各种复杂的管道。在下一节中，我们将使用几个数据预处理步骤和 ML 算法创建一个复杂的管道。</p>
+
+
+            
+
+            
+        
+    </div>
+
+
+
+  </body>
+</html>
+
+
+<html xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:epub="http://www.idpf.org/2007/ops" lang="en" xml:lang="en" xsi:schemaLocation="http://www.w3.org/2002/06/xhtml2/ http://www.w3.org/MarkUp/SCHEMA/xhtml2.xsd">
+  <head>
+    <title>Unknown</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+  
+
+</head>
+  <body class="calibre"><div><h1 class="header-title">复杂的管道</h1>
+                
+            
+            
+                
+<p class="mce-root">在本节中，我们将使用鸢尾花的四个不同特征来确定预测鸢尾花种类的最佳分类器。我们将结合使用四种不同的数据预处理技术和四种不同的 ML 算法来完成这项任务。以下是该作业的管道设计:</p>
+<div><img src="img/e1a69439-7676-4760-b195-8d986fbfbef4.png" class="calibre159"/></div>
+<p class="mce-root">我们将如下进行:</p>
+<ol class="calibre19">
+<li class="chapter">我们从导入任务所需的各种库和函数开始:</li>
+</ol>
+<pre class="calibre79">from sklearn.datasets import load_iris<br class="calibre2"/>from sklearn.preprocessing import StandardScaler<br class="calibre2"/>from sklearn.decomposition import PCA<br class="calibre2"/>from sklearn.preprocessing import MinMaxScaler<br class="calibre2"/>from sklearn.model_selection import train_test_split<br class="calibre2"/>from sklearn.neighbors import KNeighborsClassifier<br class="calibre2"/>from sklearn.ensemble import RandomForestClassifier<br class="calibre2"/>from sklearn import svm<br class="calibre2"/>from sklearn import tree<br class="calibre2"/>from sklearn.pipeline import Pipeline</pre>
+<ol start="2" class="calibre19">
+<li class="chapter">接下来，我们加载<kbd class="calibre16">Iris</kbd>数据集，并将其分成<kbd class="calibre16">train</kbd>和<kbd class="calibre16">test</kbd>数据集。<kbd class="calibre16">X_train</kbd>和<kbd class="calibre16">Y_train</kbd>数据集将用于训练不同的模型，<kbd class="calibre16">X_test</kbd>和<kbd class="calibre16">Y_test</kbd>将用于测试训练好的模型:</li>
+</ol>
+<pre class="calibre79"># Load and split the data<br class="calibre2"/>iris = load_iris()<br class="calibre2"/>X_train, X_test, y_train, y_test = train_test_split(iris.data, iris.target, test_size=0.2, random_state=42)</pre>
+<ol start="3" class="calibre19">
+<li class="chapter">接下来，我们将创建四个不同的管道，每个模型一个。在 SVM 模型的流水线中，<kbd class="calibre16">pipe_svm</kbd>，我们将首先使用<kbd class="calibre16">StandardScaler</kbd>缩放数字输入，然后使用<strong class="calibre3">主成分分析</strong> ( <strong class="calibre3"> PCA </strong>)创建主成分。最后，使用这个预处理数据集建立一个<strong class="calibre3">支持向量机</strong> ( <strong class="calibre3"> SVM </strong>)模型。</li>
+<li class="chapter">类似地，我们将构建一个管道来创建名为<kbd class="calibre16">pipe_knn</kbd>的 KNN 模型。在执行<kbd class="calibre16">KNeighborsClassifier</kbd>创建 KNN 模型之前，只有<kbd class="calibre16">StandardScaler</kbd>用于预处理数据。</li>
+<li class="chapter">然后，我们创建一个用于构建决策树模型的管道。我们使用<kbd class="calibre16">StandardScaler</kbd>和<kbd class="calibre16">MinMaxScaler</kbd>方法对<kbd class="calibre16">DecisionTreeClassifier</kbd>方法使用的数据进行预处理。</li>
+<li class="chapter">使用管道创建的最后一个模型是随机森林模型，其中只有<kbd class="calibre16">StandardScaler</kbd>用于预处理由<kbd class="calibre16">RandomForestClassifier</kbd>方法使用的数据。</li>
+</ol>
+<p class="calibre91">下面是创建这四个不同管道的代码片段，这四个管道用于创建四个不同的模型:</p>
+<pre class="calibre79"># Construct svm pipeline<br class="calibre2"/><br class="calibre2"/>pipe_svm = Pipeline([('ss1', StandardScaler()),<br class="calibre2"/>      ('pca', PCA(n_components=2)),<br class="calibre2"/>      ('svm', svm.SVC(random_state=42))])<br class="calibre2"/>      <br class="calibre2"/># Construct knn pipeline<br class="calibre2"/>pipe_knn = Pipeline([('ss2', StandardScaler()),<br class="calibre2"/>      ('knn', KNeighborsClassifier(n_neighbors=6, metric='euclidean'))])<br class="calibre2"/><br class="calibre2"/># Construct DT pipeline<br class="calibre2"/>pipe_dt = Pipeline([('ss3', StandardScaler()),<br class="calibre2"/>      ('minmax', MinMaxScaler()),<br class="calibre2"/>      ('dt', tree.DecisionTreeClassifier(random_state=42))])<br class="calibre2"/><br class="calibre2"/># Construct Random Forest pipeline<br class="calibre2"/>num_trees = 100<br class="calibre2"/>max_features = 1<br class="calibre2"/>pipe_rf = Pipeline([('ss4', StandardScaler()),<br class="calibre2"/>      ('pca', PCA(n_components=2)),<br class="calibre2"/>      ('rf', RandomForestClassifier(n_estimators=num_trees, max_features=max_features))])</pre>
+<ol start="7" class="calibre19">
+<li class="chapter">接下来，我们需要将管道的名称存储在一个字典中，该字典将用于显示结果:</li>
+</ol>
+<pre class="calibre79">pipe_dic = {0: 'K Nearest Neighbours', 1: 'Decision Tree', 2:'Random Forest', 3:'Support Vector Machines'}</pre>
+<ol start="8" class="calibre19">
+<li class="chapter">然后，我们将列出迭代执行这些管道的四个管道:</li>
+</ol>
+<pre class="calibre79">pipelines = [pipe_knn, pipe_dt,pipe_rf,pipe_svm]</pre>
+<ol start="9" class="calibre19">
+<li class="chapter">现在，我们已经准备好了整个管道的复杂结构。剩下的事情就是让数据符合管道，评估结果，并选择最佳模型。</li>
+</ol>
+<p class="calibre91">在下面的代码片段中，我们将四个管道中的每一个迭代地拟合到训练数据集:</p>
+<pre class="calibre79"># Fit the pipelines<br class="calibre2"/>for pipe in pipelines:<br class="calibre2"/>  pipe.fit(X_train, y_train)</pre>
+<ol start="10" class="calibre19">
+<li class="chapter">一旦模型拟合成功执行，我们将使用以下代码片段检查四个模型的准确性:</li>
+</ol>
+<pre class="calibre79"># Compare accuracies<br class="calibre2"/>for idx, val in enumerate(pipelines):<br class="calibre2"/>  print('%s pipeline test accuracy: %.3f' % (pipe_dic[idx], val.score(X_test, y_test)))</pre>
+<ol start="11" class="calibre19">
+<li class="chapter">我们可以从下面的结果中注意到，k-最近邻和决策树模型以 100%的完美准确率领先。这好得令人难以置信，可能是使用小数据集和/或过度拟合的结果:</li>
+</ol>
+<div><img src="img/9d30185e-432c-4663-9d38-2ed6c734df8f.png" width="455" height="82" class="calibre160"/></div>
+<ol start="12" class="calibre19">
+<li class="chapter">我们可以使用两个获胜模型中的任何一个来进行部署，<strong class="calibre3"> k 近邻</strong>(<strong class="calibre3"/>)或决策树模型。我们可以使用下面的代码片段来实现这一点:</li>
+</ol>
+<pre class="calibre79">best_accuracy = 0<br class="calibre2"/>best_classifier = 0<br class="calibre2"/>best_pipeline = ''<br class="calibre2"/>for idx, val in enumerate(pipelines):<br class="calibre2"/> if val.score(X_test, y_test) &gt; best_accuracy:<br class="calibre2"/> best_accuracy = val.score(X_test, y_test)<br class="calibre2"/> best_pipeline = val<br class="calibre2"/> best_classifier = idx<br class="calibre2"/>print('%s Classifier has the best accuracy of %.2f' % (pipe_dic[best_classifier],best_accuracy))</pre>
+<ol start="13" class="calibre19">
+<li class="chapter">由于 k-最近邻和决策树的准确性相似，KNN 被选为最佳模型，因为它是管道中的第一个模型。但是，在这个阶段，我们还可以使用一些业务规则或访问执行成本来决定最佳模型:</li>
+</ol>
+<div><img src="img/b4f37b6a-1f47-4c6b-935e-f871ba421ba3.png" width="584" height="21" class="calibre161"/></div>
+
+
+            
+
+            
+        
+    </div>
+
+
+
+  </body>
+</html>
+
+
+<html xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:epub="http://www.idpf.org/2007/ops" lang="en" xml:lang="en" xsi:schemaLocation="http://www.w3.org/2002/06/xhtml2/ http://www.w3.org/MarkUp/SCHEMA/xhtml2.xsd">
+  <head>
+    <title>Unknown</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+  
+
+</head>
+  <body class="calibre"><div><h1 class="header-title">摘要</h1>
+                
+            
+            
+                
+<p class="mce-root">这一章是为 ML 系统构建管道的草图——这只是冰山一角。建设管道非常复杂。但是，一旦开发出来，就让一个开发者的日子更舒服了。它降低了制定不同模型的复杂性，因此成为创建 AutoML 系统所需的基本概念。我们在本章中描述的概念为您提供了创建管道的基础。当您在本章中构建管道时，您一定已经理解了通过使用管道，模型构建过程变得多么结构化。</p>
+<p class="mce-root">下一章将总结我们到目前为止的学习。它还将为您提供一些建议，这些建议将有助于设计 AutoML 系统和成功执行数据科学项目。</p>
+
+
+            
+
+            
+        
+    </div>
+
+
+
+  </body>
+</html>
+</body></html>

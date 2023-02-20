@@ -1,0 +1,728 @@
+<html><head/><body>
+
+
+	
+		<title>C12624_02_ePub_Final_SW</title>
+		
+	
+	
+		<div><h1 id="_idParaDest-75"><em class="italics"> <a id="_idTextAnchor075"/>第二章:</em></h1>
+		</div>
+		<div><h1 id="_idParaDest-76"><a id="_idTextAnchor076"/>数据的探索性分析</h1>
+		</div>
+		<div><h2>学习目标</h2>
+			<p>本章结束时，您将能够:</p>
+			<ul>
+				<li class="bullets">使用行业标准框架定义问题陈述</li>
+				<li class="bullets">执行单变量和双变量分析</li>
+				<li class="bullets">解释多元分析</li>
+				<li class="bullets">进行假设检验</li>
+				<li class="bullets">使用 dplyr 和 reshape2 包执行数据辩论</li>
+				<li class="bullets">使用 ggplot2 软件包可视化数据</li>
+			</ul>
+			<p>在本章中，我们将让学习者熟悉清理、转换和可视化数据的技术，以便获得有用的见解。</p>
+		</div>
+		<div><h2 id="_idParaDest-77"><a id="_idTextAnchor077"/>简介</h2>
+			<p><em class="italics">第 1 章</em>，<em class="italics"> R for Advanced Analytics </em>，向大家介绍了数据科学的 R 语言及其生态系统。我们现在准备进入数据科学和机器学习的一个至关重要的部分，那就是<strong class="bold">探索性数据分析</strong> ( <strong class="bold"> EDA </strong>)，理解数据的艺术。</p>
+			<p>在本章中，我们将使用上一章中使用的相同银行数据集来处理 EDA，但是以一种更加以问题为中心的方式。我们将从使用行业标准工件定义问题陈述开始，设计问题的解决方案，并了解 EDA 如何适应更大的问题框架。然后，我们将使用 R 中的数据工程、数据争论和数据可视化技术的组合，通过以业务为中心的方法来解决一个葡萄牙银行机构用例的直接营销活动(电话)的 EDA 问题。</p>
+			<p>在任何数据科学用例中，理解数据都需要花费大量的时间和精力。大多数数据科学专业人员花费大约 80%的时间来理解数据。鉴于这是您旅程中最关键的部分，对任何数据科学用例的整体流程有一个宏观的看法是很重要的。</p>
+			<p>典型的数据科学用例采用核心业务分析问题或机器学习问题的路径。无论采用哪种方法，EDA 都是不可避免的。<em class="italics">图 2.1 </em>展示了一个基础数据科学用例的生命周期。它从使用一个或多个标准框架定义问题陈述开始，然后深入研究数据收集并到达 EDA。任何项目中的大部分工作和时间都消耗在 EDA 上。一旦理解数据的过程完成，项目可能会根据用例的范围选择不同的路径。在大多数基于业务分析的用例中，下一步是将所有观察到的模式吸收到有意义的见解中。虽然这听起来可能微不足道，但这是一项反复而艰巨的任务。这一步随后演变为讲故事，其中浓缩的见解被剪裁成对业务涉众有意义的故事。类似地，在目标是开发预测模型的场景中，下一步将是实际开发机器学习模型，然后将其部署到生产系统/产品中。</p>
+			<div><div><img src="img/C12624_02_01.jpg" alt="Figure 2.1: Life cycle of a data science use case&#13;&#10;"/>
+				</div>
+			</div>
+			<h6>图 2.1:数据科学用例的生命周期</h6>
+			<p>让我们简单看一下第一步，<em class="italics">定义问题陈述</em>。</p>
+			<h2 id="_idParaDest-78"><a id="_idTextAnchor078"/>定义问题陈述</h2>
+			<p>如果您还记得我们在<em class="italics">第 1 章</em>、<em class="italics">中探索的数据，即高级分析</em>银行营销数据，我们有一个数据集，它捕获了银行为吸引客户而开展的电话营销活动。</p>
+			<p>一家大型跨国银行正在设计一项营销活动，通过吸引客户存款来实现其增长目标。该活动在吸引客户方面效果不佳，营销团队希望了解如何改进该活动以实现增长目标。</p>
+			<p>我们可以从业务利益相关者的角度重新定义问题，并尝试看看什么样的解决方案最适合这里。</p>
+			<h3 id="_idParaDest-79"><a id="_idTextAnchor079"/>问题-设计工件</h3>
+			<p>就像软件工程和其他工业项目有几个框架、模板和工件一样，数据科学和商业分析项目也可以使用工业标准工件有效地表示。一些受欢迎的选择可以从咨询巨头如麦肯锡，波士顿咨询公司和决策科学巨头如穆适马。我们将使用一个基于<strong class="bold">明托金字塔</strong>原理的流行框架，称为<strong class="bold">情境-复杂-问题分析</strong> ( <strong class="bold"> SCQ </strong>)。</p>
+			<p>让我们尝试用下面的结构来定义问题陈述:</p>
+			<ul>
+				<li><strong class="bold">Situation</strong>: Define the current situation. We can simplify this by answering the question—what happened?<p>一家大型跨国银行正在设计一项营销活动，通过吸引客户存款来实现其增长目标。该活动在吸引客户方面效果不佳，营销团队希望了解如何改进该活动以实现增长目标。</p></li>
+			</ul>
+			<p>在上一节中，我们看到了为银行数据用例设计的一个假设的业务问题。尽管这在现实中可能有所不同，但我们肯定是在尝试解决一个有效的用例。通过用前面演示的格式来表示问题陈述，我们有了一个清晰的区域来关注和解决问题。这解决了典型数据科学用例生命周期的第一步。第二步是数据收集，我们在前一章中已经探讨过了。我们将参考 https://archive.ics.uci.edu/ml/datasets/Bank%20Marketing<a href="https://archive.ics.uci.edu/ml/datasets/Bank%20Marketing">的 UCI 机器学习库提供的相同数据集。</a></p>
+			<h4>注意</h4>
+			<p class="callout">[Moro 等人，2014 年] S. Moro、P. Cortez 和 P. Rita。预测银行电话营销成功的数据驱动方法。决策支持系统，爱思唯尔，62:22-31，2014 年 6 月。</p>
+			<p>这就把我们带到了最后一步:EDA。在这个用例中，我们希望了解导致活动表现不佳的各种因素。在深入实际练习之前，我们先花点时间用更直观的方式来理解 EDA 的概念。</p>
+			<h2 id="_idParaDest-80">了解 EDA 背后的科学</h2>
+			<p>通俗地说，我们可以把 EDA 定义为理解数据的科学。更正式的定义是使用统计、视觉、分析或技术组合来分析和探索数据集以总结其特征、属性和潜在关系的过程。</p>
+			<p>为了巩固我们的理解，让我们进一步分解定义。数据集是数值和分类特征的组合。为了研究数据，我们可能需要单独研究要素，为了研究关系，我们可能需要一起研究要素。根据功能的数量和类型，我们可能会遇到不同类型的 EDA。</p>
+			<p>为了简化，我们可以将 EDA 的过程大致分类如下:</p>
+			<ul>
+				<li><strong class="bold">单变量分析</strong>:研究单一特征</li>
+				<li><strong class="bold">双变量分析</strong>:研究两个特征之间的关系</li>
+				<li><strong class="bold">多元分析</strong>:研究两个以上特征之间的关系</li>
+			</ul>
+			<p>现在，我们将把本章的范围限制在<strong class="bold">单变量</strong>和<strong class="bold">双变量</strong>分析。多变量分析的几种形式，如回归，将在接下来的章节中介绍。</p>
+			<p>为了完成前面提到的每一项分析，我们可以使用可视化技术，如箱线图、散点图和条形图；统计技术，如假设检验；或者简单的分析技术，如平均值、频率计数等等。</p>
+			<p>进一步分解，我们有另一个维度来迎合，即特征的类型——<strong class="bold">数字</strong>或<strong class="bold">分类</strong>。在提到的每种类型的分析中——单变量的<strong class="bold">和双变量</strong>的<strong class="bold">——基于特征的类型，我们可能有不同的视觉技术来完成研究。因此，对于数字变量的单变量分析，我们可以使用直方图或箱线图，而对于分类变量，我们可以使用频率条形图。我们将使用<em class="italics">惰性编程</em>方法深入了解 EDA 整体练习的细节，也就是说，我们将探索书中出现的分析的上下文和细节。</strong></p>
+			<p>为练习设置了基本的背景知识后，让我们为具体的 EDA 练习做好准备。</p>
+			<h2 id="_idParaDest-81"><a id="_idTextAnchor081"/>探索性数据分析</h2>
+			<p>我们将从位于 https://archive.ics.uci.edu/ml/datasets/Bank%20Marketing<a href="https://archive.ics.uci.edu/ml/datasets/Bank%20Marketing">的 UCI ML 资源库下载的数据集开始。</a></p>
+			<p>下载 ZIP 文件，将其解压到工作区的一个文件夹中，并使用名为<code>bank-additional-full.csv</code>的文件。让学生启动一个新的 Jupyter 笔记本或他们选择的 IDE，并将数据加载到内存中。</p>
+			<h3 id="_idParaDest-82"><a id="_idTextAnchor082"/>练习 18:研究数据维度</h3>
+			<p>让我们使用前一章中探索的简单命令快速接收数据，并了解数据集的一些基本特征。</p>
+			<p>我们正在探索数据的长度和宽度，即行数和列数、每列的名称、每列的数据类型以及每列中存储的内容的高级视图。</p>
+			<p>执行以下步骤浏览银行数据集:</p>
+			<ol>
+				<li>首先，在 RStudio 中导入所有需要的库:<pre>library(dplyr)
+library(ggplot2)
+library(repr)
+library(cowplot)</pre></li>
+				<li>Now, use the <code>option</code> method to set the <code>width</code> and <code>height</code> of the plot as <code>12</code> and <code>4</code>, respectively:<pre>options(repr.plot.width=12, repr.plot.height=4)</pre><p>确保您下载了<code>bank-additional-full.csv</code>文件并将其放在适当的文件夹中。你可以从<a href="http://bit.ly/2DR4P9I">http://bit.ly/2DR4P9I</a>访问该文件。</p></li>
+				<li>使用以下命令创建一个 DataFrame 对象并读取 CSV 文件:<pre>df &lt;- read.csv("/Chapter 2/Data/bank-additional/bank-additional-full.csv",sep=';')</pre></li>
+				<li>Now, use the following command to display the data from the dataset:<pre>str(df)</pre><p>输出如下所示:</p></li>
+			</ol>
+			<div><div><img src="img/C12624_02_02.jpg" alt="Figure 2.2: Bank data from the bank-additional-full CSV file&#13;&#10;"/>
+				</div>
+			</div>
+			<h6>图 2.2:来自银行-附加-完整 CSV 文件的银行数据</h6>
+			<p>在前面的例子中，我们使用 R 中可用的传统的<code>read.csv</code>函数将文件读入内存。我们向<code>sep=";"</code>函数添加了一个参数，因为文件是用分号分隔的。<code>str</code>函数打印我们需要的关于数据集的高级信息。如果仔细观察输出片段，可以看到第一行表示数据的形状，即行数/观察数和列数/变量数。</p>
+			<p>输出片段中接下来的 21 行让我们先睹为快数据集中的每个变量。它显示变量的名称、数据类型和数据集中的前几个值。我们每列都有一行。<code>str</code>函数实际上为我们提供了整个数据集的宏观视图。</p>
+			<p>从数据集中可以看到，我们有 20 个自变量，如<code>age</code>、<code>job</code>和<code>education</code>，以及一个结果/因变量— <code>y</code>。在这里，结果变量定义了向客户发出的活动呼叫是否导致了与<code>yes</code>或<code>no</code>的成功存款注册。为了理解整个数据集，我们现在需要研究数据集中的每个变量。让我们首先跳到单变量分析。</p>
+			<h2 id="_idParaDest-83"><a id="_idTextAnchor083"/>单变量分析</h2>
+			<p><code>age</code>、<code>duration</code>、<code>nr.employed</code>(数据集中的数字特征)和许多其他特征，我们查看诸如最小值、最大值、平均值、标准偏差和百分位数分布的汇总统计。这些方法一起帮助我们理解数据的分布。类似地，对于诸如<code>job</code>、<code>marital</code>和<code>education</code>的分类特征，我们需要研究特征中的不同值以及这些值的频率。为此，我们可以实现一些分析、可视化和统计技术。让我们来看看探索数字特征的分析和可视化技术。</p>
+			<h3 id="_idParaDest-84"><a id="_idTextAnchor084"/>探索数字/连续特征</h3>
+			<p>如果您研究了前面的输出片段，您可能会注意到数据集中混合了数字和分类特征。让我们从数据集中的第一个特征开始，这是一个名为<code>age</code>的数字特征。顾名思义，它表示目标客户的年龄。让我们看看该特性的汇总统计数据，并使用一个简单的箱线图对其进行可视化。</p>
+			<h3 id="_idParaDest-85"><a id="_idTextAnchor085"/>练习 19:使用方框图可视化数据</h3>
+			<p>在本练习中，我们将探索使用箱线图进行单变量分析，解释如何解释箱线图，并浏览代码。</p>
+			<p>执行以下步骤，使用箱线图显示数据:</p>
+			<ol>
+				<li value="1">首先，使用以下命令导入 ggplot2 包:<pre>library(ggplot2)</pre></li>
+				<li>创建一个数据帧对象<code>df</code>，并通过以下命令使用<code>bank-additional-full.csv</code>文件:<pre>df &lt;- read.csv("/Chapter 2/Data/bank-additional/bank-additional-full.csv",sep=';')</pre></li>
+				<li>Print the <code>age</code> data, such as <code>mean</code> and <code>max</code>, using the following command:<pre>print(summary(df$age))</pre><p>输出如下所示:</p><pre>Min. 1st Qu.  Median    Mean 3rd Qu.    Max. 
+17.00   32.00   38.00   40.02   47.00   98.00</pre></li>
+				<li>Next, print the standard deviation of age as follows:<pre>print(paste("Std.Dev:",round(sd(df$age),2)))</pre><p>输出如下所示:</p><pre>[1] "Std.Dev: 10.42"</pre></li>
+				<li>Now, plot the boxplot using of age with following parameters:<pre>ggplot(data=df,aes(y=age)) + geom_boxplot(outlier.colour="black")</pre><p>输出如下所示:</p></li>
+			</ol>
+			<div><div><img src="img/C12624_02_03.jpg" alt="Figure 2.3: Boxplot of age.&#13;&#10;"/>
+				</div>
+			</div>
+			<h6>图 2.3:年龄的箱线图。</h6>
+			<p>我们首先加载<code>ggplot2</code>库，它为可视化数据提供了方便的函数。r 提供了一个名为<code>summary</code>的简单函数，它打印汇总统计数据，比如最小值、最大值、中值、平均值、第 75 个百分点值和第 25 个百分点值。下一行使用<code>sd</code>函数计算标准偏差，最后一行使用<code>ggplot</code>库绘制数据的箱线图。</p>
+			<p>如果您研究汇总统计数据输出的变量，我们可以看到年龄的最小值为 17，最大值为 98，平均值为 42。如果你仔细看看第 75 百分位(第 3 个四分位)和第 100 百分位(最大值)之间的差距，我们可以看到一个巨大的跳跃。这表明年龄变量中存在异常值。异常值的存在会错误地改变你的分析结论。在某些情况下，当只有一个值为第 75 百分位的数据点时，您的平均值将向右移动。在使用平均值作为变量估计值的场景中，对该特性的整体理解可能会产生误导。</p>
+			<p>另一方面，箱线图帮助我们以一种简单明了的方式直观地消费这些信息。箱线图将数据分成三个四分位数。下四分位数，即方框下面的线，代表最小值和第 25 个百分位数。中间四分位数代表第 25 至第 50 至第 75 百分位。上四分位数代表第 75 至第 100 百分位。第 100 百分位以上的点是由内部函数确定的异常值。正如我们所看到的，来自汇总统计数据的观察结果与箱线图一致。我们确实看到了异常值，标记为上四分位数上方的点。</p>
+			<p>在下一个练习中，我们将使用直方图对年龄变量执行 EDA。让我们看看我们能从直方图中得到什么启示。</p>
+			<h3 id="_idParaDest-86"><a id="_idTextAnchor086"/>练习 20:使用直方图可视化数据</h3>
+			<p>在本练习中，我们将讨论如何解释直方图和异常值。让我们继续上一个练习。</p>
+			<p>为了获得更详细的数据视图并更好地理解<code>age</code>变量是如何组织的，我们可以使用直方图。直方图是一种特殊的条形图，其中数据被分组并按顺序排列成称为<code>bins</code>的相等间隔，并绘制出各个条块中数据点的频率。直方图有助于我们更有效地理解数据的分布。该练习绘制了直方图，以帮助我们更有效地可视化数据。</p>
+			<p>执行以下步骤:</p>
+			<ol>
+				<li value="1">首先，使用以下命令导入 ggplot2 包:<pre>library(ggplot2)</pre></li>
+				<li>创建一个数据帧对象<code>df</code>，并通过以下命令使用<code>bank-additional-full.csv</code>文件:<pre>df &lt;- read.csv("/Chapter 2/Data/bank-additional/bank-additional-full.csv",sep=';')</pre></li>
+				<li>Now, use the following command to plot the histogram for age using the provided parameters:<pre>ggplot(data=df,aes(x=age)) + 
+       geom_histogram(bins=10,fill="blue", color="black", alpha =0.5)  + 
+       ggtitle("Histogram for Age") + 
+       theme_bw()  </pre><p>输出如下所示:</p></li>
+			</ol>
+			<div><div><img src="img/C12624_02_04.jpg" alt="Figure 2.4: Histogram for age&#13;&#10; &#13;&#10;"/>
+				</div>
+			</div>
+			<h6>图 2.4:年龄直方图</h6>
+			<p><code>ggplot</code>函数定义了可视化的基础层，然后是<code>geom_histogram</code>函数，它带有定义直方图相关方面的参数，如条柱数、填充颜色、alpha(不透明度)等等。默认情况下也会计算容器的数量，但是可以通过向<code>bin</code>参数传递一个值来覆盖它，比如<code>bin=10</code>。下一个函数<code>ggtitle</code>用于为情节添加标题，添加<code>theme_bw</code>函数是为了将主题改为黑白而不是默认。<code>theme</code>功能是可选的，添加在这里只是为了视觉上吸引人的情节。</p>
+			<p>正如您可以清楚地看到的，直方图为我们提供了一个更细粒度的特性数据分布视图。我们可以理解，记录的数量在 65 之后急剧减少，只有少数记录的值超过 75。在某些情况下，选择直方图的箱数变得很重要，因为箱数越多，分布越乱，而箱数越少，分布的信息量越少。在我们希望看到更细粒度的分布视图的情况下，我们可以选择使用密度图来可视化，而不是增加直方图的条柱数量，密度图可以在连续的时间间隔内可视化该图，同时使用核平滑来消除噪声。</p>
+			<p>我们也可以用密度图而不是直方图来显示年龄变量。下一个练习将详细介绍如何做这件事。</p>
+			<h3 id="_idParaDest-87"><a id="_idTextAnchor087"/>练习 21:使用密度图可视化数据</h3>
+			<p>在本练习中，我们将展示相同特征<code>age</code>的密度图。</p>
+			<p>执行以下步骤:</p>
+			<ol>
+				<li value="1">首先，使用以下命令导入 ggplot2 包:<pre>library(ggplot2)</pre></li>
+				<li>创建一个数据帧对象<code>df</code>，并通过以下命令使用<code>bank-additional-full.csv</code>文件:<pre>df &lt;- read.csv("/Chapter 2/Data/bank-additional/bank-additional-full.csv",sep=';')</pre></li>
+				<li>Now, use the following command to plot the density plot for age:<pre>ggplot(data=df,aes(x=age)) + geom_density(fill="red",alpha =0.5) + 
+                             ggtitle("Density Plot for Age") + 
+                             theme_bw()</pre><p>输出如下所示:</p></li>
+			</ol>
+			<div><div><img src="img/C12624_02_05.jpg" alt="Figure 2.5: Density plot for age.&#13;&#10;"/>
+				</div>
+			</div>
+			<h6>图 2.5:年龄的密度图。</h6>
+			<p>与之前的练习相似，我们使用相同的基底和<code>ggplot</code>函数进行可视化，并使用不同的<code>geom_density</code>函数进行密度绘图。用于可视化的其余附加功能保持不变。</p>
+			<p>密度图给出了比直方图更精细的细节。虽然这种细节级别也可以通过对直方图使用更多数量的箱来实现，但通常需要一种试凑法来获得最佳数量的箱。在这种情况下，一个更容易的选择是密度图。</p>
+			<p>既然我们已经理解了数字变量的单变量分析的概念，让我们加快对其他变量的数据探索。我们总共有 10 个分类特征和 10 个数字列。让我们试着用直方图来看一下四个数字变量。</p>
+			<p>就像我们为年龄绘制直方图一样，我们可以通过定义一个自定义函数同时为多个变量绘制直方图。下一个练习将展示如何做到这一点。</p>
+			<h3 id="_idParaDest-88"><a id="_idTextAnchor088"/>练习 22:使用直方图可视化多个变量</h3>
+			<p>在本练习中，我们将把四个直方图组合成一个图，每个直方图对应一个感兴趣的变量。我们有<code>campaign</code>，它指示在活动期间执行的联系的数量，还有<code>pdays</code>，它指示自从上一个活动最后一次联系客户以来的天数；值 999 表示以前从未联系过该客户端。<code>previous</code>表示以前为此客户联系的次数，最后，<code>emp.var.rate</code>表示雇佣差异率。</p>
+			<p>让我们执行以下步骤来完成练习:</p>
+			<ol>
+				<li value="1">First, import the <code>cowplot</code> package using the following command:<pre>library(cowplot)</pre><p>确保安装了<code>cowplot</code>包。</p></li>
+				<li>接下来，定义一个函数来绘制所有数字列的直方图:<pre>plot_grid_numeric &lt;- function(df,list_of_variables,ncols=2){
+    plt_matrix&lt;-list()
+    i&lt;-1
+    for(column in list_of_variables){
+        plt_matrix[[i]]&lt;-ggplot(data=df,aes_string(x=column)) + 
+            geom_histogram(binwidth=2,fill="blue", color="black", 
+                           alpha =0.5)  +
+            ggtitle(paste("Histogram for variable: ",column)) + theme_bw()
+            i&lt;-i+1
+            }
+    plot_grid(plotlist=plt_matrix,ncol=2)
+}</pre></li>
+				<li>Now, use the <code>summary</code> function to print the mean, max, and other parameters for the <code>campaign</code>, <code>pdays</code>, <code>previous</code>, and <code>emp.var.rate</code> columns:<pre>summary(df[,c("campaign","pdays","previous","emp.var.rate")])</pre><p>输出如下所示:</p><pre>   campaign          pdays          previous      emp.var.rate     
+Min.   : 1.000   Min.   :  0.0   Min.   :0.000   Min.   :-3.40000  
+1st Qu.: 1.000   1st Qu.:999.0   1st Qu.:0.000   1st Qu.:-1.80000  
+Median : 2.000   Median :999.0   Median :0.000   Median : 1.10000  
+Mean   : 2.568   Mean   :962.5   Mean   :0.173   Mean   : 0.08189  
+3rd Qu.: 3.000   3rd Qu.:999.0   3rd Qu.:0.000   3rd Qu.: 1.40000  
+Max.   :56.000   Max.   :999.0   Max.   :7.000   Max.   : 1.40000</pre></li>
+				<li>Call the function we defined earlier to plot the histogram:<pre>plot_grid_numeric(df,c("campaign","pdays","previous","emp.var.rate"),2)</pre><p>输出如下所示:</p></li>
+			</ol>
+			<div><div><img src="img/C12624_02_06.jpg" alt="Figure 2.6: Visualizing multiple variables using a histogram&#13;&#10;"/>
+				</div>
+			</div>
+			<h6>图 2.6:使用直方图可视化多个变量</h6>
+			<p>在本练习中，我们自动化了将多个同类地块堆叠到一个合并地块的过程。我们首先加载所需的<code>cowplot</code>库。该库提供了为<code>ggplot</code>库渲染的图形创建图形网格的便利函数。如果没有加载库，使用<code>install.packages('cowplot')</code>命令安装软件包。然后我们定义一个名为<code>plot_grid_numeric</code>的函数，它接受参数数据集、要绘制的特性列表以及网格中要使用的列数。如果你观察函数的内部，你会发现我们只是使用一个<code>for</code>循环遍历提供的变量列表，并将各个图收集到一个名为<code>plt_matrix</code>的列表中。稍后，我们使用由<code>cowplot</code>库提供的<code>plot_grid</code>函数将这些图排列成一个有两列的网格。</p>
+			<p>同样的函数可以用来显示任意数量的直方图的网格；根据您的屏幕大小使用一个数字。为了获得最佳效果，当前数量被限制为 4。我们还使用<code>summary</code>函数结合直方图显示同一组数字变量的总体统计数据。</p>
+			<h4>注意</h4>
+			<p class="callout">在前面的函数中没有使用异常处理代码。为了专注于感兴趣的主题，我们暂时忽略了复杂代码的实现。在对非数字变量使用函数的情况下，错误消息不是解决问题的最有效方法。</p>
+			<p>正如我们在前面的图中看到的，我们现在有四个变量一起进行分析。结合直方图研究汇总统计数据有助于我们更好地揭示潜在变量。<code>Campaign</code>有 75%的数值低于或等于 3。我们可以看到在 56 处有一个异常值，但是绝大多数记录的值都小于 5。<code>pdays</code>对于我们的分析似乎不是一个有用的变量，因为几乎所有记录都有默认值 999。1000 中的高栏清楚地表明，几乎没有任何记录会有除 999 以外的值。</p>
+			<p>对于<code>previous</code>变量，我们看到与<code>pdays</code>完全相反的情况；大多数记录的值为 0。最后，<code>emp.var.rate</code>向我们展示了一个有趣的结果。虽然值的范围从<code>-4</code>到<code>2</code>，但是超过一半的记录都是正值。</p>
+			<p>因此，通过对这四个变量的分析，我们可以大致得出这样的结论:之前开展的营销活动并不经常通过电话与客户沟通，或者这也可能意味着，在之前的营销活动中，几乎没有针对当前营销活动联系过任何客户。还有，之前联系的，最多也就联系了 7 次。自上次联系客户以来的天数自然与上一次活动的结果保持同步，因为之前几乎没有联系过任何客户。然而，对于目前的活动，客户平均被联系了 2.5 次，75%的客户被联系了 3 次，有些客户被联系了 56 次。就业差异率是由于宏观经济形势而雇用或解雇多少人的指标。我们知道，在竞选期间的大部分时间里，经济形势相当稳定。</p>
+			<p>与上一节中创建的将直方图堆叠在一起的函数类似，在本活动中，我们将创建另一个函数来堆叠密度图，并创建另一个函数来堆叠箱线图。</p>
+			<h3 id="_idParaDest-89"><a id="_idTextAnchor089"/>活动 4:绘制多个密度图和箱线图</h3>
+			<p>在本练习中，我们将创建一个函数来堆叠密度图，并创建另一个函数来堆叠箱线图。使用新创建的函数来可视化与上一节中相同的变量集，并研究分析数值变量的最有效方法。</p>
+			<p>本活动结束时，您将学会如何在密度图中同时绘制多个变量。这样做可以很容易地一次性比较不同的变量，并得出关于数据的见解。</p>
+			<p>执行以下步骤来完成本练习:</p>
+			<ol>
+				<li value="1">首先，在 RStudio 中加载必要的库和包。</li>
+				<li>将<code>bank-additional-full.csv</code>数据集读入名为<code>df</code>的数据帧。</li>
+				<li>定义密度图的<code>plot_grid_numeric</code>函数:<pre>plot_grid_numeric &lt;- function(df,list_of_variables,ncols=2){
+  plt_matrix&lt;-list()
+  i&lt;-1
+  }
+  plot_grid(plotlist=plt_matrix,ncol=2)
+}</pre></li>
+				<li>Plot the density plot for the <code>campaign</code>, <code>pdays</code>, <code>previous</code>, and <code>emp.var.rate</code> variables:<div><img src="img/C12624_02_07.jpg" alt="Figure 2.7: Density plots for the campaign, pdays, previous, and emp.var.rate variables&#13;&#10;"/></div><h6>图 2.7:活动、天数、前一天和员工变动率变量的密度图</h6><p>观察我们使用直方图获得的解释在密度图中也是明显真实的。因此，这是观察同一趋势的另一个替代图。</p></li>
+				<li>Repeat the steps for the boxplot:<pre>plot_grid_numeric &lt;- function(df,list_of_variables,ncols=2){
+  plt_matrix&lt;-list()
+  i&lt;-1
+}
+plot_grid_numeric(df,c("campaign","pdays","previous","emp.var.rate"),2)</pre><p>剧情如下:</p></li>
+			</ol>
+			<div><div><img src="img/C12624_02_08.jpg" alt="Figure 2.8: Boxplots for the campaign, pdays, previous, and emp.var.rate variables&#13;&#10;"/>
+				</div>
+			</div>
+			<h6>图 2.8:活动、pdays、previous 和 emp.var.rate 变量的箱线图</h6>
+			<p>在箱线图中需要注意的另一点是，它显示了在<code>campaign</code>变量中明显存在异常值，这在其他两个图中并不明显。对于<code>previous</code>和<code>pdays</code>变量也可以进行类似的观察。学生应该在去除异常值后尝试绘制箱线图，并观察它们看起来有多大的不同。</p>
+			<h4>注意</h4>
+			<p class="callout">你可以在第 442 页找到这项活动的解决方案。</p>
+			<h3 id="_idParaDest-90"><a id="_idTextAnchor090"/>练习 23:绘制 nr.employed、euribor3m、cons.conf.idx 和 duration 变量的直方图</h3>
+			<p>在本练习中，我们将学习下一组也是最后一组四个数值变量。我们有<code>nr.employed</code>，表示银行雇用的员工人数，还有<code>euribor3m</code>，表示平均利率的 3 个月欧元银行同业拆借利率。此外，我们还有<code>cons.conf.index</code>，这是一个消费者信心指标，衡量的是消费者通过储蓄和支出活动表达的对国家的乐观程度。最后还有<code>duration</code>，表示最后一次接触持续时间。根据 UCI 提供的元数据，该变量与结果高度相关，并将导致可能的数据泄漏。因此，我们将从未来的分析中去掉这个变量。</p>
+			<p>执行以下步骤研究下一组数值变量:</p>
+			<ol>
+				<li value="1">首先，使用下面的命令导入<code>cowplot</code>包:<pre>library(cowplot)</pre></li>
+				<li>创建一个数据帧对象<code>df</code>，并通过以下命令使用<code>bank-additional-full.csv</code>文件:<pre>df &lt;- read.csv("/Chapter 2/Data/bank-additional/bank-additional-full.csv",sep=';')</pre></li>
+				<li>Print the details using the <code>summary</code> method:<pre>summary(df[,c("nr.employed","euribor3m","cons.conf.idx","duration")])</pre><p>输出如下所示:</p><pre> nr.employed     euribor3m     cons.conf.idx      duration     
+Min.   :4964   Min.   :0.634   Min.   :-50.8   Min.   :   0.0  
+1st Qu.:5099   1st Qu.:1.344   1st Qu.:-42.7   1st Qu.: 102.0  
+Median :5191   Median :4.857   Median :-41.8   Median : 180.0  
+Mean   :5167   Mean   :3.621   Mean   :-40.5   Mean   : 258.3  
+3rd Qu.:5228   3rd Qu.:4.961   3rd Qu.:-36.4   3rd Qu.: 319.0  
+Max.   :5228   Max.   :5.045   Max.   :-26.9   Max.   :4918.0</pre></li>
+				<li>Plot the histogram for the defined variables, as illustrated in the following command:<pre>plot_grid_numeric(df,c("nr.employed","euribor3m","cons.conf.idx","duration"),2)</pre><p>输出如下所示:</p></li>
+			</ol>
+			<div><div><img src="img/C12624_02_09.jpg" alt="Figure 2.9: Histogram of count and duration for various variables&#13;&#10;"/>
+				</div>
+			</div>
+			<h6>图 2.9:各种变量的计数和持续时间直方图</h6>
+			<p>就像<em class="italics">练习 5 </em>，<em class="italics">使用直方图</em>可视化多个变量一样，我们首先使用<code>summary</code>函数对我们期望的变量集执行汇总统计，然后通过调用我们之前定义的相同函数，绘制所有期望变量的组合直方图。</p>
+			<p>如我们所见，雇员人数在<code>5228</code>基本保持不变，但在此期间也减少到不同的数值。这个数字是每季度测量一次的，因此频率不是很动态，这就是为什么我们只能看到以几个箱为中心的值。欧元银行间利率大部分都在 T1 和 T2 之间。只有 1 或 2 条记录的值大于 5，我们可以看到为这个变量测量的最大值是<code>5.045</code>。消费者信心指数大多为负值，这意味着消费者大多对这段时间的经济状况持负面看法。我们在直方图的柱中看到两个峰值，这要求在该时间内最常见的信心指数，并模糊地表明在活动期间指数的有限变化。呼叫的持续时间，以秒为单位，现在在我们的分析中将被忽略。</p>
+			<p>总的来说，据我们所知，该银行的员工人数在活动期间有所增减，大约在 250 人左右，占员工总数的 5%左右。它介于<code>4964</code>和<code>5228</code>之间，大部分时间变化不大。消费者信心指数在此期间大多保持负值，变化不大，欧元银行间同业拆借利率平均为 3.6，大部分记录在 2.5 至 5 之间。</p>
+			<p>现在，让我们继续使用单变量分析来研究分类变量。</p>
+			<h2 id="_idParaDest-91"><a id="_idTextAnchor091"/>探索分类特征</h2>
+			<p>分类特征本质上不同于数值或连续特征，因此以前使用的传统方法在这里不适用。我们可以分析一个分类变量中不同类别的数量以及与每个类别相关的频率。这可以通过简单的分析技术或视觉技术来实现。让我们结合使用这两者来探索分类特征的列表。</p>
+			<h3 id="_idParaDest-92"><a id="_idTextAnchor092"/>练习 24:探索分类特征</h3>
+			<p>在本练习中，我们将从一个简单的变量开始，即<code>marital</code>，它表示客户的婚姻状况。让我们使用<code>dplyr</code>库来执行分组数据聚合。</p>
+			<p>执行以下步骤来完成练习:</p>
+			<ol>
+				<li value="1">首先，使用以下命令在系统中导入<code>dplyr</code>库:<pre>library(dplyr)</pre></li>
+				<li>接下来，我们将创建一个名为<code>marital_distribution</code>的对象，并根据以下条件存储该值:<pre>marital_distribution &lt;- df %&gt;% group_by(marital) %&gt;% 
+                               summarize(Count = n()) %&gt;% 
+                               mutate(Perc.Count = round(Count/sum(Count)*100))</pre></li>
+				<li>Now, print the value stored in the <code>marital_distribution</code> object:<pre>print(marital_distribution)</pre><p>输出如下所示:</p><pre># A tibble: 4 x 3
+  marital  Count Perc.Count
+  &lt;fct&gt;    &lt;int&gt;      &lt;dbl&gt;
+1 divorced  4612         11
+2 married  24928         61
+3 single   11568         28
+4 unknown     80          0</pre></li>
+			</ol>
+			<p>为了计算 categorical 列中不同类的数量，并获得每个单独类中记录的数量，我们使用了<code>dplyr</code>库下的<code>group_by</code>函数。<code>%&gt;%</code>，也称为<code>marital</code>，然后将输出传递给<code>summarize</code>函数，该函数使用我们提供的聚合函数将数据帧聚合到分组级别；在这种情况下，<code>n()</code>是一个简单的<code>count</code>等价物。最后，我们使用<code>mutate</code>函数来计算每个组成员的计数百分比。</p>
+			<p>我们看到，大部分营销电话是打给已婚客户的，约占 61%，其次是打给单身客户的，占 28%，等等。</p>
+			<h3 id="_idParaDest-93"><a id="_idTextAnchor093"/>练习 25:使用条形图探索分类特征</h3>
+			<p>在本练习中，我们将绘制一个条形图，显示每个类别的频率计数。我们也可以用柱状图来表示每一类的频率分布。</p>
+			<p>执行以下步骤来完成练习:</p>
+			<ol>
+				<li value="1">首先，使用下面的命令导入<code>ggplot2</code>包:<pre>library(ggplot2)</pre></li>
+				<li>创建一个数据帧对象<code>df</code>，并通过以下命令使用<code>bank-additional-full.csv</code>文件:<pre>df &lt;- read.csv("/Chapter 2/Data/bank-additional/bank-additional-full.csv",sep=';')</pre></li>
+				<li>Now, plot the bar chart of marital status per count using the following command:<pre>ggplot(data = marital_distribution,aes(x=marital,y=Perc.Count)) + 
+              geom_bar(stat="identity",fill="blue",alpha=0.6) + 
+              geom_text(aes(label=marital_distribution$Perc.Count, vjust = -0.3))</pre><p>输出如下所示:</p></li>
+			</ol>
+			<div><div><img src="img/C12624_02_10.jpg" alt="Figure 2.10: Bar chart of marital status per count&#13;&#10;"/>
+				</div>
+			</div>
+			<h6>图 2.10:每个计数的婚姻状况条形图</h6>
+			<p>我们使用在前面代码片段中设计的相同数据集，它计算每个类的频率及其相对百分比。为了绘制条形图，我们使用相同的基础函数<code>ggplot</code>，其中我们定义了<em class="italics"> x </em>和<em class="italics"> y </em>变量的美学，并使用<code>geom_bar</code>函数添加条形图。<code>geom_text</code>函数允许我们给图中的每个条形添加标签。</p>
+			<p>我们现在可以看到上一个练习中显示的相同数字，在这里显示为一个条形图。在变量中有大量类的情况下，浏览每个单独的类来研究它们可能不是最有效的方法。一个简单的图表很容易帮助我们以一种简单易懂的方式理解分类变量的频率分布。</p>
+			<h3 id="_idParaDest-94"><a id="_idTextAnchor094"/>练习 26:使用饼图探索分类特征</h3>
+			<p>在本练习中，我们将定义饼图以及其中的各种组件。</p>
+			<p>与条形图类似，我们也有一个饼图，可以更容易地理解类的百分比分布。执行以下步骤，使用饼图可视化相同的变量，即婚姻状况:</p>
+			<ol>
+				<li value="1">首先，使用下面的命令导入<code>ggplot2</code>包:<pre>library(ggplot2)</pre></li>
+				<li>创建一个数据帧对象<code>df</code>，并通过以下命令使用<code>bank-additional-full.csv</code>文件:<pre>df &lt;- read.csv("/Chapter 2/Data/bank-additional/bank-additional-full.csv",sep=';')</pre></li>
+				<li>接下来，使用以下命令定义标签位置:<pre>plot_breaks = 100 - (cumsum(marital_distribution$Perc.Count) - 
+                   marital_distribution$Perc.Count/2)</pre></li>
+				<li>现在，定义图的标签:<pre>plot_labels = paste0(marital_distribution$marital,"-",marital_distribution$Perc.Count,"%")</pre></li>
+				<li>为更好的视觉效果设置绘图大小:<pre>options(repr.plot.width=12, repr.plot.height=8)</pre></li>
+				<li>使用以下命令创建饼图:<pre>ggplot(data = marital_distribution,aes(x=1,y=Perc.Count, fill=marital)) + 
+              geom_bar(stat="identity") + #Creates the base bar visual
+              coord_polar(theta ="y")  + #Creates the pie chart
+              scale_y_continuous(breaks=plot_breaks, labels = plot_labels,position = "left") + 
+              theme(axis.text.x = element_text(angle = 30, hjust =1)) + #rotates the labels
+              theme(text = element_text(size=15)) + #increases the font size for the legend
+              ggtitle("Percentage Distribution of Marital Status") #Adds the plot title</pre></li>
+			</ol>
+			<div><div><img src="img/C12624_02_11.jpg" alt="Figure 2.11: Pie chart for the percentage distribution for the marital status&#13;&#10;"/>
+				</div>
+			</div>
+			<h6>图 2.11:婚姻状况百分比分布的饼图</h6>
+			<p>我们首先定义几个额外的变量，这将有助于我们以一种更简单的方式得到这个图。为了给饼图加标签，我们需要断点和实际标签。理想情况下，断点应该位于饼图的中间部分。因此，我们取百分比分布的累积和，并减去每个类别的一半，以找到该部分的中点。然后我们从 100 中减去整数，以顺时针方向排列标签。</p>
+			<p>下一步是定义每个饼图块的标签；我们使用<code>paste</code>函数连接标签名称和实际百分比值。<code>ggplot</code>中的饼状图功能通过在条形图顶部构建元素来工作。我们首先使用来自<code>ggplot</code>和<code>geom_bar</code>的基底来渲染堆积条形图的基底，并使用<code>coord_polar</code>函数将其转换成所需的饼图。<code>scale_y_continuous</code>功能有助于在饼图分布上放置标签。下一行将旋转角度添加到文本的位置。<code>theme</code>函数的<code>element_text</code>部分中的<code>size</code>参数定义了图中文本的字体大小。其余的和我们在前面的情节中学习的一样。</p>
+			<p>我们可以看到，饼图为我们提供了一种直观的方式来探索每个变量中类别的百分比分布。需要注意的是，选择饼状图而不是条形图是基于一个变量中不同类别的数量。虽然饼图在视觉上更吸引人，有许多不同的类，饼图变得过于拥挤。</p>
+			<h4>注意</h4>
+			<p class="callout">当一个分类变量中不同类别的数量很大时，最好避免使用饼图。没有明确的规则，但是任何让饼图看起来混乱的东西都不适合研究。</p>
+			<h3 id="_idParaDest-95"><a id="_idTextAnchor095"/>练习 27:自动绘制分类变量</h3>
+			<p>在本练习中，我们将自动绘制分类变量。</p>
+			<p>就像数字变量一样，我们也有 10 个分类变量，不包括目标变量。类似于自动探索数字特征，现在让我们为分类变量创建一个函数。为了简单起见，我们将主要使用百分比分布的箱线图，而不是饼图。我们将从四个分类特征开始，然后转移到下一个余数集。</p>
+			<p>执行以下步骤来完成练习:</p>
+			<ol>
+				<li value="1">首先，使用下面的命令导入<code>cowplot</code>包:<pre>library(cowplot)</pre></li>
+				<li>定义一个函数来绘制所有数值列的直方图:<pre>plot_grid_categorical &lt;- function(df,list_of_variables,ncols=2){
+    plt_matrix &lt;- list()
+    i&lt;-1
+    #Iterate for each variable
+    for(column in list_of_variables){
+        #Creating a temporary DataFrame with the aggregation
+        var.dist &lt;- df %&gt;% group_by_(column) %&gt;% 
+                           summarize(Count = n()) %&gt;% 
+                           mutate(Perc.Count = round(Count/sum(Count)*100,1))
+        options(repr.plot.width=12, repr.plot.height=10)
+        plt_matrix[[i]]&lt;-ggplot(data = var.dist,aes_string(x=column,y="Perc.Count")) +
+            geom_bar(stat="identity",fill="blue",alpha=0.6) + #Defines the bar plot
+            geom_text(label=var.dist$Perc.Count,vjust=-0.3)+  #Adds the labels
+            theme(axis.text.x = element_text(angle = 90, vjust = 1)) + #rotates the labels
+            ggtitle(paste("Percentage Distribution of variable: ",column))  #Creates the title +
+            i&lt;-i+1
+    }
+        plot_grid(plotlist=plt_matrix,ncol=ncols) #plots the grid
+}</pre></li>
+				<li>Next, call the <code>summary</code> statistics using the following command:<pre>summary(df[,c("job","education","default","contact")])</pre><p>输出如下所示:</p><pre>          job                      education        default           contact     
+ admin.     :10422   university.degree  :12168   no     :32588   cellular :26144  
+ blue-collar: 9254   high.school        : 9515   unknown: 8597   telephone:15044  
+ technician : 6743   basic.9y           : 6045   yes    :    3
+ services   : 3969   professional.course: 5243
+ management : 2924   basic.4y           : 4176
+ retired    : 1720   basic.6y           : 2292
+ (Other)    : 6156   (Other)            : 1749</pre></li>
+				<li>Call the function we defined earlier to plot the histogram:<pre>plot_grid_categorical(df,c("job","education","default","contact"),2)</pre><p>输出如下所示:</p></li>
+			</ol>
+			<div><div><img src="img/C12624_02_12.jpg" alt="Figure 2.12: Bar plot for categorical variables&#13;&#10;"/>
+				</div>
+			</div>
+			<h6>图 2.12:分类变量的条形图</h6>
+			<p>与我们之前为数字特征可视化自动化创建的函数类似，我们创建了一个简单的函数来研究分类特征的百分比分布。对该函数的一些补充是创建临时聚合数据集和对绘图进行一些额外的修饰性增强。我们添加标签并将它们旋转 30 度，以便它们可以整齐地与绘图对齐，其余的保持不变。我们通过调用<code>categorical</code>列上的<code>summary</code>函数来获得频率计数。与数字列类似，我们首先使用<code>summary</code>函数来研究分类列，然后使用已定义的函数来可视化整理条形图。</p>
+			<p>探索<code>job</code>特性，我们可以看到 12 个不同的值，其中大部分记录是管理员、蓝领和技术人员的。总的来说，<code>job</code>类别似乎具有相当多样化的值分布。客户的教育水平也有不同的价值观，大约 50%的价值观来自高中和大学。对于<code>default</code>变量，它表明客户以前是否有信用违约，我们有大约 80%的值为<code>no</code>，大约 20%未知。这似乎不是有用的信息。最后，<code>contact</code>定义了用于竞选宣传的联系方式，显示 64%是通过手机，其余是通过固定电话。</p>
+			<p>让我们继续，对下一组特性重复同样的分析。</p>
+			<h3 id="_idParaDest-96"><a id="_idTextAnchor096"/>练习 28:自动绘制剩余分类变量</h3>
+			<p>在本练习中，我们将对下一组四个分类变量重复使用相同的函数。请记住，您需要使用使用<code>summary</code>命令生成的频率计数结合图表来解释数值。</p>
+			<p>让我们执行以下步骤来完成练习:</p>
+			<ol>
+				<li value="1">首先，使用下面的命令导入<code>cowplot</code>包:<pre>library(cowplot)</pre></li>
+				<li>创建一个数据帧对象<code>df</code>，并通过以下命令使用<code>bank-additional-full.csv</code>文件:<pre>df &lt;- read.csv("/Chapter 2/Data/bank-additional/bank-additional-full.csv",sep=';')</pre></li>
+				<li>Next, call the <code>summary</code> statistics using the following command:<pre>summary(df[,c("loan","month","day_of_week","poutcome")])</pre><p>输出如下所示:</p><pre>      loan           month       day_of_week        poutcome    
+ no     :33950   may    :13769   fri:7827    failure    : 4252  
+ unknown:  990   jul    : 7174   mon:8514    nonexistent:35563  
+ yes    : 6248   aug    : 6178   thu:8623    success    : 1373  
+                 jun    : 5318   tue:8090                       
+                 nov    : 4101   wed:8134                       
+                 apr    : 2632                                  
+                 (Other): 2016</pre></li>
+				<li>Call the defined function to plot the histogram:<pre>plot_grid_categorical(df,c("loan","month","day_of_week","poutcome"),2)</pre><p>输出如下所示:</p></li>
+			</ol>
+			<div><div><img src="img/C12624_02_13.jpg" alt="Figure 2.13: Automate plotting for the remaining categorical variables&#13;&#10;"/>
+				</div>
+			</div>
+			<h6>图 2.13:剩余分类变量的自动绘图</h6>
+			<p>我们重用以前定义的函数来研究新的四个变量的集合，就像我们研究以前的特性集合一样。</p>
+			<p><code>loan</code>变量表示客户是否有个人贷款。我们约有 86.6%的客户没有个人贷款，10.3%有贷款，3.3%身份不明。类似地，<code>month</code>变量指示执行活动调用的实际月份。我们看到，大部分沟通是在<code>may</code>月份进行的，其次是<code>jul</code>和<code>aug</code>。总的来说，<code>month</code>特性似乎也是一个相当多样化的变量，具有良好的值分布。<code>day_of_week</code>变量显示了一周中所有日子的一致分布。<code>poutcome</code>表示之前执行的活动的结果；绝大多数是不存在的，大约 3.3%的一小部分是成功的，大约 10%是失败的。</p>
+			<h3 id="_idParaDest-97"><a id="_idTextAnchor097"/>练习 29:探索最后剩下的分类变量和目标变量</h3>
+			<p>最后，让我们探索最后剩下的分类变量和目标变量。因为两者都是绝对的，我们可以继续使用相同的函数进行探索。</p>
+			<p>对最后一个独立分类变量和因变量(也是分类变量)重复相同的过程:</p>
+			<ol>
+				<li value="1">First, after importing the required packages and creating DataFrame object, call the summary statistics using the following command:<pre>summary(df[,c("y","housing")])</pre><p>输出如下所示:</p><pre>   y            housing     
+ no :36548   no     :18622  
+ yes: 4640   unknown:  990  
+             yes    :21576</pre></li>
+				<li>Call the defined function to plot the histogram:<pre>plot_grid_categorical(df,c("y","housing"),2)</pre><p>输出如下所示:</p></li>
+			</ol>
+			<div><div><img src="img/C12624_02_14.jpg" alt="Figure 2.14: Histogram of housing per count&#13;&#10;"/>
+				</div>
+			</div>
+			<h6>图 2.14:每次计数的房屋直方图</h6>
+			<p>如果我们仔细观察结果变量的分布，我们可以看到大多数客户对活动电话作出了负面回应。只有大约 11%的竞选团队积极响应了此次活动。同样，如果我们看一下<code>housing</code>变量，我们可以看到大约 50%的客户有住房贷款。</p>
+			<p>总而言之，我们可以将我们的观察结果提炼如下:</p>
+			<ul>
+				<li>该活动主要针对以前没有接触过的新客户。</li>
+				<li>大约 60%的客户是已婚人士，80%的客户没有信用违约记录。</li>
+				<li>大约 50%的客户有住房贷款，超过 80%的客户从未选择过个人贷款。</li>
+				<li>这场运动在 5 月份最为活跃，在 7 月和 8 月表现出相当强劲的势头。</li>
+				<li>超过 60%的宣传活动是通过手机进行的，超过 50%的客户群至少拥有高中学历。</li>
+				<li>总体而言，只有 11%的竞选呼吁得到了积极回应。</li>
+			</ul>
+			<p>随着所有数字和分类变量的单变量分析的完成，我们现在对数据传达的故事有了一个公平的理解。我们几乎了解了每个数据维度及其分布。让我们继续探索 EDA 的另一个有趣的方面:双变量分析。</p>
+			<h2 id="_idParaDest-98"><a id="_idTextAnchor098"/>双变量分析</h2>
+			<p>在<strong class="bold">双变量分析</strong>中，我们将我们的分析扩展到一起研究两个变量。在我们的用例中，我们有大约 20 个独立变量。研究可用的 20 个变量的所有排列组合确实是可能的，但我们不会在这一章进行到那种程度。在我们的用例中，我们更感兴趣的是研究导致活动表现不佳的所有因素。因此，我们的主要重点将是进行双变量分析，并研究所有自变量和我们的从属目标变量之间的关系。同样，根据变量的类型，我们将有不同类型的可视化或分析技术来分析两个变量之间的关系。可能的组合有数字和数字，以及数字和分类。假设我们的因变量是一个分类变量，我们可能需要探究列表中两个自变量之间的关系，以研究两个数值变量之间的关系。让我们开始吧。</p>
+			<h2 id="_idParaDest-99"><a id="_idTextAnchor099"/>研究两个数值变量之间的关系</h2>
+			<p>为了理解如何研究两个数值变量之间的关系，我们可以利用散点图。它是数据的二维可视化，其中每个变量都绘制在沿其长度的轴上。通过研究可视化的趋势，可以很容易地确定变量之间的关系。让我们看看下面练习中的一个例子。</p>
+			<h3 id="_idParaDest-100"><a id="_idTextAnchor100"/>练习 30:研究员工差异率与员工人数之间的关系</h3>
+			<p>我们来研究一下员工差异率和员工人数的关系。理想情况下，员工数量应该随着变化率的增加而增加。</p>
+			<p>执行以下步骤来完成练习:</p>
+			<ol>
+				<li value="1">首先，使用下面的命令导入<code>ggplot2</code>包:<pre>library(ggplot2)</pre></li>
+				<li>创建一个数据帧对象<code>df</code>，并通过以下命令使用<code>bank-additional-full.csv</code>文件:<pre>df &lt;- read.csv("/Chapter 2/Data/bank-additional/bank-additional-full.csv",sep=';')</pre></li>
+				<li>Now, plot the scatter plot using the following command:<pre>ggplot(data=df,aes(x=emp.var.rate,y=nr.employed)) + geom_point(size=4) + 
+ggtitle("Scatterplot of Employment variation rate v/s Number of Employees")</pre><p>输出如下所示:</p></li>
+			</ol>
+			<div><div><img src="img/C12624_02_15.jpg" alt="Figure 2.15: Scatterplot of employment variation versus the number of employees&#13;&#10;"/>
+				</div>
+			</div>
+			<h6>图 2.15:就业变化与雇员人数的散点图</h6>
+			<p>我们使用相同的基础函数<code>ggplot</code>，散点图使用新的包装器。<code>ggplot</code>中的<code>geom_point</code>函数为使用散点图提供了必要的构造。</p>
+			<p>我们可以看到一个总体的增长趋势，即随着就业差异率的增加，我们看到雇员的数量也在增加。点数较少是由于<code>nr.employed</code>中的重复记录。</p>
+			<h2 id="_idParaDest-101"><a id="_idTextAnchor101"/>研究分类变量和数值变量之间的关系</h2>
+			<p>让我们首先回忆一下研究数字变量和分类变量之间关系的方法，并讨论执行它的方法。</p>
+			<p>在本节中，我们将讨论可用于汇总数据的不同聚合指标。到目前为止，我们已经使用了<code>avg</code>，但是更好的方法是使用<code>avg</code>、<code>min</code>、<code>max</code>和其他指标的组合。</p>
+			<h3 id="_idParaDest-102">练习 31:研究 y 和年龄变量之间的关系</h3>
+			<p>我们有一个分类因变量和九个数字变量要研究。从小处着手，我们将首先探索我们的目标<code>y</code>和<code>age</code>之间的关系。为了研究分类变量和数字变量之间的关系，我们可以选择一种简单的分析技术，计算每个目标结果的平均年龄；如果我们看到明显的差异，我们可以从观察中得到深刻的见解。</p>
+			<p>在本练习中，我们将计算每个目标结果的平均年龄，并计算每个存储桶中的记录数，然后进行可视化表示。</p>
+			<p>执行以下步骤:</p>
+			<ol>
+				<li value="1">首先，使用下面的命令导入<code>ggplot2</code>包:<pre>library(ggplot2)</pre></li>
+				<li>创建一个数据帧对象<code>df</code>，并通过以下命令使用<code>bank-additional-full.csv</code>文件:<pre>df &lt;- read.csv("/Chapter 2/Data/bank-additional/bank-additional-full.csv",sep=';')</pre></li>
+				<li>使用下面的命令创建一个<code>temp</code>对象并存储该值:<pre>temp &lt;- df %&gt;% group_by(y) %&gt;% 
+                           summarize(Avg.Age = round(mean(age),2),
+                                     Num.Records = n())</pre></li>
+				<li>Print the value stored in the <code>temp</code> object:<pre>print(temp)</pre><p>输出如下所示:</p><pre># A tibble: 2 x 3
+  y     Avg.Age Num.Records
+  &lt;fct&gt;   &lt;dbl&gt;       &lt;int&gt;
+1 no       39.9       36548
+2 yes      40.9        4640</pre></li>
+				<li>Now, create a plot using the <code>ggplot</code> command:<pre>ggplot(data= temp, aes(x=y, y=Avg.Age)) + 
+       geom_bar(stat="identity",fill="blue",alpha= 0.5) +   #Creates the bar plot
+       geom_text(label=temp$Avg.Age,vjust=-0.3)+  #Adds the label
+       ggtitle(paste("Average Age across target outcome"))  #Creates the title</pre><p>输出如下所示:</p></li>
+			</ol>
+			<div><div><img src="img/C12624_02_16.jpg" alt="Figure 2.16: Histogram for the average age across target outcome&#13;&#10;"/>
+				</div>
+			</div>
+			<h6>图 2.16:目标结果的平均年龄直方图</h6>
+			<p>第一行代码创建临时聚合数据集，汇总每个类别中的平均年龄和记录数。使用的绘图功能与我们之前的视觉效果一致。我们用<code>geom_bar</code>扩展了<code>ggplot</code>函数来呈现柱状图。</p>
+			<p>我们可以看到，这两种结果几乎没有任何区别。我们没有看到任何有趣的模式。</p>
+			<h4>注意</h4>
+			<p class="callout">在双变量分析中，在得出任何有趣的模式作为见解之前，我们需要小心谨慎。在许多情况下，由于数据的偏斜分布，这些模式看起来非常有趣。</p>
+			<p>让我们继续下一组变量。</p>
+			<h3 id="_idParaDest-103"><a id="_idTextAnchor103"/>练习 32:研究平均值和 y 变量之间的关系</h3>
+			<p>在本练习中，我们将研究下一组变量:<code>average</code>和<code>y</code>之间的关系。</p>
+			<p>执行以下步骤来完成练习:</p>
+			<ol>
+				<li value="1">导入所需的库并创建 DataFrame 对象。</li>
+				<li>接下来，使用下面的命令创建<code>plot_bivariate_numeric_and_categorical</code>对象:<pre>plot_bivariate_numeric_and_categorical &lt;- function(df,target,list_of_variables,ncols=2){
+    target&lt;-sym(target) #Defined for converting text to column names
+    plt_matrix &lt;- list()
+    i&lt;-1
+for(column in list_of_variables){
+        col &lt;-sym(column) #defined for converting text to column name
+        temp &lt;- df %&gt;% group_by(!!sym(target)) %&gt;% 
+                       summarize(Avg.Val = round(mean(!!sym(col)),2))
+        options(repr.plot.width=12, repr.plot.height=8) #Defines plot size
+           plt_matrix[[i]]&lt;-ggplot(data= temp, aes(x=!!sym(target), y=Avg.Val)) + 
+           geom_bar(stat="identity",fill="blue",alpha= 0.5) +   
+           geom_text(label=temp$Avg.Val,vjust=-0.3)+  #Adds the labels
+           ggtitle(paste("Average",column,"across target outcomes"))  #Creates the title 
+            i&lt;-i+1
+    }
+    plot_grid(plotlist = plt_matrix,ncol=ncols)
+}</pre></li>
+				<li>Now, print the distribution of records across target outcomes:<pre>print("Distribution of records across target outcomes-")
+print(table(df$y))</pre><p>输出如下所示:</p><pre>[1] "Distribution of records across target outcomes-"
+   no   yes 
+36548  4640</pre></li>
+				<li>Now, plot the histogram using the following command for the defined variables:<pre>plot_bivariate_numeric_and_categorical(df,"y",c("campaign","pdays","previous","emp.var.rate"),2)</pre><p>输出如下所示:</p></li>
+			</ol>
+			<div><div><img src="img/C12624_02_17.jpg" alt="Figure 2.17: Histogram of average value versus the y variable&#13;&#10;"/>
+				</div>
+			</div>
+			<h6>图 2.17:平均值与 y 变量的直方图</h6>
+			<p>为了自动执行分类变量和数值变量之间的双变量分析的数据探索任务，我们定义了一个类似于我们在上一练习中定义的函数。我们另外使用了<code>sym</code>函数，这将帮助我们在函数中使用动态列名。使用<code>!!sym(column)</code>将字符串转换成实际的列名，类似于传递实际值。前一个函数首先聚合整个感兴趣变量的目标平均值。然后，<code>plot</code>函数使用这些信息绘制条形图，显示目标结果的平均值。</p>
+			<p>在双变量分析中，重要的是在得出特定见解之前仔细验证观察到的模式。在某些情况下，异常值可能会扭曲结果，从而产生不正确的结果。此外，特定模式的记录越少，得出的结论也可能是有风险的模式。始终建议收集观察到的所有见解，并使用额外的广泛 EDA 或统计技术进一步验证它们的重要性。</p>
+			<p>在这里，我们看不到任何突出的结论。在<code>campaign</code>变量中，对于成功的营销活动而言，营销活动期间的平均联系次数略低，但这一差异太小，无法得出任何可能的结论。<code>pdays</code>，表示自上次活动以来的天数，显示目标结果之间的巨大差异。</p>
+			<p>然而，这种差异纯粹是因为在之前的活动中没有联系到大多数客户。所有这些记录的值都设置为 999。<code>previous</code>也是如此；虽然这两者之间有相当大的区别，但大多数客户都是在当前活动中第一次接触到的。然而，就业差异率显示出与直觉相反的结果。实际上，当结果为<code>yes</code>时，我们会期望方差率更高，但我们看到的是相反的情况。这听起来很有趣，我们将暂时记下这一见解，稍后在做出任何结论之前回来进行更多的验证。</p>
+			<p>让我们转到下一组要用分类因变量研究的分类因变量。</p>
+			<h3 id="_idParaDest-104"><a id="_idTextAnchor104"/>练习 33:研究 cons.price.idx、cons.conf.idx、curibor3m 和 nr.employed 变量之间的关系</h3>
+			<p>让我们转到下一组要用分类因变量研究的分类因变量。在本练习中，我们将使用直方图探索<code>cons.price.idx</code>、<code>cons.conf.idx</code>、<code>euribor3m</code>和<code>nr.employed</code>与目标变量<code>y</code>之间的关系。</p>
+			<ol>
+				<li value="1">导入所需的库并创建 DataFrame 对象。</li>
+				<li>Next, create a <code>plot_bivariate_numeric_and_categorical</code> function and plot the histogram:<pre>plot_bivariate_numeric_and_categorical(df,"y",
+               c("cons.price.idx","cons.conf.idx", "euribor3m", "nr.employed"),2)</pre><p>输出如下所示:</p></li>
+			</ol>
+			<div><div><img src="img/C12624_02_18.jpg" alt="Figure 2.18: Histogram of the cons.price.idx, cons.conf.idx, euribor3m, and nr.employed variables&#13;&#10;"/>
+				</div>
+			</div>
+			<h6>图 2.18:cons . price . idx、cons.conf.idx、euribor3m 和 nr.employed 变量的直方图</h6>
+			<p>同样，在大多数情况下，我们看不到任何显著的模式。然而，<code>euribor3m</code>变量显示了活动的<code>yes</code>和<code>no</code>结果的平均值之间的一些良好差异，这似乎又一次违背了直觉。理想情况下，我们预计银行存款会增加，利率也会提高。因此，让我们记下这一见解，稍后进行验证。</p>
+			<p>继续，让我们现在探索两个分类变量之间的关系。</p>
+			<h2 id="_idParaDest-105"><a id="_idTextAnchor105"/>研究两个分类变量之间的关系</h2>
+			<p>为了研究两个分类变量之间存在的关系和模式，我们可以首先探索每个变量类别的频率分布。在任何结果中更高的浓度可能是一个潜在的洞察力。最有效的可视化方法是使用堆积条形图。</p>
+			<p>堆积条形图将帮助我们观察目标变量在多个分类变量中的分布。该分布将揭示分类变量中的特定类别是否支配目标变量<code>y</code>。如果是，我们可以进一步探讨它对我们问题的影响。</p>
+			<p>在接下来的几个练习中，我们将使用堆积条形图探索目标变量<code>y</code>中的各种分类变量。我们将绘制绝对计数和百分比，以便更好地理解分布。</p>
+			<h3 id="_idParaDest-106"><a id="_idTextAnchor106"/>练习 34:研究目标 y 和婚姻状况变量之间的关系</h3>
+			<p>在本练习中，我们将使用普通频率计数来演示两个分类变量之间的研究，然后展示这有多不方便。</p>
+			<p>简单地说，让我们从探索目标、<code>y</code>和<code>marital status</code>之间的关系开始。</p>
+			<ol>
+				<li value="1">首先，使用下面的命令导入<code>ggplot2</code>包:<pre>library(ggplot2)</pre></li>
+				<li>创建一个数据帧对象<code>df</code>，并通过以下命令使用<code>bank-additional-full.csv</code>文件:<pre>df &lt;- read.csv("/Chapter 2/Data/bank-additional/bank-additional-full.csv",sep=';')</pre></li>
+				<li>接下来，创建一个<code>temp</code>聚合数据集:<pre>temp &lt;- df %&gt;% group_by(y,marital) %&gt;% summarize(Count = n()) </pre></li>
+				<li>定义地块大小，如下图:<pre>options(repr.plot.width=12, repr.plot.height=4)</pre></li>
+				<li>Plot the chart with frequency distribution:<pre>ggplot(data = temp,aes(x=marital,y=Count,fill=y)) + 
+       geom_bar(stat="identity") + 
+       ggtitle("Distribution of target 'y' across Marital Status")</pre><p>输出如下所示:</p><div><img src="img/C12624_02_19.jpg" alt="Figure 2.19: Using ggplot to study the relationship between the target y and marital status variables&#13;&#10;"/></div><h6>图 2.19:使用 ggplot 研究目标 y 和婚姻状况变量之间的关系</h6><p>我们首先使用<code>group_by</code>函数聚集分类列。这将有助于我们对每个类别组合进行交叉频率计数。我们现在使用这个临时数据集来绘制独立变量的频率分布。</p><p>正如我们所看到的，已婚客户的<code>yes</code>频率最高，但这可能只是因为已婚客户的数量很高。为了更好地理解这种关系，我们可以使用百分比分布的堆积条形图来进一步细分，其中每个条形图分别代表<code>yes</code>和<code>no</code>的百分比。</p></li>
+				<li>创建一个<code>temp</code>聚合数据集:<pre>temp &lt;- df %&gt;% group_by(y,marital) %&gt;% 
+               summarize(Count = n()) %&gt;% 
+               ungroup() %&gt;%  #This function ungroups the previously grouped dataframe
+               group_by(marital) %&gt;%
+               mutate(Perc = round(Count/sum(Count)*100)) %&gt;%
+               arrange(marital)</pre></li>
+				<li>使用<code>options</code>方法:<pre>options(repr.plot.width=12, repr.plot.height=4)</pre>定义地块大小</li>
+				<li>Plot the percentage distribution using the <code>ggplot</code> method:<pre>ggplot(data = temp,aes(x=marital,y=Perc,fill=y)) + 
+    geom_bar(stat="identity") + 
+    geom_text(aes(label = Perc), size = 5, hjust = 0.5, vjust = 0.3, position = "stack") + 
+    ggtitle("Distribution of target 'y' percentage across Marital Status")</pre><p>输出如下所示:</p></li>
+			</ol>
+			<div><div><img src="img/C12624_02_20.jpg" alt="Figure 2.20: Distribution of target y percentage across marital status&#13;&#10;"/>
+				</div>
+			</div>
+			<h6>图 2.20:婚姻状况中目标 y 百分比的分布</h6>
+			<p>与之前的图相比，我们现在可以看到与直觉相反的结果。在我们对结果进行标准化后，我们发现<code>single</code>客户比已婚人士对广告活动的反应更积极。对于<code>unknown</code>也是如此，但是考虑到值的不确定性和极少量的记录，我们应该忽略这一点。我们不能直接得出单个客户对营销活动的反应更有效的结论，但我们可以稍后验证这一点。</p>
+			<h3 id="_idParaDest-107">练习 35:研究工作和教育变量之间的关系</h3>
+			<p>在这个练习中，我们将加速我们的探索。让我们构建一个自定义函数，在这里我们可以将两个图表结合起来，即频率分布和百分比分布，用于分类变量的双变量分析。</p>
+			<p>执行以下步骤:</p>
+			<ol>
+				<li value="1">首先，使用下面的命令导入<code>ggplot2</code>包:<pre>library(ggplot2)</pre></li>
+				<li>创建一个数据帧对象<code>df</code>，并通过以下命令使用<code>bank-additional-full.csv</code>文件:<pre>df &lt;- read.csv("/Chapter 2/Data/bank-additional/bank-additional-full.csv",sep=';')</pre></li>
+				<li>创建一个<code>temp</code>聚合数据集:<pre>plot_bivariate_categorical &lt;-  function(df, target, list_of_variables){
+    target &lt;- sym(target) #Converting the string to a column reference
+    i &lt;-1 
+    plt_matrix &lt;- list()
+    for(column in list_of_variables){
+        col &lt;- sym(column) 
+        temp &lt;- df %&gt;% group_by(!!sym(target),!!sym(col)) %&gt;% 
+           summarize(Count = n()) %&gt;% 
+           ungroup() %&gt;% #This fucntion ungroups the previously grouped dataframe
+           group_by(!!sym(col)) %&gt;%
+           mutate(Perc = round(Count/sum(Count)*100)) %&gt;%
+           arrange(!!sym(col))</pre></li>
+				<li>定义地块大小:<pre>options(repr.plot.width=14, repr.plot.height=12)</pre></li>
+				<li>用频率分布绘制图表:<pre>    plt_matrix[[i]]&lt;- ggplot(data = temp,aes(x=!!sym(col),y=Count,fill=!!sym(target))) + 
+        geom_bar(stat="identity") + 
+        geom_text(aes(label = Count), size = 3, hjust = 0.5, vjust = -0.3, position = "stack") + 
+        theme(axis.text.x = element_text(angle = 90, vjust = 1)) + #rotates the labels
+        ggtitle(paste("Distribution of target 'y'  frequency across",column))
+    i&lt;-i+1</pre></li>
+				<li>绘制百分比分布:<pre>    plt_matrix[[i]] &lt;- ggplot(data = temp,aes(x=!!sym(col),y=Perc,fill=!!sym(target))) + 
+        geom_bar(stat="identity") + 
+        geom_text(aes(label = Perc), size = 3, hjust = 0.5, vjust = -1, position = "stack") + 
+        theme(axis.text.x = element_text(angle = 90, vjust = 1)) + #rotates the labels
+        ggtitle(paste("Distribution of target 'y' percentage across",column))
+    i &lt;- i+1
+    }
+    plot_grid(plotlist = plt_matrix, ncol=2)
+}</pre></li>
+				<li>Plot the <code>plot_bivariate_categorical</code> using the following command:<pre>plot_bivariate_categorical(df,"y",c("job","education"))</pre><p>输出如下所示:</p><div><img src="img/C12624_02_21.jpg" alt="Figure 2.21: Studying the relationship between the job and education variables&#13;&#10;"/></div><h6>图 2.21:研究工作和教育变量之间的关系</h6><p>我们使用相同的原则来定义将图表绘制在一起的函数。这里的额外区别是每个组合有两个图。第一个(左边)是跨类别组合的频率图，右边的图展示了百分比分布(跨类别标准化)的视觉效果。一起研究两个图有助于更有效地验证结果。临时聚合数据集的创建有一个额外的步骤，即使用<code>ungroup</code>函数。这用于在独立变量的分类级别内实现目标结果的相对百分比分布，即<code>y</code>在<code>marital</code>内每个级别的分布。</p><p>如果我们观察前面输出图的结果，我们可以看到活动的最高响应率来自学生和退休专业人员，但这有一个警告。我们看到，与其他类别相比，这两个类别的观测值要少得多。因此，在做出进一步的结论之前，我们需要更多的验证。因此，我们也记下了这一见解。从教育水平来看，我们没有看到任何有趣的趋势。尽管客户的回复率很高，但观察的数量太少，无法得出任何切实的结论。</p></li>
+				<li>Let's take a look at credit default and housing loan categories:<pre>plot_bivariate_categorical(df,"y",c("default","housing"))</pre><p>输出如下所示:</p><div><img src="img/C12624_02_22.jpg" alt="Figure 2.22: Studying the relationship between the default and housing variables&#13;&#10;"/></div><h6>图 2.22:研究违约和住房变量之间的关系</h6></li>
+				<li>Again, we don't see any interesting trends. Let's continue the exploration for personal loan and contact mode:<pre>plot_bivariate_categorical(df,"y",c("loan","contact"))</pre><p>输出如下所示:</p></li>
+			</ol>
+			<div><div><img src="img/C12624_02_23.jpg" alt="Figure 2.23: Studying the relationship between the loan and contact variables&#13;&#10;"/>
+				</div>
+			</div>
+			<h6>图 2.23:研究贷款和联系变量之间的关系</h6>
+			<p>在这里，我们可以看到所用联系方式的一个有趣趋势。当营销活动的沟通方式是手机而不是固定电话时，回应率通常会更高。让我们也记录下这一趋势，然后聚在一起进一步验证。</p>
+			<p>我鼓励你探索我们的目标变量和剩余的从属分类变量之间的关系:月、星期几和之前的活动结果。</p>
+			<h2 id="_idParaDest-108"><a id="_idTextAnchor108"/>多元分析</h2>
+			<p>多元分析是研究两个以上变量之间关系的过程；本质上，一个因变量和多个自变量。二元分析是多元分析的一种形式。有几种重要的多变量分析形式，但是为了限制本章的范围，我们现在跳过细节。在接下来的几章中，我们将仔细研究线性和逻辑回归，这是两种流行的多元分析技术。</p>
+			<p>多变量分析中最常用的一些技术如下:</p>
+			<ul>
+				<li>多元线性回归(研究一个以上独立变量对数字/连续目标变量的影响)</li>
+				<li>逻辑回归(研究多个独立变量对分类目标变量的影响)</li>
+				<li>要素分析</li>
+				<li>MANOVA</li>
+			</ul>
+			<h2 id="_idParaDest-109"><a id="_idTextAnchor109"/>使用统计测试验证见解</h2>
+			<p>在 EDA 的整个过程中，我们收集并记录了一些有趣的模式以供进一步验证。现在是检验我们之前观察到的是否是真正有效的模式，或者只是因为随机的机会而显得有趣的时候了。进行这种验证的最有效和最直接的方法是执行一组统计测试，并测量模式的统计显著性。在现有的一系列测试中，我们有大量选项可供选择。选项因自变量和因变量的类型而异。下面是一个方便的参考图表，它解释了我们可以用来验证我们观察到的模式的统计测试的类型:</p>
+			<div><div><img src="img/C12624_02_24.jpg" alt="Figure 2.24: Validating dependent and independent variables&#13;&#10;"/>
+				</div>
+			</div>
+			<h6>图 2.24:验证因变量和自变量</h6>
+			<p>让我们将所有有趣的模式收集到一个地方:</p>
+			<ul>
+				<li>当员工差异率较低时，活动结果出现<code>yes</code>的几率较高。</li>
+				<li>当欧元利率较低时，竞选结果更有可能出现。</li>
+				<li>单身客户更有可能对活动做出积极回应。</li>
+				<li>学生和退休客户更有可能对该活动做出积极回应。</li>
+				<li>手机联系人更有可能对活动做出积极回应。</li>
+			</ul>
+			<p>如果你尝试对这些假设进行分类，我们可以看到，在所有情况下，我们都有一个分类因变量。因此，我们应该使用卡方检验或逻辑回归检验来验证我们的结果。</p>
+			<p>让我们逐一进行这些测试。</p>
+			<h2 id="_idParaDest-110"><a id="_idTextAnchor110"/>分类因变量和数字/连续自变量</h2>
+			<p>假设 1 和假设 2 有一个连续的自变量。参考上一节中的图，我们将选择卡方检验。在假设检验的过程中，我们首先定义一个零假设和一个替代假设。从消极的方法开始，也就是假设零假设是我们不希望发生的事情。假设检验检验观察到的模式发生的可能性是随机的，还是关于观察的确定性。这种测量被量化为概率。如果零假设发生的概率小于 5%(或一个合适的临界值)，我们拒绝零假设，并确认替代假设的有效性。</p>
+			<p>让我们开始吧；对于假设 1，我们定义如下:</p>
+			<ul>
+				<li><strong class="bold">零假设</strong>:活动结果与员工差异率无关。</li>
+				<li><strong class="bold">替代假设</strong>:活动结果与员工差异率有关。</li>
+			</ul>
+			<p>我们用简单的逻辑回归来检验我们的零假设的有效性。我们将在接下来的章节中更详细地讨论这个话题。现在，我们将快速执行一个简单的检查来测试我们的假设。下面的练习利用 R 的内置函数来执行逻辑回归。</p>
+			<h3 id="_idParaDest-111"><a id="_idTextAnchor111"/>练习 36:分类因变量和连续自变量的假设 1 检验</h3>
+			<p>为了对分类因变量和连续自变量进行假设检验，我们将使用<code>glm()</code>函数来拟合逻辑回归模型(在<em class="italics">第 5 章</em>、<em class="italics">分类</em>中对此有更多介绍)。这个练习将帮助我们在统计上检验一个分类因变量(例如，<code>y</code>)是否与一个连续自变量有任何关系，例如，</p>
+			<p><code>emp.var.rate</code>。</p>
+			<p>执行以下步骤来完成练习:</p>
+			<ol>
+				<li value="1">导入所需的库并创建 DataFrame 对象。</li>
+				<li>首先，将因变量转换成<code>factor</code>类型:<pre>df$y &lt;- factor(df$y)</pre></li>
+				<li>接下来，进行逻辑回归:<pre>h.test &lt;- glm(y ~ emp.var.rate, data = df, family = "binomial")</pre></li>
+				<li>Print the test summary:<pre>summary(h.test)</pre><p>输出如下所示:</p><pre>Call:
+glm(formula = y ~ emp.var.rate, family = "binomial", data = df)
+Deviance Residuals: 
+    Min       1Q   Median       3Q      Max  
+-1.0047  -0.4422  -0.3193  -0.2941   2.5150  
+Coefficients:
+             Estimate Std. Error z value Pr(&gt;|z|)    
+(Intercept)  -2.33228    0.01939 -120.31   &lt;2e-16 ***
+emp.var.rate -0.56222    0.01018  -55.25   &lt;2e-16 ***
+---
+Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+(Dispersion parameter for binomial family taken to be 1)
+    Null deviance: 28999  on 41187  degrees of freedom
+Residual deviance: 25597  on 41186  degrees of freedom
+AIC: 25601
+Number of Fisher Scoring iterations: 5</pre></li>
+			</ol>
+			<p>我们将目标变量<code>y</code>转换为<code>factor</code>(如果它还没有转换的话)。我们使用 R 提供的<code>glm</code>函数进行逻辑回归。<code>glm</code>函数还执行其他形式的回归，我们指定了<code>family = 'binomial'</code>参数来将该函数用作逻辑回归。函数第一个位置的公式定义了因变量和自变量。</p>
+			<p>输出中有相当多的共享结果。我们将暂时忽略其中的大部分，只关注最终输出。提供的结果之一是显著性概率，它确认我们的零假设为真的可能性小于<code>2e-16</code>，因此我们可以拒绝它。因此，目标结果与员工差异率有显著的统计关系，正如我们所见，随着员工差异率的降低，营销活动转化的机会也越大。</p>
+			<p>同样，让我们对第二个假设重复同样的测试。我们定义如下:</p>
+			<ul>
+				<li><strong class="bold">零假设</strong>:竞选结果与欧元利率无关。</li>
+				<li><strong class="bold">替代假设</strong>:竞选结果与欧元利率有关系。</li>
+			</ul>
+			<h3 id="_idParaDest-112"><a id="_idTextAnchor112"/>练习 37:分类因变量和连续自变量的假设 2 检验</h3>
+			<p>我们将再次使用逻辑回归来统计检验目标变量<code>y</code>和自变量之间是否存在关系。在本练习中，我们将使用<code>euribor3m</code>变量。</p>
+			<p>执行以下步骤:</p>
+			<ol>
+				<li value="1">导入所需的库并创建 DataFrame 对象。</li>
+				<li>首先，将因变量转换成<code>factor</code>类型:<pre>df$y &lt;- factor(df$y)</pre></li>
+				<li>接下来，进行逻辑回归:<pre>h.test2 &lt;- glm(y ~ euribor3m, data = df, family = "binomial")</pre></li>
+				<li>Print the test summary:<pre>summary(h.test2)</pre><p>输出如下所示:</p><pre>Call:
+glm(formula = y ~ euribor3m, family = "binomial", data = df)
+Deviance Residuals: 
+    Min       1Q   Median       3Q      Max  
+-0.8568  -0.3730  -0.2997  -0.2917   2.5380  
+Coefficients:
+             Estimate Std. Error z value Pr(&gt;|z|)    
+(Intercept) -0.472940   0.027521  -17.18   &lt;2e-16 ***
+euribor3m   -0.536582   0.009547  -56.21   &lt;2e-16 ***
+---
+Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+(Dispersion parameter for binomial family taken to be 1)
+    Null deviance: 28999  on 41187  degrees of freedom
+Residual deviance: 25343  on 41186  degrees of freedom
+AIC: 25347
+Number of Fisher Scoring iterations: 5</pre></li>
+			</ol>
+			<p>只关注之前的输出，我们可以确认我们可以拒绝零假设，接受替代假设。因此，目标结果与欧元利率有显著的统计关系，正如我们可以看到的，随着利率的降低，活动转换的机会更高。</p>
+			<h2 id="_idParaDest-113"><a id="_idTextAnchor113"/>分类因变量和分类自变量</h2>
+			<p>继续，让我们看看第三个假设。为了检验分类因变量和分类自变量之间的关系，我们可以使用卡方检验。</p>
+			<p>对于假设 3，我们定义如下:</p>
+			<ul>
+				<li><strong class="bold">无效假设</strong>:活动结果与从未结过婚的客户无关。</li>
+				<li><strong class="bold">替代假设</strong>:活动结果与从未结过婚的客户有关。</li>
+			</ul>
+			<p>在下面的练习中，我们将利用 R 的卡方检验函数来验证假设..</p>
+			<h3 id="_idParaDest-114"><a id="_idTextAnchor114"/>练习 38:假设 3 检验分类因变量和分类自变量</h3>
+			<p>在本练习中，我们将使用卡方检验进行统计测试。我们使用卡方检验，因为自变量和因变量都是分类变量，尤其是在检验<code>y</code>和婚姻状况之间的关系时。</p>
+			<p>执行以下步骤:</p>
+			<ol>
+				<li value="1">导入所需的库并创建 DataFrame 对象。</li>
+				<li>首先，将因变量转换成<code>factor</code>类型:<pre>df$y &lt;- factor(df$y)</pre></li>
+				<li>为<code>single</code>个客户端创建一个标志:<pre>df$single_flag &lt;- as.factor(ifelse(df$marital == "single","single","other"))</pre></li>
+				<li>Create a <code>sample</code> object and print the value:<pre>sample &lt;- table(df$y, df$single_flag)
+print(sample)</pre><p>输出如下所示:</p><pre>  other single
+no  26600   9948
+yes  3020   1620</pre></li>
+				<li>执行卡方检验:<pre>h.test3 &lt;- chisq.test(sample)</pre></li>
+				<li>Print the test summary:<pre>print(h.test3)</pre><p>输出如下所示:</p><pre>Pearson's Chi-squared test with Yates' continuity correction
+data:  sample
+X-squared = 120.32, df = 1, p-value &lt; 2.2e-16</pre></li>
+			</ol>
+			<p>我们首先为这个测试创建一个新的变量/标志，在这里我们定义一个客户机是否是<code>single</code>。由于我们专门定义了目标和客户的<code>single</code>婚姻状况之间的关系，我们掩盖了婚姻状况中的所有其他类别。</p>
+			<p><code>table</code>命令创建了一个新的数据帧，每个类之间有一个简单的频率分布。最后，我们使用这个数据框架进行卡方检验。</p>
+			<p>正如我们所见，p 值或零假设为真的几率远小于 5%。因此，我们可以接受我们的替代假设，这证实了一个事实，即活动的结果是积极影响单一客户，而不是其他客户。</p>
+			<p>继续，让我们快速看一下第四和第五个假设的有效性。</p>
+			<p>对于第 4 和第 5 个假设，我们定义如下:</p>
+			<ul>
+				<li><strong class="bold">零假设</strong>:活动结果与学生或退休客户无关。活动结果与使用的联系方式无关。</li>
+				<li><strong class="bold">替代假设</strong>:活动结果与学生或退休客户无关。活动结果与使用的联系方式有关。</li>
+			</ul>
+			<h3 id="_idParaDest-115"><a id="_idTextAnchor115"/>练习 39:检验分类因变量和分类自变量的假设 4 和假设 5</h3>
+			<p>让我们再次使用卡方检验来统计检查目标变量<code>y</code>、分类自变量<code>job_flag</code>和<code>contact</code>之间是否存在关系。</p>
+			<p>执行以下步骤:</p>
+			<ol>
+				<li value="1">导入所需的库并创建 DataFrame 对象。</li>
+				<li>首先，将因变量转换成<code>factor</code>类型:<pre>df$y &lt;- factor(df$y)</pre></li>
+				<li>准备自变量:<pre>df$job_flag &lt;- as.factor(ifelse(df$job %in% c("student","retired"),as.character(df$job),"other"))
+df$contact &lt;- as.factor(df$contact)</pre></li>
+				<li>Create an object named <code>sample4</code> and print the value:<pre>sample4 &lt;- table(df$y, df$job_flag)
+print("Frequency table for Job")
+print(sample4)</pre><p>输出如下所示:</p><pre>[1] "Frequency table for Job"
+  other retired student
+no  34662    1286     600
+yes  3931     434     275</pre></li>
+				<li>对第四个假设进行测试:<pre>h.test4 &lt;- chisq.test(sample4)</pre></li>
+				<li>Print the test summary for the 4th hypothesis:<pre>print("Hypothesis #4 results")
+print(h.test4)</pre><p>输出如下所示:</p><pre>[1] "Hypothesis #4 results"
+Pearson's Chi-squared test
+data:  sample4
+X-squared = 736.53, df = 2, p-value &lt; 2.2e-16</pre></li>
+				<li>Now, create a new <code>sample5</code> object and print the value:<pre>print("Frequency table for Contact")
+sample5 &lt;- table(df$y, df$contact)
+print(sample5)</pre><p>输出如下所示:</p><pre>[1] "Frequency table for Contact"
+  cellular telephone
+no     22291     14257
+yes     3853       787</pre></li>
+				<li>对<code>test5</code>变量进行测试:<pre>h.test5 &lt;- chisq.test(sample5)</pre></li>
+				<li>Print the test summary for the 5th hypothesis:<pre>print("Hypothesis #5 results")
+print(h.test5)</pre><p>输出如下所示:</p><pre>[1] "Hypothesis #5 results"
+Pearson's Chi-squared test with Yates' continuity correction
+data:  sample5
+X-squared = 862.32, df = 1, p-value &lt; 2.2e-16</pre></li>
+			</ol>
+			<p>我们可以看到结果对我们有利。我们还可以看到，学生和退休客户之间的关系以及手机通信模式在活动中取得了积极的成果。</p>
+			<h3 id="_idParaDest-116">整理见解——提炼问题的解决方案</h3>
+			<p>我们现在已经遍历了 EDA 的长度和宽度。在不同的部分，我们研究了不同深度的数据。现在我们已经有了数据探索问题的有效答案，我们可以再次讨论定义的初始问题。如果您还记得问题陈述中的<strong class="bold">复杂性</strong>和<strong class="bold">问题</strong>部分，我们有<em class="italics">导致活动表现不佳的因素有哪些</em>。好了，我们现在有了一个基于我们在双变量分析中发现的模式的答案，并用统计测试进行了验证。</p>
+			<p>用正确的故事来整理所有被证实的假设会带来我们问题的解决方案。花点时间研究每个假设检验结果的结果，把故事编织在一起。每个假设都告诉我们自变量和因变量是否有关系。</p>
+			<h2 id="_idParaDest-117"><a id="_idTextAnchor117"/>总结</h2>
+			<p>在这一章中，我们使用一个实际的用例探索了 EDA，并遍历了<a id="_idTextAnchor118"/>业务问题。我们首先了解执行数据科学问题的整个流程，然后使用行业标准框架定义我们的业务问题。随着用例与适当的问题和复杂性结合在一起，我们理解了 EDA 在设计问题解决方案中的作用。在探索 EDA 的过程中，我们学习了单变量、双变量和多变量分析。我们综合运用分析和可视化技术进行分析。通过这个，我们探索了可视化的 R 包，也就是<code>ggplot</code>和一些通过<code>dplyr</code>进行数据角力的包。我们还通过统计测试验证了我们的见解，最后，整理了这些见解，以便与最初的问题陈述一起循环。</p>
+			<p>在下一章中，我们将为各种机器学习算法奠定基础，并深入讨论监督学习。</p>
+		</div>
+	
+
+</body></html>

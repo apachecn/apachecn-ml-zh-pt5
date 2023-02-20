@@ -1,0 +1,251 @@
+<html><head/><body>
+
+
+
+
+
+	
+
+		<title>B15551_Preface_Final_NM_ePUB</title>
+
+		
+
+	
+
+	
+
+		<div><h1 id="_idParaDest-8"><a id="_idTextAnchor007"/>前言</h1>
+
+			<p>XGBoost 是一个经过行业验证的开源软件库，它提供了一个梯度提升框架，用于快速高效地扩展数十亿个数据点。</p>
+
+			<p>这本书在 scikit-learn 中介绍了机器学习和 XGBoost，然后建立梯度增强背后的理论。您将在机器学习环境中讨论决策树和分析 bagging，学习扩展到 XGBoost 的超参数。您将从头构建梯度增强模型，并将梯度增强扩展到大数据，同时使用计时器识别速度限制。XGBoost 中的细节主要是研究速度的提高和数学上的参数推导。在详细案例研究的帮助下，您将练习使用 scikit-learn 和原始 Python API 构建和微调 XGBoost 分类器和回归器。您将利用 XGBoost 超参数来提高分数、纠正缺失值、缩放不平衡数据集以及微调备选基础学习者。最后，您将应用高级 XGBoost 技术，如构建不相关的集成、堆叠模型，以及使用稀疏矩阵、定制的变压器和管道为行业部署准备模型。</p>
+
+			<p>到本书结束时，你将能够使用 XGBoost 以最小的错误和最大的速度构建高性能的机器学习模型。</p>
+
+			<h2 id="_idParaDest-9">这本书是给谁的</h2>
+
+			<p>这本书面向数据科学专业人士和爱好者、数据分析师以及希望构建快速准确的机器学习模型以适应大数据的开发人员。精通 Python 以及对线性代数的基本理解将帮助你从本书中获得最大收益。</p>
+
+			<h2 id="_idParaDest-10">这本书涵盖了什么</h2>
+
+			<p><a href="B15551_01_Final_NM_ePUB.xhtml#_idTextAnchor022"> <em class="italic">第 1 章</em> </a>，<em class="italic">机器学习前景</em>，在与 XGBoost 比较结果之前，通过引入线性回归和逻辑回归，在机器学习的一般背景下展示 XGBoost。<code>pandas</code>通过以各种方式转换分类列和清除空值来为机器学习预处理原始数据。</p>
+
+			<p><a href="B15551_02_Final_NM_ePUB.xhtml#_idTextAnchor047"> <em class="italic">第 2 章</em> </a>，<em class="italic">决策树深度</em>，详细介绍了 XGBoost 使用的决策树超参数，以及方差和偏差的图形和统计分析，强调了过度拟合的重要性，这是整本书涉及的主题。</p>
+
+			<p><a href="B15551_03_Final_NM_ePUB.xhtml#_idTextAnchor070"> <em class="italic">第三章</em> </a>，<em class="italic">随机森林装袋</em>，以装袋为重点，介绍随机森林作为 XGBoost 竞争者的概况。与随机森林共享的其他 XGBoost 超参数，如<code>n_esimtators</code>和<code>subsample</code>被完全覆盖。</p>
+
+			<p><a href="B15551_04_Final_NM_ePUB.xhtml#_idTextAnchor093"> <em class="italic">第四章</em> </a>，<em class="italic">从梯度增强到 XGBoost </em>，涵盖了增强基础知识，在<code>scikit-learn</code>中从头构建一个增强器，微调新的 XGBoost 超参数如<code>eta</code>，并比较梯度增强和 XGBoost 的运行时间以突出 XGBoost 令人印象深刻的速度。</p>
+
+			<p><a href="B15551_05_Final_NM_ePUB.xhtml#_idTextAnchor117"> <em class="italic">第五章</em></a><em class="italic">XGBoost 亮相</em>，分析了 XGBoost 算法的数学推导，并以一个历史相关的案例研究为特色，展示了 XGBoost 在希格斯玻色子 Kaggle 竞赛中作为获胜模型的角色。讨论了标准的 XGBoost 参数，构建了基本模型，并介绍了原始的 Python API。</p>
+
+			<p><a href="B15551_06_Final_NM_ePUB.xhtml#_idTextAnchor136"> <em class="italic">第六章</em> </a>，<em class="italic"> XGBoost 超参数</em>，涵盖了所有必要的 XGBoost 超参数，总结了以往的树集成超参数，并使用原有的网格搜索功能对 XGBoost 模型进行微调，优化得分。</p>
+
+			<p><a href="B15551_07_Final_NM_ePUB.xhtml#_idTextAnchor161"> <em class="italic">第七章</em> </a>，<em class="italic">用 XGBoost 发现系外行星</em>，让你有机会在一个自上而下的案例研究中用 XGBoost 发现系外行星。通过混淆矩阵和分类报告分析不平衡数据集的缺陷，从而得出不同的评分标准和重要的 XGBoost 超参数<code>scale_pos_weight</code>。</p>
+
+			<p><a href="B15551_08_Final_NM_ePUB.xhtml#_idTextAnchor189"> <em class="italic">第八章</em> </a>，<em class="italic"> XGBoost 备选基础学习器</em>，涵盖了 XGBoost 助推器的全系列，包括<code>gbtree</code>，<code>dart</code>，<code>gblinear</code>进行回归和分类。随机森林以基础学习者的形式出现，并以新的<code>XGBRFRegressor</code>和<code>XGBRFClassifier</code>类作为 XGBoost 替代模型。</p>
+
+			<p><a href="B15551_09_Final_NM_ePUB.xhtml#_idTextAnchor211"> <em class="italic">第 9 章</em> </a>，<em class="italic"> XGBoost Kaggle Masters </em>，介绍 XGBoost Kaggle 获胜者用来赢得高级功能工程、构建非相关机器集合和堆叠等竞赛的技巧和诀窍。</p>
+
+			<p><a href="B15551_10_Final_NM_ePUB.xhtml#_idTextAnchor230"> <em class="italic">第十章</em> </a>，<em class="italic"> XGBoost 模型部署</em>，通过使用定制的转换器处理混合数据和机器学习管道，将原始数据转换为 XGBoost 机器学习预测，以使用微调的 XGBoost 模型对传入数据进行预测。</p>
+
+			<h1 id="_idParaDest-11">为了充分利用这本书</h1>
+
+			<p>读者应该在列表切片、编写自己的函数和使用点符号的层面上精通 Python。在访问矩阵中的行和列的水平上对线性代数的一般熟悉就足够了。熊猫和机器学习的背景是有帮助的，但不是必需的，因为所有的代码和概念都会在过程中解释。</p>
+
+			<p>这本书使用了 Jupyter Notebook 中 Python 的最新版本和 Anaconda 发行版。强烈推荐 Anaconda，因为它包含了所有主要的数据科学库。在开始之前更新 Anaconda 是值得的。下一节提供了像我们这样设置您的编码环境的详细说明。</p>
+
+			<h1 id="_idParaDest-12">设置您的编码环境</h1>
+
+			<p>下表总结了本书中使用的基本软件。</p>
+
+			<div><div><img src="img/B15551_Preface_Table_1.jpg" alt=""/>
+
+				</div>
+
+			</div>
+
+			<p>以下是将该软件上传到您的系统的说明。</p>
+
+			<h2 id="_idParaDest-13">蟒蛇</h2>
+
+			<p>本书中需要的数据科学库以及 Jupyter 笔记本、scikit-learn (sklearn)和 Python 可以使用 Anaconda 安装在一起，这是推荐的。</p>
+
+			<p>以下是从 2020 年开始在你的电脑上安装 Anaconda 的步骤:</p>
+
+			<ol>
+
+				<li><p>去 https://www.anaconda.com/products/individual。</p></li>
+
+				<li><p>点击以下屏幕上的<strong class="bold">下载</strong>，该屏幕不会开始下载，但会显示各种选项(见步骤 3):</p><div><img src="img/B15551_Preface_01.jpg" alt=""/></div><p class="figure-caption">图 0.1–准备下载 Anaconda</p></li>
+
+				<li><p>选择您的安装程序。建议 Windows 和 Mac 使用<code>64-Bit Graphical Installer</code>。请确保从 Python 3.7 下的前两行中选择，因为本书通篇都在使用 Python 3.7:</p><div><img src="img/B15551_Preface_02.jpg" alt=""/></div><p class="figure-caption">图 0.2-Anaconda 安装程序</p></li>
+
+				<li><p>下载开始后，继续按照计算机上的提示完成安装:</p><p class="callout-heading">针对 Mac 用户的警告</p><p class="callout">如果您遇到错误<strong class="bold">您不能在这个位置</strong>安装 Anaconda3，不要惊慌。只需点击突出显示的那一行<strong class="bold">只为我安装</strong>，<strong class="bold">继续</strong>按钮将作为一个选项出现。</p></li>
+
+			</ol>
+
+			<div><div><img src="img/B15551_Preface_03.jpg" alt=""/>
+
+				</div>
+
+			</div>
+
+			<p class="figure-caption">图 0.3–对 Mac 用户的警告–只需点击“为我安装”，然后继续</p>
+
+			<h2 id="_idParaDest-14"><a id="_idTextAnchor013"/>使用 Jupyter 笔记本</h2>
+
+			<p>现在您已经安装了 Anaconda，您可以打开一个 Jupyter 笔记本来使用 Python 3.7。以下是打开 Jupyter 笔记本的步骤:</p>
+
+			<ol>
+
+				<li value="1"><p>点击电脑上的<strong class="bold"> Anaconda-Navigator </strong>。</p></li>
+
+				<li><p>点击<strong class="bold"> Jupyter 笔记本</strong>下的<strong class="bold">启动</strong>，如下截图所示:</p><div><img src="img/B15551_Preface_04.jpg" alt=""/></div><p class="figure-caption">图 0.4-Anaconda 主屏幕</p><p>这将在浏览器窗口中打开一个 Jupyter 笔记本。虽然 Jupyter 笔记本出现在网络浏览器中是为了方便，但它们是在你的个人电脑上运行，而不是在线运行。谷歌 Colab 笔记本是一种可以接受的在线替代产品，但在本书中，Jupyter 笔记本被独家使用。</p></li>
+
+				<li><p>从 Jupyter 笔记本右侧的<strong class="bold">新</strong>标签中选择<strong class="bold"> Python 3 </strong>，如下图所示:</p></li>
+
+			</ol>
+
+			<div><div><img src="img/B15551_Preface_05.jpg" alt=""/>
+
+				</div>
+
+			</div>
+
+			<p class="figure-caption">图 0.5–Jupyter 笔记本电脑主屏幕</p>
+
+			<p>这会将您带到以下屏幕:</p>
+
+			<div><div><img src="img/B15551_Preface_06.jpg" alt=""/>
+
+				</div>
+
+			</div>
+
+			<p class="figure-caption">图 0.6–Jupyter 笔记本内部</p>
+
+			<p>恭喜你！您现在已经准备好运行 Python 代码了！只需在单元格中键入任何内容，比如<code>print('hello xgboost!')</code>，按<em class="italic"> Shift </em> + <em class="italic"> Enter </em>运行代码。</p>
+
+			<p class="callout-heading">Jupyter 笔记本故障排除</p>
+
+			<p class="callout">如果您在运行或安装 Jupyter 笔记本时遇到问题，请访问 Jupyter 官方故障排除指南:<a href="https://jupyter-notebook.readthedocs.io/en/stable/troubleshooting.html">https://Jupyter-notebook . readthedocs . io/en/stable/troubleshoot . html</a>。</p>
+
+			<h2 id="_idParaDest-15"><a id="_idTextAnchor014"/> XGBoost</h2>
+
+			<p>在撰写本文时，Anaconda 中还没有包含 XGBoost，所以必须单独安装它。</p>
+
+			<p>以下是在计算机上安装 XGBoost 的步骤:</p>
+
+			<ol>
+
+				<li value="1"><p>去 https://anaconda.org/conda-forge/xgboost。以下是您应该看到的内容:</p><div><img src="img/B15551_Preface_07.jpg" alt=""/></div><p class="figure-caption">图 0.7-Anaconda 安装 XGBoost 的建议</p></li>
+
+				<li><p>复制前面屏幕截图中的第一行代码，如下所示:</p><div><img src="img/B15551_Preface_08.jpg" alt=""/></div><p class="figure-caption">图 0.8–包安装</p></li>
+
+				<li><p>打开计算机上的终端。</p><p>如果您不知道终端的位置，请在<code>Terminal</code>中搜索 Mac，在<code>Windows Terminal</code>中搜索 Windows。</p></li>
+
+				<li><p>将以下代码粘贴到您的终端中，按<em class="italic">回车</em>，并按照提示进行操作:</p><pre>conda install -c conda-forge xgboost</pre></li>
+
+				<li><p>按照上一节所述，打开一个新的 Jupyter 笔记本，验证安装是否成功。然后输入<code>import xgboost</code>，按<em class="italic"> Shift </em> + <em class="italic"> Enter </em>。您应该看到以下内容:</p></li>
+
+			</ol>
+
+			<div><div><img src="img/B15551_Preface_09.jpg" alt=""/>
+
+				</div>
+
+			</div>
+
+			<p class="figure-caption">图 0.9–在 Jupyter 笔记本中成功导入 XGBoost</p>
+
+			<p>如果你没有出错，恭喜你！现在，您已经具备了运行本书中代码的所有必要技术要求。</p>
+
+			<p class="callout-heading">小费</p>
+
+			<p class="callout">如果您在尝试设置您的编码环境时收到错误，请返回前面的步骤，或者考虑查看这里提供的 Anaconda 错误文档:<a href="https://docs.anaconda.com/anaconda/user-guide/troubleshooting/">https://docs . Anaconda . com/Anaconda/user-guide/trouble shooting/</a>。以前的 Anaconda 用户应该通过在终端中输入<code>conda update conda</code>来更新 Anaconda。如果你上传 XGBoost 有问题，请在<a href="https://xgboost.readthedocs.io/en/latest/build.html">https://xgboost.readthedocs.io/en/latest/build.html</a>查看官方文档。</p>
+
+			<h2 id="_idParaDest-16"><a id="_idTextAnchor015"/>版本</h2>
+
+			<p>下面是您可以在 Jupyter 笔记本中运行的代码，以查看您正在使用的以下软件的版本:</p>
+
+			<pre>import platform; print(platform.platform())
+import sys; print("Python", sys.version)
+import numpy; print("NumPy", numpy.__version__)
+import scipy; print("SciPy", scipy.__version__)
+import sklearn; print("Scikit-Learn", sklearn.__version__)
+import xgboost; print("XGBoost", xgboost.__version__)</pre>
+
+			<p>以下是本书中用于生成代码的版本:</p>
+
+			<pre>Darwin-19.6.0-x86_64-i386-64bit
+Python 3.7.7 (default, Mar 26 2020, 10:32:53) 
+[Clang 4.0.1 (tags/RELEASE_401/final)]
+NumPy 1.19.1
+SciPy 1.5.2
+Scikit-Learn 0.23.2
+XGBoost 1.2.0</pre>
+
+			<p>如果你有和我们不同的版本也没关系。软件一直在更新，发布时使用更新的版本可能会获得更好的结果。但是，如果您使用的是旧版本，建议您通过在终端中运行<code>conda update conda</code>来使用 Anaconda 进行更新。如果您之前安装了一个旧版本的 XGBoost，并且如前一节所述用 Anaconda 伪造了它，那么您也可以运行<code>conda update xgboost</code>。</p>
+
+			<h2 id="_idParaDest-17"><a id="_idTextAnchor016"/>访问代码文件</h2>
+
+			<p>如果你使用的是这本书的数字版本，我们建议你自己输入代码或者通过 GitHub 库获取代码(链接见下一节)。这样做将帮助您避免任何与复制和粘贴代码相关的潜在错误。</p>
+
+			<p>该书的代码包也托管在 GitHub 的 https://GitHub . com/packt publishing/Hands-On-Gradient-Boosting-with-XGBoost-and-Scikit-learn 上。如果代码有更新，它将在现有的 GitHub 库中更新。</p>
+
+			<p>我们在<a href="https://github.com/PacktPublishing/">https://github.com/PacktPublishing/</a>也有丰富的书籍和视频目录中的其他代码包。看看他们！</p>
+
+			<h1 id="_idParaDest-18"><a id="_idTextAnchor017"/>下载彩色图片</h1>
+
+			<p>我们还提供了一个 PDF 文件，其中有本书中使用的截图/图表的彩色图像。您可以从这里下载:</p>
+
+			<p><a href="https://static.packt-cdn.com/downloads/9781839218354_ColorImages.pdf">https://static . packt-cdn . com/downloads/9781839218354 _ color images . pdf</a>。</p>
+
+			<h1 id="_idParaDest-19"><a id="_idTextAnchor018"/>使用的惯例</h1>
+
+			<p>本书通篇使用了许多文本约定。</p>
+
+			<p><code>Code in text</code>:表示文本中的码字、数据库表名、文件夹名、文件名、文件扩展名、路径名、伪 URL、用户输入和 Twitter 句柄。这里有一个例子:“<code>AdaBoostRegressor</code>和<code>AdaBoostClassifier</code>算法可以从<code>sklearn.ensemble</code>库中下载，并适合任何训练集。”</p>
+
+			<p>代码块设置如下:</p>
+
+			<pre>X_bikes = df_bikes.iloc[:,:-1]
+y_bikes = df_bikes.iloc[:,-1]
+from sklearn.model_selection import train_test_split
+X_train, X_test, y_train, y_test = train_test_split(X_bikes, y_bikes, random_state=2)</pre>
+
+			<p>当我们希望将您的注意力吸引到代码块的特定部分时，相关的行或项目以粗体显示:</p>
+
+			<pre>Stopping. Best iteration:
+[1]	validation_0-error:0.118421
+<strong class="bold">Accuracy: 88.16%</strong></pre>
+
+			<p class="callout-heading">提示或重要注意事项</p>
+
+			<p class="callout">像这样出现。</p>
+
+			<h1 id="_idParaDest-20"><a id="_idTextAnchor019"/>取得联系</h1>
+
+			<p>我们随时欢迎读者的反馈。</p>
+
+			<p><strong class="bold">总体反馈</strong>:如果您对本书的任何方面有疑问，请在邮件主题中提及书名，并发邮件至 customercare@packtpub.com<a href="mailto:customercare@packtpub.com"/>联系我们。</p>
+
+			<p><strong class="bold">勘误表</strong>:虽然我们已经尽力确保内容的准确性，但错误还是会发生。如果你在这本书里发现了一个错误，请告诉我们，我们将不胜感激。请访问 www.packtpub.com/support/errata<a href="http://www.packtpub.com/support/errata"/>，选择您的图书，点击勘误表提交表格链接，并输入详细信息。</p>
+
+			<p><strong class="bold">盗版</strong>:如果您在互联网上遇到我们作品的任何形式的非法拷贝，如果您能提供我们的地址或网站名称，我们将不胜感激。请通过 copyright@packt.com 的<a href="mailto:copyright@packt.com">联系我们，并提供材料链接。</a></p>
+
+			<p><strong class="bold">如果你有兴趣成为一名作家</strong>:如果有你擅长的主题，并且你有兴趣写书或投稿，请访问 authors.packtpub.com<a href="http://authors.packtpub.com"/>。</p>
+
+			<h1 id="_idParaDest-21"><a id="_idTextAnchor020"/>评论</h1>
+
+			<p>请留下评论。一旦你阅读并使用了这本书，为什么不在你购买它的网站上留下评论呢？潜在的读者可以看到并使用您不带偏见的意见来做出购买决定，我们 Packt 可以了解您对我们产品的看法，我们的作者可以看到您对他们的书的反馈。谢谢大家！</p>
+
+			<p>更多关于 Packt 的信息，请访问<a href="http://packt.com">packt.com</a>。</p>
+
+		</div>
+
+	
+
+
+
+</body></html>

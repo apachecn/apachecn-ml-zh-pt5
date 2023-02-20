@@ -1,0 +1,643 @@
+<html><head/><body>
+
+
+	
+		<title>B18216_09_ePub</title>
+		
+	
+	
+		<div><h1 id="_idParaDest-166"><em class="italic"> <a id="_idTextAnchor172"/>第九章</em>:其他流行的 XAI 框架</h1>
+			<p>在前一章中，我们介绍了来自<strong class="bold">谷歌人工智能</strong>的<strong class="bold"> TCAV 框架</strong>，它用于产生<em class="italic">人类友好的基于概念的解释</em>。我们还讨论了其他广泛使用的解释框架:<strong class="bold"> LIME </strong>和<strong class="bold"> SHAP </strong>。然而，莱姆，SHAP，甚至 TCAV 都有一定的局限性，我们在前面的章节中已经讨论过了。这些框架都没有涵盖非技术最终用户可解释性的所有四个维度。由于这些已知的缺点，寻找一个健壮的<strong class="bold">可解释的人工智能</strong> ( <strong class="bold"> XAI </strong>)框架的工作仍在进行。</p>
+			<p>寻找健壮的 XAI 框架和解决流行的 XAI 模块的已知限制的旅程导致了许多其他健壮框架的发现和发展，这些框架试图解决 ML 模型可解释性的不同方面。在这一章中，除了莱姆、SHAP 和 TCAV，我们还将讨论其他流行的 XAI 框架。</p>
+			<p>更具体地说，我们将讨论每个框架的重要特性和关键优势。我们还将探讨如何在实践中应用每个框架。涵盖每个框架的所有内容超出了本章的范围。但是在这一章中，你会学到这些框架最重要的特性和实际应用。在这一章中，我们将介绍以下广泛使用的 XAI 框架:</p>
+			<ul>
+				<li>DALEX</li>
+				<li>解释器仪表板</li>
+				<li>解释性语言</li>
+				<li>托辞</li>
+				<li>骰子</li>
+				<li>ELI5</li>
+				<li>H2O 汽车解释器</li>
+			</ul>
+			<p>在本章的最后，我还将分享一个快速比较指南，比较所有这些 XAI 框架，以帮助您根据您的问题决定框架。现在，让我们开始吧！</p>
+			<h1 id="_idParaDest-167"><a id="_idTextAnchor173"/>技术要求</h1>
+			<p>可以从 GitHub 资源库下载或克隆本章所需的代码教程和必要的资源:<a href="https://github.com/PacktPublishing/Applied-Machine-Learning-Explainability-Techniques/tree/main/Chapter09">https://GitHub . com/packt publishing/Applied-Machine-Learning-explability-Techniques/tree/main/chapter 09</a>。与其他章节一样，Python 和 Jupyter 笔记本用于实现本章所涵盖的理论概念的实际应用。但是我会建议你在阅读完这一章后再看笔记本，以便更好地理解。教程中用到的大部分数据集也在代码库中提供:<a href="https://github.com/PacktPublishing/Applied-Machine-Learning-Explainability-Techniques/tree/main/Chapter09/datasets">https://github . com/packt publishing/Applied-Machine-Learning-explability-Techniques/tree/main/chapter 09/datasets</a>。</p>
+			<h1 id="_idParaDest-168"><a id="_idTextAnchor174"/> DALEX</h1>
+			<p>在<a href="B18216_01_ePub.xhtml#_idTextAnchor014"> <em class="italic">第一章</em> </a>、<em class="italic">可解释技术的基础概念</em>的<em class="italic">可解释性维度</em>部分，我们讨论了可解释性的四个不同维度——<em class="italic">数据</em>、<em class="italic">模型</em>、<em class="italic">结果</em>和<em class="italic">最终用户</em>。大多数可解释性框架，如莱姆、SHAP 和 TCAV，提供了以模型为中心的可解释性。</p>
+			<p>DALEX  ( <strong class="bold">探索和解释的模型不可知语言</strong>)是极少数广泛使用的 XAI 框架之一，它试图解决可解释性的大部分维度。DALEX 是<a id="_idIndexMarker602"/>模型不可知的，可以提供一些关于底层数据集的元数据来给出一些解释的上下文。这个框架为您提供了对模型性能和模型公平性的洞察，并且它还提供了全局和局部模型的可解释性。</p>
+			<p>DALEX 框架的开发人员希望遵守以下要求列表，他们定义这些要求是为了解释复杂的黑盒算法:</p>
+			<ul>
+				<li><strong class="bold">预测的理由</strong>:根据 DALEX 的开发者，ML 模型用户应该能够理解最终预测的变量或特征属性。</li>
+				<li><strong class="bold">预测的推测</strong>:假设假设情景或了解数据集的特定特征对模型结果的敏感性是 DALEX 开发人员考虑的其他因素。</li>
+				<li><strong class="bold">预测的验证</strong>:对于一个模型的每个预测结果，用户应该能够验证证实该模型的特定预测的证据的强度。</li>
+			</ul>
+			<p>DALEX<a id="_idIndexMarker603"/>被设计成使用框架提供的各种解释方法来符合前面的要求。<em class="italic">图 9.1 </em>展示了 DALEX 的模型勘探叠加；</p>
+			<div><div><img src="img/B18216_09_001.jpg" alt="Figure 9.1 – The model exploration stack of DALEX&#13;&#10;"/>
+				</div>
+			</div>
+			<p class="figure-caption">图 9.1–DALEX 的模型探索堆栈</p>
+			<p>接下来，我将<a id="_idIndexMarker604"/>带您看一个如何在实践中探索 DALEX 来解释黑盒模型的例子。</p>
+			<h2 id="_idParaDest-169"><a id="_idTextAnchor175"/>为模型解释能力设置 DALEX</h2>
+			<p>在本节中，您将学习在 Python 中设置 DALEX。在<a id="_idIndexMarker605"/>开始走查代码之前，我想请你在<a href="https://github.com/PacktPublishing/Applied-Machine-Learning-Explainability-Techniques/blob/main/Chapter09/DALEX_example.ipynb">https://github . com/packt publishing/Applied-Machine-Learning-explability-Techniques/blob/main/chapter 09/DALEX _ example . ipynb</a>查看一下笔记本。它包含了理解我们现在要深入讨论的概念所需的步骤。我还建议您在<a href="https://github.com/ModelOriented/DALEX/tree/master/python/dalex">https://GitHub . com/model oriented/DALEX/tree/master/python/DALEX</a>查看 DALEX 的 GitHub 项目资源库，以防在执行笔记本时需要更多的详细信息。</p>
+			<p>DALEX Python 框架可以使用<code>pip</code>安装程序进行安装:</p>
+			<pre>pip install dalex -U</pre>
+			<p>如果您想使用 DALEX 的任何需要可选依赖项的附加功能，您可以尝试以下命令:</p>
+			<pre>pip install dalex[full]</pre>
+			<p>您可以通过使用以下命令将软件包导入 Jupyter 笔记本来验证软件包安装是否成功:</p>
+			<pre>import dalex as dx</pre>
+			<p>希望您的导入会成功；否则，如果您得到任何错误，您将需要重新安装框架或单独安装它的依赖项。</p>
+			<h2 id="_idParaDest-170"><a id="_idTextAnchor176"/>关于数据集的讨论</h2>
+			<p>接下来，让我们简单介绍一下本例中使用的数据集。对于这个例子，我已经使用了国际足联俱乐部位置预测数据集(<a href="https://www.kaggle.com/datasets/adityabhattacharya/fifa-club-position-prediction-dataset">https://www . ka ggle . com/datasets/adityabattacharya/FIFA-Club-Position-Prediction-dataset</a>)来预测一名足球运动员的欧元价值，这是基于他们的技能和能力。所以，这是一个可以用回归 ML 模型解决的回归问题。</p>
+			<p class="callout-heading">国际足联俱乐部位置数据集引用</p>
+			<p class="callout">Bhattacharya A. (2022)。Kaggle - FIFA 俱乐部位置预测数据集:<a href="https://www.kaggle.com/datasets/adityabhattacharya/fifa-club-position-prediction-dataset">https://www . ka ggle . com/datasets/adityabattacharya/FIFA-Club-Position-Prediction-dataset</a></p>
+			<p>与所有其他标准 ML 解决方案流程类似，我们从数据检查流程开始。数据集可以作为 pandas 数据帧加载，我们可以检查数据集的维度、存在的要素以及每个要素的数据类型。此外，我们可以执行任何必要的数据转换步骤，如删除<a id="_idIndexMarker607"/>不相关的特征，检查缺失值，以及数据插补以填充相关特征的缺失值。我建议您按照笔记本中提供的必要步骤进行操作，但也可以随意添加其他步骤，并更深入地研究数据集。</p>
+			<h2 id="_idParaDest-171"><a id="_idTextAnchor177"/>训练模型</h2>
+			<p>对于这个例子，在将<a id="_idIndexMarker608"/>数据分成训练集和验证集之后，我使用了随机森林回归算法来拟合模型。这可以使用以下代码行来完成:</p>
+			<pre class="source-code">x_train,x_valid,y_train,y_valid = train_test_split(</pre>
+			<pre class="source-code">  df_train,labels,test_size=0.2,random_state=123)</pre>
+			<pre class="source-code">model = RandomForestRegressor(</pre>
+			<pre class="source-code">  n_estimators=790, min_samples_split = 3, </pre>
+			<pre class="source-code">  random_state=123).fit(x_train, y_train)</pre>
+			<p>我们进行最小超参数调整来训练模型，因为我们的目标不是建立一个高效的模型。相反，我们的目标是将这个模型作为一个黑盒模型，并使用 DALEX 来解释模型。所以，让我们继续使用 DALEX 的模型可解释性部分。</p>
+			<h2 id="_idParaDest-172">使用 DALEX 对可解释性建模</h2>
+			<p>DALEX 是<a id="_idIndexMarker609"/>模型不可知的，因为它没有对模型做任何假设，并且可以与任何算法一起工作。因此，它认为模型是一个黑盒。在探索如何在 Python 中使用 DALEX 之前，让我们讨论一下这个框架的以下主要优势:</p>
+			<ul>
+				<li><strong class="bold"> DALEX 提供了不同预测模型的统一抽象</strong>:作为一个解释者，DALEX 非常健壮，可以很好地与不同类型的模型框架一起工作，例如 scikit-learn、H2O、TensorFlow 等等。它可以处理不同格式的数据，如 NumPy 数组或 pandas DataFrame。它提供了关于数据或模型的额外元数据，这使得在生产中开发端到端的模型可解释性管道更加容易。</li>
+				<li><strong class="bold"> DALEX 拥有健壮的 API 结构</strong>:DALEX 简洁的 API 结构保证了模型分析使用一致的语法和编码结构。只用几行代码，我们就可以应用各种可解释性方法，并解释任何黑盒模型。</li>
+				<li><strong class="bold">可以为一个推理数据实例</strong>提供局部解释:在 DALEX 过程中可以很容易地获得单个推理数据实例的预测级可解释性。DALEX 中有不同的方法，如交互式分解图、SHAP 特征重要性图和假设分析图，可用于局部解释。我们将在下一节更详细地介绍这些方法。</li>
+				<li><strong class="bold">它还可以在考虑整个数据集和模型的同时提供全局解释</strong>:还可以使用 DALEX 部分相关性图、累积相关性图、全局变量重要性图等提供模型级别的全局解释。</li>
+				<li><strong class="bold">使用 DALEX </strong>可以轻松完成偏差和公平性检查:DALEX 提供了测量模型公平性和偏差的定量方法。与 DALEX 不同，大多数 XAI 框架没有提供评估模型公平性的明确方法。</li>
+				<li><strong class="bold">DALEX ARENA 平台可用于构建交互式仪表板，以提高用户参与度</strong> : DALEX 可用于创建交互式 web 应用平台，该平台可用于设计自定义仪表板，以显示 DALEX 中可用的不同模型可解释性方法的交互式可视化效果。我认为 DALEX 的这一独特功能为您提供了一个定制的仪表板来满足特定终端用户的需求，从而创造了更好的用户参与度。</li>
+			</ul>
+			<p>考虑到所有这些关键优势，现在让我们继续学习如何应用 DALEX 中的这些可用功能。</p>
+			<p>首先，我们<a id="_idIndexMarker611"/>需要创建一个 DALEX 模型解释器对象，它将经过训练的模型、数据和模型类型作为输入。这可以使用以下代码行来完成:</p>
+			<pre class="source-code"># Create DALEX Explainer object </pre>
+			<pre class="source-code">explainer = dx.Explainer(model, </pre>
+			<pre class="source-code">                         x_valid, y_valid, </pre>
+			<pre class="source-code">                         model_type = 'regression',</pre>
+			<pre class="source-code">                         label='Random Forest')</pre>
+			<p>一旦创建了 explainer 对象，它还提供了关于模型的附加元数据，如下所示。</p>
+			<div><div><img src="img/B18216_09_002.jpg" alt="Figure 9.2 – The DALEX explainer metadata&#13;&#10;"/>
+				</div>
+			</div>
+			<p class="figure-caption">图 9.2–DALEX 解释器元数据</p>
+			<p>这些初始元数据对于为某些生产级<a id="_idIndexMarker612"/>系统构建自动化管道非常有用。接下来，我们来探讨一下 DALEX 提供的一些模型级的解释。</p>
+			<h2 id="_idParaDest-173"><a id="_idTextAnchor179"/>模型级解释</h2>
+			<p>模型级<a id="_idIndexMarker613"/>解释是由 DALEX 产生的<a id="_idIndexMarker614"/>全局解释。考虑模型性能和预测过程中考虑的所有要素的总体影响。可以使用一行代码来检查模型的性能:</p>
+			<pre class="source-code">model_performance = explainer.model_performance("regression")</pre>
+			<p>根据 ML 模型的类型，可以应用不同的模型评估度量。在本例中，我们正在处理一个回归问题，因此，DALEX 使用了 MSE、RMSE、R2、MAE 等指标。对于分类问题，将使用准确性、精确度、召回率等指标。如<a href="B18216_03_ePub.xhtml#_idTextAnchor053"> <em class="italic">第三章</em> </a>、<em class="italic">以数据为中心的方法</em>所述，通过评估模型性能，我们可以估计模型的<em class="italic">数据可预测性</em>，这为我们提供了预测结果正确程度的指示。</p>
+			<p>DALEX 提供了全局特征重要性、<strong class="bold">部分依赖图</strong>(<strong class="bold">PDP</strong>)和累积依赖图等方法来分析基于特征的解释<a id="_idIndexMarker615"/>进行模型级预测。首先，让我们试试特征重要性图的变量:</p>
+			<pre class="source-code">Var_Importance = explainer.model_parts(</pre>
+			<pre class="source-code">  variable_groups=variable_groups, B=15, random_state=123)</pre>
+			<pre class="source-code">Var_Importance.plot(max_vars=10, </pre>
+			<pre class="source-code">                    rounding_function=np.rint, </pre>
+			<pre class="source-code">                    digits=None, </pre>
+			<pre class="source-code">                    vertical_spacing=0.15,</pre>
+			<pre class="source-code">                    title = 'Feature Importance')</pre>
+			<p>这将产生以下情节:</p>
+			<div><div><img src="img/B18216_09_003.jpg" alt="Figure 9.3 – A feature importance plot from DALEX for global feature-based explanations&#13;&#10;"/>
+				</div>
+			</div>
+			<p class="figure-caption">图 DALEX 的特征重要性图，用于基于特征的全局解释</p>
+			<p>在<em class="italic">图 9.3 </em>中，我们可以看到，经过训练的模型认为球员的能力是决定球员价值的最重要因素，包括球员的总体评级、球员的潜在评级以及其他<a id="_idIndexMarker616"/>能力，如速度、运球技巧、力量和耐力。</p>
+			<p>类似于特性重要性，我们可以生成 PDP。也可以使用以下几行代码生成累积依赖关系图:</p>
+			<pre class="source-code">pdp = explainer.model_profile(type = 'partial', N=800)</pre>
+			<pre class="source-code">pdp.plot(variables = ['age', 'potential'])</pre>
+			<pre class="source-code">ald = explainer.model_profile(type = 'accumulated', N=800)</pre>
+			<pre class="source-code">ald.plot(variables = ['age', 'movement_reactions'])</pre>
+			<p>这将为玩家的汇总档案创建以下图表:</p>
+			<div><div><img src="img/B18216_09_004.jpg" alt="Figure 9.4 – A PDP aggregate profile plot for the age and potential features with &#13;&#10;predictions for model-level explanations&#13;&#10;"/>
+				</div>
+			</div>
+			<p class="figure-caption">图 9.4–年龄和潜在特征的 PDP 总轮廓图，并预测模型级别的解释</p>
+			<p><em class="italic">图 9.4 </em>显示了<code>age</code>和<code>potential</code>的总体特征如何随着足球运动员的预测估值而变化。从剧情中我们可以了解到，随着玩家年龄的增加<a id="_idIndexMarker617"/>，预测的估值降低。类似地，随着玩家潜在等级的增加，玩家的估价也增加。所有这些观察结果也与决定玩家价值的真实世界观察结果相当一致。接下来，让我们看看如何使用 DALEX 获得预测级别的解释。</p>
+			<h2 id="_idParaDest-174"><a id="_idTextAnchor180"/>预测级解释</h2>
+			<p>DALEX 可以提供与模型无关的局部或预测级别的解释以及全局<a id="_idIndexMarker618"/>解释。它使用诸如交互式分解概要、SHAP 特征重要性值和其他条件不变概要(假设概要)等技术来解释单个数据实例级别的模型预测。为了理解这些技术的实际重要性，让我们将这些技术用于我们的用例，来解释一个被训练来预测足球运动员总体估价的 ML 模型。对于我们的例子，我们将比较三名球员的预测水平解释——克里斯蒂亚诺·罗纳尔多、莱昂内尔·梅西和贾登·桑丘。</p>
+			<p>首先，让我们尝试交互式分解图。这可以使用以下代码行来完成:</p>
+			<pre class="source-code">prediction_level = {'interactive_breakdown':[], 'shap':[]}</pre>
+			<pre class="source-code">ibd = explainer.predict_parts(</pre>
+			<pre class="source-code">  player, type='break_down_interactions', label=name)</pre>
+			<pre class="source-code">prediction_level['interactive_breakdown'].append(ibd)</pre>
+			<pre class="source-code">prediction_level['interactive_breakdown'][0].plot(</pre>
+			<pre class="source-code">  prediction_level['interactive_breakdown'][1:3],</pre>
+			<pre class="source-code">  rounding_function=lambda x, </pre>
+			<pre class="source-code">  digits: np.rint(x, digits).astype(np.int),</pre>
+			<pre class="source-code">  digits=None, </pre>
+			<pre class="source-code">  max_vars=15)</pre>
+			<p>这将<a id="_idIndexMarker620"/>为每个玩家生成以下交互式分解轮廓图:</p>
+			<div><div><img src="img/B18216_09_005.jpg" alt="Figure 9.5 – An interactive breakdown plot from DALEX&#13;&#10;"/>
+				</div>
+			</div>
+			<p class="figure-caption">图 9.5-来自 DALEX 的交互式分解图</p>
+			<p><em class="italic">图 9.5 </em>显示了比较三个选定玩家的模型预测的交互分解图。该图显示了每个特征对最终预测值的贡献。增加模型预测值的特征值以不同于减少预测值的特征的颜色显示。此图显示了总预测值相对于数据实例的每个特征值的细分。</p>
+			<p>现在，三位球员都是世界级的职业足球运动员；然而，与年轻的<a id="_idIndexMarker621"/>天才桑丘相比，罗纳尔多和梅西都是经验丰富的球员，是这项运动的活传奇。所以，如果观察剧情，说明对于 c 罗和梅西来说，<code>age</code>特征降低了预测值，而对于桑丘来说，略有增加。非常有趣的是，我们观察到该模型能够了解足球运动员年龄的增加如何降低他们的估值。这一观察结果也与领域专家的观察结果相一致，这些专家认为更年轻、更有潜力的玩家拥有更高的市场价值。与分解图类似，DALEX 也提供 SHAP 特征重要性图来分析特征的贡献。该方法提供了类似的信息，如分解图，但要素重要性是基于 SHAP 值计算的。可以使用下面几行代码获得它:</p>
+			<pre class="source-code">sh = explainer.predict_parts(player, type='shap', B=10, </pre>
+			<pre class="source-code">                             label=name)</pre>
+			<pre class="source-code">prediction_level['shap'].append(sh)</pre>
+			<pre class="source-code">prediction_level['shap'][0].plot(</pre>
+			<pre class="source-code">  prediction_level['shap'][1:3],</pre>
+			<pre class="source-code">  rounding_function=lambda x, </pre>
+			<pre class="source-code">  digits: np.rint(x, digits).astype(np.int),</pre>
+			<pre class="source-code">  digits=None, </pre>
+			<pre class="source-code">  max_vars=15)</pre>
+			<p>接下来，我们将使用基于 DALEX 中<strong class="bold">其他条件不变情况</strong>的<em class="italic">假设</em>图。其他条件不变的情况类似于<strong class="bold">敏感性分析</strong>，这在<a href="B18216_02_ePub.xhtml#_idTextAnchor033"> <em class="italic">第二章</em> </a>、<em class="italic">模型解释方法</em>中有所涉及。它基于<em class="italic">其他条件不变的原则</em>，这意味着当其他一切保持不变时，我们可以确定特定特征的变化将如何影响模型预测。这个过程<a id="_idIndexMarker622"/>通常被称为<strong class="bold">假设模型分析</strong>或<strong class="bold">个人条件期望</strong>。就应用而言，在我们的例子中，我们可以使用这个<a id="_idIndexMarker623"/>方法来找出 Jadon Sancho <a id="_idIndexMarker624"/>的预测估值可能会随着他的年龄增长或他的整体潜力增加而变化。我们可以通过使用下面几行代码来找出答案:</p>
+			<pre class="source-code">ceteris_paribus_profile = explainer.predict_profile(</pre>
+			<pre class="source-code">    player, </pre>
+			<pre class="source-code">    variables=['age', 'potential'],</pre>
+			<pre class="source-code">    label=name) # variables to calculate </pre>
+			<pre class="source-code">ceteris_paribus_profile.plot(size=3, </pre>
+			<pre class="source-code">                             title= f"What If? {name}")</pre>
+			<p>这将在 DALEX 中产生以下交互式假设图:</p>
+			<div><div><img src="img/B18216_09_006.jpg" alt="Figure 9.6 – An interactive what-if plot in DALEX&#13;&#10;"/>
+				</div>
+			</div>
+			<p class="figure-caption">图 9.6-DALEX 中的交互式假设图</p>
+			<p><em class="italic">图 9.6 </em>显示，对于 Jadon Sancho 来说，随着年龄的增长，市场估值会开始下降；然而，它也可以随着整体潜在评级的增加而增加。我强烈建议您从项目资源库提供的教程笔记本中探索所有这些预测级解释<a id="_idIndexMarker625"/>选项:<a href="https://github.com/PacktPublishing/Applied-Machine-Learning-Explainability-Techniques/blob/main/Chapter09/DALEX_example.ipynb">https://github . com/packt publishing/Applied-Machine-Learning-explability-Techniques/blob/main/chapter 09/DALEX _ example . ipynb</a>。接下来，我们将使用 DALEX 来评估模型的公平性。</p>
+			<h2 id="_idParaDest-175"><a id="_idTextAnchor181"/>评估模型的公平性</h2>
+			<p>模型公平性检查是 DALEX 的另一个<a id="_idIndexMarker626"/>重要特征。但是，对于依赖于与性别、种族、民族、国籍和其他类似人口统计特征相关的特征的分类问题，模型公平性<a id="_idIndexMarker627"/>和偏差检测更重要。然而，我们也将把它应用到回归模型中。有关使用 DALEX 进行模型公平性检查的更多详情，请参考<a href="https://dalex.drwhy.ai/python-dalex-fairness.html">https://dalex.drwhy.ai/python-dalex-fairness.html</a>中的<a id="_idIndexMarker628"/>。现在，让我们看看我们的模型是否没有任何偏见，是否公平！</p>
+			<p>我们将为公平性检查创建一个<strong class="bold">受保护变量</strong>和<strong class="bold">特权变量</strong>。在 ML 的公平性检查中，我们试图确保受保护的变量没有任何偏见。如果我们<a id="_idIndexMarker629"/>预期任何特征值或组由于不平衡数据集等因素而有任何偏差，我们可以将它们声明为特权变量。对于我们的用例，我们将根据年龄对三组不同的玩家进行公平性检查。</p>
+			<p>所有 20 岁以下的玩家都被认为是<em class="italic">青年</em>玩家，20-30 岁的玩家被认为是<em class="italic">发展</em>玩家，30 岁以上的玩家被认为是<em class="italic">发展</em>玩家。现在，让我们使用 DALEX 进行公平性检查:</p>
+			<pre class="source-code">protected = np.where(x_valid.age &lt; 30, np.where(x_valid.age &lt; 20, 'youth', 'developing'), 'developed')</pre>
+			<pre class="source-code">privileged = 'youth'</pre>
+			<pre class="source-code">fairness = explainer.model_fairness(protected=protected,</pre>
+			<pre class="source-code">                                    privileged=privileged)</pre>
+			<pre class="source-code">fairness.fairness_check(epsilon = 0.7)</pre>
+			<p>这是公平性检查的结果:</p>
+			<pre>No bias was detected! Conclusion: your model is fair in terms of checked fairness criteria.</pre>
+			<p>我们还可以检查公平性检查的定量证据，并绘制它们以供进一步分析:</p>
+			<pre class="source-code">fairness.result</pre>
+			<pre class="source-code">fairness.plot()</pre>
+			<p>这将生成以下图，用于使用 DALEX 分析模型公平性检查:</p>
+			<div><div><img src="img/B18216_09_007.jpg" alt="Figure 9.7 – A model fairness plot using DALEX&#13;&#10;"/>
+				</div>
+			</div>
+			<p class="figure-caption">图 9.7-使用 DALEX 的模型公平性图</p>
+			<p>如<em class="italic">图 9.7 </em>所示，对回归模型使用 DALEX 的模型公平性是根据独立性、分离性和充分性的度量完成的。对于分类<a id="_idIndexMarker630"/>模型，这些指标可能会有所不同，但是 API 函数的用法是相同的。接下来，我们将讨论使用 DALEX 构建交互式仪表板的基于 web 的工具 ARENA。</p>
+			<h2 id="_idParaDest-176"><a id="_idTextAnchor182"/>使用 ARENA 的交互式仪表盘</h2>
+			<p>DALEX 的另一个有趣的特性是 ARENA dashboard 平台，它可以创建一个交互式的<a id="_idIndexMarker631"/> web 应用程序，该应用程序可以用来<a id="_idIndexMarker632"/>设计一个定制的仪表板，用于保存使用不同的模型解释方法获得的所有 DALEX 交互式可视化。DALEX 的这一特殊功能为我们提供了一个机会，通过为特定问题创建一个定制的仪表板来创建更好的用户参与。</p>
+			<p>开始之前，我们需要创建一个 DALEX Arena 数据集:</p>
+			<pre class="source-code">arena_dataset = df_test[:400].set_index('short_name')</pre>
+			<p>接下来，我们需要创建一个<code>Arena</code>对象，并推送从正在解释的黑盒模型创建的 DALEX explainer 对象:</p>
+			<pre class="source-code">arena = dx.Arena()</pre>
+			<pre class="source-code"># push DALEX explainer object</pre>
+			<pre class="source-code">arena.push_model(explainer)</pre>
+			<p>接着<a id="_idIndexMarker633"/>我们只需要推送竞技场数据集<a id="_idIndexMarker634"/>并启动服务器来激活我们的竞技场平台:</p>
+			<pre class="source-code"># push whole test dataset (including target column)</pre>
+			<pre class="source-code">arena.push_observations(arena_dataset)</pre>
+			<pre class="source-code"># run server on port 9294</pre>
+			<pre class="source-code">arena.run_server(port=9294)</pre>
+			<p>基于所提供的端口，DALEX 服务器将在<a href="https://arena.drwhy.ai/?data=http://127.0.0.1:9294/">https://arena.drwhy.ai/?data=http://127.0.0.1:9294/</a>上运行。最初，您将获得一个空白的仪表板，但您可以轻松地从右侧面板拖放视觉效果，以制作您自己的自定义仪表板，如以下屏幕截图所示:</p>
+			<div><div><img src="img/B18216_09_008.jpg" alt="Figure 9.8 – An interactive Arena dashboard created using DALEX&#13;&#10;"/>
+				</div>
+			</div>
+			<p class="figure-caption">图 9.8-使用 DALEX 创建的交互式竞技场仪表盘</p>
+			<p>此外，您可以从配置 JSON 加载现有的仪表板，或者将构建仪表板<a id="_idIndexMarker635"/>导出为配置 JSON 文件。尝试<a id="_idIndexMarker636"/>重新创建仪表板，如图<em class="italic">图 9.8 </em>所示，使用<a href="https://raw.githubusercontent.com/PacktPublishing/Applied-Machine-Learning-Explainability-Techniques/main/Chapter09/dalex_sessions/session-1647894542387.json">https://raw . githubusercontent . com/packt publishing/Applied-Machine-Learning-explability-Techniques/main/chapter 09/dalex _ sessions/session-1647894542387 . JSON</a>的代码库中提供的配置 JSON 文件。</p>
+			<p>总的来说，我发现 DALEX 是一个非常有趣和强大的 XAI 框架。在<a href="https://github.com/ModelOriented/DALEX">https://github.com/ModelOriented/DALEX</a>和<a href="https://github.com/ModelOriented/DrWhy/blob/master/README.md">https://github . com/model oriented/dr why/blob/master/readme . MD</a>还有更多例子。请探索所有这些。然而，DALEX 似乎仅限于结构化数据。我认为作为一个未来的范围，使 DALEX 易于应用于图像和文本数据将增加它在人工智能研究社区中的采用。在下一节中，我们将探索 Explainerdashboard，这是另一个有趣的 XAI 框架。</p>
+			<h1 id="_idParaDest-177"><a id="_idTextAnchor183"/>讲解黑板</h1>
+			<p>人工智能研究社区一直认为交互式可视化是解释 ML 模型预测的重要方法。在这一节中，我们将介绍<strong class="bold"> Explainerdashboard </strong>，这是一个有趣的 Python 框架，它可以用最少的代码行构建一个全面的交互式<a id="_idIndexMarker637"/>仪表板，涵盖模型可解释性的各个方面。尽管这个框架只支持 scikit-learn 兼容的模型(包括 XGBoost、CatBoost 和 LightGBM)，但它可以提供与模型无关的全局和局部可解释性。目前，它支持基于 SHAP 的功能重要性和交互、PDP、模型性能分析、假设模型分析，甚至基于决策树的分解分析图。</p>
+			<p>该框架允许定制仪表板，但我认为默认版本包括了模型可解释性的所有支持方面。生成的基于 web 应用的仪表盘<a id="_idIndexMarker638"/>可以直接从实时仪表盘导出为静态网页。否则，仪表板可以通过自动化的<strong class="bold">持续集成</strong> ( <strong class="bold"> CI </strong> )/ <strong class="bold">持续部署</strong> ( <strong class="bold"> CD </strong>)部署过程以编程方式部署为 web app。在我们开始下一步的演练教程示例之前，我建议您<a id="_idIndexMarker639"/>浏览一下框架的官方文档(<a href="https://explainerdashboard.readthedocs.io/en/latest/">https://explainerdashboard.readthedocs.io/en/latest/</a>)和 GitHub 项目库(<a href="https://github.com/oegedijk/explainerdashboard">https://github.com/oegedijk/explainerdashboard</a>)。</p>
+			<h2 id="_idParaDest-178"><a id="_idTextAnchor184"/>设置解释器面板</h2>
+			<p>完整的教程笔记本在本章的代码库中提供，位于<a href="https://github.com/PacktPublishing/Applied-Machine-Learning-Explainability-Techniques/blob/main/Chapter09/Explainer_dashboard_example.ipynb">https://github . com/packt publishing/Applied-Machine-Learning-explability-Techniques/blob/main/chapter 09/Explainer _ dashboard _ example . ipynb</a>。然而，在这一节中，我将提供一个完整的教程。同样的<em class="italic"> FIFA 俱乐部位置预测数据集</em>(<a href="https://www.kaggle.com/datasets/adityabhattacharya/fifa-club-position-prediction-dataset">https://www . ka ggle . com/datasets/adityabhattacharya/FIFA-Club-Position-Prediction-dataset</a>)也将用于本教程。但在这里，我不是使用数据集来预测足球运动员的估值，而是根据为俱乐部效力的足球运动员的技术和能力，使用这个数据集来预测足球俱乐部下赛季的联赛排名。</p>
+			<p>预测未来一个赛季的俱乐部联赛位置的真实任务更加复杂，为了获得准确的预测，还需要包括其他几个变量。然而，这个预测问题仅仅基于为俱乐部效力的球员的质量。</p>
+			<p>要开始学习本教程，您需要安装运行笔记本所需的所有依赖项。如果您已经执行了前面所有的教程示例，那么除了使用<code>pip</code>安装程序的<code>explainerdashboard</code>之外，大部分的 Python 模块<a id="_idIndexMarker640"/>都应该被安装了:</p>
+			<pre class="source-code">!pip install explainerdashboard</pre>
+			<p>Explainerdashboard 框架确实依赖于<code>graphviz</code>模块，这使得根据您的系统进行安装有些繁琐。在撰写本文时，我发现 0.18 版本最适合使用 Explainerdashboard。这可以使用 pip 安装程序进行安装:</p>
+			<pre class="source-code">!pip install graphviz==0.18</pre>
+			<p><code>graphviz</code>二进制文件取决于您使用的操作系统。请访问<a href="https://graphviz.org/">https://graphviz.org/</a>了解更多信息。此外，如果您在设置该模块的过程中遇到任何摩擦<a id="_idIndexMarker641"/>，请查看 https://pypi.org/project/graphviz/<a href="https://pypi.org/project/graphviz/">提供的安装说明。</a></p>
+			<p>我们将把这个 ML 问题看作是一个回归问题。因此，与 DALEX 示例类似，我们将需要执行相同的数据预处理、特征工程、模型训练和评估步骤。我建议你按照笔记本里提供的步骤去做，网址是<a href="https://github.com/PacktPublishing/Applied-Machine-Learning-Explainability-Techniques/blob/main/Chapter09/Explainer_dashboard_example.ipynb">https://github . com/packt publishing/Applied-Machine-Learning-explability-Techniques/blob/main/chapter 09/Explainer _ dashboard _ example . ipynb</a>。这包含了获得训练模型所必需的细节。我们将使用这个训练好的模型作为黑盒，并在下一节中使用 Explainerdashboard 来解释它。</p>
+			<h2 id="_idParaDest-179"><a id="_idTextAnchor185"/>用 Explainerdashboard 对可解释性建模</h2>
+			<p>Explainerdashboard Python 模块的<a id="_idIndexMarker643"/>安装成功后，可以导入来验证安装:</p>
+			<pre class="source-code">import explainerdashboard</pre>
+			<p>对于这个例子，我们将使用<code>RegressionExplainer</code>和<code>ExplainerDashboard</code>子模块。因此，我们将加载特定的子模块:</p>
+			<pre class="source-code">from explainerdashboard import RegressionExplainer, ExplainerDashboard</pre>
+			<p>接下来，仅使用两行代码，我们就可以启动本例的<code>ExplainerDashboard</code>子模块:</p>
+			<pre class="source-code">explainer = RegressionExplainer(model_skl, x_valid, y_valid)</pre>
+			<pre class="source-code">ExplainerDashboard(explainer).run()</pre>
+			<p>一旦该步骤成功运行，仪表板应该在端口<code>8050</code>作为默认端口的<code>localhost</code>中运行。所以，你可以在浏览器中访问<code>http://localhost:8050/</code>来查看你的解释器仪表板。</p>
+			<p>下面的<a id="_idIndexMarker644"/>列出了 Explainerdashboards 提供的不同的可解释方法:</p>
+			<ul>
+				<li><strong class="bold">特征重要性</strong>:与其他 XAI 框架类似，特征重要性是了解用于预测的每个属性的总体贡献的重要方法。该框架使用 SHAP 值、排列重要性和 PDP 来分析每个特征对模型预测的贡献:</li>
+			</ul>
+			<div><div><img src="img/B18216_09_009.jpg" alt="Figure 9.9 – Contribution plots and PDPs from Explainerdashboard&#13;&#10;"/>
+				</div>
+			</div>
+			<p class="figure-caption">图 9.9–来自 Explainerdashboard 的贡献图和 PDP</p>
+			<ul>
+				<li><strong class="bold">模型性能</strong>:和 DALEX 类似，Explainerdashboard 也可以让你分析模型性能。对于分类模型，它使用精度<a id="_idIndexMarker645"/>图、混淆矩阵、ROC-AUC 图、PR AUC 图等指标。对于回归模型，我们将看到残差图、拟合优度图等图:</li>
+			</ul>
+			<div><div><img src="img/B18216_09_010.jpg" alt="Figure 9.10 – Model performance analysis plots for regression models in Explainerdashboard&#13;&#10;"/>
+				</div>
+			</div>
+			<p class="figure-caption">图 9.10–explainer dashboard 中回归模型的模型性能分析图</p>
+			<ul>
+				<li><strong class="bold">预测级分析</strong> : Explainerdashboard 为获取局部解释提供了有趣的互动情节。这与其他 Python 框架非常相似。这对于分析预测级别的结果非常重要。</li>
+				<li><strong class="bold">假设分析</strong>:explainer dashboard 提供的另一个有趣的选项是假设分析特性。我们可以使用这个特性来改变特征值<a id="_idIndexMarker646"/>，并观察整体预测是如何变化的。我发现假设分析对于提供规定性的见解非常有用:</li>
+			</ul>
+			<div><div><img src="img/B18216_09_011.jpg" alt="Figure 9.11 – What-if model analysis using Explainerdashboard&#13;&#10;"/>
+				</div>
+			</div>
+			<p class="figure-caption">图 9.11–使用 Explainerdashboard 的假设模型分析</p>
+			<ul>
+				<li><strong class="bold">特性依赖和交互</strong>:分析不同特性之间的依赖和交互是 Explainerdashboard 提供的另一个有趣的可解释性方法。大多数情况下，它使用 SHAP 方法来分析功能的依赖性和相互作用。</li>
+				<li><strong class="bold">决策树代理解释器</strong>:解释器 dashboard 使用决策树作为<a id="_idIndexMarker647"/>代理解释器。此外，它使用决策树分解图来解释模型:</li>
+			</ul>
+			<div><div><img src="img/B18216_09_012.jpg" alt="Figure 9.12 – Decision tree surrogate explainers in Explainerdashboard&#13;&#10;"/>
+				</div>
+			</div>
+			<p class="figure-caption">图 9.12–解释器面板中的决策树代理解释器</p>
+			<p>要停止在本地系统上运行仪表板，只需中断笔记本单元。</p>
+			<p>Explainerdashboard 还为您提供了许多定制选项。要从给定的模板定制自己的仪表板，建议您参考<a href="https://github.com/oegedijk/explainerdashboard#customizing-your-dashboard">https://github . com/oegedijk/explainerdashboard # customizing-your-dashboard</a>。您还可以构建多个仪表板，并将所有仪表板编译成一个解释器中心:【https://github.com/oegedijk/explainerdashboard#explainerhub】T2。要将仪表盘部署到一个可从任何地方访问的实时 web 应用程序中，我建议你看看 https://github.com/oegedijk/explainerdashboard#deployment 的<a href="https://github.com/oegedijk/explainerdashboard#deployment"/>。</p>
+			<p>与 DALEX 相比，我会说 Explainerdashboard 稍微落后一些，因为它只限于 scikit-learn 兼容的模型。这意味着，对于建立在图像和文本等非结构化数据上的复杂深度学习模型<a id="_idIndexMarker648"/>，你无法使用这个框架。然而，我发现它很容易使用，并且对于建立在表格数据集上的 ML 模型非常有用。在下一节中，我们将介绍微软的 XAI 框架。</p>
+			<h1 id="_idParaDest-180"><a id="_idTextAnchor186"/>解释</h1>
+			<p>interpret ml(https://interpret.ml/)是微软的一个 XAI 工具包。它<a id="_idIndexMarker650"/>旨在为 ML 模型的模型调试、结果解释和监管审计提供对 ML 模型的全面理解。有了这个 Python 模块，我们可以训练<em class="italic">可解释的玻璃盒子模型</em>或者<em class="italic">解释黑盒模型</em>。</p>
+			<p>在<a href="B18216_01_ePub.xhtml#_idTextAnchor014"> <em class="italic">第一章</em> </a>、<em class="italic">可解释技术的基本概念</em>中，我们发现一些模型，如决策树、线性模型或规则拟合算法，是天生可解释的。然而，这些模型对于复杂的数据集来说效率不高。通常，这些模型被称为玻璃盒模型，而不是黑盒模型，因为它们非常透明。</p>
+			<p>微软研究院开发了另一种叫做<strong class="bold">可解释 Boosting Machine </strong> ( <strong class="bold"> EBM </strong>)的算法，将<a id="_idIndexMarker651"/>Boosting、bagging、自动交互检测等现代 ML 技术引入到<strong class="bold">广义可加模型</strong> ( <strong class="bold"> GAMs </strong>)等经典算法中。研究人员还发现，EBM 作为随机森林和梯度增强树是准确的，但不像这种黑盒模型，EBM 是可解释的和透明的。因此，EBM 是内置于 InterpretML 框架中的玻璃盒子模型。</p>
+			<p>与 DALEX 和 Explainerdashboard 相比，InterpretML 在可用性和采用率方面稍显落后。然而，由于这一框架具有进一步发展的巨大潜力，因此讨论这一框架是很重要的。在讨论代码教程之前，让我们讨论一下这个框架支持的可解释性技术。</p>
+			<h2 id="_idParaDest-181"><a id="_idTextAnchor187"/>支持的解释方法</h2>
+			<p>在本文撰写之时<a id="_idIndexMarker653"/>，下表说明了在 InterpretML 中支持的解释方法，正如在<a href="https://github.com/interpretml/interpret#supported-techniques">https://GitHub . com/interpret ml/interpret # supported-techniques</a>的 GitHub 项目源代码中提到的:</p>
+			<div><div><img src="img/B18216_09_013.jpg" alt="Figure 9.13 – Explanation methods supported in InterpretML&#13;&#10;"/>
+				</div>
+			</div>
+			<p class="figure-caption">图 9.13-interpret ml 中支持的解释方法</p>
+			<p>我建议你留意一下项目文档，因为我很确定这个框架支持的解释方法会随着 InterpretML 的增加而增加。接下来，我们来探讨一下如何在实践中使用这个框架。</p>
+			<h2 id="_idParaDest-182"><a id="_idTextAnchor188"/>设置解释</h2>
+			<p>在本节中，我将带您浏览在代码库中提供的 InterpretML 的教程示例，该代码库位于<a href="https://github.com/PacktPublishing/Applied-Machine-Learning-Explainability-Techniques/blob/main/Chapter09/InterpretML_example.ipynb">https://github . com/packt publishing/Applied-Machine-Learning-explability-Techniques/blob/main/chapter 09/interpret ml _ example . ipynb</a>。在教程中，我们使用 InterpretML 解释了一个为肝炎检测训练的 ML 模型，肝炎检测是一个分类问题。</p>
+			<p>要解决这个问题，您需要安装 InterpretML Python 模块。为此，您可以使用 pip 安装程序:</p>
+			<pre class="source-code">pip install interpret</pre>
+			<p>尽管 Windows、Mac 和 Linux 都支持该框架，但它要求您拥有高于 3.6 的 Python 版本。您可以通过导入模块来验证安装是否成功:</p>
+			<pre class="source-code">import interpret as iml</pre>
+			<p>接下来，让我们讨论一下本教程中使用的数据集。</p>
+			<h2 id="_idParaDest-183"><a id="_idTextAnchor189"/>关于数据集的讨论</h2>
+			<p>肝炎检测数据集<a id="_idIndexMarker656"/>来自 https://archive.ics.uci.edu/ml/datasets/hepatitis.的 UCI 机器学习库，它有 155 个记录和 20 个不同类型的特征<a id="_idIndexMarker657"/>用于检测肝炎疾病。因此，该数据集用于解决二元分类问题。为了您的方便，我已经将这个数据集添加到位于<a href="https://github.com/PacktPublishing/Applied-Machine-Learning-Explainability-Techniques/tree/main/Chapter09/datasets/Hepatitis_Data">https://github . com/packt publishing/Applied-Machine-Learning-explability-Techniques/tree/main/chapter 09/datasets/Hepatitis _ Data</a>的代码库中。</p>
+			<p class="callout-heading">肝炎数据集引用</p>
+			<p class="callout"><em class="italic"> G .龚(卡耐基-梅隆大学)via Bojan Cestnik，Jozef Stefan Institute ( </em>、、</p>
+			<p>有关数据集和初始探索结果的更多详细信息包含在教程笔记本中。然而，在一个非常高的层次上，<em class="italic">数据集是不平衡的</em>，它有<em class="italic">缺失值</em>，它有<em class="italic">分类变量</em>和<em class="italic">连续变量</em>。因此，在建立模型之前，需要进行必要的转换。所有这些必要的步骤都包含在教程笔记本中，但是请随意探索构建更好的 ML 模型的其他方法。</p>
+			<h2 id="_idParaDest-184"><a id="_idTextAnchor190"/>训练模型</h2>
+			<p>对于这个<a id="_idIndexMarker658"/>示例，在将整个数据划分为训练集和测试集之后，我使用最小超参数调整训练了一个随机森林分类器:</p>
+			<pre class="source-code">x_train, x_test, y_train, y_test = train_test_split(</pre>
+			<pre class="source-code">  encoded, label, test_size=0.3, random_state=123)</pre>
+			<pre class="source-code">model = RandomForestClassifier(</pre>
+			<pre class="source-code">  n_estimators=500, min_samples_split = 3,</pre>
+			<pre class="source-code">  random_state=123).fit(x_train, y_train)</pre>
+			<p>注意，这个模型没有进行足够的超参数调整，因为我们更感兴趣的是使用 InterpretML 的模型可解释性部分，而不是学习如何构建一个有效的 ML 模型。但是，我鼓励您进一步探索超参数调优，以获得更好的模型。</p>
+			<p>在根据测试数据评估<a id="_idIndexMarker659"/>模型时，我们获得了 85%的准确率和 70%的 ROC 曲线下面积 ( <strong class="bold"> AUC </strong>)的<strong class="bold">得分。AUC 分数比准确性低得多，因为使用的数据集是不平衡的。这表明准确性等指标可能会产生误导。因此，最好考虑 AUC 分数、F1 分数和混淆矩阵等指标，而不是模型评估的准确性。</strong></p>
+			<p>接下来，我们将使用 InterpretML 实现模型的可解释性。</p>
+			<h2 id="_idParaDest-185">用 InterpretML 解释的能力</h2>
+			<p>如前所述，使用 InterpretML。你可以使用可解释的玻璃盒子模型作为替代解释者，或者探索某些与模型无关的方法来解释黑盒模型。使用这两种方法，您可以获得一个交互式仪表板，用于分析可解释性的各个方面。首先，我将使用 InterpretML 中的玻璃盒子模型来讨论模型的可解释性。</p>
+			<h3>使用 InterpretML 解释玻璃盒模型</h3>
+			<p>InterpretML 支持<a id="_idIndexMarker663"/>可解释的玻璃盒模型<a id="_idIndexMarker664"/>，如<strong class="bold">可解释的助推机</strong> ( <strong class="bold"> EBM </strong>)、<strong class="bold">决策树</strong>和<strong class="bold">规则拟合</strong>算法。这些算法被用作代理解释器来提供事后模型解释能力。首先，让我们尝试一下 EBM 算法。</p>
+			<h4>循证医学</h4>
+			<p>为了用 EBM 解释一个模型，我们需要用 Python 加载所需的子模块:</p>
+			<pre class="source-code">from interpret.glassbox import ExplainableBoostingClassifier</pre>
+			<p>一旦 EBM 子模块被成功导入，我们只需要创建一个经过训练的代理解释器对象:</p>
+			<pre class="source-code">ebm = ExplainableBoostingClassifier(feature_types=feature_types)</pre>
+			<pre class="source-code">ebm.fit(x_train, y_train)</pre>
+			<p><code>ebm</code>变量是 EBM 解释器对象。我们可以用这个变量得到全局或局部的解释。框架<a id="_idIndexMarker665"/>仅支持基于特征重要性的全局和局部可解释性，但为进一步分析创建了一个交互图:</p>
+			<pre class="source-code"># Showing Global Explanations</pre>
+			<pre class="source-code">ebm_global = ebm.explain_global()</pre>
+			<pre class="source-code">iml.show(ebm_global)</pre>
+			<pre class="source-code"># Local explanation using EBM</pre>
+			<pre class="source-code">ebm_local = ebm.explain_local(x_test[5:6], y_test[5:6], </pre>
+			<pre class="source-code">                              name = 'Local Explanation')</pre>
+			<pre class="source-code">iml.show(ebm_local)</pre>
+			<p><em class="italic">图 9.14 </em>显示了全球特征重要性图和<em class="italic">年龄</em>特征的变化，以及使用 InterpretML 获得的总体数据分布:</p>
+			<div><div><img src="img/B18216_09_014.jpg" alt="Figure 9.14 – Global explanation plots using InterpretML&#13;&#10;"/>
+				</div>
+			</div>
+			<p class="figure-caption">图 9.14-使用 InterpretML 的全局解释图</p>
+			<p>在单个数据实例的预测水平上完成的局部解释的特征重要性如图 9.15 所示:</p>
+			<div><div><img src="img/B18216_09_015.jpg" alt="Figure 9.15 – Local explanation using InterpretML&#13;&#10;"/>
+				</div>
+			</div>
+			<p class="figure-caption">图 9.15-使用 InterpretML 的本地解释</p>
+			<p>接下来，我们将探索基于规则的<a id="_idIndexMarker666"/>算法在 InterpretML 中作为<em class="italic">代理解释器</em>，正如在<a href="B18216_02_ePub.xhtml#_idTextAnchor033"> <em class="italic">第二章</em> </a>，<em class="italic">模型可解释方法</em>中所讨论的。</p>
+			<h4>决策规则列表</h4>
+			<p>与 EBM 类似，在 InterpretML <a id="_idIndexMarker667"/>中提供的另一个流行的玻璃盒代理解释器是 decision <a id="_idIndexMarker668"/>规则列表。这类似于规则拟合算法，它可以从数据集中学习特定的规则，以解释模型的逻辑工作。我们可以通过以下方式使用 InterpretML 来应用这个方法:</p>
+			<pre class="source-code">from interpret.glassbox import DecisionListClassifier</pre>
+			<pre class="source-code">dlc = DecisionListClassifier(feature_types=feature_types)</pre>
+			<pre class="source-code">dlc.fit(x_train, y_train)</pre>
+			<pre class="source-code"># Showing Global Explanations</pre>
+			<pre class="source-code">dlc_global = dlc.explain_global()</pre>
+			<pre class="source-code">iml.show(dlc_global)</pre>
+			<p>通过这个<a id="_idIndexMarker669"/>方法，框架<a id="_idIndexMarker670"/>显示学习到的规则，如下面的截图所示:</p>
+			<div><div><img src="img/B18216_09_016.jpg" alt="Figure 9.16 – Decision rule list using InterpretML&#13;&#10;"/>
+				</div>
+			</div>
+			<p class="figure-caption">图 9.16–使用 InterpretML 的决策规则列表</p>
+			<p>正如我们在<em class="italic">图 9.16 </em>中看到的，它生成了一个已学习规则的列表。接下来，我们将探索 InterpretML 中基于决策树的代理解释器。</p>
+			<h4>决策图表</h4>
+			<p>类似于<a id="_idIndexMarker671"/>决策规则列表，我们也可以<a id="_idIndexMarker672"/>将决策树算法作为代理解释器，使用 InterpretML 实现模型的可解释性。应用决策树分类器的 API 语法也非常相似:</p>
+			<pre class="source-code">from interpret.glassbox import ClassificationTree</pre>
+			<pre class="source-code">dtc = ClassificationTree(feature_types=feature_types)</pre>
+			<pre class="source-code">dtc.fit(x_train, y_train)</pre>
+			<pre class="source-code"># Showing Global Explanations</pre>
+			<pre class="source-code">dtc_global = dtc.explain_global()</pre>
+			<pre class="source-code">iml.show(dtc_global)</pre>
+			<p>这将生成一个决策树分解图，如下面的屏幕截图所示，用于模型解释:</p>
+			<div><div><img src="img/B18216_09_017.jpg" alt="Figure 9.17 – A decision tree-based surrogate explainer in InterpretML&#13;&#10;"/>
+				</div>
+			</div>
+			<p class="figure-caption">图 9.17-基于决策树的代理解释器</p>
+			<p>现在，所有这些单独的<a id="_idIndexMarker674"/>组件的<a id="_idIndexMarker673"/>也可以使用下面的代码组合成一个单一的仪表板:</p>
+			<pre class="source-code">iml.show([ebm_global, ebm_local, dlc_global, dtc_global])</pre>
+			<p><em class="italic">图 9.18 </em>展示了使用 InterpretML:</p>
+			<div><div><img src="img/B18216_09_018.jpg" alt="Figure 9.18 – The InterpretML dashboard consolidating all individual plots&#13;&#10;"/>
+				</div>
+			</div>
+			<p class="figure-caption">图 9.18–整合所有单个图的 InterpretML 仪表板</p>
+			<p>在下一个<a id="_idIndexMarker675"/>部分，我们将讨论<a id="_idIndexMarker676"/>在 InterpretML 中提供黑盒模型的模型不可知解释的各种方法。</p>
+			<h3>使用 InterpretML 解释黑盒模型</h3>
+			<p>在这一节中，我们将介绍解释黑盒模型的四种不同的方法。我们将只讨论代码部分，因为特性重要性和特性变化的可视化非常类似于玻璃盒子模型。我强烈建议查看教程笔记本，与生成的图进行交互，以获得更多的见解。支持的方法有石灰、核 SHAP、莫里斯敏感度和部分相关:</p>
+			<pre class="source-code">from interpret.blackbox import LimeTabular, ShapKernel, MorrisSensitivity, PartialDependence</pre>
+			<p>首先，我们将探讨石灰表格法:</p>
+			<pre class="source-code">#The InterpretML Blackbox explainers need a predict function, and optionally a dataset</pre>
+			<pre class="source-code">lime = LimeTabular(predict_fn=model.predict_proba, data=x_train.astype('float').values, random_state=123)</pre>
+			<pre class="source-code">#Select the instances to explain, optionally pass in labels if you have them</pre>
+			<pre class="source-code">lime_local = lime.explain_local(</pre>
+			<pre class="source-code">  x_test[:5].astype('float').values, </pre>
+			<pre class="source-code">  y_test[:5], name='LIME')</pre>
+			<p>接下来，InterpretML 为基于 SHAP 的模型不可知解释提供了<a id="_idIndexMarker678"/>SHAP 核方法:</p>
+			<pre class="source-code"># SHAP explanation</pre>
+			<pre class="source-code">background_val = np.median(</pre>
+			<pre class="source-code">  x_train.astype('float').values, axis=0).reshape(1, -1)</pre>
+			<pre class="source-code">shap = ShapKernel(predict_fn=model.predict_proba, </pre>
+			<pre class="source-code">                  data=background_val, </pre>
+			<pre class="source-code">                  feature_names=list(x_train.columns))</pre>
+			<pre class="source-code">shap_local = shap.explain_local(</pre>
+			<pre class="source-code">  x_test[:5].astype('float').values, </pre>
+			<pre class="source-code">  y_test[:5], name='SHAP')</pre>
+			<p>另一种支持的模型无关全局解释方法是<strong class="bold"> Morris Sensitivity </strong>，用于获得特征的总体敏感度:</p>
+			<pre class="source-code"># Morris Sensitivity</pre>
+			<pre class="source-code">sensitivity = MorrisSensitivity(</pre>
+			<pre class="source-code">  predict_fn=model.predict_proba, </pre>
+			<pre class="source-code">  data=x_train.astype('float').values,                                </pre>
+			<pre class="source-code">  feature_names=list(x_train.columns),                                </pre>
+			<pre class="source-code">  feature_types=feature_types)</pre>
+			<pre class="source-code">sensitivity_global = sensitivity.explain_global(name="Global Sensitivity")</pre>
+			<p>InterpretML 还支持 PDP 来分析特性依赖性:</p>
+			<pre class="source-code"># Partial Dependence</pre>
+			<pre class="source-code">pdp = PartialDependence(</pre>
+			<pre class="source-code">  predict_fn=model.predict_proba, </pre>
+			<pre class="source-code">  data=x_train.astype('float').values,                        </pre>
+			<pre class="source-code">  feature_names=list(x_train.columns),</pre>
+			<pre class="source-code">  feature_types=feature_types)</pre>
+			<pre class="source-code">pdp_global = pdp.explain_global(name='Partial Dependence')</pre>
+			<p>最后，所有的<a id="_idIndexMarker679"/>都可以通过一行代码整合到一个仪表板中:</p>
+			<pre class="source-code">iml.show([lime_local, shap_local, sensitivity_global, </pre>
+			<pre class="source-code">          pdp_global])</pre>
+			<p>这将创建一个类似的交互式仪表板，如图<em class="italic">图 9.18 </em>所示。</p>
+			<p>有了各种代理解释器和交互式仪表板，这个框架确实有很大的潜力，尽管有相当多的限制。它仅限于表格数据集，它与 PyTorch、TensorFlow 和 H20 等模型框架不兼容，我认为模型解释方法也有局限性。改善这些限制肯定会增加这个框架的采用。</p>
+			<p>接下来，我们将介绍另一个流行的 XAI 框架——用于模型解释的 ALIBI。</p>
+			<h1 id="_idParaDest-186"><a id="_idTextAnchor192"/>不在场证明</h1>
+			<p>ALIBI 是另一个流行的 XAI 框架，支持对分类和回归模型的本地和全球解释。在<a href="B18216_02_ePub.xhtml#_idTextAnchor033"> <em class="italic">第二章</em> </a>，<em class="italic">模型可解释性方法</em>中，我们确实探索了这个获得反事实例子的框架，但是 ALIBI 也包括其他模型可解释性方法，我们将在这一节中探讨。主要是，ALIBI 流行以下几种模型解释<a id="_idIndexMarker681"/>方法:</p>
+			<ul>
+				<li><strong class="bold">锚解释</strong>:锚解释被定义为一个规则，该规则充分地<a id="_idIndexMarker682"/>围绕局部预测旋转或锚定。这意味着，如果锚值存在于数据实例中，则无论其他特征值如何变化，模型预测几乎总是相同的。</li>
+				<li><strong class="bold">反事实解释</strong> ( <strong class="bold"> CFEs </strong>):我们已经在<a href="B18216_02_ePub.xhtml#_idTextAnchor033"> <em class="italic">第二章</em> </a>、<em class="italic">模型解释方法</em>中看到了反事实。cfe 指示哪些特征值应该<a id="_idIndexMarker683"/>改变，以及改变多少，以产生不同的结果。</li>
+				<li><strong class="bold">对比解释方法</strong> ( <strong class="bold"> CEMs </strong> ): CEMs 与分类模型<a id="_idIndexMarker684"/>一起使用，用于根据<strong class="bold">相关正</strong> ( <strong class="bold"> PPs </strong>)，即应最少且充分<a id="_idIndexMarker685"/>存在以证明给定分类的特征，以及<strong class="bold">相关负</strong> ( <strong class="bold"> PNs </strong>)，即最少且必要<a id="_idIndexMarker686"/>不存在以证明分类的特征进行局部解释。</li>
+				<li><strong class="bold">累积局部效应</strong> ( <strong class="bold"> ALE </strong> ): ALE 图说明了属性如何影响<a id="_idIndexMarker687"/> the ml 模型的整体预测。ALE 图通常被认为是无偏的，是 PDP 的更快替代方案，如第 2 章 、<em class="italic">模型解释方法</em>中所述。</li>
+			</ul>
+			<p>要获得模型解释支持方法的详细<a id="_idIndexMarker688"/>摘要，请查看<a href="https://github.com/SeldonIO/alibi#supported-methods">https://github.com/SeldonIO/alibi#supported-methods</a>。请浏览这个框架的官方文档了解更多:<a href="https://docs.seldon.io/projects/alibi/en/latest/examples/overview.html">https://docs . seldon . io/projects/alibi/en/latest/examples/overview . html</a>。</p>
+			<p>现在，让我带您浏览为 ALIBI 提供的代码教程。</p>
+			<h2 id="_idParaDest-187"><a id="_idTextAnchor193"/>制造不在场证明</h2>
+			<p>完整的代码教程在本章的项目资源库中提供，位于<a href="https://github.com/PacktPublishing/Applied-Machine-Learning-Explainability-Techniques/blob/main/Chapter09/ALIBI_example.ipynb">https://github . com/packt publishing/Applied-Machine-Learning-explability-Techniques/blob/main/chapter 09/ALIBI _ example . ipynb</a>。如果你已经学习了<a href="B18216_02_ePub.xhtml#_idTextAnchor033"> <em class="italic">第二章</em> </a>、<em class="italic">模型解释方法</em>中的<em class="italic">反事实解释</em>，你应该已经安装了 ALIBI。</p>
+			<p>您可以从 ALIBI 导入我们将在本例中使用的子模块:</p>
+			<pre class="source-code">import alibi</pre>
+			<pre class="source-code">from alibi.explainers import AnchorTabular, CEM, CounterfactualProto, ale </pre>
+			<p>接下来，让我们讨论本教程的数据集。</p>
+			<h2 id="_idParaDest-188"><a id="_idTextAnchor194"/>关于数据集的讨论</h2>
+			<p>对于这个<a id="_idIndexMarker689"/>示例，我们将使用来自<a href="https://archive.ics.uci.edu/ml/datasets/Occupancy+Detection+#">https://archive . ics . UCI . edu/ml/datasets/occupation+Detection+#</a>的<em class="italic"> UCI 机器学习</em>库中的<em class="italic">占用检测</em>数据集。该数据集用于根据提供的不同传感器值检测<a id="_idIndexMarker690"/>房间是否有人。因此，这是一个可以通过在给定数据集上拟合 ML 分类器来解决的分类问题。详细的数据检查、预处理和转换步骤包含在教程笔记本中。在很高的层面上，数据集略有不平衡，并且大多包含没有缺失值的数字要素。</p>
+			<p class="callout-heading">占用检测数据集引用</p>
+			<p class="callout">L.M. Candanedo，V. Feldheim (2016 年)-使用统计学习模型，根据光线、温度、湿度和 CO2 测量值准确检测办公室房间的占用情况。(<a href="https://archive.ics.uci.edu/ml/datasets/Occupancy+Detection+#">https://archive . ics . UCI . edu/ml/datasets/Occupancy+Detection+#</a>)</p>
+			<p>在本教程中，我演示了如何使用 scikit-learn 的管道方法来训练 ML 模型。这是构建 ML 模型的一种非常简洁的方式，并且在处理需要部署到生产系统的工业问题时特别有用。要了解关于这种方法的更多信息，请查看官方 scikit-learn pipeline 文档，网址为<a href="https://scikit-learn.org/stable/modules/generated/sklearn.pipeline.Pipeline.html">https://scikit-learn . org/stable/modules/generated/sk learn . pipeline . html</a>。</p>
+			<p>接下来，让我们讨论将用于提取解释的模型。</p>
+			<h2 id="_idParaDest-189"><a id="_idTextAnchor195"/>训练模型</h2>
+			<p>对于这个例子，我使用了一个随机森林分类器来训练一个具有最小超参数<a id="_idIndexMarker692"/>调整的模型。您也可以探索其他 ML 分类器，因为算法的选择并不重要。我们的目标是探索模型可解释性的不在场证明，这将在下一节中介绍。</p>
+			<h2 id="_idParaDest-190"><a id="_idTextAnchor196"/>用不在场证明解释模型</h2>
+			<p>现在，让我们对训练好的模型使用前面讨论的各种解释方法，我们可以将它视为一个黑盒。</p>
+			<h3>使用锚点解释</h3>
+			<p>为了获得<a id="_idIndexMarker693"/>锚点，首先，我们需要创建一个锚点解释对象:</p>
+			<pre class="source-code">explainer = AnchorTabular(</pre>
+			<pre class="source-code">  predict_fn, </pre>
+			<pre class="source-code">  feature_names=list(df_train.columns), </pre>
+			<pre class="source-code">  seed=123)</pre>
+			<p>接下来，我们需要让 explainer 对象适合训练数据:</p>
+			<pre class="source-code">explainer.fit(df_train.values, disc_perc=[25, 50, 75])</pre>
+			<p>我们需要学习占用类和未占用类的锚值。该过程包括提供属于这些类中的每一个的数据实例作为估计锚点的输入。这可以通过使用以下代码行来完成:</p>
+			<pre class="source-code">class_names = ['not_occupied', 'occupied']</pre>
+			<pre class="source-code">print('Prediction: ', </pre>
+			<pre class="source-code">      class_names[explainer.predictor(</pre>
+			<pre class="source-code">        df_test.values[5].reshape(1, -1))[0]])</pre>
+			<pre class="source-code">explanation = explainer.explain(df_test.values[5], </pre>
+			<pre class="source-code">                                threshold=0.8)</pre>
+			<pre class="source-code">print('Anchor: %s' % (' AND '.join(explanation.anchor)))</pre>
+			<pre class="source-code">print('Prediction: ', </pre>
+			<pre class="source-code">      class_names[explainer.predictor(</pre>
+			<pre class="source-code">        df_test.values[100].reshape(1, -1))[0]])</pre>
+			<pre class="source-code">explanation = explainer.explain(df_test.values[100], </pre>
+			<pre class="source-code">                                threshold=0.8)</pre>
+			<pre class="source-code">print('Anchor: %s' % (' AND '.join(explanation.anchor)))</pre>
+			<p>在该示例中，当光强度值大于<code>256.7</code>并且<code>CO2</code>值大于<code>638.8</code>时，获得被占用类别的锚点。相比之下，对于未被占用的类，当<code>CO2</code>值大于<code>439</code>时获得。本质上，这告诉我们，如果测量光强度的传感器值大于<code>256.7</code>并且<code>CO2</code>水平大于<code>638.8</code>，则模型预测房间被占用。</p>
+			<p>该模型学习的模式实际上是合适的，因为每当一个房间被占用时，灯更有可能被打开，随着更多的居住者，二氧化碳水平也有可能增加。无人居住类的定位点不是非常合适、直观或可解释，但这表明，通常情况下，当房间无人居住时，CO2 水平较低。通常，我们会了解模型预测结果所依赖的某些影响特征的一些阈值。</p>
+			<h3>利用 CEM</h3>
+			<p>对于 CEM，主要思想是学习应该存在以证明一个类的出现<a id="_idIndexMarker695"/>的 PPs 或条件，以及应该不存在以指示一个类的出现的 PNs。这用于模型不可知的局部可解释性。你可以在 https://arxiv.org/pdf/1802.07623.pdf 的研究文献中找到更多关于这种方法的信息。</p>
+			<p>要在 Python 中应用这一点，我们需要创建一个具有所需超参数的 CEM 对象，并拟合训练值以学习 PP 和 PN 值:</p>
+			<pre class="source-code">cem = CEM(predict_fn, mode, shape, kappa=kappa, </pre>
+			<pre class="source-code">          beta=beta, feature_range=feature_range, </pre>
+			<pre class="source-code">          max_iterations=max_iterations, c_init=c_init, </pre>
+			<pre class="source-code">          c_steps=c_steps, </pre>
+			<pre class="source-code">          learning_rate_init=lr_init, clip=clip)</pre>
+			<pre class="source-code">cem.fit(df_train.values, no_info_type='median')</pre>
+			<pre class="source-code">explanation = cem.explain(X, verbose=False)</pre>
+			<p>在我们的示例中，已学习的 PP 和 PN 值显示了该值应增加或减少多少，以满足正确结果的最低标准。令人惊讶的是，我们的示例没有获得 PN 值。这表明所有特性<a id="_idIndexMarker696"/>对模型都很重要。缺少任何特征或任何特定的取值范围都无助于模型预测结果。通常，对于更高维度的数据，PN 值对于分析是很重要的。</p>
+			<h3>使用 cfe</h3>
+			<p>在<a href="B18216_02_ePub.xhtml#_idTextAnchor033"> <em class="italic">第二章</em> </a>、<em class="italic">模型可解释方法</em>中，我们看了如何将 CFEs】应用于 ALIBI 的教程示例。对于这个例子，我们也将遵循类似的方法。然而，ALIBI 确实允许不同的算法<a id="_idIndexMarker698"/>生成 CFE，我强烈建议您探索:https://docs . seldon . io/projects/ALIBI/en/latest/Methods/cf . html .在这一章中，我们将坚持使用在<a href="B18216_02_ePub.xhtml#_idTextAnchor033"> <em class="italic">第 2 章</em> </a>、<em class="italic">模型可解释性方法</em>的 CFE 教程中涵盖的基于原型的方法:</p>
+			<pre class="source-code">cfe = CounterfactualProto(predict_fn,</pre>
+			<pre class="source-code">                          shape,</pre>
+			<pre class="source-code">                          use_kdtree=True, </pre>
+			<pre class="source-code">                          theta=10., </pre>
+			<pre class="source-code">                          max_iterations=1000,</pre>
+			<pre class="source-code">                          c_init=1., </pre>
+			<pre class="source-code">                          c_steps=10</pre>
+			<pre class="source-code">                         )</pre>
+			<pre class="source-code">cfe.fit(df_train.values, d_type='abdm', </pre>
+			<pre class="source-code">        disc_perc=[25, 50, 75])</pre>
+			<pre class="source-code">explanation = cfe.explain(X)</pre>
+			<p>一旦解释对象准备就绪，我们就可以实际比较 cfe 和原始数据实例之间的差异，以了解翻转结果所需的特征值的变化。然而，使用这种方法来获得正确的 CFE 可能有点儿<a id="_idIndexMarker699"/>困难，因为有许多超参数需要正确的调整；因此，该方法可能具有挑战性且冗长乏味。接下来，让我们讨论如何使用 ALE 图进行模型解释。</p>
+			<h3>使用 ALE 图</h3>
+			<p>与 PDP 类似，如在<a href="B18216_02_ePub.xhtml#_idTextAnchor033"> <em class="italic">第 2 章</em> </a>、<em class="italic">模型可解释方法</em>中所述，ALE 图可用于<a id="_idIndexMarker700"/>找到个体特征相对于目标类的关系。让我们看看如何在 Python 中应用这一点:</p>
+			<pre class="source-code">proba_ale = ale.ALE(predict_fn, feature_names=numeric,</pre>
+			<pre class="source-code">                    target_names=class_names)</pre>
+			<pre class="source-code">proba_explain = proba_ale.explain(df_test.values)</pre>
+			<pre class="source-code">ale.plot_ale(proba_explain, n_cols=3, </pre>
+			<pre class="source-code">             fig_kw={'figwidth': 12, 'figheight': 8})</pre>
+			<p>这将创建以下 ALE 图:</p>
+			<div><div><img src="img/B18216_09_019.jpg" alt="Figure 9.19 – ALE plots using ALIBI&#13;&#10;"/>
+				</div>
+			</div>
+			<p class="figure-caption">图 9.19–使用 ALIBI 的 ALE 图</p>
+			<p>在<em class="italic">图 9.19 </em>中，我们可以看到<code>occupied</code>和<code>not occupied</code>目标类的特征值方差对于特征光最大，其次是 CO2 和温度，对于<code>HumidityRatio</code>最小。这为我们提供了模型预测如何根据特征值的变化而变化的指示。</p>
+			<p>总的来说，我觉得 ALIBI 是一个有趣的 XAI 框架，它处理表格和非结构化数据，如文本和图像，并且确实有各种各样的技术来解释 ML 模型。我发现的唯一限制是有些方法不是很简化，所以它们需要大量的超参数调整来获得可靠的解释。请探索<a href="https://github.com/SeldonIO/alibi/tree/master/doc/source/examples">https://github . com/sel donio/alibi/tree/master/doc/source/examples</a>为 ALIBI 提供的其他例子，获取更多实用的专业知识。在下一节中，我们将讨论作为 XAI Python 框架的 DiCE。</p>
+			<h1 id="_idParaDest-191"><a id="_idTextAnchor197"/>骰子</h1>
+			<p><strong class="bold">多样的反事实解释</strong> ( <strong class="bold">骰子</strong>)是另一个流行的 XAI 框架，我们在<em class="italic"> CFE 教程</em>第二章 、<em class="italic">模型解释方法</em>中简要介绍过。有趣的是，DiCE 也是微软研究院的关键 XAI 框架之一，但是<a id="_idIndexMarker702"/>它还没有与 InterpretML 模块集成(我想知道为什么！).我发现 CFE 的整个想法非常接近理想的人性化解释，给出可行的建议。这篇来自微软的博客<a id="_idIndexMarker703"/>讨论了 DiCE 框架背后的动机和想法:<a href="https://www.microsoft.com/en-us/research/blog/open-source-library-provides-explanation-for-machine-learning-through-diverse-counterfactuals/">https://www . Microsoft . com/en-us/research/blog/open-source-library-provide-explain-for-machine-learning-through-diversity-counter factuals/</a>。</p>
+			<p>与 ALIBI CFE 相比，我发现 DiCE 能够以最小的超参数调整产生更合适的 CFE。这就是为什么我觉得提到骰子很重要，因为它主要是为基于示例的解释而设计的。接下来，让我们讨论一下 DiCE 中支持的 CFE 方法。</p>
+			<h2 id="_idParaDest-192"><a id="_idTextAnchor198"/>DiCE 支持的 CFE 方法</h2>
+			<p>DiCE 可以基于以下方法生成<a id="_idIndexMarker704"/>cfe:</p>
+			<ul>
+				<li>与模型无关的方法:<ul><li>KD 树</li><li>遗传算法</li><li>随机抽样</li></ul></li>
+				<li>基于梯度的方法(特定模型的方法):<ul><li>基于损失的深度学习模型方法</li><li><strong class="bold">基于变分自动编码器</strong> ( <strong class="bold"> VAE </strong>)的方法</li></ul></li>
+			</ul>
+			<p>要了解关于所有这些方法的更多信息，我请求您浏览 DiCE 的官方文档(https://github . com/interpret ml/DiCE)，其中包含每种方法的必要研究文献。现在，让我们用骰子来解释模型。</p>
+			<h2 id="_idParaDest-193"><a id="_idTextAnchor199"/>用骰子模拟可解释性</h2>
+			<p>完整的教程示例在<a href="https://github.com/PacktPublishing/Applied-Machine-Learning-Explainability-Techniques/blob/main/Chapter09/DiCE_example.ipynb">https://github . com/packt publishing/Applied-Machine-Learning-explability-Techniques/blob/main/chapter 09/DiCE _ example . ipynb</a>提供。对于这个例子，我使用了我们在 ALIBI 教程中使用的相同的占用检测数据集。由于使用了相同的数据<a id="_idIndexMarker705"/>预处理、转换、模型训练和评估步骤，我们将直接使用 DALEX 进行模型可解释性部分。笔记本教程包含所有必要的步骤，所以我建议您先浏览一下笔记本。</p>
+			<p>我们将使用 DiCE 框架，就像我们在 CFE 教程中从<a href="B18216_02_ePub.xhtml#_idTextAnchor033"> <em class="italic">第二章</em> </a>，<em class="italic">模型可解释方法</em>中所做的一样。</p>
+			<p>因此，首先，我们需要定义一个骰子数据对象:</p>
+			<pre class="source-code">data_object = dice_ml.Data(</pre>
+			<pre class="source-code">  dataframe = df_train[numeric + [target_variable]],</pre>
+			<pre class="source-code">  continuous_features = numeric,</pre>
+			<pre class="source-code">  outcome_name = target_variable</pre>
+			<pre class="source-code">)</pre>
+			<p>接下来，我们需要创建一个骰子模型对象:</p>
+			<pre class="source-code">model_object = dice_ml.Model(model=model,backend='sklearn')</pre>
+			<p>接下来，我们需要为 DiCE 解释对象传递数据对象和模型对象:</p>
+			<pre class="source-code">explainer = dice_ml.Dice(data_object, model_object, </pre>
+			<pre class="source-code">                         method = 'random')</pre>
+			<p>接下来，我们可以使用 DiCE explainer 对象获取一个查询数据实例并生成 cfe:</p>
+			<pre class="source-code">test_query = df_test[400:401][numeric]</pre>
+			<pre class="source-code">cfe = explainer.generate_counterfactuals(</pre>
+			<pre class="source-code">    test_query, </pre>
+			<pre class="source-code">    total_CFs=4, </pre>
+			<pre class="source-code">    desired_range=None,</pre>
+			<pre class="source-code">    desired_class="opposite",</pre>
+			<pre class="source-code">    features_to_vary= numeric,</pre>
+			<pre class="source-code">    permitted_range = { 'CO2' : [400, 1000]}, # Adding a constraint for CO2 feature</pre>
+			<pre class="source-code">    random_seed = 123,</pre>
+			<pre class="source-code">    verbose=True)</pre>
+			<pre class="source-code">cfe.visualize_as_dataframe(show_only_changes=True)</pre>
+			<p>这将产生一个 CFE 数据帧，显示需要改变的特征值，以<a id="_idIndexMarker706"/>翻转模型预测结果。这种方法的结果如下图所示:</p>
+			<div><div><img src="img/B18216_09_020.jpg" alt="Figure 9.20 – CFE generated using the DiCE framework, which is displayed as a DataFrame&#13;&#10;"/>
+				</div>
+			</div>
+			<p class="figure-caption">图 9.20–使用 DiCE 框架生成的 CFE，显示为数据帧</p>
+			<p>有趣的是，cfe 不仅从数据中提供可操作的见解。但是，它们也可用于生成局部和全局要素重要性。通过这种特征重要性的方法，可以容易地改变以改变模型预测的特征被认为是更重要的。让我们尝试使用 DiCE 方法应用局部特征重要性:</p>
+			<pre class="source-code">local_importance = explainer.local_feature_importance(test_query)</pre>
+			<pre class="source-code">print(local_importance.local_importance)</pre>
+			<pre class="source-code">plt.figure(figsize=(10,5))</pre>
+			<pre class="source-code">plt.bar(range(len(local_importance.local_importance[0])), </pre>
+			<pre class="source-code">        list(local_importance.local_importance[0].values())/(np.sum(list(local_importance.local_importance[0].values()))), </pre>
+			<pre class="source-code">        tick_label=list(local_importance.local_importance[0].keys()),</pre>
+			<pre class="source-code">        color = list('byrgmc')</pre>
+			<pre class="source-code">       )</pre>
+			<pre class="source-code">plt.show()</pre>
+			<p>这为所选的测试查询产生了<a id="_idIndexMarker707"/>以下局部特征重要性图:</p>
+			<div><div><img src="img/B18216_09_021.jpg" alt="Figure 9.21 – Local feature importance using DiCE&#13;&#10;"/>
+				</div>
+			</div>
+			<p class="figure-caption">图 9.21-使用骰子的局部特征重要性</p>
+			<p><em class="italic">图 9.21 </em>显示，对于测试查询数据，湿度、光照和 CO2 特征对模型预测最重要。这表明大多数 cfe 会建议改变这些特征之一的特征值来改变模型预测。</p>
+			<p>总的来说，DiCE 是一个非常有前途的健壮 cfe 框架。我建议您探索生成 cfe 的不同算法，如 KD 树、随机抽样和遗传算法。骰子的例子有时是非常随机的。我的建议是始终使用随机种子来控制随机性，明确定义<a id="_idIndexMarker708"/>可操作和不可操作的特征，并设置可操作特征的边界条件，以生成有意义且实际可行的 cfe。否则，生成的 cfe 可能非常随机，实际上是不可行的，因此使用起来影响较小。</p>
+			<p>关于 DiCE 框架用于多类分类或回归问题的其他示例，请浏览<a href="https://github.com/interpretml/DiCE/tree/master/docs/source/notebooks">https://github . com/interpret ml/DiCE/tree/master/docs/source/notebooks</a>。接下来，让我们来看看 ELI5，它是最初的 XAI 框架之一，已经被开发来产生对 ML 模型的简单化解释。</p>
+			<h1 id="_idParaDest-194"><a id="_idTextAnchor200"/>以利 5</h1>
+			<p><em class="italic"> ELI5 </em>，或<em class="italic"> Explain Like I'm Five </em>，是一个用于调试、检查和解释 ML 分类器的 Python XAI 库。它是最初开发的 XAI 框架之一，以最简化的格式解释黑盒<a id="_idIndexMarker709"/>模型。它支持广泛的 ML 建模框架，如 scikit-learn 兼容模型、Keras 等。它还集成了 LIME 解释器，可以处理表格数据集以及文本和图像等非结构化数据。库文档在<a href="https://eli5.readthedocs.io/en/latest/">https://eli5.readthedocs.io/en/latest/</a>提供，GitHub 项目在<a href="https://github.com/eli5-org/eli5">https://github.com/eli5-org/eli5</a>提供。</p>
+			<p>在本节中，我们将只讨论表格数据集的 ELI5 应用部分，但请随意探索在<a href="https://eli5.readthedocs.io/en/latest/tutorials/index.html">https://eli5.readthedocs.io/en/latest/tutorials/index.html</a>举办的 ELI5 示例教程中提供的其他示例。接下来，让我们开始浏览代码教程。</p>
+			<h2 id="_idParaDest-195"><a id="_idTextAnchor201"/>设置 ELI5</h2>
+			<p>ELI5 示例的完整教程可以在本章的 GitHub 资源库中找到:<a href="https://github.com/PacktPublishing/Applied-Machine-Learning-Explainability-Techniques/blob/main/Chapter09/ELI5_example.ipynb">https://GitHub . com/packt publishing/Applied-Machine-Learning-explability-Techniques/blob/main/chapter 09/Eli 5 _ example . ipynb</a>。可以使用 pip 安装程序在 Python 中安装 ELI5:</p>
+			<pre class="source-code">pip install eli5</pre>
+			<p>如果安装过程成功，您可以通过导入 Jupyter 笔记本中的模块进行验证:</p>
+			<pre class="source-code">import eli5</pre>
+			<p>对于这个例子，我们将使用来自 UCI 机器学习存储库(https://archive . ics . UCI . edu/ml/datasets/hepatitis)的相同肝炎检测数据集，它用于 InterpretML 例子。此外，我们使用了一个随机森林分类模型<a id="_idIndexMarker710"/>,它具有最小的超参数调整，将被用作我们的黑盒模型。因此，我们将跳过关于数据集和模型部分的讨论，继续讨论使用 ELI5 的模型可解释性部分。</p>
+			<h2 id="_idParaDest-196"><a id="_idTextAnchor202"/>使用 ELI5 对可解释性建模</h2>
+			<p>在 Python <a id="_idIndexMarker711"/>中应用 ELI5 非常简单，只需几行代码即可完成:</p>
+			<pre class="source-code">eli5.show_weights(model, vec = DictVectorizer(), </pre>
+			<pre class="source-code">                  feature_names = list(encoded.columns))</pre>
+			<p>这将生成以下可用于分析全局要素重要性的要素权重表格可视化:</p>
+			<div><div><img src="img/B18216_09_022.jpg" alt="Figure 9.22 – Feature weights obtained using ELI5&#13;&#10;"/>
+				</div>
+			</div>
+			<p class="figure-caption">图 9.22–使用 ELI5 获得的特征权重</p>
+			<p><em class="italic">图 9.22 </em>表明特征<code>BILIRUBIN</code>具有最大权重，因此对影响模型结果的贡献最大。重量值旁边显示的+/-值可视为置信区间。这种方法可以被认为是深入了解黑盒模型的一种非常简单的方式。ELI5 使用树模型计算特征权重。树的每个节点给出一个输出分数，用于估计一个特性的总贡献。决策路径上的总<a id="_idIndexMarker712"/>贡献是父代与子代之间分数变化的程度。所有特征的总权重合计了用于预测特定类别的模型的总概率。</p>
+			<p>我们可以使用这种方法来提供本地可解释性和推理数据实例:</p>
+			<pre class="source-code">no_missing = lambda feature_name, feature_value: not np.isnan(feature_value) # filter missing values</pre>
+			<pre class="source-code">eli5.show_prediction(model, </pre>
+			<pre class="source-code">                     x_test.iloc[1:2].astype('float'), </pre>
+			<pre class="source-code">                     feature_names = list(encoded.columns), </pre>
+			<pre class="source-code">                     show_feature_values=True, </pre>
+			<pre class="source-code">                     feature_filter=no_missing,</pre>
+			<pre class="source-code">                     target_names = {1:'Die', 2:'Live'},</pre>
+			<pre class="source-code">                     top = 10,</pre>
+			<pre class="source-code">                     show = ['feature_importances', </pre>
+			<pre class="source-code">                             'targets', 'decision_tree', </pre>
+			<pre class="source-code">                             'description'])</pre>
+			<p>这将产生以下表格可视化，用于分析推断数据的特征贡献:</p>
+			<div><div><img src="img/B18216_09_023.jpg" alt="Figure 9.23 – Feature contributions using ELI5 for local explainability&#13;&#10;"/>
+				</div>
+			</div>
+			<p class="figure-caption">图 9.23-使用 ELI5 进行局部解释的特征贡献</p>
+			<p>在<em class="italic">图 9.23 </em>中，我们可以看到使用 ELI5 对用于预测的本地数据的特征贡献。有一个<code>&lt;BIAS&gt;</code>术语被添加到表中。这被认为是模型输出的预期<a id="_idIndexMarker713"/>平均分数，取决于训练数据的分布。要了解更多信息，请<a id="_idIndexMarker714"/>看看这个堆栈溢出帖子:<a href="https://stackoverflow.com/questions/49402701/eli5-explaining-prediction-xgboost-model">https://Stack Overflow . com/questions/49402701/Eli 5-explaining-prediction-xgboost-model</a>。</p>
+			<p>尽管 ELI5 易于使用，并且可能是迄今为止所涉及的所有 XAI 框架中最不复杂的，但我认为该框架还不够全面。甚至为分析特性贡献而提供的可视化也显得非常陈旧，可以改进。因为 ELI5 是最初的处理表格数据、图像和文本数据的 XAI 框架之一，所以了解它是很重要的。</p>
+			<p>在下一节中，我将讨论 H2O 汽车模型的模型可解释性。</p>
+			<h1 id="_idParaDest-197"><a id="_idTextAnchor203"/> H2O 汽车解说</h1>
+			<p>在本章中，我们主要使用基于 scikit-learn 和基于 TensorFlow 的模型。然而，当 AutoML 的想法第一次被引入时，https://docs.h2o.ai/h2o/latest-stable/h2o-docs/automl.html 的 H2O 社区是这个概念的最早采用者之一，并为 H2O ML 框架引入了 AutoML 特性。</p>
+			<p>有趣的是，H2O AutoML 在行业中的应用非常广泛，尤其是对于大容量数据集。不幸的是，像 DALEX 这样与 H2O 模型兼容的模型可解释性框架非常少。H2O 模型在 R 和 Python 中都有很好的用途，而且有了 AutoML 特性，这个框架有望在很短的时间内以更少的努力提高经过训练和调整的模型的性能。所以，这就是为什么我觉得在这一章提到 H2O AutoML 解释器是很重要的。这个框架有一个内置的模型可解释性方法的实现，用于解释 AutoML 模型的预测(<a href="https://docs.h2o.ai/h2o/latest-stable/h2o-docs/automl.html">https://docs.h2o.ai/h2o/latest-stable/h2o-docs/automl.html</a>)。接下来，让我们深入了解 H2O 解释者。</p>
+			<h2 id="_idParaDest-198"><a id="_idTextAnchor204"/>用 H2O 的解释者来解释</h2>
+			<p>H2O 解释器仅支持 H2O 型号。它们可用于提供全局和<a id="_idIndexMarker716"/>局部解释。以下列表显示了 H2O 支持的解释方法:</p>
+			<ul>
+				<li>模型性能比较(这对于在同一数据集上尝试不同算法的 AutoML 模型特别有用)</li>
+				<li>变量或特征的重要性(这适用于全局和局部解释)</li>
+				<li>模型关联热图</li>
+				<li>基于树形图的解释(仅适用于树形模型)</li>
+				<li>PDP(这是针对全球和本地的解释)</li>
+				<li>单个条件期望图，也称为假设分析图(用于全局和局部解释)</li>
+			</ul>
+			<p>你可以在<a href="https://docs.h2o.ai/h2o/latest-stable/h2o-docs/explain.html">https://docs.h2o.ai/h2o/latest-stable/h2o-docs/explain.html</a>找到更多关于 H2O 解说的信息。完整的教程示例在<a href="https://github.com/PacktPublishing/Applied-Machine-Learning-Explainability-Techniques/blob/main/Chapter09/H2o_AutoML_explain_example.ipynb">https://github . com/packt publishing/Applied-Machine-Learning-explability-Techniques/blob/main/chapter 09/H2o _ AutoML _ explain _ example . ipynb</a>提供。在这个例子中，我演示了如何使用 H2O 汽车公司的 FIFA 俱乐部位置预测数据集(<a href="https://github.com/PacktPublishing/Applied-Machine-Learning-Explainability-Techniques/tree/main/Chapter09/datasets/FIFA_Club_Position">https://github . com/packt publishing/Applied-Machine-Learning-explability-Techniques/tree/main/chapter 09/datasets/FIFA _ Club _ Position</a>)根据球员的质量来预测顶级<a id="_idIndexMarker718"/>足球俱乐部的联赛位置。这与我们在 DALEX 和 Explainerdashboard 教程中使用的数据集相同。</p>
+			<p>要安装 H2O 模块，您可以使用 pip 安装程序:</p>
+			<pre class="source-code">pip install h2o</pre>
+			<p>由于我们已经在前面的教程中介绍了数据准备和转换的步骤，因此我将在这里跳过这些步骤。但是请务必参考教程笔记本来执行端到端示例。</p>
+			<p>H2O 模型与熊猫数据框架不兼容。因此，您需要将熊猫数据帧转换成 H2O 数据帧。让我们看看用于训练 H2O AutoML 模块的代码行:</p>
+			<pre class="source-code">import h2o</pre>
+			<pre class="source-code">from h2o.automl import H2OAutoML</pre>
+			<pre class="source-code"># Start the H2O cluster (locally) - Don't forget this step</pre>
+			<pre class="source-code">h2o.init()</pre>
+			<pre class="source-code">aml = H2OAutoML(max_models=20, seed=1)</pre>
+			<pre class="source-code">train = x_train.copy()</pre>
+			<pre class="source-code">valid = x_valid.copy()</pre>
+			<pre class="source-code">train["position"] = y_train</pre>
+			<pre class="source-code">valid["position"] = y_valid</pre>
+			<pre class="source-code">x = list(train.columns)</pre>
+			<pre class="source-code">y = "position"</pre>
+			<pre class="source-code">training_frame = h2o.H2OFrame(train)</pre>
+			<pre class="source-code">validation_frame=h2o.H2OFrame(valid) </pre>
+			<pre class="source-code"># training the automl model</pre>
+			<pre class="source-code">aml.train(x=x, y=y, training_frame=training_frame, </pre>
+			<pre class="source-code">          validation_frame=validation_frame)</pre>
+			<p>AutoML 训练过程完成后，我们可以获得最佳模型，并将其存储为变量以备将来使用:</p>
+			<pre class="source-code">model = aml.get_best_model()</pre>
+			<p>对于模型可解释性部分，我们只需要使用 AutoML 模型对象的<code>explain</code>方法:</p>
+			<pre class="source-code">aml.explain(validation_frame)</pre>
+			<p>这将自动创建各种受支持的 XAI 方法，并生成可视化效果来解释模型。在撰写本文时，H2O 的可解释特性是最新发布的<a id="_idIndexMarker719"/>,处于实验阶段。如果您想给出任何反馈或发现任何错误，请在 H2O JIRA 问题跟踪器(<a href="https://0xdata.atlassian.net/projects/PUBDEV">https://0xdata.atlassian.net/projects/PUBDEV</a>)上提出请求。</p>
+			<p>至此，我已经介绍了所有流行的 XAI 框架，除了常用的或者很有可能解释 ML 模型的<em class="italic"> LIME </em>、<em class="italic"> SHAP </em>和<em class="italic"> TCAV </em>。在下一节中，我将给出一个快速的比较指南来比较本章中涉及的所有七个框架。</p>
+			<h1 id="_idParaDest-199"><a id="_idTextAnchor205"/>快速对比指南</h1>
+			<p>在本章中，我们讨论了 Python 中可用的不同类型的 XAI 框架。当然，没有一个框架是绝对完美的，可以用于所有场景。在整个章节中，我确实提到了每个框架的优缺点，但是我相信如果您有一个快速的比较指南来决定您选择的 XAI 框架，考虑到您给定的问题，这将是非常方便的。</p>
+			<p>下表说明了本章中涉及的七个 XAI 框架的快速比较指南。我试图根据可解释性的不同维度，它们与各种 ML 模型的兼容性，对人类友好解释的定性评估，产生的解释的健壮性，可扩展性的定性评估，以及特定框架在生产级系统中采用的速度来比较这些:</p>
+			<div><div><img src="img/B18216_09_024.jpg" alt="Figure 9.24 – A quick comparison guide of the popular XAI frameworks covered in this chapter&#13;&#10;"/>
+				</div>
+			</div>
+			<p class="figure-caption">图 9.24-本章所涉及的流行的 XAI 框架的快速比较指南</p>
+			<p>这就把我们带到了本章的结尾。接下来，让我总结一下本章讨论的主要话题。</p>
+			<h1 id="_idParaDest-200"><a id="_idTextAnchor206"/>总结</h1>
+			<p>在这一章中，我们介绍了 Python 中七个流行的 XAI 框架:DALEX 、<em class="italic"> Explainerdashboard </em>、<em class="italic"> InterpretML </em>、<em class="italic"> ALIBI </em>、<em class="italic"> DiCE </em>、<em class="italic"> ELI5 </em>和<em class="italic"> H2O AutoML explainers </em>。我们已经讨论了每个框架支持的解释方法、每个框架的实际应用以及各种利弊。所以，我们在这一章确实讲了很多！我还提供了一个快速比较指南来帮助您决定应该选择哪个框架。这也把我们带到了本书第 2 部分的结尾，它给了你使用 XAI Python 框架解决问题的实践机会。</p>
+			<p>这本书的第三部分主要是针对和我有着同样热情的研究人员和专家:<em class="italic">让人工智能更接近终端用户</em>。因此，在下一章，我们将讨论 XAI 推荐的设计人性化人工智能系统的最佳实践。</p>
+			<h1 id="_idParaDest-201"><a id="_idTextAnchor207"/>参考文献</h1>
+			<p>有关更多信息，请参考以下资源:</p>
+			<ul>
+				<li>DALEX GitHub 项目:<a href="https://github.com/ModelOriented/DALEX">https://github.com/ModelOriented/DALEX</a></li>
+				<li>讲解 dashboard GitHub 项目:<a href="https://github.com/oegedijk/explainerdashboard">https://github.com/oegedijk/explainerdashboard</a></li>
+				<li>InterpretML GitHub 项目:<a href="https://github.com/interpretml/interpret">https://github.com/interpretml/interpret</a></li>
+				<li>ALIBI GitHub 项目:<a href="https://github.com/SeldonIO/alibi">https://github.com/SeldonIO/alibi</a></li>
+				<li>骰子 GitHub 项目:<a href="https://github.com/interpretml/DiCE">https://github.com/interpretml/DiCE</a></li>
+				<li>ELI5 官方文档:<a href="https://eli5.readthedocs.io/en/latest/overview.html">https://eli5.readthedocs.io/en/latest/overview.html</a></li>
+				<li>使用 H2O 的模型可解释性:<a href="https://docs.h2o.ai/h2o/latest-stable/h2o-docs/explain.html#">https://docs . H2O . ai/H2O/latest-stable/H2O-docs/explain . html #</a></li>
+			</ul>
+		</div>
+	
+
+</body></html>

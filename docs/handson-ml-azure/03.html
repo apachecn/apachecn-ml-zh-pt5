@@ -1,0 +1,602 @@
+<html><head/><body>
+
+
+
+
+
+
+<style type="text/css" title="ibis-book">
+    #sbo-rt-content .chapter-number{font-weight:bold;font-size:8.3em;text-align:right;font-family:symbol}#sbo-rt-content .chapter-title{font-size:30pt;text-align:right}#sbo-rt-content h1,#sbo-rt-content .packt_head1{font-size:16pt;font-weight:bold}#sbo-rt-content h2,#sbo-rt-content .packt_head2{font-size:14pt;font-weight:bold}#sbo-rt-content h3,#sbo-rt-content .packt_head3{font-size:13pt;font-weight:bold}#sbo-rt-content h4,#sbo-rt-content .packt_head4{font-size:11pt;font-weight:normal;font-style:italic}#sbo-rt-content ul,#sbo-rt-content .packt_bullet{font-weight:normal;list-style-type:disc}#sbo-rt-content ol,#sbo-rt-content .packt_numbered{font-weight:normal}#sbo-rt-content .packt_normal{font-weight:normal}#sbo-rt-content code,#sbo-rt-content .packt_code,#sbo-rt-content .packt_codeblock,#sbo-rt-content pre{font-family:monospace;font-size:9pt;font-weight:normal;border-left:1px solid black;margin-left:20px;padding-left:5px;display:block;margin-bottom:.12in}#sbo-rt-content .packt_figref{font-size:10pt;font-weight:normal}#sbo-rt-content q,#sbo-rt-content .packt_quote{font-size:11pt;font-weight:normal;color:black;font-style:italic}#sbo-rt-content .packt_tip{font-size:11pt;font-weight:normal;color:black;font-style:italic;background-image:url(../assets/0a79c387-fdee-4347-a587-034cf8cf4f7f.png);background-position:left center;background-repeat:no-repeat;background-size:.6in;margin-left:20px;margin-right:20px;padding-left:.7in;min-height:.75in;}#sbo-rt-content .packt_infobox{font-size:11pt;font-weight:normal;color:black;font-style:italic;background-image:url(../assets/6f2eee5d-61a6-4ff8-8b44-493a0b8e545b.png);background-position:left center;background-repeat:no-repeat;background-size:.6in;margin-left:20px;margin-right:20px;padding-left:.7in;min-height:.75in;}#sbo-rt-content kbd,#sbo-rt-content .packt_action{font-family:monospace;font-size:9pt;font-weight:normal}#sbo-rt-content .packt_italics{font-size:11pt;font-weight:normal;color:black;font-style:italic}#sbo-rt-content a,#sbo-rt-content .packt_url{font-family:monospace;font-size:9pt;font-weight:normal;text-decoration:none;word-break:break-all}#sbo-rt-content var,#sbo-rt-content .packt_inlinemsgid{display:none}#sbo-rt-content p,#sbo-rt-content .packt_para{text-align:left;font-size:11pt;line-height:17px}#sbo-rt-content .underline{text-decoration:underline}#sbo-rt-content .CDPImageAlign{width:100%;display:block}#sbo-rt-content div.CDPAlign,#sbo-rt-content p.CDPAlign{width:100%;display:block;margin-top:.18in;margin-bottom:.18in}#sbo-rt-content .CDPAlignCenter{text-align:center}#sbo-rt-content .CDPAlignLeft{text-align:left}#sbo-rt-content .CDPAlignRight{text-align:right}#sbo-rt-content .fm-editor-equation{border:none}#sbo-rt-content nav a.section{border-bottom:1px solid black;width:100%;display:block}#sbo-rt-content body table{border-collapse:collapse}#sbo-rt-content body table td{border:1px solid black;padding:.31em .62em}#sbo-rt-content .header-title{font-size:2.5em}#sbo-rt-content img.inline-image{height:1em}#sbo-rt-content .chapter-title{font-size:2.5em}#sbo-rt-content h1,#sbo-rt-content .packt_head1{font-size:2em}#sbo-rt-content h2,#sbo-rt-content .packt_head2{font-size:1.5em}#sbo-rt-content h3,#sbo-rt-content .packt_head3{font-size:1.17em}#sbo-rt-content h4,#sbo-rt-content .packt_head4{font-size:1em}#sbo-rt-content code,#sbo-rt-content .packt_code,#sbo-rt-content .packt_codeblock,#sbo-rt-content pre{font-size:.8em;margin-left:1.25em;padding-left:.3em;margin-bottom:.01em}#sbo-rt-content .packt_figref{font-size:.62em}#sbo-rt-content q,#sbo-rt-content .packt_quote{font-size:.68em}#sbo-rt-content .packt_tip{font-size:.68em;background-size:2.5em;margin-left:1.25em;margin-right:1.25em;padding-left:3em;min-height:2.5em}#sbo-rt-content .packt_infobox{font-size:.68em;background-size:2.5em;margin-left:1.25em;margin-right:1.25em;padding-left:3em;min-height:2.5em}#sbo-rt-content kbd,#sbo-rt-content .packt_action{font-size:.75em}#sbo-rt-content .packt_italics{font-size:.9em}#sbo-rt-content a,#sbo-rt-content .packt_url{font-size:.7em}#sbo-rt-content p,#sbo-rt-content .packt_para{font-size:1em;line-height:1.06em}#sbo-rt-content .CDPImageAlign{max-width:100%;max-height:100%}#sbo-rt-content div.CDPAlign,#sbo-rt-content p.CDPAlign{margin-top:.01em;margin-bottom:.01em}
+    </style>
+<style type="text/css" id="font-styles">#sbo-rt-content, #sbo-rt-content p, #sbo-rt-content div { font-size: &amp;lt;%= font_size %&amp;gt; !important; }</style>
+<style type="text/css" id="font-family">#sbo-rt-content, #sbo-rt-content p, #sbo-rt-content div { font-family: &amp;lt;%= font_family %&amp;gt; !important; }</style>
+<style type="text/css" id="column-width">#sbo-rt-content { max-width: &amp;lt;%= column_width %&amp;gt;% !important; margin: 0 auto !important; }</style>
+
+<style type="text/css">body{margin:1em;}#sbo-rt-content *{text-indent:0pt!important;}#sbo-rt-content .bq{margin-right:1em!important;}body{background-color:transparent!important;}#sbo-rt-content *{word-wrap:break-word!important;word-break:break-word!important;}#sbo-rt-content table,#sbo-rt-content pre{overflow-x:unset!important;overflow:unset!important;overflow-y:unset!important;white-space:pre-wrap!important;}</style>
+<div><h1 class="header-title">认知服务</h1>
+                
+            
+            
+                
+<p>认知服务是微软提供的一套预先训练好的 API，允许开发者开发使用 AI 的应用，而不必构建 ML 模型。凭借对边缘部署的支持，开发人员可以构建使用强大的人工智能算法在无人机等设备上进行解释、听、说和看的应用程序。</p>
+<p>API 有五个主要类别:</p>
+<ul>
+<li>视力</li>
+<li>语言</li>
+<li>演讲</li>
+<li>知识</li>
+<li>搜索</li>
+</ul>
+<p>现在，这些 API 中的许多都可以定制，以满足公司及其客户的特定需求。在本章中，我们将对每个服务类别进行概述，并浏览一些示例。</p>
+
+
+            
+
+            
+        
+    </div>
+
+
+
+  
+
+
+
+
+
+
+
+
+<style type="text/css" title="ibis-book">
+    #sbo-rt-content .chapter-number{font-weight:bold;font-size:8.3em;text-align:right;font-family:symbol}#sbo-rt-content .chapter-title{font-size:30pt;text-align:right}#sbo-rt-content h1,#sbo-rt-content .packt_head1{font-size:16pt;font-weight:bold}#sbo-rt-content h2,#sbo-rt-content .packt_head2{font-size:14pt;font-weight:bold}#sbo-rt-content h3,#sbo-rt-content .packt_head3{font-size:13pt;font-weight:bold}#sbo-rt-content h4,#sbo-rt-content .packt_head4{font-size:11pt;font-weight:normal;font-style:italic}#sbo-rt-content ul,#sbo-rt-content .packt_bullet{font-weight:normal;list-style-type:disc}#sbo-rt-content ol,#sbo-rt-content .packt_numbered{font-weight:normal}#sbo-rt-content .packt_normal{font-weight:normal}#sbo-rt-content code,#sbo-rt-content .packt_code,#sbo-rt-content .packt_codeblock,#sbo-rt-content pre{font-family:monospace;font-size:9pt;font-weight:normal;border-left:1px solid black;margin-left:20px;padding-left:5px;display:block;margin-bottom:.12in}#sbo-rt-content .packt_figref{font-size:10pt;font-weight:normal}#sbo-rt-content q,#sbo-rt-content .packt_quote{font-size:11pt;font-weight:normal;color:black;font-style:italic}#sbo-rt-content .packt_tip{font-size:11pt;font-weight:normal;color:black;font-style:italic;background-image:url(../assets/0a79c387-fdee-4347-a587-034cf8cf4f7f.png);background-position:left center;background-repeat:no-repeat;background-size:.6in;margin-left:20px;margin-right:20px;padding-left:.7in;min-height:.75in;}#sbo-rt-content .packt_infobox{font-size:11pt;font-weight:normal;color:black;font-style:italic;background-image:url(../assets/6f2eee5d-61a6-4ff8-8b44-493a0b8e545b.png);background-position:left center;background-repeat:no-repeat;background-size:.6in;margin-left:20px;margin-right:20px;padding-left:.7in;min-height:.75in;}#sbo-rt-content kbd,#sbo-rt-content .packt_action{font-family:monospace;font-size:9pt;font-weight:normal}#sbo-rt-content .packt_italics{font-size:11pt;font-weight:normal;color:black;font-style:italic}#sbo-rt-content a,#sbo-rt-content .packt_url{font-family:monospace;font-size:9pt;font-weight:normal;text-decoration:none;word-break:break-all}#sbo-rt-content var,#sbo-rt-content .packt_inlinemsgid{display:none}#sbo-rt-content p,#sbo-rt-content .packt_para{text-align:left;font-size:11pt;line-height:17px}#sbo-rt-content .underline{text-decoration:underline}#sbo-rt-content .CDPImageAlign{width:100%;display:block}#sbo-rt-content div.CDPAlign,#sbo-rt-content p.CDPAlign{width:100%;display:block;margin-top:.18in;margin-bottom:.18in}#sbo-rt-content .CDPAlignCenter{text-align:center}#sbo-rt-content .CDPAlignLeft{text-align:left}#sbo-rt-content .CDPAlignRight{text-align:right}#sbo-rt-content .fm-editor-equation{border:none}#sbo-rt-content nav a.section{border-bottom:1px solid black;width:100%;display:block}#sbo-rt-content body table{border-collapse:collapse}#sbo-rt-content body table td{border:1px solid black;padding:.31em .62em}#sbo-rt-content .header-title{font-size:2.5em}#sbo-rt-content img.inline-image{height:1em}#sbo-rt-content .chapter-title{font-size:2.5em}#sbo-rt-content h1,#sbo-rt-content .packt_head1{font-size:2em}#sbo-rt-content h2,#sbo-rt-content .packt_head2{font-size:1.5em}#sbo-rt-content h3,#sbo-rt-content .packt_head3{font-size:1.17em}#sbo-rt-content h4,#sbo-rt-content .packt_head4{font-size:1em}#sbo-rt-content code,#sbo-rt-content .packt_code,#sbo-rt-content .packt_codeblock,#sbo-rt-content pre{font-size:.8em;margin-left:1.25em;padding-left:.3em;margin-bottom:.01em}#sbo-rt-content .packt_figref{font-size:.62em}#sbo-rt-content q,#sbo-rt-content .packt_quote{font-size:.68em}#sbo-rt-content .packt_tip{font-size:.68em;background-size:2.5em;margin-left:1.25em;margin-right:1.25em;padding-left:3em;min-height:2.5em}#sbo-rt-content .packt_infobox{font-size:.68em;background-size:2.5em;margin-left:1.25em;margin-right:1.25em;padding-left:3em;min-height:2.5em}#sbo-rt-content kbd,#sbo-rt-content .packt_action{font-size:.75em}#sbo-rt-content .packt_italics{font-size:.9em}#sbo-rt-content a,#sbo-rt-content .packt_url{font-size:.7em}#sbo-rt-content p,#sbo-rt-content .packt_para{font-size:1em;line-height:1.06em}#sbo-rt-content .CDPImageAlign{max-width:100%;max-height:100%}#sbo-rt-content div.CDPAlign,#sbo-rt-content p.CDPAlign{margin-top:.01em;margin-bottom:.01em}
+    </style>
+<style type="text/css" id="font-styles">#sbo-rt-content, #sbo-rt-content p, #sbo-rt-content div { font-size: &amp;lt;%= font_size %&amp;gt; !important; }</style>
+<style type="text/css" id="font-family">#sbo-rt-content, #sbo-rt-content p, #sbo-rt-content div { font-family: &amp;lt;%= font_family %&amp;gt; !important; }</style>
+<style type="text/css" id="column-width">#sbo-rt-content { max-width: &amp;lt;%= column_width %&amp;gt;% !important; margin: 0 auto !important; }</style>
+
+<style type="text/css">body{margin:1em;}#sbo-rt-content *{text-indent:0pt!important;}#sbo-rt-content .bq{margin-right:1em!important;}body{background-color:transparent!important;}#sbo-rt-content *{word-wrap:break-word!important;word-break:break-word!important;}#sbo-rt-content table,#sbo-rt-content pre{overflow-x:unset!important;overflow:unset!important;overflow-y:unset!important;white-space:pre-wrap!important;}</style>
+<div><h1 class="header-title">视觉 API 的认知服务</h1>
+                
+            
+            
+                
+<p>Vision APIs 帮助您将图像分析功能添加到您的 AI 应用程序中。在撰写本文时，认知服务包括五个 Vision APIs:</p>
+<ul>
+<li>计算机视觉</li>
+<li>脸</li>
+<li>内容版主</li>
+<li>视频索引器</li>
+<li>定制视觉</li>
+</ul>
+<p>我们将在本章学习前两个 API。我们会把剩下的留给你自己去探索。</p>
+
+
+            
+
+            
+        
+    </div>
+
+
+
+  
+
+
+
+
+
+
+
+
+<style type="text/css" title="ibis-book">
+    #sbo-rt-content .chapter-number{font-weight:bold;font-size:8.3em;text-align:right;font-family:symbol}#sbo-rt-content .chapter-title{font-size:30pt;text-align:right}#sbo-rt-content h1,#sbo-rt-content .packt_head1{font-size:16pt;font-weight:bold}#sbo-rt-content h2,#sbo-rt-content .packt_head2{font-size:14pt;font-weight:bold}#sbo-rt-content h3,#sbo-rt-content .packt_head3{font-size:13pt;font-weight:bold}#sbo-rt-content h4,#sbo-rt-content .packt_head4{font-size:11pt;font-weight:normal;font-style:italic}#sbo-rt-content ul,#sbo-rt-content .packt_bullet{font-weight:normal;list-style-type:disc}#sbo-rt-content ol,#sbo-rt-content .packt_numbered{font-weight:normal}#sbo-rt-content .packt_normal{font-weight:normal}#sbo-rt-content code,#sbo-rt-content .packt_code,#sbo-rt-content .packt_codeblock,#sbo-rt-content pre{font-family:monospace;font-size:9pt;font-weight:normal;border-left:1px solid black;margin-left:20px;padding-left:5px;display:block;margin-bottom:.12in}#sbo-rt-content .packt_figref{font-size:10pt;font-weight:normal}#sbo-rt-content q,#sbo-rt-content .packt_quote{font-size:11pt;font-weight:normal;color:black;font-style:italic}#sbo-rt-content .packt_tip{font-size:11pt;font-weight:normal;color:black;font-style:italic;background-image:url(../assets/0a79c387-fdee-4347-a587-034cf8cf4f7f.png);background-position:left center;background-repeat:no-repeat;background-size:.6in;margin-left:20px;margin-right:20px;padding-left:.7in;min-height:.75in;}#sbo-rt-content .packt_infobox{font-size:11pt;font-weight:normal;color:black;font-style:italic;background-image:url(../assets/6f2eee5d-61a6-4ff8-8b44-493a0b8e545b.png);background-position:left center;background-repeat:no-repeat;background-size:.6in;margin-left:20px;margin-right:20px;padding-left:.7in;min-height:.75in;}#sbo-rt-content kbd,#sbo-rt-content .packt_action{font-family:monospace;font-size:9pt;font-weight:normal}#sbo-rt-content .packt_italics{font-size:11pt;font-weight:normal;color:black;font-style:italic}#sbo-rt-content a,#sbo-rt-content .packt_url{font-family:monospace;font-size:9pt;font-weight:normal;text-decoration:none;word-break:break-all}#sbo-rt-content var,#sbo-rt-content .packt_inlinemsgid{display:none}#sbo-rt-content p,#sbo-rt-content .packt_para{text-align:left;font-size:11pt;line-height:17px}#sbo-rt-content .underline{text-decoration:underline}#sbo-rt-content .CDPImageAlign{width:100%;display:block}#sbo-rt-content div.CDPAlign,#sbo-rt-content p.CDPAlign{width:100%;display:block;margin-top:.18in;margin-bottom:.18in}#sbo-rt-content .CDPAlignCenter{text-align:center}#sbo-rt-content .CDPAlignLeft{text-align:left}#sbo-rt-content .CDPAlignRight{text-align:right}#sbo-rt-content .fm-editor-equation{border:none}#sbo-rt-content nav a.section{border-bottom:1px solid black;width:100%;display:block}#sbo-rt-content body table{border-collapse:collapse}#sbo-rt-content body table td{border:1px solid black;padding:.31em .62em}#sbo-rt-content .header-title{font-size:2.5em}#sbo-rt-content img.inline-image{height:1em}#sbo-rt-content .chapter-title{font-size:2.5em}#sbo-rt-content h1,#sbo-rt-content .packt_head1{font-size:2em}#sbo-rt-content h2,#sbo-rt-content .packt_head2{font-size:1.5em}#sbo-rt-content h3,#sbo-rt-content .packt_head3{font-size:1.17em}#sbo-rt-content h4,#sbo-rt-content .packt_head4{font-size:1em}#sbo-rt-content code,#sbo-rt-content .packt_code,#sbo-rt-content .packt_codeblock,#sbo-rt-content pre{font-size:.8em;margin-left:1.25em;padding-left:.3em;margin-bottom:.01em}#sbo-rt-content .packt_figref{font-size:.62em}#sbo-rt-content q,#sbo-rt-content .packt_quote{font-size:.68em}#sbo-rt-content .packt_tip{font-size:.68em;background-size:2.5em;margin-left:1.25em;margin-right:1.25em;padding-left:3em;min-height:2.5em}#sbo-rt-content .packt_infobox{font-size:.68em;background-size:2.5em;margin-left:1.25em;margin-right:1.25em;padding-left:3em;min-height:2.5em}#sbo-rt-content kbd,#sbo-rt-content .packt_action{font-size:.75em}#sbo-rt-content .packt_italics{font-size:.9em}#sbo-rt-content a,#sbo-rt-content .packt_url{font-size:.7em}#sbo-rt-content p,#sbo-rt-content .packt_para{font-size:1em;line-height:1.06em}#sbo-rt-content .CDPImageAlign{max-width:100%;max-height:100%}#sbo-rt-content div.CDPAlign,#sbo-rt-content p.CDPAlign{margin-top:.01em;margin-bottom:.01em}
+    </style>
+<style type="text/css" id="font-styles">#sbo-rt-content, #sbo-rt-content p, #sbo-rt-content div { font-size: &amp;lt;%= font_size %&amp;gt; !important; }</style>
+<style type="text/css" id="font-family">#sbo-rt-content, #sbo-rt-content p, #sbo-rt-content div { font-family: &amp;lt;%= font_family %&amp;gt; !important; }</style>
+<style type="text/css" id="column-width">#sbo-rt-content { max-width: &amp;lt;%= column_width %&amp;gt;% !important; margin: 0 auto !important; }</style>
+
+<style type="text/css">body{margin:1em;}#sbo-rt-content *{text-indent:0pt!important;}#sbo-rt-content .bq{margin-right:1em!important;}body{background-color:transparent!important;}#sbo-rt-content *{word-wrap:break-word!important;word-break:break-word!important;}#sbo-rt-content table,#sbo-rt-content pre{overflow-x:unset!important;overflow:unset!important;overflow-y:unset!important;white-space:pre-wrap!important;}</style>
+<div><h1 class="header-title">计算机视觉 API</h1>
+                
+            
+            
+                
+<p>这个 API 为基于各种可识别的物体、生物、动作和风景的图像提供标签。上传图像或指定图像的 URL 后，计算机视觉 API 的算法会在图像中识别标签。这可能包括主题、场景(室内或室外)、家具、工具、植物、动物、配件和小工具。</p>
+<p>让我们来看一个示例图像:</p>
+<p class="CDPAlignCenter CDPAlign"><img src="img/94bf3272-5611-4377-bab1-90b4814d7d32.png" style="width:31.33em;height:21.58em;" width="640" height="440"/></p>
+<p>我们将它发送给 API，并获得 JSON 格式的输出。这将向我们显示标签以及与每个标签相关联的置信度:</p>
+<table style="border-collapse: collapse;width: 100%" border="1">
+<tbody>
+<tr>
+<td style="width: 10%">
+<p><strong>标签</strong></p>
+</td>
+<td style="width: 89.1736%">
+<p><kbd>[</kbd></p>
+<p><kbd>{ "name": "bench", "confidence": 0.999963641 ...</kbd></p></td></tr></tbody></table></div>
+
+
+
+  
+
+
+
+
+
+
+
+
+<style type="text/css" title="ibis-book">
+    #sbo-rt-content .chapter-number{font-weight:bold;font-size:8.3em;text-align:right;font-family:symbol}#sbo-rt-content .chapter-title{font-size:30pt;text-align:right}#sbo-rt-content h1,#sbo-rt-content .packt_head1{font-size:16pt;font-weight:bold}#sbo-rt-content h2,#sbo-rt-content .packt_head2{font-size:14pt;font-weight:bold}#sbo-rt-content h3,#sbo-rt-content .packt_head3{font-size:13pt;font-weight:bold}#sbo-rt-content h4,#sbo-rt-content .packt_head4{font-size:11pt;font-weight:normal;font-style:italic}#sbo-rt-content ul,#sbo-rt-content .packt_bullet{font-weight:normal;list-style-type:disc}#sbo-rt-content ol,#sbo-rt-content .packt_numbered{font-weight:normal}#sbo-rt-content .packt_normal{font-weight:normal}#sbo-rt-content code,#sbo-rt-content .packt_code,#sbo-rt-content .packt_codeblock,#sbo-rt-content pre{font-family:monospace;font-size:9pt;font-weight:normal;border-left:1px solid black;margin-left:20px;padding-left:5px;display:block;margin-bottom:.12in}#sbo-rt-content .packt_figref{font-size:10pt;font-weight:normal}#sbo-rt-content q,#sbo-rt-content .packt_quote{font-size:11pt;font-weight:normal;color:black;font-style:italic}#sbo-rt-content .packt_tip{font-size:11pt;font-weight:normal;color:black;font-style:italic;background-image:url(../assets/0a79c387-fdee-4347-a587-034cf8cf4f7f.png);background-position:left center;background-repeat:no-repeat;background-size:.6in;margin-left:20px;margin-right:20px;padding-left:.7in;min-height:.75in;}#sbo-rt-content .packt_infobox{font-size:11pt;font-weight:normal;color:black;font-style:italic;background-image:url(../assets/6f2eee5d-61a6-4ff8-8b44-493a0b8e545b.png);background-position:left center;background-repeat:no-repeat;background-size:.6in;margin-left:20px;margin-right:20px;padding-left:.7in;min-height:.75in;}#sbo-rt-content kbd,#sbo-rt-content .packt_action{font-family:monospace;font-size:9pt;font-weight:normal}#sbo-rt-content .packt_italics{font-size:11pt;font-weight:normal;color:black;font-style:italic}#sbo-rt-content a,#sbo-rt-content .packt_url{font-family:monospace;font-size:9pt;font-weight:normal;text-decoration:none;word-break:break-all}#sbo-rt-content var,#sbo-rt-content .packt_inlinemsgid{display:none}#sbo-rt-content p,#sbo-rt-content .packt_para{text-align:left;font-size:11pt;line-height:17px}#sbo-rt-content .underline{text-decoration:underline}#sbo-rt-content .CDPImageAlign{width:100%;display:block}#sbo-rt-content div.CDPAlign,#sbo-rt-content p.CDPAlign{width:100%;display:block;margin-top:.18in;margin-bottom:.18in}#sbo-rt-content .CDPAlignCenter{text-align:center}#sbo-rt-content .CDPAlignLeft{text-align:left}#sbo-rt-content .CDPAlignRight{text-align:right}#sbo-rt-content .fm-editor-equation{border:none}#sbo-rt-content nav a.section{border-bottom:1px solid black;width:100%;display:block}#sbo-rt-content body table{border-collapse:collapse}#sbo-rt-content body table td{border:1px solid black;padding:.31em .62em}#sbo-rt-content .header-title{font-size:2.5em}#sbo-rt-content img.inline-image{height:1em}#sbo-rt-content .chapter-title{font-size:2.5em}#sbo-rt-content h1,#sbo-rt-content .packt_head1{font-size:2em}#sbo-rt-content h2,#sbo-rt-content .packt_head2{font-size:1.5em}#sbo-rt-content h3,#sbo-rt-content .packt_head3{font-size:1.17em}#sbo-rt-content h4,#sbo-rt-content .packt_head4{font-size:1em}#sbo-rt-content code,#sbo-rt-content .packt_code,#sbo-rt-content .packt_codeblock,#sbo-rt-content pre{font-size:.8em;margin-left:1.25em;padding-left:.3em;margin-bottom:.01em}#sbo-rt-content .packt_figref{font-size:.62em}#sbo-rt-content q,#sbo-rt-content .packt_quote{font-size:.68em}#sbo-rt-content .packt_tip{font-size:.68em;background-size:2.5em;margin-left:1.25em;margin-right:1.25em;padding-left:3em;min-height:2.5em}#sbo-rt-content .packt_infobox{font-size:.68em;background-size:2.5em;margin-left:1.25em;margin-right:1.25em;padding-left:3em;min-height:2.5em}#sbo-rt-content kbd,#sbo-rt-content .packt_action{font-size:.75em}#sbo-rt-content .packt_italics{font-size:.9em}#sbo-rt-content a,#sbo-rt-content .packt_url{font-size:.7em}#sbo-rt-content p,#sbo-rt-content .packt_para{font-size:1em;line-height:1.06em}#sbo-rt-content .CDPImageAlign{max-width:100%;max-height:100%}#sbo-rt-content div.CDPAlign,#sbo-rt-content p.CDPAlign{margin-top:.01em;margin-bottom:.01em}
+    </style>
+<style type="text/css" id="font-styles">#sbo-rt-content, #sbo-rt-content p, #sbo-rt-content div { font-size: &amp;lt;%= font_size %&amp;gt; !important; }</style>
+<style type="text/css" id="font-family">#sbo-rt-content, #sbo-rt-content p, #sbo-rt-content div { font-family: &amp;lt;%= font_family %&amp;gt; !important; }</style>
+<style type="text/css" id="column-width">#sbo-rt-content { max-width: &amp;lt;%= column_width %&amp;gt;% !important; margin: 0 auto !important; }</style>
+
+<style type="text/css">body{margin:1em;}#sbo-rt-content *{text-indent:0pt!important;}#sbo-rt-content .bq{margin-right:1em!important;}body{background-color:transparent!important;}#sbo-rt-content *{word-wrap:break-word!important;word-break:break-word!important;}#sbo-rt-content table,#sbo-rt-content pre{overflow-x:unset!important;overflow:unset!important;overflow-y:unset!important;white-space:pre-wrap!important;}</style>
+<div><h1 class="header-title">Face API</h1>
+                
+            
+            
+                
+<p>现在让我们看看视觉类别中的下一个 API，面部 API。</p>
+<p>这可以用来检测人脸和比较相似的人脸。它还会指示面部属性，包括年龄、情绪、性别和头发颜色。</p>
+<p>让我们来看一个示例图像:</p>
+<div><img src="img/1284b5ac-51c4-4ff5-bf5e-138cb2f4cdbe.png" style="width:21.00em;height:17.25em;" width="585" height="480"/></div>
+<p>如果我们将这个输入图像发送给 API，我们会得到以下 JSON 格式的输出:</p>
+<pre>//output omitted<br/>"faceAttributes": {<br/>      "hair": {<br/>        "bald": 0.01,<br/>        "invisible": false,<br/>        "hairColor": [<br/>          {<br/>            "color": "blond",<br/>            "confidence": 1.0<br/>          },<br/>          {<br/>            "color": "brown",<br/>            "confidence": 0.87<br/>          },<br/>        //omitted<br/>        ]<br/>      },<br/>      "smile": 0.018,<br/>      "headPose": {<br/>        "pitch": 0.0,<br/>        "roll": 3.2,<br/>        "yaw": -23.3<br/>      },<br/>      "gender": "female",<br/>      "age": 24.4,<br/>      "facialHair": {<br/>        "moustache": 0.0,<br/>        "beard": 0.0,<br/>        "sideburns": 0.0<br/>      },<br/>      "glasses": "NoGlasses",      "makeup": {<br/>        "eyeMakeup": true,<br/>        "lipMakeup": true<br/>      },<br/>      "emotion": {<br/>        "anger": 0.001,<br/>        "contempt": 0.002,<br/>        "disgust": 0.002,<br/>        "fear": 0.0,<br/>        "happiness": 0.018,<br/>        "neutral": 0.969,<br/>        "sadness": 0.006,<br/>        "surprise": 0.002<br/>      },<br/>//output omitted</pre>
+<p>想要快速试用 Face API，可以去下面的网址:<a href="https://azure.microsoft.com/en-us/services/cognitive-services/face/">https://azure . Microsoft . com/en-us/services/cognitive-services/Face/</a>。</p>
+<p>就像计算机视觉 API 一样，您可以使用 Python 或任何其他语言调用 Face API。创建 Face API 资源的步骤与计算机视觉 API 类似，只是您必须在门户中搜索 Face API，如以下屏幕截图所示:</p>
+<p class="CDPAlignCenter CDPAlign"><img src="img/4fcf4e0a-f0da-48a6-91ef-e6190e96e2b4.png" width="1712" height="588"/></p>
+<p class="mce-root"/>
+<p>有关其余 Vision APIs 的更多信息，可以访问以下网址:<a href="https://azure.microsoft.com/en-us/services/cognitive-services/directory/vision/">https://azure . Microsoft . com/en-us/services/cognitive-services/directory/Vision/</a>。</p>
+
+
+            
+
+            
+        
+    </div>
+
+
+
+  
+
+
+
+
+
+
+
+
+<style type="text/css" title="ibis-book">
+    #sbo-rt-content .chapter-number{font-weight:bold;font-size:8.3em;text-align:right;font-family:symbol}#sbo-rt-content .chapter-title{font-size:30pt;text-align:right}#sbo-rt-content h1,#sbo-rt-content .packt_head1{font-size:16pt;font-weight:bold}#sbo-rt-content h2,#sbo-rt-content .packt_head2{font-size:14pt;font-weight:bold}#sbo-rt-content h3,#sbo-rt-content .packt_head3{font-size:13pt;font-weight:bold}#sbo-rt-content h4,#sbo-rt-content .packt_head4{font-size:11pt;font-weight:normal;font-style:italic}#sbo-rt-content ul,#sbo-rt-content .packt_bullet{font-weight:normal;list-style-type:disc}#sbo-rt-content ol,#sbo-rt-content .packt_numbered{font-weight:normal}#sbo-rt-content .packt_normal{font-weight:normal}#sbo-rt-content code,#sbo-rt-content .packt_code,#sbo-rt-content .packt_codeblock,#sbo-rt-content pre{font-family:monospace;font-size:9pt;font-weight:normal;border-left:1px solid black;margin-left:20px;padding-left:5px;display:block;margin-bottom:.12in}#sbo-rt-content .packt_figref{font-size:10pt;font-weight:normal}#sbo-rt-content q,#sbo-rt-content .packt_quote{font-size:11pt;font-weight:normal;color:black;font-style:italic}#sbo-rt-content .packt_tip{font-size:11pt;font-weight:normal;color:black;font-style:italic;background-image:url(../assets/0a79c387-fdee-4347-a587-034cf8cf4f7f.png);background-position:left center;background-repeat:no-repeat;background-size:.6in;margin-left:20px;margin-right:20px;padding-left:.7in;min-height:.75in;}#sbo-rt-content .packt_infobox{font-size:11pt;font-weight:normal;color:black;font-style:italic;background-image:url(../assets/6f2eee5d-61a6-4ff8-8b44-493a0b8e545b.png);background-position:left center;background-repeat:no-repeat;background-size:.6in;margin-left:20px;margin-right:20px;padding-left:.7in;min-height:.75in;}#sbo-rt-content kbd,#sbo-rt-content .packt_action{font-family:monospace;font-size:9pt;font-weight:normal}#sbo-rt-content .packt_italics{font-size:11pt;font-weight:normal;color:black;font-style:italic}#sbo-rt-content a,#sbo-rt-content .packt_url{font-family:monospace;font-size:9pt;font-weight:normal;text-decoration:none;word-break:break-all}#sbo-rt-content var,#sbo-rt-content .packt_inlinemsgid{display:none}#sbo-rt-content p,#sbo-rt-content .packt_para{text-align:left;font-size:11pt;line-height:17px}#sbo-rt-content .underline{text-decoration:underline}#sbo-rt-content .CDPImageAlign{width:100%;display:block}#sbo-rt-content div.CDPAlign,#sbo-rt-content p.CDPAlign{width:100%;display:block;margin-top:.18in;margin-bottom:.18in}#sbo-rt-content .CDPAlignCenter{text-align:center}#sbo-rt-content .CDPAlignLeft{text-align:left}#sbo-rt-content .CDPAlignRight{text-align:right}#sbo-rt-content .fm-editor-equation{border:none}#sbo-rt-content nav a.section{border-bottom:1px solid black;width:100%;display:block}#sbo-rt-content body table{border-collapse:collapse}#sbo-rt-content body table td{border:1px solid black;padding:.31em .62em}#sbo-rt-content .header-title{font-size:2.5em}#sbo-rt-content img.inline-image{height:1em}#sbo-rt-content .chapter-title{font-size:2.5em}#sbo-rt-content h1,#sbo-rt-content .packt_head1{font-size:2em}#sbo-rt-content h2,#sbo-rt-content .packt_head2{font-size:1.5em}#sbo-rt-content h3,#sbo-rt-content .packt_head3{font-size:1.17em}#sbo-rt-content h4,#sbo-rt-content .packt_head4{font-size:1em}#sbo-rt-content code,#sbo-rt-content .packt_code,#sbo-rt-content .packt_codeblock,#sbo-rt-content pre{font-size:.8em;margin-left:1.25em;padding-left:.3em;margin-bottom:.01em}#sbo-rt-content .packt_figref{font-size:.62em}#sbo-rt-content q,#sbo-rt-content .packt_quote{font-size:.68em}#sbo-rt-content .packt_tip{font-size:.68em;background-size:2.5em;margin-left:1.25em;margin-right:1.25em;padding-left:3em;min-height:2.5em}#sbo-rt-content .packt_infobox{font-size:.68em;background-size:2.5em;margin-left:1.25em;margin-right:1.25em;padding-left:3em;min-height:2.5em}#sbo-rt-content kbd,#sbo-rt-content .packt_action{font-size:.75em}#sbo-rt-content .packt_italics{font-size:.9em}#sbo-rt-content a,#sbo-rt-content .packt_url{font-size:.7em}#sbo-rt-content p,#sbo-rt-content .packt_para{font-size:1em;line-height:1.06em}#sbo-rt-content .CDPImageAlign{max-width:100%;max-height:100%}#sbo-rt-content div.CDPAlign,#sbo-rt-content p.CDPAlign{margin-top:.01em;margin-bottom:.01em}
+    </style>
+<style type="text/css" id="font-styles">#sbo-rt-content, #sbo-rt-content p, #sbo-rt-content div { font-size: &amp;lt;%= font_size %&amp;gt; !important; }</style>
+<style type="text/css" id="font-family">#sbo-rt-content, #sbo-rt-content p, #sbo-rt-content div { font-family: &amp;lt;%= font_family %&amp;gt; !important; }</style>
+<style type="text/css" id="column-width">#sbo-rt-content { max-width: &amp;lt;%= column_width %&amp;gt;% !important; margin: 0 auto !important; }</style>
+
+<style type="text/css">body{margin:1em;}#sbo-rt-content *{text-indent:0pt!important;}#sbo-rt-content .bq{margin-right:1em!important;}body{background-color:transparent!important;}#sbo-rt-content *{word-wrap:break-word!important;word-break:break-word!important;}#sbo-rt-content table,#sbo-rt-content pre{overflow-x:unset!important;overflow:unset!important;overflow-y:unset!important;white-space:pre-wrap!important;}</style>
+<div><h1 class="header-title">语言 API 的认知服务</h1>
+                
+            
+            
+                
+<p>语言 API 允许我们将文本分析、翻译和其他功能添加到我们的 AI 应用程序中。在撰写本文时，认知服务提供了五种语言 API:</p>
+<ul>
+<li>
+<p>文本分析</p>
+</li>
+<li>
+<p>翻译文本</p>
+</li>
+<li>
+<p>Bing 拼写检查</p>
+</li>
+<li>
+<p>内容版主</p>
+</li>
+<li>
+<p>语言理解</p>
+</li>
+</ul>
+<p>在本章中，我们将只看第一个 API。我们会把其他的留给你自己去探索。</p>
+
+
+            
+
+            
+        
+    </div>
+
+
+
+  
+
+
+
+
+
+
+
+
+<style type="text/css" title="ibis-book">
+    #sbo-rt-content .chapter-number{font-weight:bold;font-size:8.3em;text-align:right;font-family:symbol}#sbo-rt-content .chapter-title{font-size:30pt;text-align:right}#sbo-rt-content h1,#sbo-rt-content .packt_head1{font-size:16pt;font-weight:bold}#sbo-rt-content h2,#sbo-rt-content .packt_head2{font-size:14pt;font-weight:bold}#sbo-rt-content h3,#sbo-rt-content .packt_head3{font-size:13pt;font-weight:bold}#sbo-rt-content h4,#sbo-rt-content .packt_head4{font-size:11pt;font-weight:normal;font-style:italic}#sbo-rt-content ul,#sbo-rt-content .packt_bullet{font-weight:normal;list-style-type:disc}#sbo-rt-content ol,#sbo-rt-content .packt_numbered{font-weight:normal}#sbo-rt-content .packt_normal{font-weight:normal}#sbo-rt-content code,#sbo-rt-content .packt_code,#sbo-rt-content .packt_codeblock,#sbo-rt-content pre{font-family:monospace;font-size:9pt;font-weight:normal;border-left:1px solid black;margin-left:20px;padding-left:5px;display:block;margin-bottom:.12in}#sbo-rt-content .packt_figref{font-size:10pt;font-weight:normal}#sbo-rt-content q,#sbo-rt-content .packt_quote{font-size:11pt;font-weight:normal;color:black;font-style:italic}#sbo-rt-content .packt_tip{font-size:11pt;font-weight:normal;color:black;font-style:italic;background-image:url(../assets/0a79c387-fdee-4347-a587-034cf8cf4f7f.png);background-position:left center;background-repeat:no-repeat;background-size:.6in;margin-left:20px;margin-right:20px;padding-left:.7in;min-height:.75in;}#sbo-rt-content .packt_infobox{font-size:11pt;font-weight:normal;color:black;font-style:italic;background-image:url(../assets/6f2eee5d-61a6-4ff8-8b44-493a0b8e545b.png);background-position:left center;background-repeat:no-repeat;background-size:.6in;margin-left:20px;margin-right:20px;padding-left:.7in;min-height:.75in;}#sbo-rt-content kbd,#sbo-rt-content .packt_action{font-family:monospace;font-size:9pt;font-weight:normal}#sbo-rt-content .packt_italics{font-size:11pt;font-weight:normal;color:black;font-style:italic}#sbo-rt-content a,#sbo-rt-content .packt_url{font-family:monospace;font-size:9pt;font-weight:normal;text-decoration:none;word-break:break-all}#sbo-rt-content var,#sbo-rt-content .packt_inlinemsgid{display:none}#sbo-rt-content p,#sbo-rt-content .packt_para{text-align:left;font-size:11pt;line-height:17px}#sbo-rt-content .underline{text-decoration:underline}#sbo-rt-content .CDPImageAlign{width:100%;display:block}#sbo-rt-content div.CDPAlign,#sbo-rt-content p.CDPAlign{width:100%;display:block;margin-top:.18in;margin-bottom:.18in}#sbo-rt-content .CDPAlignCenter{text-align:center}#sbo-rt-content .CDPAlignLeft{text-align:left}#sbo-rt-content .CDPAlignRight{text-align:right}#sbo-rt-content .fm-editor-equation{border:none}#sbo-rt-content nav a.section{border-bottom:1px solid black;width:100%;display:block}#sbo-rt-content body table{border-collapse:collapse}#sbo-rt-content body table td{border:1px solid black;padding:.31em .62em}#sbo-rt-content .header-title{font-size:2.5em}#sbo-rt-content img.inline-image{height:1em}#sbo-rt-content .chapter-title{font-size:2.5em}#sbo-rt-content h1,#sbo-rt-content .packt_head1{font-size:2em}#sbo-rt-content h2,#sbo-rt-content .packt_head2{font-size:1.5em}#sbo-rt-content h3,#sbo-rt-content .packt_head3{font-size:1.17em}#sbo-rt-content h4,#sbo-rt-content .packt_head4{font-size:1em}#sbo-rt-content code,#sbo-rt-content .packt_code,#sbo-rt-content .packt_codeblock,#sbo-rt-content pre{font-size:.8em;margin-left:1.25em;padding-left:.3em;margin-bottom:.01em}#sbo-rt-content .packt_figref{font-size:.62em}#sbo-rt-content q,#sbo-rt-content .packt_quote{font-size:.68em}#sbo-rt-content .packt_tip{font-size:.68em;background-size:2.5em;margin-left:1.25em;margin-right:1.25em;padding-left:3em;min-height:2.5em}#sbo-rt-content .packt_infobox{font-size:.68em;background-size:2.5em;margin-left:1.25em;margin-right:1.25em;padding-left:3em;min-height:2.5em}#sbo-rt-content kbd,#sbo-rt-content .packt_action{font-size:.75em}#sbo-rt-content .packt_italics{font-size:.9em}#sbo-rt-content a,#sbo-rt-content .packt_url{font-size:.7em}#sbo-rt-content p,#sbo-rt-content .packt_para{font-size:1em;line-height:1.06em}#sbo-rt-content .CDPImageAlign{max-width:100%;max-height:100%}#sbo-rt-content div.CDPAlign,#sbo-rt-content p.CDPAlign{margin-top:.01em;margin-bottom:.01em}
+    </style>
+<style type="text/css" id="font-styles">#sbo-rt-content, #sbo-rt-content p, #sbo-rt-content div { font-size: &amp;lt;%= font_size %&amp;gt; !important; }</style>
+<style type="text/css" id="font-family">#sbo-rt-content, #sbo-rt-content p, #sbo-rt-content div { font-family: &amp;lt;%= font_family %&amp;gt; !important; }</style>
+<style type="text/css" id="column-width">#sbo-rt-content { max-width: &amp;lt;%= column_width %&amp;gt;% !important; margin: 0 auto !important; }</style>
+
+<style type="text/css">body{margin:1em;}#sbo-rt-content *{text-indent:0pt!important;}#sbo-rt-content .bq{margin-right:1em!important;}body{background-color:transparent!important;}#sbo-rt-content *{word-wrap:break-word!important;word-break:break-word!important;}#sbo-rt-content table,#sbo-rt-content pre{overflow-x:unset!important;overflow:unset!important;overflow-y:unset!important;white-space:pre-wrap!important;}</style>
+<div><h1 class="header-title">文本分析</h1>
+                
+            
+            
+                
+<p>文本分析 API 可用于从文本中检测情感、关键短语、实体和语言。下面是一个示例，它向 API 发送一个输入文本，并以 JSON 格式获得以下输出。正文如下:</p>
+<pre class="mce-root">{  "languageDetection": {    "documents": [      {        "id": "fe2529ff-073e-4355-86fa-b927d1b62a23",        "detectedLanguages": [          {            "name": "English",            "iso6391Name": "en",            "score": 1.0          }        ]      }    ],    "errors": []  },  "keyPhrases": {    "documents": [      {        "id": "fe2529ff-073e-4355-86fa-b927d1b62a23",        "keyPhrases": [          "Microsoft's offerings",          "AI space"        ]      }    ],    "errors": []  },  "sentiment": {    "documents": [      {        "id": "fe2529ff-073e-4355-86fa-b927d1b62a23",        "score": 0.93527746200561523      }    ],    "errors": []  },  "entities": {    "documents": [      {        "id": "fe2529ff-073e-4355-86fa-b927d1b62a23",        "entities": [          {            "name": "Microsoft",            "matches": [              {                "text": "Microsoft's",                "offset": 25,                "length": 11              }            ],            "wikipediaLanguage": "en",            "wikipediaId": "Microsoft",            "wikipediaUrl": "https://en.wikipedia.org/wiki/Microsoft",            "bingId": "a093e9b9-90f5-a3d5-c4b8-5855e1b01f85"          },          {            "name": "Ai Space",            "matches": [              {                "text": "AI space",                "offset": 50,                "length": 8              }            ],            "wikipediaLanguage": "en",            "wikipediaId": "Ai Space",            "wikipediaUrl": "https://en.wikipedia.org/wiki/Ai_Space",            "bingId": "2d055fa3-b3cc-e9f6-776a-77b6ed7f341f"          }        ]      }    ],    "errors": []  }}</pre>
+<p>要快速试用文本分析 API，请访问以下 URL:<a href="https://azure.microsoft.com/en-us/services/cognitive-services/text-analytics/">https://azure . Microsoft . com/en-us/services/cognitive-services/Text-Analytics/</a>。</p>
+<p>作为一个 AI 开发者，你可以用任何语言调用 API。在这个例子中，我们将看看如何使用 Python 调用 API。类似的方法可以用于其他编程语言:</p>
+<ol>
+<li>
+<p>从 Azure 门户创建一个文本分析 API 认知服务资源:<a href="https://portal.azure.com">https://portal.azure.com</a>。</p>
+</li>
+<li>
+<p>导航到 API，如下面的屏幕截图所示。点击创建资源，然后 AI +机器学习，然后文本分析:</p>
+</li>
+</ol>
+<div><img src="img/eb446d3f-89a7-439b-8105-129a78e5c63e.png" style="width:55.33em;height:53.42em;" width="1715" height="1657"/></div>
+<ol start="3">
+<li>或者，你可以在 Azure 门户中搜索<kbd>Text Analytics</kbd>:</li>
+</ol>
+<div><img src="img/dd3d3083-be95-43a5-9920-5e62c9fc17d9.png" style="width:57.50em;height:23.00em;" width="1706" height="683"/></div>
+<ol start="4">
+<li>为您的服务提供一个名称，然后选择合适的 Azure 订阅、位置和定价层(免费或付费)。您还需要创建一个新的资源组或选择一个现有的资源组:</li>
+</ol>
+<div><img src="img/69614c31-8086-4d34-ad23-6abd60da9b80.png" style="width:33.33em;height:51.92em;" width="851" height="1326"/></div>
+<ol start="5">
+<li>创建 API 不到一分钟。创建完成后，您将看到快速启动页面，其中包含指向 API 密钥及其文档的链接。您将需要 API 键来从您的 Python(或任何其他语言)代码或您正在使用的任何语言的代码中访问 API。创建 API 后，您将看到以下屏幕:</li>
+</ol>
+<div><img src="img/967b3f1f-b46c-424a-ac80-e6338d28bfd8.png" style="width:48.42em;height:30.33em;" width="2550" height="1597"/></div>
+<ol start="6">
+<li>使用您最喜欢的 Python 编辑器，并使用以下示例代码调用 API:</li>
+</ol>
+<pre style="padding-left: 60px"># Replace &lt;Subscription Key&gt; with your valid subscription's api access key.<br/>subscription_key = "&lt;Access Key&gt;"<br/>assert subscription_key<br/><br/># Replace the base url with what you see as Endpoint in the portal’s Overview section under your api<br/>text_analytics_base_url = "https://westus2.api.cognitive.microsoft.com/text/analytics/v2.0/"<br/>sentiment_api_url = text_analytics_base_url + "sentiment"<br/><br/># Send the text you want the api to analyze<br/># You can send multiple texts<br/>documents = {'documents' : [<br/>  {'id': '1', 'text': 'I am excited about using AI offerings by Microsoft.'},<br/>]}<br/><br/>import requests<br/># Get sentiment of text<br/>headers   = {"Ocp-Apim-Subscription-Key": subscription_key}<br/>response  = requests.post(sentiment_api_url, headers=headers, json=documents)<br/>sentiments = response.json()<br/>print(sentiments)<br/><br/># Get the language of text<br/>language_api_url = text_analytics_base_url + "languages"<br/>response  = requests.post(language_api_url, headers=headers, json=documents)<br/>languages = response.json()<br/>print(languages)<br/><br/># Get key phrases from text<br/>key_phrase_api_url = text_analytics_base_url + "keyPhrases"<br/>response  = requests.post(key_phrase_api_url, headers=headers, json=documents)<br/>key_phrases = response.json()<br/>print(key_phrases)<br/><br/># Get well-known entities<br/>entity_linking_api_url = text_analytics_base_url + "entities"<br/>response  = requests.post(entity_linking_api_url, headers=headers, json=documents)<br/>entities = response.json()<br/>print(entities)</pre>
+<ol start="7">
+<li>当您运行上述代码时，您将看到如下所示的输出:</li>
+</ol>
+<pre style="padding-left: 60px"><br/>{'documents': [{'id': '1', 'score': 0.9388835430145264}], 'errors': []}{'documents': [{'detectedLanguages': [{'iso6391Name': 'en', 'name': 'English', 'score': 1.0}], 'id': '1'}], 'errors': []}<br/>{'documents': [{'keyPhrases': ['AI offerings', 'Microsoft'], 'id': '1'}], 'errors': []}<br/>{'documents': [{'id': '1', 'entities': [{'name': 'Microsoft', 'wikipediaId': 'Microsoft', 'matches': [{'offset': 41, 'length': 9, 'text': 'Microsoft'}], 'bingId': 'a093e9b9-90f5-a3d5-c4b8-5855e1b01f85', 'wikipediaUrl': 'https://en.wikipedia.org/wiki/Microsoft', 'wikipediaLanguage': 'en'}, {'name': 'Artificial intelligence', 'wikipediaId': 'Artificial intelligence', 'matches': [{'offset': 25, 'length': 2, 'text': 'AI'}], 'bingId': '9d99fb44-edac-0e03-1579-19d8d8591a49',<br/>'wikipediaUrl': 'https://en.wikipedia.org/wiki/Artificial_intelligence', 'wikipediaLanguage': 'en'}]}], 'errors': []}</pre>
+<p style="padding-left: 90px">情绪得分为 0.93 表示情绪积极。API 检测到英语作为语言，以及两个关键短语和实体。</p>
+<ol start="8">
+<li>每个事务相当于一个 API 调用。该门户将显示您可以监控的详细信息，如呼叫总数、错误、延迟和数据输入/输出。在前面的例子中，我们调用了四个不同的 API:<kbd>sentiment</kbd>、<kbd>languages</kbd>、<kbd>keyPhrases</kbd>和<kbd>entities</kbd>:</li>
+</ol>
+<div><img src="img/de19e7f5-f855-4d9c-ae59-716784706177.png" width="1379" height="809"/></div>
+<p>想了解更多关于其余语言 API 的信息，可以去以下网址:<a href="https://azure.microsoft.com/en-us/services/cognitive-services/directory/lang/">https://azure . Microsoft . com/en-us/services/cognitive-services/directory/lang/</a>。</p>
+
+
+            
+
+            
+        
+    </div>
+
+
+
+  
+
+
+
+
+
+
+
+
+<style type="text/css" title="ibis-book">
+    #sbo-rt-content .chapter-number{font-weight:bold;font-size:8.3em;text-align:right;font-family:symbol}#sbo-rt-content .chapter-title{font-size:30pt;text-align:right}#sbo-rt-content h1,#sbo-rt-content .packt_head1{font-size:16pt;font-weight:bold}#sbo-rt-content h2,#sbo-rt-content .packt_head2{font-size:14pt;font-weight:bold}#sbo-rt-content h3,#sbo-rt-content .packt_head3{font-size:13pt;font-weight:bold}#sbo-rt-content h4,#sbo-rt-content .packt_head4{font-size:11pt;font-weight:normal;font-style:italic}#sbo-rt-content ul,#sbo-rt-content .packt_bullet{font-weight:normal;list-style-type:disc}#sbo-rt-content ol,#sbo-rt-content .packt_numbered{font-weight:normal}#sbo-rt-content .packt_normal{font-weight:normal}#sbo-rt-content code,#sbo-rt-content .packt_code,#sbo-rt-content .packt_codeblock,#sbo-rt-content pre{font-family:monospace;font-size:9pt;font-weight:normal;border-left:1px solid black;margin-left:20px;padding-left:5px;display:block;margin-bottom:.12in}#sbo-rt-content .packt_figref{font-size:10pt;font-weight:normal}#sbo-rt-content q,#sbo-rt-content .packt_quote{font-size:11pt;font-weight:normal;color:black;font-style:italic}#sbo-rt-content .packt_tip{font-size:11pt;font-weight:normal;color:black;font-style:italic;background-image:url(../assets/0a79c387-fdee-4347-a587-034cf8cf4f7f.png);background-position:left center;background-repeat:no-repeat;background-size:.6in;margin-left:20px;margin-right:20px;padding-left:.7in;min-height:.75in;}#sbo-rt-content .packt_infobox{font-size:11pt;font-weight:normal;color:black;font-style:italic;background-image:url(../assets/6f2eee5d-61a6-4ff8-8b44-493a0b8e545b.png);background-position:left center;background-repeat:no-repeat;background-size:.6in;margin-left:20px;margin-right:20px;padding-left:.7in;min-height:.75in;}#sbo-rt-content kbd,#sbo-rt-content .packt_action{font-family:monospace;font-size:9pt;font-weight:normal}#sbo-rt-content .packt_italics{font-size:11pt;font-weight:normal;color:black;font-style:italic}#sbo-rt-content a,#sbo-rt-content .packt_url{font-family:monospace;font-size:9pt;font-weight:normal;text-decoration:none;word-break:break-all}#sbo-rt-content var,#sbo-rt-content .packt_inlinemsgid{display:none}#sbo-rt-content p,#sbo-rt-content .packt_para{text-align:left;font-size:11pt;line-height:17px}#sbo-rt-content .underline{text-decoration:underline}#sbo-rt-content .CDPImageAlign{width:100%;display:block}#sbo-rt-content div.CDPAlign,#sbo-rt-content p.CDPAlign{width:100%;display:block;margin-top:.18in;margin-bottom:.18in}#sbo-rt-content .CDPAlignCenter{text-align:center}#sbo-rt-content .CDPAlignLeft{text-align:left}#sbo-rt-content .CDPAlignRight{text-align:right}#sbo-rt-content .fm-editor-equation{border:none}#sbo-rt-content nav a.section{border-bottom:1px solid black;width:100%;display:block}#sbo-rt-content body table{border-collapse:collapse}#sbo-rt-content body table td{border:1px solid black;padding:.31em .62em}#sbo-rt-content .header-title{font-size:2.5em}#sbo-rt-content img.inline-image{height:1em}#sbo-rt-content .chapter-title{font-size:2.5em}#sbo-rt-content h1,#sbo-rt-content .packt_head1{font-size:2em}#sbo-rt-content h2,#sbo-rt-content .packt_head2{font-size:1.5em}#sbo-rt-content h3,#sbo-rt-content .packt_head3{font-size:1.17em}#sbo-rt-content h4,#sbo-rt-content .packt_head4{font-size:1em}#sbo-rt-content code,#sbo-rt-content .packt_code,#sbo-rt-content .packt_codeblock,#sbo-rt-content pre{font-size:.8em;margin-left:1.25em;padding-left:.3em;margin-bottom:.01em}#sbo-rt-content .packt_figref{font-size:.62em}#sbo-rt-content q,#sbo-rt-content .packt_quote{font-size:.68em}#sbo-rt-content .packt_tip{font-size:.68em;background-size:2.5em;margin-left:1.25em;margin-right:1.25em;padding-left:3em;min-height:2.5em}#sbo-rt-content .packt_infobox{font-size:.68em;background-size:2.5em;margin-left:1.25em;margin-right:1.25em;padding-left:3em;min-height:2.5em}#sbo-rt-content kbd,#sbo-rt-content .packt_action{font-size:.75em}#sbo-rt-content .packt_italics{font-size:.9em}#sbo-rt-content a,#sbo-rt-content .packt_url{font-size:.7em}#sbo-rt-content p,#sbo-rt-content .packt_para{font-size:1em;line-height:1.06em}#sbo-rt-content .CDPImageAlign{max-width:100%;max-height:100%}#sbo-rt-content div.CDPAlign,#sbo-rt-content p.CDPAlign{margin-top:.01em;margin-bottom:.01em}
+    </style>
+<style type="text/css" id="font-styles">#sbo-rt-content, #sbo-rt-content p, #sbo-rt-content div { font-size: &amp;lt;%= font_size %&amp;gt; !important; }</style>
+<style type="text/css" id="font-family">#sbo-rt-content, #sbo-rt-content p, #sbo-rt-content div { font-family: &amp;lt;%= font_family %&amp;gt; !important; }</style>
+<style type="text/css" id="column-width">#sbo-rt-content { max-width: &amp;lt;%= column_width %&amp;gt;% !important; margin: 0 auto !important; }</style>
+
+<style type="text/css">body{margin:1em;}#sbo-rt-content *{text-indent:0pt!important;}#sbo-rt-content .bq{margin-right:1em!important;}body{background-color:transparent!important;}#sbo-rt-content *{word-wrap:break-word!important;word-break:break-word!important;}#sbo-rt-content table,#sbo-rt-content pre{overflow-x:unset!important;overflow:unset!important;overflow-y:unset!important;white-space:pre-wrap!important;}</style>
+<div><h1 class="header-title">语音 API 的认知服务</h1>
+                
+            
+            
+                
+<p>语音 API 帮助您将与语音到文本和文本到语音操作相关的各种功能添加到您的 AI 应用程序中。</p>
+<p>在撰写本文时，认知服务提供了四个语音 API:</p>
+<ul>
+<li>
+<p>语音转文本</p>
+</li>
+<li>
+<p>文本到语音</p>
+</li>
+<li>
+<p>说话人识别</p>
+</li>
+<li>
+<p>语音翻译</p>
+</li>
+</ul>
+
+
+            
+
+            
+        
+    </div>
+
+
+
+  
+
+
+
+
+
+
+
+
+<style type="text/css" title="ibis-book">
+    #sbo-rt-content .chapter-number{font-weight:bold;font-size:8.3em;text-align:right;font-family:symbol}#sbo-rt-content .chapter-title{font-size:30pt;text-align:right}#sbo-rt-content h1,#sbo-rt-content .packt_head1{font-size:16pt;font-weight:bold}#sbo-rt-content h2,#sbo-rt-content .packt_head2{font-size:14pt;font-weight:bold}#sbo-rt-content h3,#sbo-rt-content .packt_head3{font-size:13pt;font-weight:bold}#sbo-rt-content h4,#sbo-rt-content .packt_head4{font-size:11pt;font-weight:normal;font-style:italic}#sbo-rt-content ul,#sbo-rt-content .packt_bullet{font-weight:normal;list-style-type:disc}#sbo-rt-content ol,#sbo-rt-content .packt_numbered{font-weight:normal}#sbo-rt-content .packt_normal{font-weight:normal}#sbo-rt-content code,#sbo-rt-content .packt_code,#sbo-rt-content .packt_codeblock,#sbo-rt-content pre{font-family:monospace;font-size:9pt;font-weight:normal;border-left:1px solid black;margin-left:20px;padding-left:5px;display:block;margin-bottom:.12in}#sbo-rt-content .packt_figref{font-size:10pt;font-weight:normal}#sbo-rt-content q,#sbo-rt-content .packt_quote{font-size:11pt;font-weight:normal;color:black;font-style:italic}#sbo-rt-content .packt_tip{font-size:11pt;font-weight:normal;color:black;font-style:italic;background-image:url(../assets/0a79c387-fdee-4347-a587-034cf8cf4f7f.png);background-position:left center;background-repeat:no-repeat;background-size:.6in;margin-left:20px;margin-right:20px;padding-left:.7in;min-height:.75in;}#sbo-rt-content .packt_infobox{font-size:11pt;font-weight:normal;color:black;font-style:italic;background-image:url(../assets/6f2eee5d-61a6-4ff8-8b44-493a0b8e545b.png);background-position:left center;background-repeat:no-repeat;background-size:.6in;margin-left:20px;margin-right:20px;padding-left:.7in;min-height:.75in;}#sbo-rt-content kbd,#sbo-rt-content .packt_action{font-family:monospace;font-size:9pt;font-weight:normal}#sbo-rt-content .packt_italics{font-size:11pt;font-weight:normal;color:black;font-style:italic}#sbo-rt-content a,#sbo-rt-content .packt_url{font-family:monospace;font-size:9pt;font-weight:normal;text-decoration:none;word-break:break-all}#sbo-rt-content var,#sbo-rt-content .packt_inlinemsgid{display:none}#sbo-rt-content p,#sbo-rt-content .packt_para{text-align:left;font-size:11pt;line-height:17px}#sbo-rt-content .underline{text-decoration:underline}#sbo-rt-content .CDPImageAlign{width:100%;display:block}#sbo-rt-content div.CDPAlign,#sbo-rt-content p.CDPAlign{width:100%;display:block;margin-top:.18in;margin-bottom:.18in}#sbo-rt-content .CDPAlignCenter{text-align:center}#sbo-rt-content .CDPAlignLeft{text-align:left}#sbo-rt-content .CDPAlignRight{text-align:right}#sbo-rt-content .fm-editor-equation{border:none}#sbo-rt-content nav a.section{border-bottom:1px solid black;width:100%;display:block}#sbo-rt-content body table{border-collapse:collapse}#sbo-rt-content body table td{border:1px solid black;padding:.31em .62em}#sbo-rt-content .header-title{font-size:2.5em}#sbo-rt-content img.inline-image{height:1em}#sbo-rt-content .chapter-title{font-size:2.5em}#sbo-rt-content h1,#sbo-rt-content .packt_head1{font-size:2em}#sbo-rt-content h2,#sbo-rt-content .packt_head2{font-size:1.5em}#sbo-rt-content h3,#sbo-rt-content .packt_head3{font-size:1.17em}#sbo-rt-content h4,#sbo-rt-content .packt_head4{font-size:1em}#sbo-rt-content code,#sbo-rt-content .packt_code,#sbo-rt-content .packt_codeblock,#sbo-rt-content pre{font-size:.8em;margin-left:1.25em;padding-left:.3em;margin-bottom:.01em}#sbo-rt-content .packt_figref{font-size:.62em}#sbo-rt-content q,#sbo-rt-content .packt_quote{font-size:.68em}#sbo-rt-content .packt_tip{font-size:.68em;background-size:2.5em;margin-left:1.25em;margin-right:1.25em;padding-left:3em;min-height:2.5em}#sbo-rt-content .packt_infobox{font-size:.68em;background-size:2.5em;margin-left:1.25em;margin-right:1.25em;padding-left:3em;min-height:2.5em}#sbo-rt-content kbd,#sbo-rt-content .packt_action{font-size:.75em}#sbo-rt-content .packt_italics{font-size:.9em}#sbo-rt-content a,#sbo-rt-content .packt_url{font-size:.7em}#sbo-rt-content p,#sbo-rt-content .packt_para{font-size:1em;line-height:1.06em}#sbo-rt-content .CDPImageAlign{max-width:100%;max-height:100%}#sbo-rt-content div.CDPAlign,#sbo-rt-content p.CDPAlign{margin-top:.01em;margin-bottom:.01em}
+    </style>
+<style type="text/css" id="font-styles">#sbo-rt-content, #sbo-rt-content p, #sbo-rt-content div { font-size: &amp;lt;%= font_size %&amp;gt; !important; }</style>
+<style type="text/css" id="font-family">#sbo-rt-content, #sbo-rt-content p, #sbo-rt-content div { font-family: &amp;lt;%= font_family %&amp;gt; !important; }</style>
+<style type="text/css" id="column-width">#sbo-rt-content { max-width: &amp;lt;%= column_width %&amp;gt;% !important; margin: 0 auto !important; }</style>
+
+<style type="text/css">body{margin:1em;}#sbo-rt-content *{text-indent:0pt!important;}#sbo-rt-content .bq{margin-right:1em!important;}body{background-color:transparent!important;}#sbo-rt-content *{word-wrap:break-word!important;word-break:break-word!important;}#sbo-rt-content table,#sbo-rt-content pre{overflow-x:unset!important;overflow:unset!important;overflow-y:unset!important;white-space:pre-wrap!important;}</style>
+<div><h1 class="header-title">语音转文本</h1>
+                
+            
+            
+                
+<p>语音到文本 API 可以帮助将语音音频转换为文本。音频可以是实时音频，也可以是从录音中流出的音频。你可以在<a href="https://azure.microsoft.com/en-us/services/cognitive-services/speech-to-text/">https://azure . Microsoft . com/en-us/services/cognitive-services/speech-to-text/</a>找到更多信息。</p>
+
+
+            
+
+            
+        
+    </div>
+
+
+
+  
+
+
+
+
+
+
+
+
+<style type="text/css" title="ibis-book">
+    #sbo-rt-content .chapter-number{font-weight:bold;font-size:8.3em;text-align:right;font-family:symbol}#sbo-rt-content .chapter-title{font-size:30pt;text-align:right}#sbo-rt-content h1,#sbo-rt-content .packt_head1{font-size:16pt;font-weight:bold}#sbo-rt-content h2,#sbo-rt-content .packt_head2{font-size:14pt;font-weight:bold}#sbo-rt-content h3,#sbo-rt-content .packt_head3{font-size:13pt;font-weight:bold}#sbo-rt-content h4,#sbo-rt-content .packt_head4{font-size:11pt;font-weight:normal;font-style:italic}#sbo-rt-content ul,#sbo-rt-content .packt_bullet{font-weight:normal;list-style-type:disc}#sbo-rt-content ol,#sbo-rt-content .packt_numbered{font-weight:normal}#sbo-rt-content .packt_normal{font-weight:normal}#sbo-rt-content code,#sbo-rt-content .packt_code,#sbo-rt-content .packt_codeblock,#sbo-rt-content pre{font-family:monospace;font-size:9pt;font-weight:normal;border-left:1px solid black;margin-left:20px;padding-left:5px;display:block;margin-bottom:.12in}#sbo-rt-content .packt_figref{font-size:10pt;font-weight:normal}#sbo-rt-content q,#sbo-rt-content .packt_quote{font-size:11pt;font-weight:normal;color:black;font-style:italic}#sbo-rt-content .packt_tip{font-size:11pt;font-weight:normal;color:black;font-style:italic;background-image:url(../assets/0a79c387-fdee-4347-a587-034cf8cf4f7f.png);background-position:left center;background-repeat:no-repeat;background-size:.6in;margin-left:20px;margin-right:20px;padding-left:.7in;min-height:.75in;}#sbo-rt-content .packt_infobox{font-size:11pt;font-weight:normal;color:black;font-style:italic;background-image:url(../assets/6f2eee5d-61a6-4ff8-8b44-493a0b8e545b.png);background-position:left center;background-repeat:no-repeat;background-size:.6in;margin-left:20px;margin-right:20px;padding-left:.7in;min-height:.75in;}#sbo-rt-content kbd,#sbo-rt-content .packt_action{font-family:monospace;font-size:9pt;font-weight:normal}#sbo-rt-content .packt_italics{font-size:11pt;font-weight:normal;color:black;font-style:italic}#sbo-rt-content a,#sbo-rt-content .packt_url{font-family:monospace;font-size:9pt;font-weight:normal;text-decoration:none;word-break:break-all}#sbo-rt-content var,#sbo-rt-content .packt_inlinemsgid{display:none}#sbo-rt-content p,#sbo-rt-content .packt_para{text-align:left;font-size:11pt;line-height:17px}#sbo-rt-content .underline{text-decoration:underline}#sbo-rt-content .CDPImageAlign{width:100%;display:block}#sbo-rt-content div.CDPAlign,#sbo-rt-content p.CDPAlign{width:100%;display:block;margin-top:.18in;margin-bottom:.18in}#sbo-rt-content .CDPAlignCenter{text-align:center}#sbo-rt-content .CDPAlignLeft{text-align:left}#sbo-rt-content .CDPAlignRight{text-align:right}#sbo-rt-content .fm-editor-equation{border:none}#sbo-rt-content nav a.section{border-bottom:1px solid black;width:100%;display:block}#sbo-rt-content body table{border-collapse:collapse}#sbo-rt-content body table td{border:1px solid black;padding:.31em .62em}#sbo-rt-content .header-title{font-size:2.5em}#sbo-rt-content img.inline-image{height:1em}#sbo-rt-content .chapter-title{font-size:2.5em}#sbo-rt-content h1,#sbo-rt-content .packt_head1{font-size:2em}#sbo-rt-content h2,#sbo-rt-content .packt_head2{font-size:1.5em}#sbo-rt-content h3,#sbo-rt-content .packt_head3{font-size:1.17em}#sbo-rt-content h4,#sbo-rt-content .packt_head4{font-size:1em}#sbo-rt-content code,#sbo-rt-content .packt_code,#sbo-rt-content .packt_codeblock,#sbo-rt-content pre{font-size:.8em;margin-left:1.25em;padding-left:.3em;margin-bottom:.01em}#sbo-rt-content .packt_figref{font-size:.62em}#sbo-rt-content q,#sbo-rt-content .packt_quote{font-size:.68em}#sbo-rt-content .packt_tip{font-size:.68em;background-size:2.5em;margin-left:1.25em;margin-right:1.25em;padding-left:3em;min-height:2.5em}#sbo-rt-content .packt_infobox{font-size:.68em;background-size:2.5em;margin-left:1.25em;margin-right:1.25em;padding-left:3em;min-height:2.5em}#sbo-rt-content kbd,#sbo-rt-content .packt_action{font-size:.75em}#sbo-rt-content .packt_italics{font-size:.9em}#sbo-rt-content a,#sbo-rt-content .packt_url{font-size:.7em}#sbo-rt-content p,#sbo-rt-content .packt_para{font-size:1em;line-height:1.06em}#sbo-rt-content .CDPImageAlign{max-width:100%;max-height:100%}#sbo-rt-content div.CDPAlign,#sbo-rt-content p.CDPAlign{margin-top:.01em;margin-bottom:.01em}
+    </style>
+<style type="text/css" id="font-styles">#sbo-rt-content, #sbo-rt-content p, #sbo-rt-content div { font-size: &amp;lt;%= font_size %&amp;gt; !important; }</style>
+<style type="text/css" id="font-family">#sbo-rt-content, #sbo-rt-content p, #sbo-rt-content div { font-family: &amp;lt;%= font_family %&amp;gt; !important; }</style>
+<style type="text/css" id="column-width">#sbo-rt-content { max-width: &amp;lt;%= column_width %&amp;gt;% !important; margin: 0 auto !important; }</style>
+
+<style type="text/css">body{margin:1em;}#sbo-rt-content *{text-indent:0pt!important;}#sbo-rt-content .bq{margin-right:1em!important;}body{background-color:transparent!important;}#sbo-rt-content *{word-wrap:break-word!important;word-break:break-word!important;}#sbo-rt-content table,#sbo-rt-content pre{overflow-x:unset!important;overflow:unset!important;overflow-y:unset!important;white-space:pre-wrap!important;}</style>
+<div><h1 class="header-title">知识 API 的认知服务</h1>
+                
+            
+            
+                
+<p>基于自然语言处理，知识 API 帮助解析复杂的信息，并以一种易于使用的方式对其进行映射。</p>
+<p>在撰写本文时，有一个基于知识 API 的服务:QnA Maker。</p>
+
+
+            
+
+            
+        
+    </div>
+
+
+
+  
+
+
+
+
+
+
+
+
+<style type="text/css" title="ibis-book">
+    #sbo-rt-content .chapter-number{font-weight:bold;font-size:8.3em;text-align:right;font-family:symbol}#sbo-rt-content .chapter-title{font-size:30pt;text-align:right}#sbo-rt-content h1,#sbo-rt-content .packt_head1{font-size:16pt;font-weight:bold}#sbo-rt-content h2,#sbo-rt-content .packt_head2{font-size:14pt;font-weight:bold}#sbo-rt-content h3,#sbo-rt-content .packt_head3{font-size:13pt;font-weight:bold}#sbo-rt-content h4,#sbo-rt-content .packt_head4{font-size:11pt;font-weight:normal;font-style:italic}#sbo-rt-content ul,#sbo-rt-content .packt_bullet{font-weight:normal;list-style-type:disc}#sbo-rt-content ol,#sbo-rt-content .packt_numbered{font-weight:normal}#sbo-rt-content .packt_normal{font-weight:normal}#sbo-rt-content code,#sbo-rt-content .packt_code,#sbo-rt-content .packt_codeblock,#sbo-rt-content pre{font-family:monospace;font-size:9pt;font-weight:normal;border-left:1px solid black;margin-left:20px;padding-left:5px;display:block;margin-bottom:.12in}#sbo-rt-content .packt_figref{font-size:10pt;font-weight:normal}#sbo-rt-content q,#sbo-rt-content .packt_quote{font-size:11pt;font-weight:normal;color:black;font-style:italic}#sbo-rt-content .packt_tip{font-size:11pt;font-weight:normal;color:black;font-style:italic;background-image:url(../assets/0a79c387-fdee-4347-a587-034cf8cf4f7f.png);background-position:left center;background-repeat:no-repeat;background-size:.6in;margin-left:20px;margin-right:20px;padding-left:.7in;min-height:.75in;}#sbo-rt-content .packt_infobox{font-size:11pt;font-weight:normal;color:black;font-style:italic;background-image:url(../assets/6f2eee5d-61a6-4ff8-8b44-493a0b8e545b.png);background-position:left center;background-repeat:no-repeat;background-size:.6in;margin-left:20px;margin-right:20px;padding-left:.7in;min-height:.75in;}#sbo-rt-content kbd,#sbo-rt-content .packt_action{font-family:monospace;font-size:9pt;font-weight:normal}#sbo-rt-content .packt_italics{font-size:11pt;font-weight:normal;color:black;font-style:italic}#sbo-rt-content a,#sbo-rt-content .packt_url{font-family:monospace;font-size:9pt;font-weight:normal;text-decoration:none;word-break:break-all}#sbo-rt-content var,#sbo-rt-content .packt_inlinemsgid{display:none}#sbo-rt-content p,#sbo-rt-content .packt_para{text-align:left;font-size:11pt;line-height:17px}#sbo-rt-content .underline{text-decoration:underline}#sbo-rt-content .CDPImageAlign{width:100%;display:block}#sbo-rt-content div.CDPAlign,#sbo-rt-content p.CDPAlign{width:100%;display:block;margin-top:.18in;margin-bottom:.18in}#sbo-rt-content .CDPAlignCenter{text-align:center}#sbo-rt-content .CDPAlignLeft{text-align:left}#sbo-rt-content .CDPAlignRight{text-align:right}#sbo-rt-content .fm-editor-equation{border:none}#sbo-rt-content nav a.section{border-bottom:1px solid black;width:100%;display:block}#sbo-rt-content body table{border-collapse:collapse}#sbo-rt-content body table td{border:1px solid black;padding:.31em .62em}#sbo-rt-content .header-title{font-size:2.5em}#sbo-rt-content img.inline-image{height:1em}#sbo-rt-content .chapter-title{font-size:2.5em}#sbo-rt-content h1,#sbo-rt-content .packt_head1{font-size:2em}#sbo-rt-content h2,#sbo-rt-content .packt_head2{font-size:1.5em}#sbo-rt-content h3,#sbo-rt-content .packt_head3{font-size:1.17em}#sbo-rt-content h4,#sbo-rt-content .packt_head4{font-size:1em}#sbo-rt-content code,#sbo-rt-content .packt_code,#sbo-rt-content .packt_codeblock,#sbo-rt-content pre{font-size:.8em;margin-left:1.25em;padding-left:.3em;margin-bottom:.01em}#sbo-rt-content .packt_figref{font-size:.62em}#sbo-rt-content q,#sbo-rt-content .packt_quote{font-size:.68em}#sbo-rt-content .packt_tip{font-size:.68em;background-size:2.5em;margin-left:1.25em;margin-right:1.25em;padding-left:3em;min-height:2.5em}#sbo-rt-content .packt_infobox{font-size:.68em;background-size:2.5em;margin-left:1.25em;margin-right:1.25em;padding-left:3em;min-height:2.5em}#sbo-rt-content kbd,#sbo-rt-content .packt_action{font-size:.75em}#sbo-rt-content .packt_italics{font-size:.9em}#sbo-rt-content a,#sbo-rt-content .packt_url{font-size:.7em}#sbo-rt-content p,#sbo-rt-content .packt_para{font-size:1em;line-height:1.06em}#sbo-rt-content .CDPImageAlign{max-width:100%;max-height:100%}#sbo-rt-content div.CDPAlign,#sbo-rt-content p.CDPAlign{margin-top:.01em;margin-bottom:.01em}
+    </style>
+<style type="text/css" id="font-styles">#sbo-rt-content, #sbo-rt-content p, #sbo-rt-content div { font-size: &amp;lt;%= font_size %&amp;gt; !important; }</style>
+<style type="text/css" id="font-family">#sbo-rt-content, #sbo-rt-content p, #sbo-rt-content div { font-family: &amp;lt;%= font_family %&amp;gt; !important; }</style>
+<style type="text/css" id="column-width">#sbo-rt-content { max-width: &amp;lt;%= column_width %&amp;gt;% !important; margin: 0 auto !important; }</style>
+
+<style type="text/css">body{margin:1em;}#sbo-rt-content *{text-indent:0pt!important;}#sbo-rt-content .bq{margin-right:1em!important;}body{background-color:transparent!important;}#sbo-rt-content *{word-wrap:break-word!important;word-break:break-word!important;}#sbo-rt-content table,#sbo-rt-content pre{overflow-x:unset!important;overflow:unset!important;overflow-y:unset!important;white-space:pre-wrap!important;}</style>
+<div><h1 class="header-title">QnA 制造商</h1>
+                
+            
+            
+                
+<p>这个 API 允许您通过智能地解析文本，从 FAQ 形式的文本中快速提取问题和答案。一旦这些信息可用，就可以用来创建一个问答机器人。你可以在<a href="https://azure.microsoft.com/en-us/services/cognitive-services/qna-maker/">https://azure . Microsoft . com/en-us/services/cognitive-services/qna-maker/</a>找到更多信息。</p>
+
+
+            
+
+            
+        
+    </div>
+
+
+
+  
+
+
+
+
+
+
+
+
+<style type="text/css" title="ibis-book">
+    #sbo-rt-content .chapter-number{font-weight:bold;font-size:8.3em;text-align:right;font-family:symbol}#sbo-rt-content .chapter-title{font-size:30pt;text-align:right}#sbo-rt-content h1,#sbo-rt-content .packt_head1{font-size:16pt;font-weight:bold}#sbo-rt-content h2,#sbo-rt-content .packt_head2{font-size:14pt;font-weight:bold}#sbo-rt-content h3,#sbo-rt-content .packt_head3{font-size:13pt;font-weight:bold}#sbo-rt-content h4,#sbo-rt-content .packt_head4{font-size:11pt;font-weight:normal;font-style:italic}#sbo-rt-content ul,#sbo-rt-content .packt_bullet{font-weight:normal;list-style-type:disc}#sbo-rt-content ol,#sbo-rt-content .packt_numbered{font-weight:normal}#sbo-rt-content .packt_normal{font-weight:normal}#sbo-rt-content code,#sbo-rt-content .packt_code,#sbo-rt-content .packt_codeblock,#sbo-rt-content pre{font-family:monospace;font-size:9pt;font-weight:normal;border-left:1px solid black;margin-left:20px;padding-left:5px;display:block;margin-bottom:.12in}#sbo-rt-content .packt_figref{font-size:10pt;font-weight:normal}#sbo-rt-content q,#sbo-rt-content .packt_quote{font-size:11pt;font-weight:normal;color:black;font-style:italic}#sbo-rt-content .packt_tip{font-size:11pt;font-weight:normal;color:black;font-style:italic;background-image:url(../assets/0a79c387-fdee-4347-a587-034cf8cf4f7f.png);background-position:left center;background-repeat:no-repeat;background-size:.6in;margin-left:20px;margin-right:20px;padding-left:.7in;min-height:.75in;}#sbo-rt-content .packt_infobox{font-size:11pt;font-weight:normal;color:black;font-style:italic;background-image:url(../assets/6f2eee5d-61a6-4ff8-8b44-493a0b8e545b.png);background-position:left center;background-repeat:no-repeat;background-size:.6in;margin-left:20px;margin-right:20px;padding-left:.7in;min-height:.75in;}#sbo-rt-content kbd,#sbo-rt-content .packt_action{font-family:monospace;font-size:9pt;font-weight:normal}#sbo-rt-content .packt_italics{font-size:11pt;font-weight:normal;color:black;font-style:italic}#sbo-rt-content a,#sbo-rt-content .packt_url{font-family:monospace;font-size:9pt;font-weight:normal;text-decoration:none;word-break:break-all}#sbo-rt-content var,#sbo-rt-content .packt_inlinemsgid{display:none}#sbo-rt-content p,#sbo-rt-content .packt_para{text-align:left;font-size:11pt;line-height:17px}#sbo-rt-content .underline{text-decoration:underline}#sbo-rt-content .CDPImageAlign{width:100%;display:block}#sbo-rt-content div.CDPAlign,#sbo-rt-content p.CDPAlign{width:100%;display:block;margin-top:.18in;margin-bottom:.18in}#sbo-rt-content .CDPAlignCenter{text-align:center}#sbo-rt-content .CDPAlignLeft{text-align:left}#sbo-rt-content .CDPAlignRight{text-align:right}#sbo-rt-content .fm-editor-equation{border:none}#sbo-rt-content nav a.section{border-bottom:1px solid black;width:100%;display:block}#sbo-rt-content body table{border-collapse:collapse}#sbo-rt-content body table td{border:1px solid black;padding:.31em .62em}#sbo-rt-content .header-title{font-size:2.5em}#sbo-rt-content img.inline-image{height:1em}#sbo-rt-content .chapter-title{font-size:2.5em}#sbo-rt-content h1,#sbo-rt-content .packt_head1{font-size:2em}#sbo-rt-content h2,#sbo-rt-content .packt_head2{font-size:1.5em}#sbo-rt-content h3,#sbo-rt-content .packt_head3{font-size:1.17em}#sbo-rt-content h4,#sbo-rt-content .packt_head4{font-size:1em}#sbo-rt-content code,#sbo-rt-content .packt_code,#sbo-rt-content .packt_codeblock,#sbo-rt-content pre{font-size:.8em;margin-left:1.25em;padding-left:.3em;margin-bottom:.01em}#sbo-rt-content .packt_figref{font-size:.62em}#sbo-rt-content q,#sbo-rt-content .packt_quote{font-size:.68em}#sbo-rt-content .packt_tip{font-size:.68em;background-size:2.5em;margin-left:1.25em;margin-right:1.25em;padding-left:3em;min-height:2.5em}#sbo-rt-content .packt_infobox{font-size:.68em;background-size:2.5em;margin-left:1.25em;margin-right:1.25em;padding-left:3em;min-height:2.5em}#sbo-rt-content kbd,#sbo-rt-content .packt_action{font-size:.75em}#sbo-rt-content .packt_italics{font-size:.9em}#sbo-rt-content a,#sbo-rt-content .packt_url{font-size:.7em}#sbo-rt-content p,#sbo-rt-content .packt_para{font-size:1em;line-height:1.06em}#sbo-rt-content .CDPImageAlign{max-width:100%;max-height:100%}#sbo-rt-content div.CDPAlign,#sbo-rt-content p.CDPAlign{margin-top:.01em;margin-bottom:.01em}
+    </style>
+<style type="text/css" id="font-styles">#sbo-rt-content, #sbo-rt-content p, #sbo-rt-content div { font-size: &amp;lt;%= font_size %&amp;gt; !important; }</style>
+<style type="text/css" id="font-family">#sbo-rt-content, #sbo-rt-content p, #sbo-rt-content div { font-family: &amp;lt;%= font_family %&amp;gt; !important; }</style>
+<style type="text/css" id="column-width">#sbo-rt-content { max-width: &amp;lt;%= column_width %&amp;gt;% !important; margin: 0 auto !important; }</style>
+
+<style type="text/css">body{margin:1em;}#sbo-rt-content *{text-indent:0pt!important;}#sbo-rt-content .bq{margin-right:1em!important;}body{background-color:transparent!important;}#sbo-rt-content *{word-wrap:break-word!important;word-break:break-word!important;}#sbo-rt-content table,#sbo-rt-content pre{overflow-x:unset!important;overflow:unset!important;overflow-y:unset!important;white-space:pre-wrap!important;}</style>
+<div><h1 class="header-title">搜索 API 的认知服务</h1>
+                
+            
+            
+                
+<p>搜索 API 帮助您搜索不同类型的内容，而不必开发复杂的搜索算法。</p>
+<p>在撰写本文时，认知服务提供了八个 API:</p>
+<ul>
+<li>
+<p>Bing 网络搜索</p>
+</li>
+<li>
+<p>Bing 自定义搜索</p>
+</li>
+<li>
+<p>必应视频搜索</p>
+</li>
+<li>
+<p>必应图片搜索</p>
+</li>
+<li>
+<p>Bing 视觉搜索</p>
+</li>
+<li>
+<p>Bing 实体搜索</p>
+</li>
+<li>
+<p>必应新闻搜索</p>
+</li>
+<li>
+<p>Bing 自动建议</p>
+</li>
+</ul>
+<p>在这一章中，我们将讨论一个 API，Bing 视觉搜索，剩下的就留给你自己去探索了。</p>
+
+
+            
+
+            
+        
+    </div>
+
+
+
+  
+
+
+
+
+
+
+
+
+<style type="text/css" title="ibis-book">
+    #sbo-rt-content .chapter-number{font-weight:bold;font-size:8.3em;text-align:right;font-family:symbol}#sbo-rt-content .chapter-title{font-size:30pt;text-align:right}#sbo-rt-content h1,#sbo-rt-content .packt_head1{font-size:16pt;font-weight:bold}#sbo-rt-content h2,#sbo-rt-content .packt_head2{font-size:14pt;font-weight:bold}#sbo-rt-content h3,#sbo-rt-content .packt_head3{font-size:13pt;font-weight:bold}#sbo-rt-content h4,#sbo-rt-content .packt_head4{font-size:11pt;font-weight:normal;font-style:italic}#sbo-rt-content ul,#sbo-rt-content .packt_bullet{font-weight:normal;list-style-type:disc}#sbo-rt-content ol,#sbo-rt-content .packt_numbered{font-weight:normal}#sbo-rt-content .packt_normal{font-weight:normal}#sbo-rt-content code,#sbo-rt-content .packt_code,#sbo-rt-content .packt_codeblock,#sbo-rt-content pre{font-family:monospace;font-size:9pt;font-weight:normal;border-left:1px solid black;margin-left:20px;padding-left:5px;display:block;margin-bottom:.12in}#sbo-rt-content .packt_figref{font-size:10pt;font-weight:normal}#sbo-rt-content q,#sbo-rt-content .packt_quote{font-size:11pt;font-weight:normal;color:black;font-style:italic}#sbo-rt-content .packt_tip{font-size:11pt;font-weight:normal;color:black;font-style:italic;background-image:url(../assets/0a79c387-fdee-4347-a587-034cf8cf4f7f.png);background-position:left center;background-repeat:no-repeat;background-size:.6in;margin-left:20px;margin-right:20px;padding-left:.7in;min-height:.75in;}#sbo-rt-content .packt_infobox{font-size:11pt;font-weight:normal;color:black;font-style:italic;background-image:url(../assets/6f2eee5d-61a6-4ff8-8b44-493a0b8e545b.png);background-position:left center;background-repeat:no-repeat;background-size:.6in;margin-left:20px;margin-right:20px;padding-left:.7in;min-height:.75in;}#sbo-rt-content kbd,#sbo-rt-content .packt_action{font-family:monospace;font-size:9pt;font-weight:normal}#sbo-rt-content .packt_italics{font-size:11pt;font-weight:normal;color:black;font-style:italic}#sbo-rt-content a,#sbo-rt-content .packt_url{font-family:monospace;font-size:9pt;font-weight:normal;text-decoration:none;word-break:break-all}#sbo-rt-content var,#sbo-rt-content .packt_inlinemsgid{display:none}#sbo-rt-content p,#sbo-rt-content .packt_para{text-align:left;font-size:11pt;line-height:17px}#sbo-rt-content .underline{text-decoration:underline}#sbo-rt-content .CDPImageAlign{width:100%;display:block}#sbo-rt-content div.CDPAlign,#sbo-rt-content p.CDPAlign{width:100%;display:block;margin-top:.18in;margin-bottom:.18in}#sbo-rt-content .CDPAlignCenter{text-align:center}#sbo-rt-content .CDPAlignLeft{text-align:left}#sbo-rt-content .CDPAlignRight{text-align:right}#sbo-rt-content .fm-editor-equation{border:none}#sbo-rt-content nav a.section{border-bottom:1px solid black;width:100%;display:block}#sbo-rt-content body table{border-collapse:collapse}#sbo-rt-content body table td{border:1px solid black;padding:.31em .62em}#sbo-rt-content .header-title{font-size:2.5em}#sbo-rt-content img.inline-image{height:1em}#sbo-rt-content .chapter-title{font-size:2.5em}#sbo-rt-content h1,#sbo-rt-content .packt_head1{font-size:2em}#sbo-rt-content h2,#sbo-rt-content .packt_head2{font-size:1.5em}#sbo-rt-content h3,#sbo-rt-content .packt_head3{font-size:1.17em}#sbo-rt-content h4,#sbo-rt-content .packt_head4{font-size:1em}#sbo-rt-content code,#sbo-rt-content .packt_code,#sbo-rt-content .packt_codeblock,#sbo-rt-content pre{font-size:.8em;margin-left:1.25em;padding-left:.3em;margin-bottom:.01em}#sbo-rt-content .packt_figref{font-size:.62em}#sbo-rt-content q,#sbo-rt-content .packt_quote{font-size:.68em}#sbo-rt-content .packt_tip{font-size:.68em;background-size:2.5em;margin-left:1.25em;margin-right:1.25em;padding-left:3em;min-height:2.5em}#sbo-rt-content .packt_infobox{font-size:.68em;background-size:2.5em;margin-left:1.25em;margin-right:1.25em;padding-left:3em;min-height:2.5em}#sbo-rt-content kbd,#sbo-rt-content .packt_action{font-size:.75em}#sbo-rt-content .packt_italics{font-size:.9em}#sbo-rt-content a,#sbo-rt-content .packt_url{font-size:.7em}#sbo-rt-content p,#sbo-rt-content .packt_para{font-size:1em;line-height:1.06em}#sbo-rt-content .CDPImageAlign{max-width:100%;max-height:100%}#sbo-rt-content div.CDPAlign,#sbo-rt-content p.CDPAlign{margin-top:.01em;margin-bottom:.01em}
+    </style>
+<style type="text/css" id="font-styles">#sbo-rt-content, #sbo-rt-content p, #sbo-rt-content div { font-size: &amp;lt;%= font_size %&amp;gt; !important; }</style>
+<style type="text/css" id="font-family">#sbo-rt-content, #sbo-rt-content p, #sbo-rt-content div { font-family: &amp;lt;%= font_family %&amp;gt; !important; }</style>
+<style type="text/css" id="column-width">#sbo-rt-content { max-width: &amp;lt;%= column_width %&amp;gt;% !important; margin: 0 auto !important; }</style>
+
+<style type="text/css">body{margin:1em;}#sbo-rt-content *{text-indent:0pt!important;}#sbo-rt-content .bq{margin-right:1em!important;}body{background-color:transparent!important;}#sbo-rt-content *{word-wrap:break-word!important;word-break:break-word!important;}#sbo-rt-content table,#sbo-rt-content pre{overflow-x:unset!important;overflow:unset!important;overflow-y:unset!important;white-space:pre-wrap!important;}</style>
+<div><h1 class="header-title">Bing 视觉搜索</h1>
+                
+            
+            
+                
+<p>Bing 视觉搜索 API 允许用户识别图像中的实体和文本。这意味着他们可以执行一系列操作，包括从图像中获取信息，并在一系列类别中找到相似的图像、产品和对象，包括时尚、地标、鲜花、名人等。Bing 视觉搜索可以从名片中提取信息，并可以针对特定领域进行定制。</p>
+<p>下面的屏幕截图显示了一个发送给 API 的输入图像的例子。然后，我们收到了 JSON 格式的输出，它可以被解析并显示在 web 页面上，如屏幕截图的右侧所示:</p>
+<div><img src="img/791a3ce7-50bc-4da4-806d-2befcfe70b1e.png" width="1360" height="594"/></div>
+<p>要试用这个 API 或以编程方式调用这个 API，可以转到以下 URL:<a href="https://azure.microsoft.com/en-us/services/cognitive-services/bing-visual-search/">https://azure . Microsoft . com/en-us/services/cognitive-services/bing-visual-search/</a>。它还包含 API 参考文档。</p>
+<p>其余的搜索 API，可以去以下网址:<a href="https://azure.microsoft.com/en-us/services/cognitive-services/directory/search/">https://azure . Microsoft . com/en-us/services/cognitive-services/directory/Search/</a>。</p>
+
+
+            
+
+            
+        
+    </div>
+
+
+
+  
+
+
+
+
+
+
+
+
+<style type="text/css" title="ibis-book">
+    #sbo-rt-content .chapter-number{font-weight:bold;font-size:8.3em;text-align:right;font-family:symbol}#sbo-rt-content .chapter-title{font-size:30pt;text-align:right}#sbo-rt-content h1,#sbo-rt-content .packt_head1{font-size:16pt;font-weight:bold}#sbo-rt-content h2,#sbo-rt-content .packt_head2{font-size:14pt;font-weight:bold}#sbo-rt-content h3,#sbo-rt-content .packt_head3{font-size:13pt;font-weight:bold}#sbo-rt-content h4,#sbo-rt-content .packt_head4{font-size:11pt;font-weight:normal;font-style:italic}#sbo-rt-content ul,#sbo-rt-content .packt_bullet{font-weight:normal;list-style-type:disc}#sbo-rt-content ol,#sbo-rt-content .packt_numbered{font-weight:normal}#sbo-rt-content .packt_normal{font-weight:normal}#sbo-rt-content code,#sbo-rt-content .packt_code,#sbo-rt-content .packt_codeblock,#sbo-rt-content pre{font-family:monospace;font-size:9pt;font-weight:normal;border-left:1px solid black;margin-left:20px;padding-left:5px;display:block;margin-bottom:.12in}#sbo-rt-content .packt_figref{font-size:10pt;font-weight:normal}#sbo-rt-content q,#sbo-rt-content .packt_quote{font-size:11pt;font-weight:normal;color:black;font-style:italic}#sbo-rt-content .packt_tip{font-size:11pt;font-weight:normal;color:black;font-style:italic;background-image:url(../assets/0a79c387-fdee-4347-a587-034cf8cf4f7f.png);background-position:left center;background-repeat:no-repeat;background-size:.6in;margin-left:20px;margin-right:20px;padding-left:.7in;min-height:.75in;}#sbo-rt-content .packt_infobox{font-size:11pt;font-weight:normal;color:black;font-style:italic;background-image:url(../assets/6f2eee5d-61a6-4ff8-8b44-493a0b8e545b.png);background-position:left center;background-repeat:no-repeat;background-size:.6in;margin-left:20px;margin-right:20px;padding-left:.7in;min-height:.75in;}#sbo-rt-content kbd,#sbo-rt-content .packt_action{font-family:monospace;font-size:9pt;font-weight:normal}#sbo-rt-content .packt_italics{font-size:11pt;font-weight:normal;color:black;font-style:italic}#sbo-rt-content a,#sbo-rt-content .packt_url{font-family:monospace;font-size:9pt;font-weight:normal;text-decoration:none;word-break:break-all}#sbo-rt-content var,#sbo-rt-content .packt_inlinemsgid{display:none}#sbo-rt-content p,#sbo-rt-content .packt_para{text-align:left;font-size:11pt;line-height:17px}#sbo-rt-content .underline{text-decoration:underline}#sbo-rt-content .CDPImageAlign{width:100%;display:block}#sbo-rt-content div.CDPAlign,#sbo-rt-content p.CDPAlign{width:100%;display:block;margin-top:.18in;margin-bottom:.18in}#sbo-rt-content .CDPAlignCenter{text-align:center}#sbo-rt-content .CDPAlignLeft{text-align:left}#sbo-rt-content .CDPAlignRight{text-align:right}#sbo-rt-content .fm-editor-equation{border:none}#sbo-rt-content nav a.section{border-bottom:1px solid black;width:100%;display:block}#sbo-rt-content body table{border-collapse:collapse}#sbo-rt-content body table td{border:1px solid black;padding:.31em .62em}#sbo-rt-content .header-title{font-size:2.5em}#sbo-rt-content img.inline-image{height:1em}#sbo-rt-content .chapter-title{font-size:2.5em}#sbo-rt-content h1,#sbo-rt-content .packt_head1{font-size:2em}#sbo-rt-content h2,#sbo-rt-content .packt_head2{font-size:1.5em}#sbo-rt-content h3,#sbo-rt-content .packt_head3{font-size:1.17em}#sbo-rt-content h4,#sbo-rt-content .packt_head4{font-size:1em}#sbo-rt-content code,#sbo-rt-content .packt_code,#sbo-rt-content .packt_codeblock,#sbo-rt-content pre{font-size:.8em;margin-left:1.25em;padding-left:.3em;margin-bottom:.01em}#sbo-rt-content .packt_figref{font-size:.62em}#sbo-rt-content q,#sbo-rt-content .packt_quote{font-size:.68em}#sbo-rt-content .packt_tip{font-size:.68em;background-size:2.5em;margin-left:1.25em;margin-right:1.25em;padding-left:3em;min-height:2.5em}#sbo-rt-content .packt_infobox{font-size:.68em;background-size:2.5em;margin-left:1.25em;margin-right:1.25em;padding-left:3em;min-height:2.5em}#sbo-rt-content kbd,#sbo-rt-content .packt_action{font-size:.75em}#sbo-rt-content .packt_italics{font-size:.9em}#sbo-rt-content a,#sbo-rt-content .packt_url{font-size:.7em}#sbo-rt-content p,#sbo-rt-content .packt_para{font-size:1em;line-height:1.06em}#sbo-rt-content .CDPImageAlign{max-width:100%;max-height:100%}#sbo-rt-content div.CDPAlign,#sbo-rt-content p.CDPAlign{margin-top:.01em;margin-bottom:.01em}
+    </style>
+<style type="text/css" id="font-styles">#sbo-rt-content, #sbo-rt-content p, #sbo-rt-content div { font-size: &amp;lt;%= font_size %&amp;gt; !important; }</style>
+<style type="text/css" id="font-family">#sbo-rt-content, #sbo-rt-content p, #sbo-rt-content div { font-family: &amp;lt;%= font_family %&amp;gt; !important; }</style>
+<style type="text/css" id="column-width">#sbo-rt-content { max-width: &amp;lt;%= column_width %&amp;gt;% !important; margin: 0 auto !important; }</style>
+
+<style type="text/css">body{margin:1em;}#sbo-rt-content *{text-indent:0pt!important;}#sbo-rt-content .bq{margin-right:1em!important;}body{background-color:transparent!important;}#sbo-rt-content *{word-wrap:break-word!important;word-break:break-word!important;}#sbo-rt-content table,#sbo-rt-content pre{overflow-x:unset!important;overflow:unset!important;overflow-y:unset!important;white-space:pre-wrap!important;}</style>
+<div><h1 class="header-title">摘要</h1>
+                
+            
+            
+                
+<p>在这一章中，我们学习了如何使用认知服务快速开发 AI 应用。在下一章，我们将学习机器人框架，它是用来建立机器人的。</p>
+
+
+
+
+            
+
+            
+        
+    </div>
+
+
+
+  
+
+
+
+
+
+
+
+
+<style type="text/css" title="ibis-book">
+    #sbo-rt-content .chapter-number{font-weight:bold;font-size:8.3em;text-align:right;font-family:symbol}#sbo-rt-content .chapter-title{font-size:30pt;text-align:right}#sbo-rt-content h1,#sbo-rt-content .packt_head1{font-size:16pt;font-weight:bold}#sbo-rt-content h2,#sbo-rt-content .packt_head2{font-size:14pt;font-weight:bold}#sbo-rt-content h3,#sbo-rt-content .packt_head3{font-size:13pt;font-weight:bold}#sbo-rt-content h4,#sbo-rt-content .packt_head4{font-size:11pt;font-weight:normal;font-style:italic}#sbo-rt-content ul,#sbo-rt-content .packt_bullet{font-weight:normal;list-style-type:disc}#sbo-rt-content ol,#sbo-rt-content .packt_numbered{font-weight:normal}#sbo-rt-content .packt_normal{font-weight:normal}#sbo-rt-content code,#sbo-rt-content .packt_code,#sbo-rt-content .packt_codeblock,#sbo-rt-content pre{font-family:monospace;font-size:9pt;font-weight:normal;border-left:1px solid black;margin-left:20px;padding-left:5px;display:block;margin-bottom:.12in}#sbo-rt-content .packt_figref{font-size:10pt;font-weight:normal}#sbo-rt-content q,#sbo-rt-content .packt_quote{font-size:11pt;font-weight:normal;color:black;font-style:italic}#sbo-rt-content .packt_tip{font-size:11pt;font-weight:normal;color:black;font-style:italic;background-image:url(../assets/0a79c387-fdee-4347-a587-034cf8cf4f7f.png);background-position:left center;background-repeat:no-repeat;background-size:.6in;margin-left:20px;margin-right:20px;padding-left:.7in;min-height:.75in;}#sbo-rt-content .packt_infobox{font-size:11pt;font-weight:normal;color:black;font-style:italic;background-image:url(../assets/6f2eee5d-61a6-4ff8-8b44-493a0b8e545b.png);background-position:left center;background-repeat:no-repeat;background-size:.6in;margin-left:20px;margin-right:20px;padding-left:.7in;min-height:.75in;}#sbo-rt-content kbd,#sbo-rt-content .packt_action{font-family:monospace;font-size:9pt;font-weight:normal}#sbo-rt-content .packt_italics{font-size:11pt;font-weight:normal;color:black;font-style:italic}#sbo-rt-content a,#sbo-rt-content .packt_url{font-family:monospace;font-size:9pt;font-weight:normal;text-decoration:none;word-break:break-all}#sbo-rt-content var,#sbo-rt-content .packt_inlinemsgid{display:none}#sbo-rt-content p,#sbo-rt-content .packt_para{text-align:left;font-size:11pt;line-height:17px}#sbo-rt-content .underline{text-decoration:underline}#sbo-rt-content .CDPImageAlign{width:100%;display:block}#sbo-rt-content div.CDPAlign,#sbo-rt-content p.CDPAlign{width:100%;display:block;margin-top:.18in;margin-bottom:.18in}#sbo-rt-content .CDPAlignCenter{text-align:center}#sbo-rt-content .CDPAlignLeft{text-align:left}#sbo-rt-content .CDPAlignRight{text-align:right}#sbo-rt-content .fm-editor-equation{border:none}#sbo-rt-content nav a.section{border-bottom:1px solid black;width:100%;display:block}#sbo-rt-content body table{border-collapse:collapse}#sbo-rt-content body table td{border:1px solid black;padding:.31em .62em}#sbo-rt-content .header-title{font-size:2.5em}#sbo-rt-content img.inline-image{height:1em}#sbo-rt-content .chapter-title{font-size:2.5em}#sbo-rt-content h1,#sbo-rt-content .packt_head1{font-size:2em}#sbo-rt-content h2,#sbo-rt-content .packt_head2{font-size:1.5em}#sbo-rt-content h3,#sbo-rt-content .packt_head3{font-size:1.17em}#sbo-rt-content h4,#sbo-rt-content .packt_head4{font-size:1em}#sbo-rt-content code,#sbo-rt-content .packt_code,#sbo-rt-content .packt_codeblock,#sbo-rt-content pre{font-size:.8em;margin-left:1.25em;padding-left:.3em;margin-bottom:.01em}#sbo-rt-content .packt_figref{font-size:.62em}#sbo-rt-content q,#sbo-rt-content .packt_quote{font-size:.68em}#sbo-rt-content .packt_tip{font-size:.68em;background-size:2.5em;margin-left:1.25em;margin-right:1.25em;padding-left:3em;min-height:2.5em}#sbo-rt-content .packt_infobox{font-size:.68em;background-size:2.5em;margin-left:1.25em;margin-right:1.25em;padding-left:3em;min-height:2.5em}#sbo-rt-content kbd,#sbo-rt-content .packt_action{font-size:.75em}#sbo-rt-content .packt_italics{font-size:.9em}#sbo-rt-content a,#sbo-rt-content .packt_url{font-size:.7em}#sbo-rt-content p,#sbo-rt-content .packt_para{font-size:1em;line-height:1.06em}#sbo-rt-content .CDPImageAlign{max-width:100%;max-height:100%}#sbo-rt-content div.CDPAlign,#sbo-rt-content p.CDPAlign{margin-top:.01em;margin-bottom:.01em}
+    </style>
+<style type="text/css" id="font-styles">#sbo-rt-content, #sbo-rt-content p, #sbo-rt-content div { font-size: &amp;lt;%= font_size %&amp;gt; !important; }</style>
+<style type="text/css" id="font-family">#sbo-rt-content, #sbo-rt-content p, #sbo-rt-content div { font-family: &amp;lt;%= font_family %&amp;gt; !important; }</style>
+<style type="text/css" id="column-width">#sbo-rt-content { max-width: &amp;lt;%= column_width %&amp;gt;% !important; margin: 0 auto !important; }</style>
+
+<style type="text/css">body{margin:1em;}#sbo-rt-content *{text-indent:0pt!important;}#sbo-rt-content .bq{margin-right:1em!important;}body{background-color:transparent!important;}#sbo-rt-content *{word-wrap:break-word!important;word-break:break-word!important;}#sbo-rt-content table,#sbo-rt-content pre{overflow-x:unset!important;overflow:unset!important;overflow-y:unset!important;white-space:pre-wrap!important;}</style>
+<div><h1 class="header-title">参考</h1>
+                
+            
+            
+                
+<ul>
+<li>所有认知服务都可以通过以下网址访问:<a href="https://azure.microsoft.com/en-us/services/cognitive-services/">https://azure . Microsoft . com/en-us/Services/Cognitive-Services/</a></li>
+</ul>
+
+
+            
+
+            
+        
+    </div>
+
+
+
+  
+</body></html>

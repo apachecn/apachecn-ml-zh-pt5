@@ -1,0 +1,947 @@
+<html><head/><body><html xmlns:epub="http://www.idpf.org/2007/ops">
+
+    <head>
+
+        <title>Logistic Regression</title>
+
+        
+
+        <meta charset="utf-8"/>
+
+<meta content="urn:uuid:edef0689-6ba8-4dfc-93a3-190fd7a9b9a4" name="Adept.expected.resource"/>
+
+    </head>
+
+
+
+    <body>
+
+        
+
+
+
+                            
+
+                    <h1 class="header-title">逻辑回归</h1>
+
+                
+
+            
+
+            
+
+                
+
+<p>"这个世界的真正逻辑是概率计算."</p>
+
+<p>-苏格兰物理学家詹姆斯·克拉克·麦克斯韦</p>
+
+<p>在前一章中，我们看了使用<strong>普通最小二乘法</strong> ( <strong> OLS </strong>)来预测定量结果，或者换句话说，线性回归。现在是时候稍微改变一下方式，研究我们如何开发算法来预测定性结果了。这种结果变量可以是二元的(男性对女性，购买对不购买，或肿瘤是良性对恶性)或多项类别(教育水平或眼睛颜色)。不管感兴趣的结果是二元的还是多元的，我们的任务是预测属于结果变量的特定类别的观察值的概率。换句话说，我们开发了一种算法来对观察结果进行分类。</p>
+
+<p>为了开始探讨分类问题，我们将讨论为什么应用 OLS 线性回归不是正确的技术，以及本章介绍的算法如何解决这些问题。然后，我们将研究预测银行客户是否满意的问题。为了解决这个问题，我们将从建立和解释逻辑回归模型开始。我们还将开始研究选择特征的单变量方法。接下来，我们将转向多元回归样条，并探索选择最佳整体算法的方法。本章将为后续章节中更高级的机器学习方法奠定基础。</p>
+
+<p>我们将在本章中讨论以下主题:</p>
+
+<ul>
+
+<li>分类方法和线性回归</li>
+
+<li>逻辑回归</li>
+
+<li>模型训练和评估</li>
+
+</ul>
+
+
+
+
+
+            
+
+
+
+            
+
+        
+
+    </body>
+
+
+
+</html>
+<html xmlns:epub="http://www.idpf.org/2007/ops">
+
+    <head>
+
+        <title>Classification methods and linear regression</title>
+
+        
+
+        <meta charset="utf-8"/>
+
+<meta content="urn:uuid:edef0689-6ba8-4dfc-93a3-190fd7a9b9a4" name="Adept.expected.resource"/>
+
+    </head>
+
+
+
+    <body>
+
+        
+
+
+
+                            
+
+                    <h1 class="header-title">分类方法和线性回归</h1>
+
+                
+
+            
+
+            
+
+                
+
+<p>那么，为什么我们不能用上一章学过的最小二乘回归法来得到一个定性的结果呢？事实证明，你可以，但风险自负。让我们假设你有一个你试图预测的结果，它有三个不同的等级:轻度，中度和重度。你和你的同事还假设轻度和中度以及中度和重度的区别是一个等价的度量，是一个线性关系。您可以创建一个虚拟变量，其中 0 表示轻度，1 表示中度，2 表示重度。如果你有理由相信这一点，那么线性回归可能是一个可以接受的解决方案。然而，定性标签(如之前的标签)可能会导致高水平的测量误差，从而使 OLS 产生偏差。在大多数商业问题中，没有科学上可接受的方法将定性反应转化为定量反应。如果你的回答有两种结果，比如失败和通过，那该怎么办？同样，使用虚拟变量方法，我们可以将失败结果编码为<kbd>0</kbd>，将通过结果编码为<kbd>1</kbd>。使用线性回归，我们可以建立一个模型，其中预测值是通过或失败观察的概率。然而，模型中<kbd>Y</kbd>的估计很可能会超过<kbd>[0,1]</kbd>的概率限制，因此有点难以解释。</p>
+
+
+
+
+
+            
+
+
+
+            
+
+        
+
+    </body>
+
+
+
+</html>
+<html xmlns:epub="http://www.idpf.org/2007/ops">
+
+    <head>
+
+        <title>Logistic regression</title>
+
+        
+
+        <meta charset="utf-8"/>
+
+<meta content="urn:uuid:edef0689-6ba8-4dfc-93a3-190fd7a9b9a4" name="Adept.expected.resource"/>
+
+    </head>
+
+
+
+    <body>
+
+        
+
+
+
+                            
+
+                    <h1 class="header-title">逻辑回归</h1>
+
+                
+
+            
+
+            
+
+                
+
+<p>如前所述，我们的分类问题最好用由<kbd>0</kbd>和<kbd>1</kbd>限定的概率来建模。我们可以用一些不同的函数对所有的观测值进行这样的处理，但这里我们将重点放在逻辑函数上。逻辑回归中使用的逻辑函数如下:</p>
+
+<div><img class="fm-editor-equation" src="img/fe892a4c-d5bc-4f37-85e2-2a18994e1a5d.png" style="width:22.50em;height:1.75em;"/></div>
+
+<p>如果你曾经在赛马或世界杯上下过友好的赌注，你可能会更好地理解赔率的概念。逻辑函数可以用<em>概率(Y) / 1 -概率(Y) </em>的公式化为 odds。例如，如果巴西赢得世界杯的概率是 20%，那么赔率是<em> 0.2 / 1 - 0.2 </em>，等于<em> 0.25 </em>，也就是说赔率是四分之一。</p>
+
+<p>要将赔率转换回概率，取赔率并除以 1 加上赔率。因此，世界杯的例子是<em> 0.25 / 1 + 0.25 </em>，等于 20%。此外，让我们考虑优势比。假设德国夺冠的几率是<em> 0.18 </em>。我们可以用赔率来对比巴西和德国的赔率。在这个例子中，赔率是巴西的赔率除以德国的赔率。我们最终得出的赔率等于<em> 0.25/0.18 </em>，等于<em> 1.39 </em>。在这里，我们会说巴西赢得世界杯的可能性是德国的 1.39 倍。</p>
+
+<p>查看逻辑回归与线性回归的关系的一种方法是将逻辑回归显示为对数优势或<em> log (P(Y)/1 - P(Y)) </em>等于<em> Bo + B1x </em>。使用最大似然法而不是 OLS 来估计系数。最大似然背后的直觉是，我们正在计算对<em> Bo </em>和<em> B1、</em>的估计，这将创建一个尽可能接近实际观察结果<em> Y </em>的预测概率，即所谓的似然性。R 语言为最大似然性做了其他软件包做的事情，就是找到使似然性最大化的 beta 值的最优组合。</p>
+
+<p>考虑到这些事实，逻辑回归是预测涉及分类的问题的有效技术，并且通常是在这种问题中创建模型的起点。因此，在这一章中，我们将首先用逻辑回归来解决未来的问题。</p>
+
+
+
+
+
+            
+
+
+
+            
+
+        
+
+    </body>
+
+
+
+</html>
+<html xmlns:epub="http://www.idpf.org/2007/ops">
+
+    <head>
+
+        <title>Model training and evaluation</title>
+
+        
+
+        <meta charset="utf-8"/>
+
+<meta content="urn:uuid:edef0689-6ba8-4dfc-93a3-190fd7a9b9a4" name="Adept.expected.resource"/>
+
+    </head>
+
+
+
+    <body>
+
+        
+
+
+
+                            
+
+                    <h1 class="header-title">模型训练和评估</h1>
+
+                
+
+            
+
+            
+
+                
+
+<p>如前所述，我们将预测客户满意度。该数据基于以前的在线竞赛。我已经提取了数据的训练部分，并对其进行了清理以供我们使用。</p>
+
+<p>比赛的完整描述和数据可在以下链接获得:<a href="https://www.kaggle.com/c/santander-customer-satisfaction/data">https://www . ka ggle . com/c/Santander-customer-satisfaction/data</a>。</p>
+
+<p>出于多种原因，这对于分类问题来说是一个极好的数据集。像如此多的客户数据一样，它非常杂乱——尤其是在我删除一堆无用的功能之前(大约有四十几个零方差功能)。正如前两章所讨论的，我解决了缺失值、线性依赖和高度相关对的问题。我还发现这些特性的名字又长又没用，所以我把它们编码为 V1 到 V142。由此产生的数据处理的是通常难以衡量的东西:满意度。由于专有方法，没有给出满意的描述或定义。</p>
+
+<p class="mce-root"/>
+
+<p class="mce-root"/>
+
+<p>我以前在银行业工作过，我可以向你保证，这是一个有点挑战性的命题，充满了测量误差。因此，相对于信号有相当多的噪声，可以预期模型性能相当差。此外，与没有不满意的客户相比，感兴趣的结果<em>客户不满意</em>相对较少。经典的问题是，当试图对少数民族标签进行分类时，你最终会得到相当多的误报。</p>
+
+<p>和往常一样，你可以在 GitHub 上找到数据:<a href="https://github.com/PacktPublishing/Advanced-Machine-Learning-with-R/blob/master/Data/santander_prepd.RData">https://GitHub . com/packt publishing/Advanced-Machine-Learning-with-R/blob/master/Data/Santander _ prepd。RData </a>。</p>
+
+<p>因此，让我们首先加载数据并训练一个逻辑回归算法。</p>
+
+
+
+
+
+            
+
+
+
+            
+
+        
+
+    </body>
+
+
+
+</html>
+<html xmlns:epub="http://www.idpf.org/2007/ops">
+
+    <head>
+
+        <title>Training a logistic regression algorithm</title>
+
+        
+
+        <meta charset="utf-8"/>
+
+<meta content="urn:uuid:edef0689-6ba8-4dfc-93a3-190fd7a9b9a4" name="Adept.expected.resource"/>
+
+    </head>
+
+
+
+    <body>
+
+        
+
+
+
+                            
+
+                    <h1 class="header-title">训练逻辑回归算法</h1>
+
+                
+
+            
+
+            
+
+                
+
+<p>按照以下简单步骤训练逻辑回归算法:</p>
+
+<ol>
+
+<li>第一步是确保加载我们的包，并将<kbd>magrittr</kbd>库调用到我们的环境中:</li>
+
+</ol>
+
+<pre style="padding-left: 60px">&gt; library(magrittr)<br/>&gt; install.packages("caret")<br/>&gt; install.packages("classifierplots")<br/>&gt; install.packages("earth")<br/>&gt; install.packages("Information")<br/>&gt; install.packages("InformationValue")<br/>&gt; install.packages("Metrics")<br/>&gt; install.packages("tidyverse")  </pre>
+
+<ol start="2">
+
+<li class="mce-root">在这里，我们加载文件，然后检查尺寸并检查客户标签表:</li>
+
+</ol>
+
+<pre style="padding-left: 60px">&gt; santander &lt;- read.csv("~/santander_prepd.csv")<br/><br/>&gt; dim(santander)<br/>[1] 76020 143<br/><br/>&gt; table(santander$y)<br/><br/>    0    1 <br/>73012 3008 </pre>
+
+<p style="padding-left: 60px">我们有 76，020 个观察值，但只有 3，008 个客户被标记为<kbd>1</kbd>，这意味着不满意。接下来我将使用 caret 来创建 80/20 分割的训练集和测试集。</p>
+
+<ol start="3">
+
+<li>在 caret 的<kbd>createDataPartition()</kbd>函数中，它会根据响应自动对样本进行分层，因此我们可以放心，在训练集和测试集之间有一个平衡的百分比:</li>
+
+</ol>
+
+<pre style="padding-left: 60px">&gt; set.seed(1966)<br/><br/>&gt; trainIndex &lt;- caret::createDataPartition(santander$y, p = 0.8, list = FALSE)<br/><br/>&gt; train &lt;- santander[trainIndex, ]<br/><br/>&gt; test &lt;- santander[-trainIndex, ]</pre>
+
+<ol start="4">
+
+<li>让我们看看两个数据集之间的响应是如何平衡的:</li>
+
+</ol>
+
+<pre style="padding-left: 60px">&gt; table(train$y)<br/><br/>    0    1 <br/>58411 2405<br/><br/>&gt; table(test$y)<br/><br/>    0     1 <br/>14601   603 </pre>
+
+<p class="mce-root" style="padding-left: 60px">每组大约有 4 %,所以我们可以继续。拆分数据时可能发生的一件有趣的事情是，您现在会发现一个接近零方差的特征变成了训练集中的零方差特征。当我处理这些数据时，我只去掉了零方差特征。</p>
+
+<ol start="5">
+
+<li class="mce-root">有一些低方差特性，所以让我们看看是否可以消除一些新的零方差特性:</li>
+
+</ol>
+
+<pre style="padding-left: 60px">&gt; train_zero &lt;- caret::nearZeroVar(train, saveMetrics = TRUE)<br/><br/>&gt; table(train_zero$zeroVar)<br/><br/>FALSE TRUE <br/>  142    1</pre>
+
+<ol start="6">
+
+<li>好了，由于分割，一个特征现在是零方差，我们可以删除它:</li>
+
+</ol>
+
+<pre style="padding-left: 60px">&gt; train &lt;- train[, train_zero$zeroVar == 'FALSE']</pre>
+
+<p>我们的数据框现在有 139 个输入要素和带标签的客户列。正如我们对线性回归所做的那样，为了使逻辑回归得到有意义的结果，也就是说不要过度拟合，您需要减少输入特征的数量。我们可以像上一章所做的那样，用逐步选择或类似的方法向前推进。我们可以实现特征正则化方法，我们将在下一章讨论。但是，我想介绍一种使用<strong>证据权重</strong> ( <strong> WOE </strong>)和<strong>信息值</strong> ( <strong> IV </strong>)的单变量特征约简方法，并讨论我们如何理解如何结合逻辑回归在分类问题中使用它。</p>
+
+
+
+
+
+            
+
+
+
+            
+
+        
+
+    </body>
+
+
+
+</html>
+<html xmlns:epub="http://www.idpf.org/2007/ops">
+
+    <head>
+
+        <title>Weight of evidence and information value</title>
+
+        
+
+        <meta charset="utf-8"/>
+
+<meta content="urn:uuid:edef0689-6ba8-4dfc-93a3-190fd7a9b9a4" name="Adept.expected.resource"/>
+
+    </head>
+
+
+
+    <body>
+
+        
+
+
+
+                            
+
+                    <h1 class="header-title">证据权重和信息价值</h1>
+
+                
+
+            
+
+            
+
+                
+
+<p class="mce-root">几年前我在咨询工作中偶然发现了这个方法。我所在的团队对大数据集非常感兴趣，并且局限于使用 SAS 统计软件。客户团队能够容易地解释模型也是一个关键的需求。</p>
+
+<p class="mce-root">鉴于可能有数百种甚至数千种特征，我有幸学习了一位前火箭科学家对 WOE 和 IV 的使用。没错:一个真正从事过载人航天飞行的人。我成了一名求知若渴的学生。现在，这个方法不是万灵药。首先，它是单变量的，因此被丢弃的特征在多变量模型中可能变得重要，反之亦然。我可以说它为其他方法提供了很好的补充，你应该把它放在你的建模工具箱里。我相信它起源于信用评分的世界，所以如果你在金融行业工作，你可能已经很熟悉它了。</p>
+
+<p>首先，让我们来看看 WOE 的公式:</p>
+
+<p class="CDPAlignCenter CDPAlign"><img class="fm-editor-equation" src="img/8271bdb4-06a3-4e5d-8e66-1ba3e55ebf03.png" style="width:17.42em;height:2.75em;"/></p>
+
+<p>WOE 是 IV 的一个组成部分。对于数字特征，您将对数据进行分类，然后分别计算每个分类的权重。对于分类的，或者当一个热编码时，为每个级别绑定并分别计算 WOE。我们举个例子，用 r 来演示。</p>
+
+<p>我们的数据由一个编码为 0 或 1 的输入要素组成，因此我们只有两个箱。对于每个箱子，我们计算我们的悲哀。在容器 1 中，或者在值等于 0 的情况下，有 4 个作为事件的观察和 96 个作为非事件的观察。相反，在 bin 2 中，或者值等于 1 的情况下，我们将<kbd>12</kbd>个观察值作为事件，将 88 个观察值作为非事件。让我们看看如何计算每个箱的权重:</p>
+
+<pre>&gt; bin1events &lt;- 4<br/><br/>&gt; bin1nonEvents &lt;- 96<br/><br/>&gt; bin2events &lt;- 12<br/><br/>&gt; bin2nonEvents &lt;- 88<br/><br/>&gt; totalEvents &lt;- bin1events + bin2events<br/><br/>&gt; totalNonEvents &lt;- bin1nonEvents + bin2nonEvents<br/># Now calculate the percentage per bin<br/>&gt; bin1percentE &lt;- bin1events / totalEvents<br/><br/>&gt; bin1percentNE &lt;- bin1nonEvents / totalNonEvents<br/><br/>&gt; bin2percentE &lt;- bin2events / totalEvents<br/><br/>&gt; bin2percentNE &lt;- bin2nonEvents / totalNonEvents<br/># It's now possible to produce WOE<br/>&gt; bin1WOE &lt;- log(bin1percentE / bin1percentNE)<br/><br/>&gt; bin2WOE &lt;- log(bin2percentE / bin2percentNE)</pre>
+
+<p>完成这一步后，你得到的<kbd>bin1</kbd>和<kbd>bin2</kbd>的权重分别约为-0.74 和 0.45。我们现在使用它来计算每个 bin 的 IV，然后对其求和，得出该特性的总体 IV。公式如下:</p>
+
+<p class="CDPAlignCenter CDPAlign"><img class="fm-editor-equation" src="img/564aafb0-bb64-4d3b-ab88-c6fffa38e6cb.png" style="width:27.00em;height:2.92em;"/></p>
+
+<p>以我们目前的例子为例；这是我们的特色四:</p>
+
+<pre>&gt; bin1IV &lt;- (bin1percentE - bin1percentNE) * bin1WOE<br/><br/>&gt; bin2IV &lt;- (bin2percentE - bin2percentNE) * bin2WOE<br/><br/>&gt; bin1IV + bin2IV<br/>[1] 0.3221803</pre>
+
+<p>特征的 IV 是<kbd>0.322</kbd>。这是什么意思？简而言之，这要视情况而定。我们提供了一种启发式方法来帮助确定哪些 IV 阈值对模型开发有意义:</p>
+
+<ul>
+
+<li>&lt; 0.02 不具有预测性</li>
+
+<li>0.02 到 0.1 弱</li>
+
+<li>0.1 至 0.3 中等</li>
+
+<li>0.3 到 0.5 强</li>
+
+<li>&gt; 0.5 可疑</li>
+
+</ul>
+
+<p>下面的例子将为我们提供一些有趣的决定，告诉我们应该在哪里划线。</p>
+
+
+
+
+
+            
+
+
+
+            
+
+        
+
+    </body>
+
+
+
+</html>
+<html xmlns:epub="http://www.idpf.org/2007/ops">
+
+    <head>
+
+        <title>Feature selection</title>
+
+        
+
+        <meta charset="utf-8"/>
+
+<meta content="urn:uuid:edef0689-6ba8-4dfc-93a3-190fd7a9b9a4" name="Adept.expected.resource"/>
+
+    </head>
+
+
+
+    <body>
+
+        
+
+
+
+                            
+
+                    <h1 class="header-title">特征选择</h1>
+
+                
+
+            
+
+            
+
+                
+
+<p>我们现在要做的是使用<kbd>Information</kbd>包来计算我们特性的 iv。然后，我将向您展示如何评估这些值，并运行一些图。因为对于特性包含的阈值没有硬性的规则，所以我将提供我的关于在哪里划线的判断。当然，你可以拒绝这一点，并应用你自己的。</p>
+
+<p>在本例中，代码将创建一系列表，您可以使用这些表来浏览结果。开始时，您只需要指定数据和响应或<kbd>"y"</kbd>变量:</p>
+
+<pre>IV &lt;- Information::create_infotables(data = train, y = "y", parallel = FALSE)</pre>
+
+<p>这将为我们提供顶级<kbd>25</kbd>功能的<kbd>IV</kbd>摘要:</p>
+
+<pre>&gt; knitr::kable(head(IV$Summary, 25))<br/><br/><br/>|    |Variable |     IV|<br/>|:---|:--------|------:|<br/>|2   |V2       | 0.7006|<br/>|102 |V103     | 0.5296|<br/>|124 |V125     | 0.5281|<br/>|45  |V45      | 0.5273|<br/>|31  |V31      | 0.5213|<br/>|125 |V126     | 0.4507|<br/>|55  |V55      | 0.3135|<br/>|140 |V141     | 0.0982|<br/>|108 |V109     | 0.0711|<br/>|130 |V131     | 0.0681|<br/>|33  |V33      | 0.0672|<br/>|104 |V105     | 0.0640|<br/>|66  |V66      | 0.0519|<br/>|92  |V93      | 0.0519|<br/>|128 |V129     | 0.0499|<br/>|121 |V122     | 0.0461|<br/>|24  |V24      | 0.0417|<br/>|131 |V132     | 0.0365|<br/>|34  |V34      | 0.0323|<br/>|47  |V47      | 0.0323|<br/>|123 |V124     | 0.0289|<br/>|129 |V130     | 0.0194|<br/>|83  |V84      | 0.0189|<br/>|19  |V19      | 0.0181|<br/>|35  |V35      | 0.0181|</pre>
+
+<p>结果显示了特性列号、特性名称和<kbd>IV</kbd>。请注意，我们有五个可能可疑的特征。我完全赞成采用任何一个<kbd>IV</kbd>高于<kbd>0.02</kbd>的特征，这是弱预测的底部。这将给我们 21 个输入特征。<kbd>V2</kbd>功能很有意思。如果你看看这些值，想想这些数据，很明显这是客户的年龄。让我们看看数据是如何装箱的，<kbd>WOE</kbd>值和 IVs:</p>
+
+<pre>&gt; knitr::kable(IV$Tables$V2)<br/><br/><br/>|V2       |     N| Percent|     WOE|     IV|<br/>|:--------|-----:|-------:|-------:|------:|<br/>|[5,22]   | 951  | 0.0156 | 0.0000 | 0.0000|<br/>|[23,23]  | 16222| 0.2667 | -1.6601| 0.3705|<br/>|[24,24]  | 4953 | 0.0814 | -1.2811| 0.4481|<br/>|[25,26]  | 6048 | 0.0994 | -0.7895| 0.4919|<br/>|[27,31]  | 8088 | 0.1330 | 0.2261 | 0.4994|<br/>|[32,36]  | 6037 | 0.0993 | 0.4923 | 0.5297|<br/>|[37,42]  | 6302 | 0.1036 | 0.6876 | 0.5975|<br/>|[43,51]  | 6095 | 0.1002 | 0.7328 | 0.6737|<br/>|[52,105] | 6120 | 0.1006 | 0.4636 | 0.7006|</pre>
+
+<p>好吧，你一定是在开玩笑。看看 bin 号 2，我相信它是 23 岁的客户年龄。它几乎占总观测值的 27 %,并占 IV 的一半以上。确实可疑！如果这个特征是真的<kbd>AGE</kbd>像我怀疑的那样，我们对这些数据产生的任何算法将如何有所帮助？然而，这超出了本文的范围，不值得浪费更多的时间和精力。在这里，我们可以快速调出一个由宾绘制的柱状图:</p>
+
+<pre>&gt; Information::plot_infotables(IV, "V2", show_values = TRUE)</pre>
+
+<p>上述代码的输出如下:</p>
+
+<p class="CDPAlignCenter CDPAlign"><img class="alignnone size-full wp-image-854 image-border" src="img/67553392-205c-4078-9d7f-36e1fc5e466f.png" style="width:37.58em;height:20.42em;"/></p>
+
+<p>有趣的是，这个特征和反应之间有某种线性关系。可以做的是，我们可以创建一些功能，将入库的值转换为 WOE 值。这些新特征将是线性的，并且可以用来代替原始特征。我们应该放弃它，因为有什么方法可以做到这一点呢？没错，下一节火星可以为我们做到这一点！下面是四大功能的网格图:</p>
+
+<pre>&gt; Information::plot_infotables(IV, IV$Summary$Variable[1:4], same_scales=TRUE)</pre>
+
+<p>上述代码的输出如下:</p>
+
+<p class="CDPAlignCenter CDPAlign"><img class="alignnone size-full wp-image-855 image-border" src="img/e5288192-940c-4b69-9492-be4b5f2643a0.png" style="width:44.75em;height:24.92em;"/></p>
+
+<p>现在，给定我之前选择的截止点，我们可以选择那些<kbd>21</kbd>特征:</p>
+
+<pre>&gt; features &lt;- IV$Summary$Variable[1:21]<br/><br/>&gt; train_reduced &lt;- train[, colnames(train) %in% features]<br/><br/>&gt; train_reduced$y &lt;- train$y</pre>
+
+<p>给你。我们现在准备开始训练我们的算法。</p>
+
+
+
+
+
+            
+
+
+
+            
+
+        
+
+    </body>
+
+
+
+</html>
+<html xmlns:epub="http://www.idpf.org/2007/ops">
+
+    <head>
+
+        <title>Cross-validation and logistic regression</title>
+
+        
+
+        <meta charset="utf-8"/>
+
+<meta content="urn:uuid:edef0689-6ba8-4dfc-93a3-190fd7a9b9a4" name="Adept.expected.resource"/>
+
+    </head>
+
+
+
+    <body>
+
+        
+
+
+
+                            
+
+                    <h1 class="header-title">交叉验证和逻辑回归</h1>
+
+                
+
+            
+
+            
+
+                
+
+<p>我们这里的目标是建立一个使用五重交叉验证的模型。我们将利用<kbd>caret</kbd>包来建立我们的采样方案并生产最终模型。首先构建一个单独的<kbd>trainControl()</kbd>函数:</p>
+
+<pre>&gt; glm_control &lt;-<br/>    caret::trainControl(method = "cv",<br/>    number = 5,<br/>    returnResamp = "final")</pre>
+
+<p class="mce-root">此对象作为参数传递以训练算法。我们现在生成输入特征、响应变量(必须是 caret 训练为逻辑回归的一个因素)，设置我们的随机种子，并训练模型。对于<kbd>train()</kbd>函数，为<strong>广义线性模型</strong> ( <strong> GLM </strong>)指定<kbd>glm</kbd>:</p>
+
+<pre>&gt; x &lt;- train_reduced[, -22]<br/><br/>&gt; y &lt;- as.factor(train_reduced$y)<br/><br/>&gt; set.seed(1988)<br/><br/>&gt; glm_fit &lt;-<br/>   caret::train(x, y, method = "glm", <br/>                trControl = glm_control,<br/>                trace = FALSE)</pre>
+
+<p>当完成<em>磨掉</em>后，您可以快速检查结果:</p>
+
+<pre>&gt; glm_fit$results<br/>  parameter Accuracy     Kappa AccuracySD  KappaSD<br/>1      none   0.9602 0.0002369  0.0001591 0.001743</pre>
+
+<p>快看，96%的准确率！我知道这完全没有意义，因为如果我们只是猜测响应中的所有标签都是零，我们将达到 96%。这似乎是显而易见的，但我采访过拥有<em>数据科学学位</em>的人，他们忽略了这个事实。<kbd>Kappa</kbd>指的是众所周知的科恩卡帕统计。Kappa 统计通过调整准确度分数提供了对这个问题的深入了解，这是通过解释模型完全正确仅仅是偶然的。统计的公式如下:</p>
+
+<p class="CDPAlignCenter CDPAlign"><img class="fm-editor-equation" src="img/7ffe6256-9ed5-46d5-a2b0-c592cf2edb94.png" style="width:69.50em;height:1.83em;"/></p>
+
+<p><em>符合百分比</em>是模型对该类(准确性)达成一致的比率，而<em>机会符合百分比</em>是模型随机达成一致的比率。统计值越高，性能越好，最大一致性为 1。所以，以这个 Kappa 分数，模特是可悲的。</p>
+
+<p>好吧，卡帕会有更平衡的标签。我们现在需要寻找其他方法来检查模型结果。用密度图或箱线图来比较不同类别的概率分布总是一个好主意。</p>
+
+<p class="mce-root"/>
+
+<p class="mce-root"/>
+
+<p>这里，我们在训练数据上生成了一个优雅而丰富多彩的密度图:</p>
+
+<pre>&gt; glm_train_pred &lt;- predict(glm_fit, train, type = "prob")<br/><br/>&gt; colnames(glm_train_pred) &lt;- c("zero", "one")<br/><br/>&gt; classifierplots::density_plot(train_reduced$y, glm_train_pred$one)</pre>
+
+<p>上述代码的输出如下:</p>
+
+<p class="CDPAlignCenter CDPAlign"><img class="alignnone size-full wp-image-676 image-border" src="img/e71ceb17-7c90-4403-81ce-64c8cccaaa03.png" style="width:36.75em;height:21.75em;"/></p>
+
+<p>这给了我们一个有趣的视角来看这个模型在做什么。在达到 7%之前，我们看不到任何预测能力。我们可以确定一个最佳概率阈值来最大化我们的分类目标。我们稍后将应用的<kbd>InformationValue</kbd>包中有一个出色的函数。它允许确定四个不同的阈值:</p>
+
+<ul>
+
+<li><kbd>misclasserror</kbd>:函数中的默认设置，标识最小化分类误差的阈值</li>
+
+<li>这是最大限度检测 1 的阈值</li>
+
+<li>这是最大限度检测 0 的阈值</li>
+
+<li><kbd>Both</kbd>:这是最大化尤登指数的阈值，是<em> <em>(灵敏度+特异性)- 1 </em> </em></li>
+
+</ul>
+
+<div><em>Sensitivity = True Positives / (True Positives + False Negatives)</em>: This is also called the True Positive Rate or Recall and is a measure of correctly identifying positive labels. <em>Specificity = True Negatives / (True Negatives + False Positives)</em>: Also called the True Negative Rate, this is a measure of correctly identifying negative labels.</div>
+
+<p>在这种情况下，我们应该看看<kbd>Both</kbd>的阈值。我们还会询问所有的诊断信息:</p>
+
+<pre>&gt; glm_cutoff &lt;-<br/>    InformationValue::optimalCutoff(<br/>    train_reduced$y,<br/>    glm_train_pred$one,<br/>    optimiseFor = 'Both',<br/>    returnDiagnostics = TRUE<br/>    )</pre>
+
+<p>如果您在您的全局环境中点击<kbd>glm_cutoff</kbd>或运行<kbd>View(glm_cutoff)</kbd>，您将看到六个不同结果的列表:</p>
+
+<ul>
+
+<li><kbd>optimalCutoff</kbd> = 0.0606</li>
+
+<li>你可以自己进一步检查灵敏度表</li>
+
+<li>错误分类误差= 0.2006</li>
+
+<li>TPR = 0.6079</li>
+
+<li>FPR = 0.1927</li>
+
+<li>特异性= 0.8073</li>
+
+</ul>
+
+<p>如果我们选择 0.0606 的截止值，我们将获得几乎 61%的<strong>真阳性率</strong> ( <strong> TPR </strong>)。然而，超过 19%会是假阳性。</p>
+
+<p>考虑到班级的不平衡，这是一个巨大的客户数量。混淆矩阵可以证明以下事实:</p>
+
+<pre>&gt; InformationValue::confusionMatrix(train_reduced$y, glm_train_pred$one,   threshold = 0.0607)<br/>      0    1<br/>0 47164  944<br/>1 11247 1461</pre>
+
+<p>在培训数据中，不满意的客户共有 2405 个；如果我们对其中的 1461 个进行了正确的分类，我们将会对 11247 个进行错误的分类。因此，我们决定将最佳阈值放在哪里取决于业务需求。我们将在模型比较中看到如何以不同的方式描绘它。</p>
+
+<p class="mce-root"/>
+
+<p>现在让我们看看该算法如何对可变重要性进行排序:</p>
+
+<pre>&gt; caret::varImp(glm_fit)<br/>glm variable importance<br/><br/>only 20 most important variables shown (out of 21)<br/><br/>      Overall<br/>V2   100.0000<br/>V103  70.2840<br/>V141  33.2809<br/>V105  18.0160<br/>V24   13.1048<br/>V129  12.4327<br/>V55   10.7379<br/>V34    8.7920<br/>V45    8.5681<br/>V124   7.1968<br/>V122   5.9959<br/>V109   5.8668<br/>V33    4.8295<br/>V125   3.6369<br/>V131   1.5439<br/>V126   0.8383<br/>V47    0.7430<br/>V132   0.4286<br/>V66    0.3133<br/>V31    0.0912</pre>
+
+<p>我们的<kbd>suspicious</kbd>变量是最重要的。我会建议您尝试其他型号，不考虑<kbd>V2</kbd>。但这取决于你，因为我现在的想法是看看测试数据的表现如何:</p>
+
+<pre>&gt; glm_test_pred &lt;- predict(glm_fit, test, type = "prob")<br/><br/>&gt; colnames(glm_test_pred) &lt;- c("zero", "one")<br/><br/>&gt; classifierplots::density_plot(test$y, glm_test_pred$one)</pre>
+
+<p>上述代码的输出如下:</p>
+
+<p class="CDPAlignCenter CDPAlign"><img class="alignnone size-full wp-image-677 image-border" src="img/76cb8d55-4c72-4996-8055-5cd893ea7dd3.png" style="width:37.50em;height:21.25em;"/></p>
+
+<p>测试数据的结果非常相似。假设我们的阈值是在训练中确定的，那么混淆矩阵呢？让我们看看:</p>
+
+<pre>&gt; InformationValue::confusionMatrix(test$y, glm_test_pred$one, threshold = 0.0607)<br/>      0   1<br/>0 11710 227<br/>1  2891 376</pre>
+
+<p>一致的结果！现在，让我们检查这个模型在测试数据上的性能，以便我们可以将它与即将到来的火星模型进行比较。有两个指标可以解决这个问题，曲线下的面积 ( <strong xmlns:epub="http://www.idpf.org/2007/ops"> AUC </strong>)和对数损失。AUC 为您提供了一个有用的性能指标，可以证明 AUC 等于观察者在随机选择一对病例时正确识别阳性病例的概率，其中一个病例为阳性，一个病例为阴性(汉利·贾&amp;麦克尼尔·BJ，1982)。在我们的例子中，我们将使用我们的算法切换观察器，并相应地进行评估。对数损失是一种有效的度量，因为它考虑了预测的概率以及它偏离正确标签的程度。下面的公式产生它:</p>
+
+<p class="CDPAlignCenter CDPAlign"><img class="fm-editor-equation" src="img/a55809dc-0bed-4d01-8a61-b66c4a58926f.png" style="width:27.33em;height:4.00em;"/></p>
+
+<p class="mce-root"/>
+
+<p class="mce-root"/>
+
+<p>像高尔夫球一样，0 到 1 之间的值越低越好。完美模型的值应该是 0。我们可以使用<kbd>Metrics</kbd>包轻松生成这些值:</p>
+
+<pre>&gt; Metrics::auc(test$y, glm_test_pred$one)<br/>[1] 0.7794<br/><br/>&gt; Metrics::logLoss(test$y, glm_test_pred$one)<br/>[1] 0.1499</pre>
+
+<p>我要说，我们的 AUC 没有那么好。如果模型不比随机猜测好，那么 AUC 将等于 0.5，如果完美，它将是 1。我们的对数损失只有在与下一个模型比较时才是必要的。</p>
+
+
+
+
+
+            
+
+
+
+            
+
+        
+
+    </body>
+
+
+
+</html>
+<html xmlns:epub="http://www.idpf.org/2007/ops">
+
+    <head>
+
+        <title>Multivariate adaptive regression splines</title>
+
+        
+
+        <meta charset="utf-8"/>
+
+<meta content="urn:uuid:edef0689-6ba8-4dfc-93a3-190fd7a9b9a4" name="Adept.expected.resource"/>
+
+    </head>
+
+
+
+    <body>
+
+        
+
+
+
+                            
+
+                    <h1 class="header-title">多元自适应回归样条</h1>
+
+                
+
+            
+
+            
+
+                
+
+<p>在前一章中，我们讨论了火星，它是如何工作的，为什么使用它，等等，所以我在这里不再重复；除此之外，它还可以作为广义线性模型应用于分类问题。其中一个重要的好处是它能够进行特征选择，因此不需要逐步运行或 IV-甚至正则化。</p>
+
+<p>我们将用 5 重交叉验证来训练它，并将<kbd>nprune = 15</kbd>设置为将最大功能数限制在 15。回想一下前一章，由于它适合分段样条，所以可能有 15 个以上的项。</p>
+
+<p>这段代码将为我们提供<kbd>model</kbd>对象。请注意，这可能需要一些时间才能完成:</p>
+
+<pre>&gt; set.seed(1972)<br/><br/>&gt; earth_fit &lt;-<br/>    earth::earth(<br/>    x = train[, -142],<br/>    y = train[, 142],<br/>    pmethod = 'cv',<br/>    nfold = 5,<br/>    degree = 1,<br/>    minspan = -1,<br/>    nprune = 15,<br/>    glm = list(family = binomial)<br/>    )</pre>
+
+<p class="mce-root"/>
+
+<p class="mce-root"/>
+
+<p>以下是模型总结:</p>
+
+<pre>&gt; summary(earth_fit)<br/>Call: earth(x=train[,-142], y=train[,142], pmethod="cv",<br/>            glm=list(family=binomial), degree=1, nprune=15, nfold=5,<br/>            minspan=-1)<br/><br/>GLM coefficients<br/>                     y<br/>(Intercept)    -3.4407<br/>V23            -6.6750<br/>V24            -1.3539<br/>V105           -0.8200<br/>h(28-V2)       -0.4769<br/>h(V2-28)        0.0071<br/>h(1-V31)        1.4876<br/>h(V31-1)        0.0947<br/>h(106449-V141)  0.0000<br/>h(V141-106449)  0.0000<br/><br/>Earth selected 10 of 10 terms, and 6 of 141 predictors using pmethod="cv"</pre>
+
+<p>正如您在摘要中看到的，该模型最终总共有六个预测特征和十个术语，包括对<kbd>V2</kbd>的一个<kbd>hinge</kbd>函数。根据标准协议，成对的铰链项可以首先被读取为小于铰链值的预测值，然后被读取为大于或等于铰链值的预测值。例如，对于<kbd>V31</kbd>，小于 1 的值具有系数 1.4876，否则为 0.0947。</p>
+
+<p>我们可以画出预测概率的线性相互作用。将<kbd>ylim</kbd>设置为<kbd>NA</kbd>有助于显示<em> y </em>(预测概率)的变化与特征值的变化:</p>
+
+<pre>&gt; plotmo::plotmo(earth_fit, ylim = NA)</pre>
+
+<p>上述代码的输出如下:</p>
+
+<p class="CDPAlignCenter CDPAlign"><img class="alignnone size-full wp-image-678 image-border" src="img/5f161128-475d-43dc-a12d-97b67fe43144.png" style="width:88.50em;height:34.83em;"/></p>
+
+<p>注意，对于<kbd>V31</kbd>，等于零的值有一个系数，另一个系数，如前所述。特征重要性的产生是微不足道的:</p>
+
+<pre>&gt; earth::evimp(earth_fit)<br/>     nsubsets   gcv   rss<br/>V31         9 100.0 100.0<br/>V2          8  74.8  75.0<br/>V141        7  40.2  41.1<br/>V105        6  31.5  32.5<br/>V23         5  26.8  27.8<br/>V24         4  20.7  21.8</pre>
+
+<p><kbd>nsubsets</kbd>标准计算包含该特征的模型子集的数量。包含在更多子集中的特征被认为更重要。这些子集是地球修剪过程产生的术语。</p>
+
+<p>现在，我们指定了交叉验证，但是 earth 同时进行前向和后向特征选择和消除，使用前面章节中讨论的<strong>广义交叉验证</strong> ( <strong> GCV </strong>)。因此，为了便于比较，一个特性的 GCV 和 rss 结果被归一化为 0 到 100。</p>
+
+<p class="mce-root"/>
+
+<p class="mce-root"/>
+
+<p>像我们之前做的一样，概率密度图是有用的，并且<kbd>earth</kbd>有它自己的<kbd>plotd()</kbd>函数:</p>
+
+<p class="CDPAlignCenter CDPAlign"><img class="alignnone size-full wp-image-857 image-border" src="img/1a605ca7-b8fd-4ebe-8514-47cdc8645ddd.png" style="width:36.08em;height:20.08em;"/></p>
+
+<p>我喜欢预测值与之前的图相比是如何反转的。除此之外，除了密度非常相似之外，很难辨别出任何有意义的东西。让我们得到<kbd>cutoff</kbd>值:</p>
+
+<pre>&gt; mars_cutoff &lt;-<br/>    InformationValue::optimalCutoff(<br/>    train$y,<br/>    pred,<br/>    optimiseFor = 'Both',<br/>    returnDiagnostics = TRUE<br/>    )</pre>
+
+<p>对物体的检查提供了以下内容:</p>
+
+<ul>
+
+<li>最佳截止值= 0.04976</li>
+
+<li>TPR = 0.6449</li>
+
+<li>FPR = 0.208</li>
+
+</ul>
+
+<p>与逻辑回归相比，我们以稍高的假阳性率为代价获得了更高的真阳性率。</p>
+
+<p class="mce-root"/>
+
+<p>让我们继续评估测试集的性能:</p>
+
+<pre>&gt; test_pred &lt;- predict(earth_fit, test, type = 'response')<br/><br/>&gt; Metrics::auc(test$y, test_pred)<br/>[1] 0.8079<br/><br/>&gt; Metrics::logLoss(test$y, test_pred)<br/>[1] 0.1406</pre>
+
+<p>我们在这里看到了什么？AUC 略有改善，对数损失更低(更好)。虽然不引人注目，但它可能是有价值的。我们现在可以转向视觉比较这两个模型，以确认 MARS 确实是首选算法。</p>
+
+
+
+
+
+            
+
+
+
+            
+
+        
+
+    </body>
+
+
+
+</html>
+<html xmlns:epub="http://www.idpf.org/2007/ops">
+
+    <head>
+
+        <title>Model comparison</title>
+
+        
+
+        <meta charset="utf-8"/>
+
+<meta content="urn:uuid:edef0689-6ba8-4dfc-93a3-190fd7a9b9a4" name="Adept.expected.resource"/>
+
+    </head>
+
+
+
+    <body>
+
+        
+
+
+
+                            
+
+                    <h1 class="header-title">模型比较</h1>
+
+                
+
+            
+
+            
+
+                
+
+<p>分类模型比较的一个有用工具是<strong xmlns:epub="http://www.idpf.org/2007/ops">接收机工作特性</strong> ( <strong xmlns:epub="http://www.idpf.org/2007/ops"> ROC </strong>)图。ROC 是一种基于性能可视化、组织和选择分类器的技术(Fawcett，2006)。在 ROC 图上，<em xmlns:epub="http://www.idpf.org/2007/ops"> y </em>轴是<strong xmlns:epub="http://www.idpf.org/2007/ops">真阳性率</strong> ( <strong xmlns:epub="http://www.idpf.org/2007/ops"> TPR </strong>)，x<em xmlns:epub="http://www.idpf.org/2007/ops">轴是<strong xmlns:epub="http://www.idpf.org/2007/ops">假阳性率</strong> ( <strong xmlns:epub="http://www.idpf.org/2007/ops"> FPR </strong>)。</em></p>
+
+<p>要在 R 中创建 ROC 图表，可以使用<kbd>ROCR</kbd>包。我认为这是一个很棒的包，它允许你只用三行代码就能构建一个图表。该软件包还有一个优秀的配套网站(有示例和演示)，可以在以下链接找到:<a href="http://rocr.bioinf.mpi-sb.mpg.de/">http://rocr.bioinf.mpi-sb.mpg.de/</a>。</p>
+
+<p>对于每个模型，您创建一个实际标签和预测概率的预测对象，然后创建一个嵌入 TPR 和 FPR 的性能对象，最后绘制它:</p>
+
+<pre>&gt; pred.glm &lt;- ROCR::prediction(glm_test_pred$one, test$y)<br/><br/>&gt; perf.glm &lt;- ROCR::performance(pred.glm, "tpr", "fpr")<br/><br/>&gt; ROCR::plot(perf.glm, main = "ROC", col = 1)</pre>
+
+<p>这给了我们 GLM 的曲线图(逻辑回归)。现在，我们将火星模型叠加在同一个图上，并创建一个图例:</p>
+
+<pre>&gt; pred.earth &lt;- ROCR::prediction(test_pred, test$y)<br/><br/>&gt; perf.earth &lt;- ROCR::performance(pred.earth, "tpr", "fpr")<br/><br/>&gt; ROCR::plot(perf.earth, col = 2, add = TRUE)<br/><br/>&gt; legend(0.6, 0.6, c("GLM", "MARS"), 1:2)</pre>
+
+<p>上述代码的输出如下:</p>
+
+<p class="CDPAlignCenter CDPAlign"><img class="alignnone size-full wp-image-856 image-border" src="img/2aaf7327-00fe-470b-bf9f-ff754bcf0041.png" style="width:36.08em;height:21.50em;"/></p>
+
+<p>ROC 曲线下的面积对应于先前计算的 AUC。火星模型的 AUC 更高；因此，它的曲线略高于 GLM 模型。值得注意的是，在 0.5 的 TPR 附近，他们有几乎相同的 FPR。不过，底线是 MARS 模型具有更少的输入特征，优于 logistic 回归，尽管只是略微优于后者。</p>
+
+<p>对于此类数据提供的问题，我们可以做很多事情来提高性能。您可以进一步探索数据，尝试添加自定义功能。您还可以使用更高级的方法，创建更多的模型进行比较，或者甚至构建几个模型并创建一个集合。至于高级技术和构建合奏，我们将在后续章节中讨论。让你的想象驰骋吧！</p>
+
+<p class="mce-root"/>
+
+<p class="mce-root"/>
+
+
+
+
+
+            
+
+
+
+            
+
+        
+
+    </body>
+
+
+
+</html>
+<html xmlns:epub="http://www.idpf.org/2007/ops">
+
+    <head>
+
+        <title>Summary</title>
+
+        
+
+        <meta charset="utf-8"/>
+
+<meta content="urn:uuid:edef0689-6ba8-4dfc-93a3-190fd7a9b9a4" name="Adept.expected.resource"/>
+
+    </head>
+
+
+
+    <body>
+
+        
+
+
+
+                            
+
+                    <h1 class="header-title">摘要</h1>
+
+                
+
+            
+
+            
+
+                
+
+<p>在这一章中，我们研究了使用概率线性模型来预测两种广义线性模型方法的定性反应:逻辑回归和多元自适应回归样条。我们探索了使用信息的权重和信息值作为技术来进行单变量特征选择。我们讨论了寻找合适的概率阈值来最小化分类错误的概念。此外，我们开始使用各种性能指标，如 AUC、log-loss 和 ROC 图，从视觉上和统计上探索模型选择。这些指标被证明比纯粹的准确性更能提供信息，尤其是在类别标签高度不平衡的情况下。在下一章中，我们将讨论特征选择的正则化方法，以及如何用它来训练你的算法。我们将了解如何创建数据集。我们将了解岭回归，并深入探讨特征选择。</p>
+
+
+
+
+
+            
+
+
+
+            
+
+        
+
+    </body>
+
+
+
+</html></body></html>

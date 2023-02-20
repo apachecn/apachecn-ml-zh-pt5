@@ -1,0 +1,393 @@
+<html><head/><body>
+
+
+
+
+
+<style type="text/css">body{margin:1em;background-color:transparent!important;}#sbo-rt-content *{text-indent:0pt!important;}#sbo-rt-content .bq{margin-right:1em!important;}</style>
+<div><div><h1 id="_idParaDest-54"><em class="italic"> <a id="_idTextAnchor053"/>第四章</em>:配置工作区</h1>
+			<p>在这一章中，你将在 Azure Machine Learning(Azure 机器学习)Studio web 界面中工作，并学习如何配置在其工作空间中运行实验所需的基础设施。然后，您将了解如何调配或附加到现有的计算资源，并在 Azure ML 工作区和托管您的数据的各种数据存储之间建立连接。配置好这些资源后，您将能够注册一个数据集，并探索 Azure ML 中提供的监控这些数据集的功能。</p>
+			<p>在本章中，我们将讨论以下主要话题:</p>
+			<ul>
+				<li>调配计算资源</li>
+				<li>连接到数据存储</li>
+				<li>使用数据集</li>
+			</ul>
+			<h1 id="_idParaDest-55"><a id="_idTextAnchor054"/>技术要求</h1>
+			<p>您需要访问 Azure 订阅。在该订阅中，您将需要一个<code>packt-azureml-rg</code>。你将需要一个<code>Contributor</code>或者<code>Owner</code>T3，如<a href="B16777_02_Final_VK_ePub.xhtml#_idTextAnchor026"> <em class="italic">第二章</em> </a>、<em class="italic">部署 Azure 机器学习工作区资源</em>中所述。</p>
+			<h1 id="_idParaDest-56"><a id="_idTextAnchor055"/>调配计算资源</h1>
+			<p>计算资源<a id="_idIndexMarker224"/>允许您在数据探索性分析、培训阶段以及操作 ML 模型时执行代码脚本。<strong class="bold"> Azure ML </strong>工作区提供了<a id="_idIndexMarker225"/>以下类型的计算资源:</p>
+			<ul>
+				<li><strong class="bold">计算实例</strong>:这些是专门为在<strong class="bold"> Azure ML 工作区</strong>工作的每个数据科学家准备的虚拟机。</li>
+				<li><strong class="bold">计算集群</strong>:这些是可扩展的计算机集群，可以并行运行多个训练或推理步骤。</li>
+				<li><strong class="bold">推理集群</strong>:这些<a id="_idIndexMarker226"/>是<strong class="bold"> Azure Kubernetes 服务</strong> ( <strong class="bold"> AKS </strong>)集群，它们可以操作 Docker 镜像，通过 REST API 公开你的模型。</li>
+				<li><strong class="bold">附加计算</strong>:这些是现有的<a id="_idIndexMarker227"/>计算资源，比如 Ubuntu <strong class="bold">虚拟机</strong> ( <strong class="bold"> VMs </strong>)或者<strong class="bold"> Synapse Spark pools </strong>，它们可以附加到<a id="_idIndexMarker228"/>工作区来执行你的训练或者推理管道的一些步骤。</li>
+			</ul>
+			<p>当您访问 Azure ML Studio 的<strong class="bold">管理</strong> | <strong class="bold">计算</strong>部分时，您将看到并能够通过选择相应的选项卡来管理这些类型，如以下截图所示:</p>
+			<div><div><img src="img/B16777_04_001.jpg" alt="Figure 4.1 – Compute types in Azure ML Studio&#13;&#10;" width="1633" height="1440"/>
+				</div>
+			</div>
+			<p class="figure-caption">图 4.1–Azure ML Studio 中的计算类型</p>
+			<p>在接下来的章节中，您将<a id="_idIndexMarker229"/>了解每一种计算类型，并理解您必须了解的重要配置参数。</p>
+			<p class="callout-heading">重要说明</p>
+			<p class="callout">供应和附加计算资源也可以通过 Azure ML CLI 和 Azure ML Python SDK 来完成。在第七章 、<em class="italic">Azure ML Python SDK</em>中，你会看到通过 Python SDK 提供相同资源的例子。</p>
+			<h2 id="_idParaDest-57"><a id="_idTextAnchor056"/>计算实例</h2>
+			<p>一个计算实例<a id="_idIndexMarker230"/>是一个虚拟机，它将方便您作为数据科学家的日常工作。这是一个托管的、基于 Ubuntu 的工作站，预配置了数据科学工具<a id="_idIndexMarker231"/>，如 Jupyter Labs、RStudio，以及各种深度学习框架，如<strong class="bold"> PyTorch </strong>和<strong class="bold"> TensorFlow </strong>。<em class="italic">托管</em>意味着<a id="_idIndexMarker232"/>您不必手动更新操作系统或确保它针对最新的安全漏洞打了补丁。</p>
+			<p class="callout-heading">重要说明</p>
+			<p class="callout">计算实例非常适合可能无法在公司计算机上安装 Python 的公司用户。计算实例只要求您拥有现代化的网络浏览器和互联网接入。一旦连接到计算实例，您就可以访问使用 Azure ML 工作空间所需的所有软件包。</p>
+			<p>您所有的文件和首选项都安全地存储在虚拟机的<code>/home/&lt;username&gt;/cloudfiles/code/</code>文件夹中。此文件夹不是虚拟机磁盘的一部分，但它是从位于您的 Azure ML 存储帐户中的远程文件共享装载的，如下图所示。这种文件共享允许您在多个计算机实例之间共享代码文件和笔记本，您甚至可以在自己计算机上本地安装该文件夹:</p>
+			<div><div><img src="img/B16777_04_002.jpg" alt="Figure 4.2 – Remote file share mounted on multiple compute instances&#13;&#10;" width="822" height="232"/>
+				</div>
+			</div>
+			<p class="figure-caption">图 4.2–装载在多个计算实例上的远程文件共享</p>
+			<p>计算实例主要支持 studio web 界面的<strong class="bold">笔记本</strong>体验，但是它们也可以用于小规模的训练和推理。事实上，计算实例<a id="_idIndexMarker233"/>提供了作业排队功能，并允许您在每个内核上运行两个作业，这对于测试和调试场景非常有用。在本章后面的<em class="italic">数据漂移检测</em>部分，您将使用您的计算实例来执行数据漂移分析。在下一节中，您将学习如何调配您的第一个计算实例。</p>
+			<h3>调配计算实例</h3>
+			<p>让我们学习如何<a id="_idIndexMarker234"/>供应实例:</p>
+			<ol>
+				<li>In the studio web interface, navigate to the <strong class="bold">Manage</strong> | <strong class="bold">Compute</strong> section and select the <strong class="bold">Compute instances</strong> tab. If no compute instances have been provisioned, you will see a short introduction to compute instances: you can click the <strong class="bold">New</strong> button to start the compute provisioning wizard, as shown on the left-hand side of <em class="italic">Figure 4.3</em>. If other compute instances have already been provisioned in the workspace, you can start the same wizard by clicking on the <strong class="bold">New</strong> button from the top menu, as shown on the right-hand side of the following screenshot:<div><img src="img/B16777_04_003.jpg" alt="Figure 4.3 – Starting the compute instance provisioning wizard&#13;&#10;" width="1650" height="801"/></div><p class="figure-caption">图 4.3–启动计算实例配置向导</p></li>
+				<li>The first thing you will <a id="_idIndexMarker235"/>need to select is the virtual machine's size. You can specify whether you need GPU-enabled machines or normal CPU machines. If you plan to run computer vision experiments or deep neural network training, a GPU machine can accelerate the training and inference process if the framework supports GPUs. Moreover, you can add filters to limit the list based on the minimum requirements you have for your workspace. In our case, we will select a CPU-only compute instance that has at least 14 GB of RAM and at least 4 cores, as shown in the following screenshot:<div><img src="img/B16777_04_004.jpg" alt="Figure 4.4 – The first page of the compute instance provisioning wizard&#13;&#10;" width="1542" height="1219"/></div><p class="figure-caption">图 4.4–计算实例配置向导的第一页</p><p>在结果表中，您可以查看每个虚拟机的特征，并估计每小时的成本。</p><p class="callout-heading">重要说明</p><p class="callout">虚拟机的成本取决于它们的大小，但也取决于它们被调配的区域。例如，在撰写本书时，美国东部 2 小时的平均价格最低，而西欧是最贵的地区之一。</p><p>下面的<a id="_idIndexMarker236"/>表包含了关于出现在结果列表中的前三个虚拟机大小的更多信息。<strong class="bold">标准 _D3_v2 </strong>和<strong class="bold">标准 _DS3_v2 </strong>虚拟机的主要区别在于高级存储磁盘。这提供了磁盘缓存功能，使虚拟机能够实现超过底层磁盘性能的性能水平。因此，默认情况下，向导建议您选择<strong class="bold">标准 _DS3_v2 </strong>虚拟机大小:</p><div><img src="img/B16777_04_005.jpg" alt="Figure 4.5 – Comparison of compute sizes based on the docs.microsoft.com site&#13;&#10;" width="1113" height="225"/></div><p class="figure-caption">图 4.5–基于 docs.microsoft.com 站点的计算规模对比</p></li>
+				<li>Leave the <strong class="bold">Standard_DS3_v2</strong> size selected and click <strong class="bold">Next</strong> to configure the advanced settings for the compute instance:<div><img src="img/B16777_04_006.jpg" alt="Figure 4.6 – The second page of the compute instance provisioning wizard&#13;&#10;" width="1638" height="873"/></div><p class="figure-caption">图 4.6–计算实例配置向导的第二页</p><p class="callout-heading">重要说明</p><p class="callout">如果你是免费试用，那么你有一个固定的核心配额，你不能改变，除非你切换到现收现付的订阅。您可能需要选择<strong class="bold"> Standard_DS2_v2 </strong>来减少您的计算实例将使用的内核数量。对于您将在<a href="B16777_07_Final_VK_ePub.xhtml#_idTextAnchor102"> <em class="italic">第 7 章</em> </a>、<em class="italic">Azure ML Python SDK</em>中配置的计算机集群，您至少还需要两个内核。</p></li>
+				<li>现在，您需要<a id="_idIndexMarker237"/>提供一个计算机名。这是您将用来引用特定计算机的名称。计算名称在 Azure 区域中应该是唯一的。这意味着您可能需要将名称更改为独一无二的，可能是通过在名称中添加一些数字；比如<code>ds-021-workstation</code>。</li>
+				<li>Optionally, enable<a id="_idIndexMarker238"/> the SSH access flag. This option allows you to specify the public portion of the SSH key, which will give you remote access to the compute instance. The wizard allows you to generate that key directly within the wizard. Alternatively, you can generate one by following the instructions provided in the <em class="italic">Generating an SSH key pair</em> section. This option is not needed if you only plan to use the studio experience to conduct your data science experiments:<p class="figure-caption"> </p><div><img src="img/B16777_04_007.jpg" alt="Figure 4.7 – Enabling SSH access to the compute instance&#13;&#10;" width="1118" height="441"/></div><p class="figure-caption">图 4.7–启用对计算实例的 SSH 访问</p></li>
+				<li>单击<strong class="bold">创建</strong>按钮来配置计算实例。这将完成向导。此时，compute 实例将被创建然后启动:<div> <img src="img/B16777_04_008.jpg" alt="Figure 4.8 – Waiting for the compute instance to be created and transition to the Running state&#13;&#10;" width="814" height="191"/> </div></li>
+			</ol>
+			<p class="figure-caption"> </p>
+			<p class="figure-caption">图 4.8–等待计算实例创建并转换到运行状态</p>
+			<p>在接下来的<a id="_idIndexMarker239"/>部分中，将向您简要介绍基于 SSH 密钥的认证，以及如果您不熟悉该过程，如何生成 SSH 密钥。此外，您将探索向导的高级选项，这些选项对于本书来说是不需要的。</p>
+			<h3>生成 SSH 密钥对</h3>
+			<p>SSH 密钥对<a id="_idIndexMarker240"/>由两个文件组成——一个私钥和一个公钥。这个密钥对允许最终用户使用密钥的公共部分来加密文本。加密的文本只能由 SSH 密钥的私有部分解密，如下图所示。SSH 密钥的私有部分需要存储在安全的地方，而密钥的公共部分可以自由地分发给任何人:</p>
+			<div><div><img src="img/B16777_04_009.jpg" alt="Figure 4.9 – A private key can decrypt information that's been encrypted with a public key&#13;&#10;" width="796" height="598"/>
+				</div>
+			</div>
+			<p class="figure-caption">图 4.9-私钥可以解密用公钥加密的信息</p>
+			<p>使用 SSH 密钥对的这个属性<a id="_idIndexMarker241"/>,您可以向服务器配置您的公钥，以便服务器可以使用它进行身份验证。简而言之，当您尝试连接到服务器时，服务器将创建一个随机挑战，并使用您的密钥的公共部分(在配置计算实例时配置的部分)对其进行加密。您必须使用密钥的私有部分来解密这个挑战，然后用一个答案来验证您已经成功地解密了服务器的消息。这个流将允许您通过 SSH 访问远程服务器。</p>
+			<p>有多种开源工具可以帮助您在本地机器上生成 SSH 密钥对。Azure 提供了一种非常简单的方法来在浏览器上生成 SSH 密钥对，然后将密钥的公共部分作为资源存储在 Azure 门户中。让我们来看看:</p>
+			<ol>
+				<li value="1">Navigate to <a href="https://portal.azure.com">https://portal.azure.com</a> and click on the <code>SSH Key</code> resource and click on <strong class="bold">Create</strong>:<div><img src="img/B16777_04_010.jpg" alt="Figure 4.10 – SSH key resource in the marketplace&#13;&#10;" width="212" height="101"/></div><p class="figure-caption"> </p><p class="figure-caption">图 4.10-市场中的 SSH 关键资源</p></li>
+				<li>Select the <code>packt-azureml-rg</code> resource group and provide a key-pair name, such as <code>azureml-compute</code>. Click on <strong class="bold">Review + create</strong> to navigate to the last step of the wizard:<div><img src="img/B16777_04_011.jpg" alt="Figure 4.11 – Generating an SSH key pair &#13;&#10;" width="753" height="493"/></div><p class="figure-caption">图 4.11–生成 SSH 密钥对</p></li>
+				<li>选择<code>azureml-compute.pem</code>。确保将文件存储在安全的位置:</li>
+			</ol>
+			<div><div><img src="img/B16777_04_012.jpg" alt="Figure 4.12 – Storing the private portion of the SSH key&#13;&#10;" width="1095" height="826"/>
+				</div>
+			</div>
+			<p class="figure-caption">图 4.12–存储 SSH 密钥的私有部分</p>
+			<p>一旦这个过程<a id="_idIndexMarker244"/>完成，SSH 密钥资源将出现在您在向导中选择的资源组中:</p>
+			<div><div><img src="img/B16777_04_013.jpg" alt="Figure 4.13 – The SSH key resource you deployed&#13;&#10;" width="385" height="70"/>
+				</div>
+			</div>
+			<p class="figure-caption">图 4.13–您部署的 SSH 密钥资源</p>
+			<p>在参考资料中，您可以找到 SSH 密钥公共部分，您可以将它复制并粘贴到您在<em class="italic">配置计算实例</em>小节中看到的计算<a id="_idIndexMarker245"/>实例配置向导步骤中:</p>
+			<div><div><img src="img/B16777_04_014.jpg" alt="Figure 4.14 – The public portion of the generated key pair. At the top, &#13;&#10;you can see the downloaded private portion&#13;&#10;" width="1384" height="1321"/>
+				</div>
+			</div>
+			<p class="figure-caption">图 4.14–生成的密钥对的公共部分。在顶部，你可以看到下载的私人部分</p>
+			<p class="callout-heading">重要说明</p>
+			<p class="callout">SSH 密钥资源要求<code>Microsoft.Compute</code>提供者在您计划使用的 Azure 订阅中注册。如果您是订阅的所有者，Azure 将在您部署资源时自动为您注册提供者；否则，您将需要请求订阅所有者为您注册该提供者，同时遵循第<a href="B16777_02_Final_VK_ePub.xhtml#_idTextAnchor026"> <em class="italic">第 2 章</em> </a>、<em class="italic">部署 Azure 机器学习工作区资源</em>中提供的说明。</p>
+			<p>到目前为止，您已经学习了如何提供计算实例和配置 SSH 密钥，这将允许您远程连接到该计算机。您还可以使用这个 SSH 密钥连接到远程集群，这将在下一节<em class="italic">计算集群</em>中提供。在接下来的小节中，您将了解计算实例供应<a id="_idTextAnchor057"/>向导的高级配置选项。</p>
+			<h3>高级计算实例设置</h3>
+			<p>在计算资源调配向导中，您可以选择配置一些高级设置。其中之一是<strong class="bold">启用虚拟网络</strong>选项，该选项允许您将调配的<a id="_idIndexMarker246"/>计算连接到虚拟网络中的特定子网，如以下屏幕截图所示:</p>
+			<div><div><img src="img/B16777_04_015.jpg" alt="Figure 4.15 – Attaching the compute instance to a specific subnet&#13;&#10;" width="292" height="205"/>
+				</div>
+			</div>
+			<p class="figure-caption">图 4.15–将计算实例连接到特定子网</p>
+			<p>此功能可解锁多种高级网络拓扑。最常见的是当您计划访问无法通过 internet 访问的数据源时。例如，如果您有一个受防火墙保护以拒绝通过互联网访问的存储帐户，您通常会在特定的子网中部署一个私有端点(T2)，以允许访问该特定的存储帐户(T3)。当您调配计算实例并使用前面的选项将其配置在同一子网上时，该计算实例将能够访问受保护的存储帐户，如下图所示:</p>
+			<div><div><img src="img/B16777_04_016.jpg" alt="Figure 4.16 – Accessing a storage account that is only accessible through a private endpoint&#13;&#10;" width="969" height="332"/>
+				</div>
+			</div>
+			<p class="figure-caption">图 4.16–访问只能通过私有端点访问的存储帐户</p>
+			<p>向导中显示的另一个高级选项是<strong class="bold">分配给另一个用户</strong>。这个选项可以追溯到<a href="B16777_02_Final_VK_ePub.xhtml#_idTextAnchor026"> <em class="italic">第 2 章</em> </a>、<em class="italic">部署 Azure 机器学习工作区资源</em>的<em class="italic">创建定制角色</em>部分，在那里您学习了如何为您的 Azure ML 工作区创建定制角色。在企业环境中，通常不允许终端用户部署他们想要的任何计算实例。这是通过创建自定义角色并仅允许虚拟机执行以下操作来实现的:</p>
+			<ul>
+				<li><strong class="bold">微软。计算/虚拟机器/启动/动作</strong></li>
+				<li><strong class="bold">微软。计算/虚拟机器/重启/操作</strong></li>
+				<li><strong class="bold">微软。计算/虚拟机器/解除分配/操作</strong></li>
+			</ul>
+			<p>在这些环境中，管理员(或拥有<strong class="bold">微软。compute/virtual machines/write</strong>权限)可以调配计算实例，并将它们分配给可能无法自行调配计算实例的特定人员，如以下屏幕截图所示:</p>
+			<div><div><img src="img/B16777_04_017.jpg" alt="Figure 4.17 – Assigning the provisioned compute instance to a fellow data scientist&#13;&#10;" width="245" height="94"/>
+				</div>
+			</div>
+			<p class="figure-caption">图 4.17–将调配的计算实例分配给数据科学家同事</p>
+			<p>虽然这是 web 界面向导提供的一个很好的特性，但是当您需要为多个数据科学家提供多个计算实例时，它的伸缩性并不好。因此，大多数时候，管理员更喜欢通过<strong class="bold"> ARM 模板</strong>部署来部署计算实例。他们可以通过该向导生成并下载模板，然后使用<strong class="bold"> Azure CLI </strong>为多个用户部署模板，并将用户 ID 作为参数传递，正如您在<a href="B16777_02_Final_VK_ePub.xhtml#_idTextAnchor026"> <em class="italic">第 2 章</em> </a>、<em class="italic">部署 Azure 机器学习工作区资源</em>中看到的。</p>
+			<p>到目前为止，您已经看到了如何配置计算实例。在下一节中，您将学习如何管理计算实例。</p>
+			<h3>管理您的计算实例</h3>
+			<p>一旦您提供了至少一个计算实例，<strong class="bold">管理</strong> | <strong class="bold">计算</strong> | <strong class="bold">计算实例</strong>界面会变成一个列表，显示工作区中可用的实例。默认情况下，该列表经过过滤，仅显示您可以使用的实例，即您自己或他人代表您调配的实例:</p>
+			<p class="figure-caption"> </p>
+			<div><div><img src="img/B16777_04_018.jpg" alt="Figure 4.18 – Compute instances list&#13;&#10;" width="1404" height="338"/>
+				</div>
+			</div>
+			<p class="figure-caption">图 4.18–计算实例列表</p>
+			<p>从这里，您可以启动、停止、重启和删除计算实例。当您启动一个计算实例时，资源的状态更改为<strong class="bold">正在运行</strong>并且<strong class="bold">应用</strong>列<a id="_idIndexMarker250"/>提供链接来打开计算实例上的终端或打开 Jupyter、JupyterLab、RStudio 和 VS 代码第三方创作体验。</p>
+			<p>在您打开这三种编辑体验中的任何一种之前，您必须接受一项重要通知，即您可以在这些环境中执行的代码，如下面的屏幕截图所示:</p>
+			<div><div><img src="img/B16777_04_019.jpg" alt="Figure 4.19 – Warning message about the code you execute within Azure ML Studio&#13;&#10;" width="461" height="200"/>
+				</div>
+			</div>
+			<p class="figure-caption">图 4.19–关于您在 Azure ML Studio 中执行的代码的警告消息</p>
+			<p>重要的是你要明白，如果你从互联网上下载一个随机脚本，它可能包含恶意代码，这可能使其他人窃取数据，甚至从你的帐户访问令牌，这可能使他们能够代表你访问 Azure 资源。</p>
+			<p>JupyterLab 和 Jupyter 是非常受欢迎的 Jupyter 笔记本、Python 脚本编辑、访问终端执行各种命令的创作体验，如下图所示。当你点击打开这些编辑体验时，一个新的浏览器标签将会打开。如果您看一下新浏览器选项卡上的 URL，您会注意到它由计算实例的名称、该计算实例所在的区域以及后缀<strong class="bold"> instances.azureml.ms </strong>组成。这就是为什么在上一节<em class="italic">提供计算实例</em>中，当您提供计算实例时，您必须选择一个名称，该名称在您部署特定计算实例的 Azure 区域中必须是唯一的。</p>
+			<p>所有这些第三方创作体验都有一个强大的社区，如果您已经熟悉它们，就可以使用它们。然而，请注意，Azure ML 提供了<strong class="bold">作者</strong> | <strong class="bold">笔记本</strong>体验，这是一种基于 JupyterLab 的增强编辑体验，增加了智能感知等功能<a id="_idIndexMarker251"/>，这是您将从<a href="B16777_07_Final_VK_ePub.xhtml#_idTextAnchor102"> <em class="italic">第 7 章</em> </a>、<em class="italic">Azure ML Python SDK</em>开始使用的功能:</p>
+			<div><div><img src="img/B16777_04_020.jpg" alt="Figure 4.20 – The JupyterLab editing experience&#13;&#10;" width="938" height="666"/>
+				</div>
+			</div>
+			<p class="figure-caption">图 4.20–JupyterLab 编辑体验</p>
+			<p>点击<strong class="bold">应用</strong>栏中的<strong class="bold">终端</strong>链接将打开一个新的浏览器标签。你将被转到<strong class="bold">作者</strong> | <strong class="bold">笔记本</strong>版块。在这里，将打开一个基于 web 的终端，允许您向计算实例发出命令:</p>
+			<p class="figure-caption"> </p>
+			<div><div><img src="img/B16777_04_021.jpg" alt="Figure 4.21 – Getting access to a terminal through the browser&#13;&#10;" width="1644" height="784"/>
+				</div>
+			</div>
+			<p class="figure-caption">图 4.21–通过浏览器访问终端</p>
+			<p>当您不需要计算实例时，比如在周末，您可以停止它以避免产生成本。计算实例将转换到<strong class="bold">停止</strong>状态，并且<strong class="bold">应用程序</strong>链接将被禁用。启动停止的计算实例需要一些时间。</p>
+			<p>如果您已经完成了对一个计算实例的<a id="_idIndexMarker252"/>工作，例如当项目的研究阶段已经完成时，您可以<strong class="bold">删除</strong>它以取消分配保留的 CPU 内核，这些内核将计入您的订阅配额。在<em class="italic">图 4.18 </em>所示的菜单中，点击相应的<strong class="bold">查看额度</strong>选项，即可查看当前额度。</p>
+			<p>现在，您可以停止您计算实例。您将在<em class="italic">数据漂移检测</em>部分再次启动:</p>
+			<p class="figure-caption"> </p>
+			<div><div><img src="img/B16777_04_022.jpg" alt="Figure 4.22 – Stopped compute instance&#13;&#10;" width="867" height="131"/>
+				</div>
+			</div>
+			<p class="figure-caption">图 4.22–停止的计算实例</p>
+			<p>在本节中，您学习了如何供应和管理计算实例，该实例将为您提供创作笔记本和脚本所需的计算能力，并可能执行小规模的培训和推理管道。在下一节中，您将了解如何配置计算集群，这是一种能够向上和向下扩展以并行容纳多个训练和推理管道的计算资源。</p>
+			<h2 id="_idParaDest-58"><a id="_idTextAnchor058"/>计算集群</h2>
+			<p>计算<a id="_idIndexMarker254"/>集群是一组相互连接的虚拟机，它们可以横向扩展和纵向扩展，以容纳任务队列。这意味着集群中可以只有几个甚至零个节点，以避免在不需要时产生成本，并且当您想要并行运行大量任务或执行分布式 ML 训练过程时，它还可以扩展到多个节点。</p>
+			<p>创建过程<a id="_idIndexMarker256"/>与配置计算实例非常相似。让我们来看看:</p>
+			<ol>
+				<li value="1">Start by clicking the <strong class="bold">New</strong> button in the corresponding <strong class="bold">Compute clusters</strong> tab, as shown in <em class="italic">Figure 4.23</em>.<div><img src="img/B16777_04_023.jpg" alt="Figure 4.23 – Creating a new compute cluster&#13;&#10;" width="1650" height="1326"/></div><p class="figure-caption">图 4.23–创建新的计算集群</p></li>
+				<li>您会注意到，与名为<strong class="bold">虚拟机优先级</strong>的计算实例相比，计算群集配置向导提供了一个额外的选项，如下面的屏幕截图所示。低优先级虚拟机利用 Azure 区域的剩余容量<a id="_idIndexMarker257"/>,您希望在该区域配置计算集群。与专用虚拟机相比，这些虚拟机的价格大幅降低，但不能保证计算节点在您需要时可用，甚至不能保证它们将一直由您拥有，直到计划的作业完成。这意味着您可能需要等待很长时间，直到您可以分配这样的虚拟机，并且您的培训过程中的一个步骤可能会在其执行过程中停止。考虑到低优先级虚拟机的这些特征，当您的作业对时间不敏感并且由小的运行步骤组成时，或者当这些步骤自动保持其状态并且在被驱逐时可以恢复执行时，您通常会使用这种类型的集群。出于本书的目的，您可以选择<strong class="bold">专用的</strong>选项来<a id="_idIndexMarker258"/>避免分配计算节点时意外的长时间等待。</li>
+				<li>In the <strong class="bold">Virtual machine type</strong> option, select <strong class="bold">GPU</strong> and select the cheapest VM size available from the <strong class="bold">Select from recommended options</strong> list seen in <em class="italic">Figure 4.24</em>.<p class="callout-heading">重要说明</p><p class="callout">默认情况下，免费试用订阅不允许您提供 GPU 计算。即使您更改为现收现付订阅，您也需要通过 Azure 门户网站请求增加您的配额。如果遇到配额不足的问题，可以选择基于 CPU 的计算，而不是基于 GPU 的计算。出于本书的目的，您不需要基于 GPU 的集群。</p><div><img src="img/B16777_04_024.jpg" alt="Figure 4.24 – The first page of the compute cluster provisioning wizard&#13;&#10;" width="1650" height="1212"/></div><p class="figure-caption">图 4.24–计算集群配置向导的第一页</p></li>
+				<li>点击<strong class="bold">下一步</strong>进入向导的第二页:</li>
+				<li>On the second page<a id="_idIndexMarker259"/> of the wizard, you will need to specify a cluster name. This name is going to be how you reference this cluster in the web experience and through code, so make sure it's something that represents what this cluster is meant for, such as <code>gpu-cluster</code>:<div><img src="img/B16777_04_025.jpg" alt="Figure 4.25 – The second page of the compute cluster provisioning wizard&#13;&#10;" width="1650" height="1190"/></div><p class="figure-caption">图 4.25–计算集群配置向导的第二页</p><p>您还可以调整<a id="_idIndexMarker260"/>最小和最大节点数以及集群缩减前的空闲秒数。每次请求群集执行作业时，该作业的任务都会添加到群集的调度程序中。如果群集没有足够的节点来执行计划任务，它将通过向群集添加一个计算节点来进行横向扩展。向集群添加节点需要一些时间，因为您需要分配虚拟机。因此，一旦计划的任务完成，集群可以等待定义的空闲时间，而不是立即取消分配虚拟机，以防计划新的任务。</p><p>与计算实例类似，如果您想要远程连接到计算集群节点以对作业执行进行故障排除，您可以<strong class="bold">启用 SSH 访问</strong>。由于集群节点的<a id="_idIndexMarker261"/>短暂性，向导允许您根据需要指定一个<strong class="bold">管理员密码</strong>，而不是<strong class="bold"> SSH 公钥</strong>，如下面的屏幕截图所示:</p><p class="figure-caption"> </p><div><img src="img/B16777_04_026.jpg" alt="Figure 4.26 – Compute clusters allow you to use an Admin password instead of an SSH public key&#13;&#10;" width="712" height="520"/></div><p class="figure-caption">图 4.26–计算集群允许您使用管理员密码而不是 SSH 公钥</p><p>在<strong class="bold">高级设置</strong>下，您可以找到<strong class="bold">启用虚拟网络</strong>选项，这是我们在上一节查看计算实例时看到的。除此之外，您还可以选择<strong class="bold">将托管身份</strong>分配给计算集群:</p><div><img src="img/B16777_04_027.jpg" alt="Figure 4.27 – Assigning a managed identity to the compute cluster&#13;&#10;" width="285" height="126"/></div><p class="figure-caption">图 4.27–向计算集群分配托管身份</p><p>Azure 允许<a id="_idIndexMarker262"/>你将一个<strong class="bold">Azure Active Directory</strong>(<strong class="bold">AAD</strong>)身份附加到计算集群<a id="_idIndexMarker263"/>节点，允许在那些虚拟机中执行的代码使用该身份访问 Azure 资源。<strong class="bold">托管身份</strong>消除了在脚本中存储凭证的需要。身份附加到特定的 VM，并且只要代码在特定的 VM 中执行，您的代码就可以通过 Azure 实例元数据服务或通过 Python SDK 请求 AAD 访问令牌，而无需密码。</p></li>
+				<li>出于本书的目的，您不能修改此处的任何选项。命名集群<code>gpu-cluster</code>并点击<strong class="bold">创建</strong>来创建您的第一个零节点、基于 GPU 的计算集群:</li>
+			</ol>
+			<div><div><img src="img/B16777_04_028.jpg" alt="Figure 4.28 – Your first GPU-based compute cluster is ready to use&#13;&#10;" width="870" height="223"/>
+				</div>
+			</div>
+			<p class="figure-caption">图 4.28–您的第一个基于 GPU 的计算集群已经准备就绪</p>
+			<p>请注意，在前面的屏幕截图中，计算群集已成功调配，但其中有 0 个节点，这意味着它不会产生任何成本。您还可以在该列表中看到以下指标:</p>
+			<ul>
+				<li><strong class="bold">空闲节点</strong>:空闲时间过去后，等待任务调度或取消分配的节点。</li>
+				<li><strong class="bold">忙碌节点</strong>:这些是当前正在执行任务的节点。</li>
+				<li><strong class="bold">Unprovisioned nodes</strong>: These are the nodes that haven't been allocated yet but can potentially be allocated if the number of scheduled tasks increases.<p>如果不再需要该集群，可以从该列表中将其删除。</p><p>如果您单击<a id="_idIndexMarker265"/>计算群集的名称，您将能够看到该群集的详细信息，如下面的屏幕截图所示。在此视图中，您可以编辑最小和最大节点数、集群缩减前的空闲秒数，以及更改之前配置的受管身份的分配方式。事实上，数据科学团队通常会在早上修改其预定义的计算集群，以便其中至少有一个节点。这有助于它们避免等待第一个节点被分配。当一天结束时，他们将设置调低至零以节省成本:</p></li>
+			</ul>
+			<div><div><img src="img/B16777_04_029.jpg" alt="Figure 4.29 – Compute cluster's details about where you can edit its configuration&#13;&#10;" width="1650" height="1358"/>
+				</div>
+			</div>
+			<p class="figure-caption">图 4.29–计算集群的详细信息，您可以在哪里编辑其配置</p>
+			<p>在本节中，您<a id="_idIndexMarker266"/>学习了如何配置计算集群。这些聚类用于执行训练作业和批量推理。在下一节中，您将学习如何提供一个<strong class="bold"> Azure Kubernetes 服务</strong> ( <strong class="bold"> AKS </strong>)，它允许您执行大规模的实时推理。</p>
+			<h2 id="_idParaDest-59"><a id="_idTextAnchor059"/>推理集群</h2>
+			<p>Kubernetes 是一个可移植、可扩展的开源平台，用于管理<a id="_idIndexMarker268"/>容器化的工作负载和服务。由于它具有自动伸缩和从故障中自动恢复的能力，它已被广泛用于操作各种形式的应用程序，从 web 应用程序到模型推理 REST APIs。<strong class="bold"> Azure Kubernetes 服务</strong> ( <strong class="bold"> AKS </strong>)是 Azure 中 Kubernetes 集群的托管版本，这是一个<a id="_idIndexMarker269"/>服务，让你专注于你的工作负载，让 Azure 管理集群的操作位，比如它的主节点。</p>
+			<p>如果您不熟悉 AKS，请不要担心，下图提供了相关组件的高级概述。简单来说，你可以配置<strong class="bold">节点池</strong>，一组配置相同的虚拟机；比如上面有 GPU 卡的虚拟机。这些<a id="_idIndexMarker270"/>池可以有一个<strong class="bold">节点</strong>(或者更多)，这是一个虚拟机。在每个节点中，您可以托管一个或多个<strong class="bold">pod</strong>。每个 pod 由几个<strong class="bold"> Docker 图像</strong>组成<a id="_idIndexMarker271"/>，它们形成一个应用程序单元，其中一个可能是您想要操作的模型。每个 pod 可以复制到多个节点中，以适应增加的负载，或者在某个节点出现故障时提供弹性:</p>
+			<div><div><img src="img/B16777_04_030.jpg" alt="Figure 4.30 – High-level overview of AKS concepts showing Pod X being replicated in two nodes&#13;&#10;" width="1650" height="727"/>
+				</div>
+			</div>
+			<p class="figure-caption">图 4.30–显示 Pod X 在两个节点中复制的 AKS 概念的高级概述</p>
+			<p>从 Azure ML Studio 中，您可以创建一个现有的 AKS 集群或将它附加到您的工作区。对于本书来说，你不需要创建一个 AKS 集群。让我们开始吧:</p>
+			<ol>
+				<li value="1">The creation wizard can be invoked by clicking on the <strong class="bold">New</strong> button in the <strong class="bold">Inference clusters</strong> tab, seen in <em class="italic">Figure 4.31</em>:<div><img src="img/B16777_04_031.jpg" alt="Figure 4.31 – Create or attach an AKS cluster to the Azure ML workspace&#13;&#10;" width="1657" height="1374"/></div><p class="figure-caption">图 4.31–创建一个 AKS 集群或将它附加到 Azure ML 工作区</p><p class="callout-heading">重要说明</p><p class="callout">当您提供 AKS 集群时，在您的 Azure 订阅中会创建一个新的资源组，它托管 AKS 工作所需的所有组件。这需要订阅级别的附加权限。如果您无法创建资源组，AKS 群集配置将会失败。</p></li>
+				<li>In the first step of the wizard, you can either attach an existing AKS cluster or create a new one. If you choose to create one, you will have to specify the Azure region where you want the AKS cluster to be deployed. You will also need to specify the node pool's VM size, similar to what you did when you deployed a compute instance:<div><img src="img/B16777_04_032.jpg" alt="Figure 4.32 – Step 1 of provisioning an inference AKS cluster&#13;&#10;" width="939" height="607"/></div><p class="figure-caption">图 4.32–设置推理 AKS 集群的步骤 1</p></li>
+				<li>点击<strong class="bold">下一步</strong>会将你带到<strong class="bold">设置</strong>页面，在这里你需要指定 AKS 集群的名称。您还需要指定群集的用途。如果这是一个生产集群，集群中的虚拟 CPU 数量必须超过 12 个；这意味着，如果您选择了 4 核虚拟机大小，您将需要至少三个节点才能调配生产就绪型 AKS 集群。如果该集群用于开发和测试，您可以只配置一个节点。</li>
+				<li>Besides the name and the number of nodes in the node pool, you can configure the networking options of the cluster and the SSL certificate that will be used to secure the connection to the applications, if you want to expose them through an HTTPS endpoint. For the purposes of this book, you do not need to modify any of those options:<div><img src="img/B16777_04_033.jpg" alt="Figure 4.33 – Step 2 of provisioning an inference AKS cluster&#13;&#10;" width="848" height="604"/></div><p class="figure-caption">图 4.33–设置推理 AKS 集群的步骤 2</p></li>
+				<li>创建集群后，您将能够通过以下屏幕截图中显示的列表删除集群或将其从工作区中分离出来:</li>
+			</ol>
+			<div><div><img src="img/B16777_04_034.jpg" alt="Figure 4.34 – List of AKS inference clusters&#13;&#10;" width="704" height="168"/>
+				</div>
+			</div>
+			<p class="figure-caption">图 4.34-AKS 推理集群列表</p>
+			<p class="callout-heading">重要说明</p>
+			<p class="callout">AKS 是部署实时端点的生产就绪方式。在考试中，当您被问到您将在哪里部署生产负载时，AKS 应该是正确的答案。尽管如此，因为 AKS 集群是一种昂贵的资源，所以本书不会在其示例中使用它。如果您使用免费订阅，您可能没有足够的核心配额来配置一个。如果您确实提供了一个，请确保关注成本，以避免信用耗尽。</p>
+			<p>在本节中，您了解了 Azure ML 如何帮助您附加或供应 AKS 集群，以便您可以托管您的生产实时推理端点。在下一节中，您将了解如何将现有计算资源附加到您的工作区。</p>
+			<h2 id="_idParaDest-60"><a id="_idTextAnchor060"/>附属计算机</h2>
+			<p>如果您已经<a id="_idIndexMarker272"/>提供了计算资源，不一定在订阅中部署了 Azure ML 工作空间，您可以将它们附加到您的工作空间。附加这些资源允许您重用它们，尤其是在它们未被充分利用的情况下。一个常见的场景是，一个部门拥有一个基于 Ubuntu 的<strong class="bold">数据科学虚拟机</strong> ( <strong class="bold"> DSVM </strong>)，它可能每周 7 天、每天 24 小时运行<a id="_idIndexMarker274"/>，为遗留的 web 应用程序提供服务。您可以在实验中重用该资源，方法是将它附加到您的工作区，然后引用它来执行各种任务，就像您引用计算集群来执行任务一样。</p>
+			<p>studio 体验允许您附加多种类型的计算，包括以下流行的目标:</p>
+			<ul>
+				<li><strong class="bold">虚拟机</strong>:你可以连接现有的基于 Ubuntu 的虚拟机，这些虚拟机可以通过互联网公开访问。该选项包括您可能已经拥有的潜在 DSVMs。</li>
+				<li>Azure Databricks 和<strong class="bold"> HDInsights </strong>:这些选项允许您将现有的基于<strong class="bold"> Apache Spark </strong>的计算机连接到您的工作区。</li>
+				<li>Azure 数据工厂:Azure 数据工厂资源允许你执行从一个数据源到另一个数据源的复制活动。例如，您可以使用该资源从存储帐户复制到 SQL 数据库。Azure Data Factory 目前仅通过 Azure ML SDK 支持，而不是来自 studio 体验。</li>
+			</ul>
+			<p>对于 DP100 考试，您不需要附加任何资源。以下屏幕截图显示了如何从 studio 体验中启动连接向导:</p>
+			<div><div><img src="img/B16777_04_035.jpg" alt="Figure 4.35 – Attaching existing compute resources to your workspace&#13;&#10;" width="1396" height="1135"/>
+				</div>
+			</div>
+			<p class="figure-caption">图 4.35–将现有计算资源附加到您的工作空间</p>
+			<p>在本节中，您学习了如何向 Azure ML 工作空间供应和附加计算资源。这允许您在数据科学项目的数据探索、模型训练和模型推理阶段执行代码。在下一节中，您将学习如何配置到各种数据源的连接，这将使您能够访问数据。</p>
+			<h1 id="_idParaDest-61"><a id="_idTextAnchor061"/>连接到数据存储</h1>
+			<p>数据存储是您的数据所在的引擎，并向任何获得授权的人提供访问权限。在您在互联网上看到的大多数 Python 示例中，都有一个连接字符串，其中包含连接到数据库或 blob 存储的凭据。这种技术有几个缺点:</p>
+			<ul>
+				<li>存储在这些脚本中的凭证被认为是违反安全的，您可能会通过在公共存储库中(如 GitHub)发布脚本而意外地暴露受保护的数据集。</li>
+				<li>当凭证更改时，您需要手动更新所有脚本。</li>
+			</ul>
+			<p>Azure ML 允许您有一个单一的集中位置，在这里您可以定义到各种存储的连接属性。您的凭证作为<strong class="bold">机密</strong>安全地存储在工作区的关联<strong class="bold">密钥库</strong>中。在您的脚本中，您使用数据存储的名称来引用它，并且您可以访问它的数据，而不必指定凭据。如果在某个时间点，数据存储的凭证发生变化，您可以集中更新它们，并且您的所有脚本和管道将继续工作。</p>
+			<p>您可以通过导航到 studio 的<strong class="bold">管理</strong> | <strong class="bold">数据存储</strong>部分来查看所有已注册的数据存储:</p>
+			<div><div><img src="img/B16777_04_036.jpg" alt="Figure 4.36 – List of registered datastores in the workspace&#13;&#10;" width="1211" height="431"/>
+				</div>
+			</div>
+			<p class="figure-caption">图 4.36–工作区中已注册的数据存储列表</p>
+			<p>请注意，默认情况下，您已经注册了两个数据存储。默认的一个名为<code>workspaceblobstore</code>，是默认的 blob 存储，其中存储了所有的管道度量和工件。您的工作区需要有一个默认的数据存储。正如你将在<a href="B16777_07_Final_VK_ePub.xhtml#_idTextAnchor102"> <em class="italic">第 7 章</em> </a>、<em class="italic"> The Azure ML Python SDK </em>中看到的，你甚至可以通过 Python SDK 非常容易地引用那个商店。另一个名为<code>workspacefilestore</code>的存储是一个文件<a id="_idIndexMarker277"/>共享数据存储，您可以在本地机器上挂载并上传文件。</p>
+			<p>从该列表中，您可以执行以下操作:</p>
+			<ul>
+				<li>更新数据存储的凭证:您需要单击数据存储的名称，这将为您提供它的注册细节。从那里，您可以单击<strong class="bold"> Update credentials </strong>来指定更新的值或更改身份验证的类型，您将在下一节中看到这一点。</li>
+				<li><strong class="bold">取消注册</strong>数据存储:您可以取消注册任何未标记为默认数据存储的数据存储。</li>
+				<li><strong class="bold">设置为默认数据存储</strong>:将默认数据存储更改为您从列表中选择的数据存储。</li>
+			</ul>
+			<p>最后，从该列表中，您可以创建一个<strong class="bold">新数据存储库</strong>注册，这是一个激活新建数据存储库向导的操作，如下图所示:</p>
+			<div><div><img src="img/B16777_04_037.jpg" alt="Figure 4.37 – New datastore wizard&#13;&#10;" width="463" height="461"/>
+				</div>
+			</div>
+			<p class="figure-caption">图 4.37–新建数据存储向导</p>
+			<p>这里，您需要<a id="_idIndexMarker278"/>在 Azure ML 工作空间中指定一个惟一的数据存储名称。您必须这样做，以便在您的脚本和 studio 体验的各种组件中引用该商店。接下来您需要选择的是数据存储类型。Azure ML 工作空间支持一些 Azure 原生数据存储，这将在下一节中探讨。</p>
+			<h2 id="_idParaDest-62"><a id="_idTextAnchor062"/>数据存储的类型</h2>
+			<p>Azure ML 支持两种<a id="_idIndexMarker279"/>类别的数据存储:基于文件的数据存储，如 blob 存储、文件共享和数据湖存储，以及关系数据库，如 Azure SQL 和 Azure PostgreSQL。</p>
+			<p>下图显示了当前支持的数据存储:</p>
+			<div><div><img src="img/B16777_04_038.jpg" alt="Figure 4.38 – Azure ML supported datastores&#13;&#10;" width="1290" height="730"/>
+				</div>
+			</div>
+			<p class="figure-caption">图 4.38–Azure ML 支持的数据存储</p>
+			<p><a id="_idIndexMarker280"/>建议使用基于<strong class="bold"> Azure Blob 存储</strong>的数据存储。这些店是性价比最高的。它们提供多个层，例如更贵的高级层，这为您提供了更高的吞吐速度，如果您正在处理大量数据，这可以减少您的培训时间。</p>
+			<p>另一方面，<strong class="bold"> Azure Data Lake Storage Gen 2 </strong>在<strong class="bold"> Azure Blob Storage </strong>的基础上，通过添加层次化的<a id="_idIndexMarker281"/>名称空间来构建。该特性允许数据湖在文件夹级别分配访问权限。大型企业通常用存储数据的不同区域来构建数据湖。每个区域都有自己的<strong class="bold">访问控制列表</strong> ( <strong class="bold"> ACL </strong>)，将权限授予特定的人群。这意味着你可以看到一个文件夹的内容，而不是另一个文件夹的内容，而在 Azure Blob 存储中，一旦你访问了一个容器，你就可以看到其中的所有数据。</p>
+			<p>如果您的数据驻留在 Azure ML 不支持的数据存储中，您可以使用来自<strong class="bold"> Azure Data Factory </strong>的复制工具轻松地将数据复制到<strong class="bold"> Azure Blob 存储</strong>或<strong class="bold"> Azure Data Lake 存储 Gen 2 </strong>。<strong class="bold"> Azure Data Factory </strong>允许您从几乎任何地方复制数据，即使它驻留在本地数据库中，如下图所示:</p>
+			<div><div><img src="img/B16777_04_039.jpg" alt="Figure 4.39 – Copying on-premises data to an Azure ML supported datastore using Azure Data Factory and the Self-Hosted Integration Runtime&#13;&#10;" width="1650" height="406"/>
+				</div>
+			</div>
+			<p class="figure-caption">图 4.39–使用 Azure 数据工厂和自托管集成运行时将内部数据复制到 Azure ML 支持的数据存储</p>
+			<p class="callout-heading">重要说明</p>
+			<p class="callout">在<em class="italic">附加计算</em>部分，您看到您可以附加一个<code>DataTransferStep</code>。从本地网络复制数据可以在同一个 ADF 中完成，但是您必须在 ADF 中创作、执行和监控数据提取管道。</p>
+			<p>在本节中，您将看到 Azure ML 支持的<a id="_idIndexMarker283"/>类型的数据存储。在下一节中，您将了解这些数据存储支持的各种身份验证方法。</p>
+			<h2 id="_idParaDest-63"><a id="_idTextAnchor063"/>数据存储安全注意事项</h2>
+			<p>根据<a id="_idIndexMarker284"/>数据存储，您将不得不指定不同类型的凭证来在 Azure ML 工作空间中注册它。对于 Azure Blob 和 Azure 文件共享数据存储，您可以使用以下凭据:</p>
+			<ul>
+				<li><strong class="bold">账户密钥</strong>:这提供了对整个 Azure 存储账户的访问。</li>
+				<li><strong class="bold">共享访问签名</strong> ( <strong class="bold"> SAS </strong> ) <strong class="bold">令牌</strong>:这是一种为存储账户的各种服务分配权限的更细粒度的方式。使用<strong class="bold">帐户密钥</strong>，您可以生成一个 SAS 令牌，该令牌只允许在有限的时间内访问特定的 blob 容器。</li>
+			</ul>
+			<p>对于 Azure Data Lake 存储数据存储，由于它们的高级安全特性，您将需要提供一个<code>tenant_id</code>)，其中该实体已注册并具有唯一的 ID(称为<code>client_id</code>)。这个身份有一个密码(称为<code>client_secret</code>)，使您的代码能够访问模拟该身份的数据存储。</p>
+			<p>对于关系数据库数据存储，您需要指定数据库的名称、服务器的名称以及要连接的服务器端口。对于凭证，您可以提供一个<strong class="bold">服务主体</strong>，如果<a id="_idIndexMarker285"/>数据存储支持的话，或者提供必要的<strong class="bold"> SQL 认证</strong>凭证，它由一个数据库用户 ID 和一个密码组成。</p>
+			<p>有些数据存储允许您使用工作区的托管身份进行数据预览和分析。此选项将系统分配的托管身份作为特定资源的读者添加到工作区，允许工作区在 studio 体验中加载数据预览。该选项在数据存储注册页面上可用，如以下屏幕截图所示:</p>
+			<div><div><img src="img/B16777_04_040.jpg" alt="Figure 4.40 – Granting access to the workspace's managed identity&#13;&#10;" width="561" height="80"/>
+				</div>
+			</div>
+			<p class="figure-caption">图 4.40–授予对工作区受管身份的访问权限</p>
+			<p>到目前为止，您已经学习了如何在 Azure ML 工作空间中注册各种数据存储。在下一节中，您将了解如何使用这些注册来定义数据集。</p>
+			<h1 id="_idParaDest-64"><a id="_idTextAnchor064"/>使用数据集</h1>
+			<p>在前面的部分中，您<a id="_idIndexMarker287"/>在工作室的<strong class="bold">管理</strong>部分下配置计算和数据存储资源。配置好这个基础设施后，您可以开始将数据拉入您注册的数据存储库，并在 studio 的<strong class="bold">资产</strong>部分注册数据集:</p>
+			<div><div><img src="img/B16777_04_041.jpg" alt="Figure 4.41 – Datasets in the Assets section of the Azure ML Studio experience&#13;&#10;" width="1650" height="1468"/>
+				</div>
+			</div>
+			<p class="figure-caption">图 4.41–Azure ML Studio 体验的资产部分中的数据集</p>
+			<p><strong class="bold">数据集</strong>是你用于训练和推理的数据之上的一个抽象层。它包含对物理数据位置的引用，并提供一系列元数据来帮助您理解它们的形状和统计属性。当您想要访问数据集时，您可以通过它的名称来引用它，而不必担心凭据或确切的文件路径。此外，在同一工作空间工作的所有数据科学家都可以访问相同的数据集，从而允许他们并行地对相同的数据进行实验。</p>
+			<p>有两种类型的数据集——基于文件的数据集和表格数据集。文件数据集引用数据存储中的文件列表。例如，如果您正在构建一个计算机视觉模型，您将需要可以作为<code>FileDataset</code>下载或安装到您的计算机上的图像。表格数据集表示驻留在基于文件的数据存储区或关系数据库数据存储区中的表格数据。例如，您可以引用几个包含<code>TabularDataset</code>构造的文件夹，而不必解析物理文件。</p>
+			<p>数据集的另一个特性是，您可以使用版本对其属性和元数据进行快照。假设您有一个遵循<code>weather/&lt;year&gt;/&lt;month&gt;/</code>模式的文件夹结构。例如，您会发现 2021 年 1 月的天气测量值存储在<code>weather/2021/01/measurements.parquet</code>下。随着时间的流逝，你会得到越来越多的文件夹，每个文件夹下都有一个单独的文件。为了重现你的训练结果，你<a id="_idIndexMarker288"/>将想要参考仅包含截至 2021 年 1 月的文件的数据集。这正是数据集版本化派上用场的地方。在定型模型时，您注册了包含用于定型的所有文件的数据集版本。稍后，您可以参考数据集并请求它的特定版本，这将为您提供当时可用的所有文件的参考。</p>
+			<p class="callout-heading">重要说明</p>
+			<p class="callout">数据集版本不<em class="italic">也不</em>复制底层数据。它们只存储对实际文件和数据集元数据的引用，您将在接下来的章节中读到这些内容。这意味着，如果您更改文件的内容而不是添加新文件，数据集版本将不会加载相同的数据。</p>
+			<h2 id="_idParaDest-65"><a id="_idTextAnchor065"/>注册数据集</h2>
+			<p>您可以从各种来源注册数据集<a id="_idIndexMarker289"/>，如以下屏幕截图所示，包括从您在<em class="italic">连接到数据存储库</em>部分中了解到的数据存储库注册:</p>
+			<div><div><img src="img/B16777_04_042.jpg" alt="Figure 4.42 – Possible options for registering datasets&#13;&#10;" width="182" height="175"/>
+				</div>
+			</div>
+			<p class="figure-caption">图 4.42–注册数据集的可能选项</p>
+			<p>为了更好地理解数据集注册过程是如何工作的，我们将注册两个托管在 web 上的表格<a id="_idIndexMarker290"/>数据集。这些数据集每个都由一个单独的<strong class="bold">拼花</strong>文件组成。我们将在本章后面使用这两个数据集来理解数据漂移检测功能。让我们开始吧:</p>
+			<ol>
+				<li value="1">从前面截图显示的菜单中选择<strong class="bold">从 web 文件</strong>，启动<strong class="bold">从 web 文件</strong>创建数据集向导。</li>
+				<li>在向导的第一页上，提供以下信息:<ul><li><code>survey-drift-base</code></li><li><code>Tabular</code></li></ul></li>
+				<li>Click <strong class="bold">Next</strong>:<div><img src="img/B16777_04_043.jpg" alt="Figure 4.43 – The first step of the dataset registration wizard&#13;&#10;" width="648" height="500"/></div><p class="figure-caption">图 4.43–数据集注册向导的第一步</p></li>
+				<li>The wizard will <a id="_idIndexMarker291"/>parse the file and figure out the file type and the schema of your dataset. You will need to validate the selection by clicking <strong class="bold">Next</strong>. Note that the wizard supports multiple file formats, as shown in the following screenshot:<div><img src="img/B16777_04_044.jpg" alt="Figure 4.44 – The second step of the dataset registration wizard&#13;&#10;" width="829" height="465"/></div><p class="figure-caption">图 4.44–数据集注册向导的第二步</p></li>
+				<li>在下一步中，您可以定义关于模式的高级选项。对于基线数据集，保持默认选项不变。点击<strong class="bold">下一步</strong>，将引导您进入确认步骤。</li>
+				<li>In this step, you can review your selections in the previous steps, and you can also schedule your first data science analysis task – profiling the dataset. This process generates the profile that you will explore in the next section. Enable the option and select <code>gpu-cluster</code>, which you provisioned in the previous section, as shown in the following screenshot: <p class="callout-heading">重要说明</p><p class="callout">在<strong class="bold">Select Compute for profiling</strong>选项中，您可以从您在<em class="italic">计算实例</em>和<em class="italic">计算集群</em>部分调配的计算实例和计算集群中进行选择。选择计算群集将强制群集从零个节点扩展到一个节点，分析数据集，然后再次向下扩展到零个节点。如果需要，您可以导航到<strong class="bold">管理</strong> | <strong class="bold">计算</strong>部分，并通过单击计算群集的名称来观察这种横向扩展。如果您选择计算实例而不是计算群集，作业将被调度，并在计算实例启动时执行。</p></li>
+			</ol>
+			<div><div><img src="img/B16777_04_045.jpg" alt="Figure 4.45 – Last step of the dataset registration process&#13;&#10;" width="1650" height="1216"/>
+				</div>
+			</div>
+			<p class="figure-caption">图 4.45-数据集注册过程的最后一步</p>
+			<p>您将需要再注册一个<a id="_idIndexMarker293"/>数据集。这里的过程几乎相同，只是这一次，您将把数据集标记为时序数据集:</p>
+			<ol>
+				<li value="1">Click on <strong class="bold">Create dataset</strong> and select <strong class="bold">From web files</strong>, as shown in the following screenshot:<div><img src="img/B16777_04_046.jpg" alt="Figure 4.46 – Create dataset menu in the dataset list&#13;&#10;" width="536" height="401"/></div><p class="figure-caption">图 4.46–数据集列表中的创建数据集菜单</p></li>
+				<li>按照与之前相同的<a id="_idIndexMarker294"/>步骤，输入以下信息:<ul><li><code>survey-drift-target</code></li></ul></li>
+				<li>During the schema step, make sure that you select <strong class="bold">Timestamp</strong> from the <strong class="bold">Properties</strong> section of the <strong class="bold">inference_date</strong> column, as shown in the following screenshot. This option flags this tabular dataset as a <strong class="bold">time series</strong> dataset, something that allows you to perform additional analysis, as you will see in the <em class="italic">Data drift detection</em> section:<div><img src="img/B16777_04_047.jpg" alt="Figure 4.47 – Configuring a tabular dataset so that it becomes a time series dataset&#13;&#10;" width="1209" height="417"/></div><p class="figure-caption">图 4.47–配置表格数据集，使其成为时间序列数据集</p></li>
+				<li>Schedule data profile analysis and complete the dataset registration process. <p class="callout-heading">重要说明</p><p class="callout">如果您一直这样做，您可能会注意到，对于<code>year=2021/month=05/day=01/data.parquet</code>，您可以通过路径<a id="_idIndexMarker295"/>模式创建一个虚拟列，并将其定义为您的<strong class="bold">分区时间戳</strong>。这提高了时间序列功能的重要性，并允许您通过有选择地只读取所需的文件来加载特定的日期。</p></li>
+			</ol>
+			<p>您应该能够看到两个注册的数据集，如下面的屏幕截图所示:</p>
+			<div><div><img src="img/B16777_04_048.jpg" alt="Figure 4.48 – List of registered datasets in the Azure ML workspace&#13;&#10;" width="754" height="270"/>
+				</div>
+			</div>
+			<p class="figure-caption">图 4.48–Azure ML 工作区中已注册数据集的列表</p>
+			<p>在这个视图中，您可以选择一个<a id="_idIndexMarker296"/>数据集，然后单击<strong class="bold">取消注册</strong>按钮来删除注册。单击数据集后，您可以查看关于它的更多详细信息，包括您在数据集上执行的剖面分析，您将在下一节中看到这些内容。</p>
+			<h2 id="_idParaDest-66"><a id="_idTextAnchor066"/>探索数据集</h2>
+			<p>在数据集列表中，点击<strong class="bold">测量-漂移-目标</strong>数据集上的<a id="_idIndexMarker297"/>，打开其详细信息。在第一个选项卡<strong class="bold"> Details </strong>中，您可以修改数据集的描述并指定与数据集相关联的标签。标签是名称-值对。在下面的截图中，您可以看到我们将<strong class="bold">调查</strong>指定为<strong class="bold">实验</strong>标签的值:</p>
+			<div><div><img src="img/B16777_04_049.jpg" alt="Figure 4.49 – Dataset details showing all the metadata associated with the specific dataset&#13;&#10;" width="1601" height="1144"/>
+				</div>
+			</div>
+			<p class="figure-caption">图 4.49–显示与特定数据集相关联的所有元数据的数据集详细信息</p>
+			<p>在<strong class="bold">消费</strong>选项卡中，您<a id="_idIndexMarker298"/>可以复制您将在<a href="B16777_07_Final_VK_ePub.xhtml#_idTextAnchor102"> <em class="italic">第七章</em> </a>、<em class="italic">Azure ML Python SDK</em>中使用的 Python SDK 代码，以访问数据集:</p>
+			<p class="figure-caption"> </p>
+			<div><div><img src="img/B16777_04_050.jpg" alt="Figure 4.50 – Consuming a snippet that gives access to the dataset&#13;&#10;" width="1144" height="757"/>
+				</div>
+			</div>
+			<p class="figure-caption">图 4.50-使用提供数据集访问的代码片段</p>
+			<p>在<strong class="bold"> Explore </strong>选项卡中，您将能够<a id="_idIndexMarker299"/>预览数据集中包含的数据样本，就像您在注册过程中看到的一样:</p>
+			<div><div><img src="img/B16777_04_051.jpg" alt="Figure 4.51 – Previewing a sample of the dataset&#13;&#10;" width="559" height="277"/>
+				</div>
+			</div>
+			<p class="figure-caption">图 4.51–预览数据集样本</p>
+			<p>如果您点击<strong class="bold"> Profile </strong>选项卡，您<a id="_idIndexMarker300"/>将能够看到数据集的统计分析，如下图所示:</p>
+			<div><div><img src="img/B16777_04_052.jpg" alt="Figure 4.52 – Statistical analysis of the dataset&#13;&#10;" width="1650" height="520"/>
+				</div>
+			</div>
+			<p class="figure-caption">图 4.52-数据集的统计分析</p>
+			<p class="callout-heading">重要说明</p>
+			<p class="callout">如果您的数据集包含的行少于 10，000 行，将自动为您进行分析，而无需您为数据集安排处理方面的时间。如果数据集包含超过 10，000 行，那么 Azure ML 会对前 10，000 行执行分析，并显示一条警告消息，提示您安排一次完整的概要分析，您可以通过单击菜单中的<strong class="bold"> Generate profile </strong>按钮来完成。</p>
+			<p>最后，在<strong class="bold"> Models </strong>选项卡上，您<a id="_idIndexMarker301"/>可以看到与该数据集相关的模型，这是您将在<a href="B16777_05_Final_VK_ePub.xhtml#_idTextAnchor072"> <em class="italic">第 5 章</em></a><em class="italic">中做的事情，让机器进行模型训练</em>，这时您将注册您将作为 web 服务部署的最佳模型。</p>
+			<p>注册数据集后，您可以为数据集配置数据漂移的定期监控，这将在下一节中介绍。</p>
+			<h2 id="_idParaDest-67"><a id="_idTextAnchor067"/>数据漂移检测</h2>
+			<p>数据漂移检测是一种<a id="_idIndexMarker302"/>技术，允许您将时间序列数据集与参考数据集进行比较，然后检查您正在比较的<a id="_idIndexMarker303"/>特征的统计属性是否发生了显著变化。例如，让我们假设您训练了一个 ML 模型，该模型根据某人的年龄来预测他是否会参与调查。您使用了<code>survey-drift-base</code>数据集来训练该模型。下图显示了密度曲线，该曲线显示了年龄在训练数据集中的分布:</p>
+			<div><div><img src="img/B16777_04_053.jpg" alt="Figure 4.53 – Negative skewed unimodal distribution of the age feature in the training dataset&#13;&#10;" width="1324" height="978"/>
+				</div>
+			</div>
+			<p class="figure-caption">图 4.53-训练数据集中年龄特征的负偏态单峰分布</p>
+			<p>当你<a id="_idIndexMarker304"/>操作模型时，你跟踪它<a id="_idIndexMarker305"/>每周做出的推论，并且你将这些信息记录在你之前注册的<code>survey-drift-target</code>数据集中。这个数据集包含了你在 2020 年前两周所做的推论。数据漂移检测使您能够检测输入要素的分布是否随时间而变化。让我们来看看:</p>
+			<ol>
+				<li value="1">Navigate to <strong class="bold">Assets </strong>| <strong class="bold">Datasets</strong> | <strong class="bold">Dataset monitors</strong> and click on the <strong class="bold">Create</strong> button to start the dataset monitor wizard:<div><img src="img/B16777_04_054.jpg" alt="Figure 4.54 – Creating a new dataset monitor&#13;&#10;" width="793" height="753"/></div><p class="figure-caption">图 4.54–创建新的数据集监视器</p></li>
+				<li>On the target <a id="_idIndexMarker306"/>dataset, you will see all the registered time series <a id="_idIndexMarker307"/>datasets you want to monitor for data drift. This is the inference that your model has been doing in production. Select <code>survey-drift-target (Version:1)</code> and click <strong class="bold">Next</strong>:<div><img src="img/B16777_04_055.jpg" alt="Figure 4.55 – The first step in data drift monitor configuration&#13;&#10;" width="668" height="297"/></div><p class="figure-caption">图 4.55–数据漂移监控器配置的第一步</p></li>
+				<li>On the next <a id="_idIndexMarker308"/>page, you need to select your reference point. This<a id="_idIndexMarker309"/> can either be a specific point in time from within the time series tabular dataset or a specific dataset. In your case, select the <code>survey-drift-base (Version:1)</code> dataset, which is the dataset that was used to train the ML model:<div><img src="img/B16777_04_056.jpg" alt="Figure 4.56 – Selecting the baseline dataset during the data drift monitor configuration&#13;&#10;" width="668" height="326"/></div><p class="figure-caption">图 4.56–在数据漂移监视器配置期间选择基线数据集</p></li>
+				<li>在向导的最后一步，您需要定义以下信息:<ul><li><code>survey-drift-monitor</code>。</li><li><strong class="bold">特征</strong>:选择两个数据集之间的一个<a id="_idIndexMarker310"/>或多个共同特征，监测它们的分布情况以及是否存在数据漂移。在这种情况下，两个数据集之间唯一的共同特征是年龄特征。</li><li><strong class="bold">计算目标</strong>:将上下旋转以执行分析的集群。</li><li><strong class="bold">频率</strong>:频率<a id="_idIndexMarker311"/>指定目标数据被检测漂移的时间间隔。一旦创建了监视器，就不能更改该属性。您可以选择日、周或月。请记住，每个时间间隔需要不到 50 个样本来执行数据漂移分析。这意味着，如果每天的行数少于 50 行，就不能以此作为频率，而应该选择周，甚至月。</li><li><strong class="bold">延迟</strong>:在对一行进行实际评分和刷新目标数据集之间通常会有延迟。在该字段中，您指定在假设目标数据集获得最新记录之前要等待多长时间；然后，监视器可以执行数据漂移分析。</li><li><strong class="bold">电子邮件地址</strong>:如果数据集的漂移超过了为<strong class="bold">阈值</strong>参数指定的范围，这是发送电子邮件的地方。</li></ul></li>
+				<li>出于本书的目的，您可以禁用该计划，如下图所示。您将手动运行数据漂移分析。</li>
+				<li>Click on the <strong class="bold">Create</strong> button to create the monitor: <div><img src="img/B16777_04_057.jpg" alt="Figure 4.57 – Data drift monitor settings&#13;&#10;" width="865" height="772"/></div><p class="figure-caption">图 4.57–数据漂移监控设置</p></li>
+				<li>点击您从<a id="_idIndexMarker313"/>监视器列表中创建的新监视器的名称<a id="_idIndexMarker312"/>:</li>
+			</ol>
+			<div><div><img src="img/B16777_04_058.jpg" alt="Figure 4.58 – Data drift monitors list&#13;&#10;" width="659" height="193"/>
+				</div>
+			</div>
+			<p class="figure-caption">图 4.58–数据漂移监视器列表</p>
+			<p>数据漂移监视器旨在针对新数据按计划运行。在您的情况下，您希望分析目标数据集中的现有数据。让我们来看看:</p>
+			<ol>
+				<li value="1">Click on the <strong class="bold">Analyze existing data</strong> button, which will bring up the backfill wizard shown in the following screenshot: <div><img src="img/B16777_04_059.jpg" alt="Figure 4.59 – Manually starting an analysis of past dates&#13;&#10;" width="907" height="562"/></div><p class="figure-caption">图 4.59–手动开始过去日期的分析</p></li>
+				<li>选择 2019 年 12 月 31 日至 2020 年 1 月 15 日。这是包含目标数据集中所有记录的时间范围。</li>
+				<li>选择将进行分析的计算群集。</li>
+				<li>点击<strong class="bold">提交</strong>。</li>
+			</ol>
+			<p>一旦分析完成，这是一个需要一些时间的<a id="_idIndexMarker314"/>过程，您<a id="_idIndexMarker315"/>将能够看到数据漂移结果，这表明在我们的数据集中观察到了大数据漂移。注意，总结指的是最新的推论，是 2020 年 1 月 5 日做的。您可以通过单击相应日期的图表来手动选择以前的时段:</p>
+			<div><div><img src="img/B16777_04_060.jpg" alt="Figure 4.60 – Data drift detected between the base dataset and the target one&#13;&#10;" width="1074" height="350"/>
+				</div>
+			</div>
+			<p class="figure-caption">图 4.60-在基础数据集和目标数据集之间检测到的数据漂移</p>
+			<p>如果您向下滚动到特征分布，您将能够清楚地看到年龄特征上的分布漂移。这表明该模型正在对一个群体进行推断，该群体的特征与其接受训练的群体的特征不同。这是一个很好的迹象，表明您可能需要重新训练模型，使其与新的功能分布保持一致:</p>
+			<div><div><img src="img/B16777_04_061.jpg" alt="Figure 4.61 – The baseline is a negative skewed distribution, while the latest inferences follow a positive skewed distribution&#13;&#10;" width="1127" height="502"/>
+				</div>
+			</div>
+			<p class="figure-caption">图 4.61-基线是负偏态分布，而最新的推论遵循正偏态分布</p>
+			<p>在本节中，您<a id="_idIndexMarker316"/>学习了如何配置数据漂移检测，这是通过<a id="_idIndexMarker317"/>将您的模型在生产中观察到的数据与用于训练模型的数据集进行比较来完成的。这是一个强大的功能，允许您确定是否需要使用较新的数据重新训练模型，尤其是当功能分布随着时间的推移而改变/漂移时。</p>
+			<h1 id="_idParaDest-68"><a id="_idTextAnchor068"/>总结</h1>
+			<p>在本章中，您学习了如何向 Azure ML 工作空间供应和附加计算资源。您还了解了如何注册各种数据存储，以便以安全的方式访问数据。最后，您探索了 Azure ML Studio 的数据集注册功能，它允许您轻松地访问实验数据。注册数据集后，您可以配置数据漂移监视器，如果要素的分布随时间发生变化，它会向您发出警告，这可能表明需要重新训练在该数据集上训练的 ML 模型。现在你应该对配置你的 Azure ML 工作空间感到舒服了，这是 DP-100 认证中衡量的关键技能之一。</p>
+			<p>在下一章中，您将了解如何利用您在工作空间中注册的数据集来执行<strong class="bold"> Auto ML </strong>分析，该过程将在您配置的计算集群上运行多个 ML 实验，以检测您的数据集的最佳算法。</p>
+			<h1 id="_idParaDest-69"><a id="_idTextAnchor069"/>问题</h1>
+			<p>在每一章中，你会发现几个问题，这样你就可以测试你对本章内容的了解程度:</p>
+			<ol>
+				<li value="1">How many data scientists can work on a single compute instance that has 8 cores and 56 GB of RAM?<p>a.只有一个。</p><p>b.最多两个。</p><p>c.最多五个。</p><p>d.他们想要多少就有多少，只要不耗尽计算资源。</p></li>
+				<li>What type of credentials do you need to provide to access a data lake store that's either Gen 1 or Gen 2?<p>a.一个<strong class="bold">个人接入令牌</strong> ( <strong class="bold">拍</strong>)</p><p>b.服务主体的客户端 ID 和机密</p><p>c.您自己的 AAD 用户凭证</p><p>d.不需要凭证</p></li>
+				<li>Which of the following Azure tools can help you orchestrate data moving from an on-premises environment?<p>a.Blob 存储</p><p>b.Azure 活动目录</p><p>c.Azure 数据工厂</p><p>d.Azure ML 工作区</p></li>
+			</ol>
+			<h1 id="_idParaDest-70"><a id="_idTextAnchor070"/>延伸阅读</h1>
+			<p>本节提供了一个有用的网络资源列表，可以帮助你增加对本章所讨论主题的知识和理解:</p>
+			<ul>
+				<li>您可以通过以下链接了解有关如何在计算集群中使用托管身份的更多信息:<a href="https://docs.microsoft.com/azure/machine-learning/how-to-create-attach-compute-cluster?tabs=python#managed-identity-usage">https://docs . Microsoft . com/azure/machine-learning/how-to-create-attach-compute-cluster？tabs = python # managed-identity-use</a>。</li>
+				<li>实例元数据服务允许您使用附加的托管身份请求 Azure 资源的令牌。你可以在<a href="https://docs.microsoft.com/azure/virtual-machines/linux/instance-metadata-service">https://docs . Microsoft . com/azure/virtual-machines/Linux/instance-metadata-service</a>了解更多信息。</li>
+				<li>你可以在<a href="https://docs.microsoft.com/azure/storage/blobs/data-lake-storage-access-control-model">https://docs . Microsoft . com/Azure/Storage/blobs/Data-Lake-Storage-access-control-model</a>了解更多关于 Azure Data Lake Storage Gen2 的访问控制模型。</li>
+				<li>您可以在<a href="https://docs.microsoft.com/azure/data-factory/quickstart-create-data-factory-copy-data-tool">https://docs . Microsoft . com/Azure/Data-Factory/quick start-create-Data-Factory-copy-Data-tool</a>了解如何使用 Azure Data Factory 的复制数据工具轻松复制数据和配置常规数据接收。</li>
+				<li>您可以在<a href="https://docs.microsoft.com/azure/storage/common/storage-sas-overview">https://docs . Microsoft . com/Azure/Storage/common/Storage-SAS-overview</a>了解如何使用 SAS 令牌授予对 Azure 存储帐户的有限访问权限。</li>
+				<li>您可以在<a href="https://docs.microsoft.com/azure/active-directory/develop/app-objects-and-service-principals">https://docs . Microsoft . com/Azure/active-directory/develop/app-objects-and-service-principals</a>了解有关服务主体的更多信息，这些服务主体可用于访问 Azure 数据湖数据存储。</li>
+			</ul>
+		</div>
+	</div>
+</body></html>

@@ -1,0 +1,775 @@
+<html><head/><body><html xmlns:epub="http://www.idpf.org/2007/ops">
+
+    <head>
+
+        <title>Optimizing the Model through Hyperparameter Tuning</title>
+
+        
+
+        <meta charset="utf-8"/>
+
+<meta content="urn:uuid:c0dc9385-c68c-47e3-9ef8-4abf6976fdcb" name="Adept.expected.resource"/>
+
+    </head>
+
+
+
+    <body>
+
+        
+
+
+
+                            
+
+                    <h1 class="header-title">通过超参数调整优化模型</h1>
+
+                
+
+            
+
+            
+
+                
+
+<p>神经网络由多个参数组成，这些参数可以影响预测事件或标签的最终准确性。典型参数包括:</p>
+
+<ul>
+
+<li>用于培训的批量</li>
+
+<li>时代数</li>
+
+<li>学习率</li>
+
+<li>隐藏层数</li>
+
+<li>每个隐藏层中隐藏单元的数量</li>
+
+<li>应用于隐藏层的激活函数</li>
+
+<li>使用的优化器</li>
+
+</ul>
+
+<p>从前面的列表中，我们可以看到可以调整的参数数量非常多。这使得寻找超参数的最佳组合成为一个挑战。在这种情况下，Cloud ML Engine 提供的超参数调优服务就派上了用场。</p>
+
+<p>在本章中，我们将介绍:</p>
+
+<ul>
+
+<li>为什么需要超参数调谐</li>
+
+<li>超参数调整工作原理概述</li>
+
+<li>在云中实现超参数调优</li>
+
+</ul>
+
+
+
+
+
+            
+
+
+
+            
+
+        
+
+    </body>
+
+
+
+</html>
+<html xmlns:epub="http://www.idpf.org/2007/ops">
+
+    <head>
+
+        <title>The intuition of hyperparameter tuning</title>
+
+        
+
+        <meta charset="utf-8"/>
+
+<meta content="urn:uuid:c0dc9385-c68c-47e3-9ef8-4abf6976fdcb" name="Adept.expected.resource"/>
+
+    </head>
+
+
+
+    <body>
+
+        
+
+
+
+                            
+
+                    <h1 class="header-title">超参数调谐的直觉</h1>
+
+                
+
+            
+
+            
+
+                
+
+<p>为了获得超参数调整需求的实际直觉，让我们在 MNIST 数据集上预测给定神经网络架构的准确性时经历以下场景:</p>
+
+<ul>
+
+<li><strong>场景 1 </strong>:历元数多，学习率低</li>
+
+<li><strong>场景 2 </strong>:纪元数少，学习率高</li>
+
+</ul>
+
+<p>让我们在 Google Cloud 环境中创建训练和测试数据集，如下所示:</p>
+
+<ol>
+
+<li>下载数据集:</li>
+
+</ol>
+
+<pre style="padding-left: 60px">mkdir data
+
+curl -O https://s3.amazonaws.com/img-datasets/mnist.pkl.gz
+
+gzip -d mnist.pkl.gz
+
+mv mnist.pkl data/ <strong>  </strong>         </pre>
+
+<p style="padding-left: 60px">前面的代码创建一个名为<kbd>data</kbd>的新文件夹，下载 MNIST 数据集，并将其移动到<kbd>data</kbd>文件夹中。</p>
+
+<ol start="2">
+
+<li>在终端中打开 Python 并导入所需的包:</li>
+
+</ol>
+
+<pre style="padding-left: 60px">from __future__ import print_function <br/>import tensorflow as tf<br/>import pickle # for handling the new data source<br/>import numpy as np<br/>from datetime import datetime # for filename conventions<br/>from tensorflow.python.lib.io import file_io # for better file I/O<br/>import sys</pre>
+
+<ol start="3">
+
+<li>导入 MNIST 数据集:</li>
+
+</ol>
+
+<pre style="padding-left: 60px">f = file_io.FileIO('data/mnist.pkl', mode='r')<br/>data = pickle.load(f)</pre>
+
+<ol start="4">
+
+<li>提取训练和测试数据集:</li>
+
+</ol>
+
+<pre style="padding-left: 60px">(x_train, y_train), (x_test, y_test) = data<br/># Converting the data from a 28 x 28 shape to 784 columns<br/>x_train = x_train.reshape(60000, 784)<br/>x_train = x_train.astype('float32')<br/># Scaling the train dataset<br/>x_train /= 255<br/># Reshaping the test dataset<br/>x_test = x_test.reshape(10000, 784)<br/>x_test = x_test.astype('float32')<br/># Scaling the test dataset<br/>x_test /= 255<br/># Specifying the type of labels<br/>y_train = y_train.astype(np.int32)<br/>y_test = y_test.astype(np.int32)</pre>
+
+<ol start="5">
+
+<li>创建估计函数:</li>
+
+</ol>
+
+<pre style="padding-left: 60px"># Creating the estimator input functions for train and test datasets <br/>train_input_fn = tf.estimator.inputs.numpy_input_fn(<br/> x={"x2": np.array(x_train)},<br/> y=np.array(y_train),<br/> num_epochs=None,<br/> batch_size=1024,<br/> shuffle=True)<br/>test_input_fn = tf.estimator.inputs.numpy_input_fn(<br/> x={"x2": np.array(x_test)},<br/> y=np.array(y_test),<br/> num_epochs=1,<br/> shuffle=False)</pre>
+
+<ol start="6">
+
+<li>指定列的类型:</li>
+
+</ol>
+
+<pre style="padding-left: 60px">feature_x = tf.feature_column.numeric_column("x2", shape=(784))<br/>feature_columns = [feature_x]</pre>
+
+<ol start="7">
+
+<li>使用场景 1 中的参数构建 DNN 分类器；即，学习率为<kbd>0.1</kbd>，步数为<kbd>200</kbd>:</li>
+
+</ol>
+
+<pre style="padding-left: 60px">num_hidden_units = [1000]<br/>lr=0.1<br/>num_steps=200<br/># Building the estimator using DNN classifier<br/># This is where the learning rate hyper parameter is passed<br/>model = tf.estimator.DNNClassifier(feature_columns=feature_columns,<br/>                 hidden_units=num_hidden_units,<br/>                 activation_fn=tf.nn.relu,<br/>                 n_classes=10,<br/>                 optimizer=tf.train.AdagradOptimizer(learning_rate = lr))<br/>model.train(input_fn=train_input_fn, steps=num_steps) <br/># Fetching the model results<br/>result = model.evaluate(input_fn=test_input_fn)<br/>print('Test loss:', result['average_loss'])<br/>print('Test accuracy:', result['accuracy'])</pre>
+
+<p>在这种情况下，测试准确率为 96.49%。</p>
+
+<p>在场景 2 中，我们将使用不同的参数构建另一个 DNN 分类器；现在学习率为<kbd>0.01</kbd>，步数为<kbd>2000</kbd>:</p>
+
+<pre>num_hidden_units = [1000]<br/>lr=0.01<br/>num_steps=2000<br/># Building the estimator using DNN classifier<br/># This is where the learning rate hyper parameter is passed<br/>model = tf.estimator.DNNClassifier(feature_columns=feature_columns,<br/> hidden_units=num_hidden_units,<br/> activation_fn=tf.nn.relu,<br/> n_classes=10,<br/> optimizer=tf.train.AdagradOptimizer(learning_rate = lr))<br/>model.train(input_fn=train_input_fn, steps=num_steps) <br/># Fetching the model results<br/>result = model.evaluate(input_fn=test_input_fn)<br/>print('Test loss:', result['average_loss'])<br/>print('Test accuracy:', result['accuracy']) </pre>
+
+<p>场景 2 中测试数据集的准确率接近 98.2%。</p>
+
+<p>前面的两个场景向我们展示了不同超参数的不同值如何影响最终结果的重要性。</p>
+
+<p>在这种情况下，Google Cloud ML engine 就派上了用场，我们可以更智能地选择更优的超参数集。</p>
+
+
+
+
+
+            
+
+
+
+            
+
+        
+
+    </body>
+
+
+
+</html>
+<html xmlns:epub="http://www.idpf.org/2007/ops">
+
+    <head>
+
+        <title>Overview of hyperparameter tuning</title>
+
+        
+
+        <meta charset="utf-8"/>
+
+<meta content="urn:uuid:c0dc9385-c68c-47e3-9ef8-4abf6976fdcb" name="Adept.expected.resource"/>
+
+    </head>
+
+
+
+    <body>
+
+        
+
+
+
+                            
+
+                    <h1 class="header-title">超参数调整概述</h1>
+
+                
+
+            
+
+            
+
+                
+
+<p>超参数调整通过在单个培训作业中运行多次试验来实现。每次试验都是训练应用程序的一次完整执行，所选超参数的值设置在您指定的范围内。云 ML 引擎培训服务会跟踪每次试验的结果，并为后续试验做出调整。当作业完成时，您可以获得所有试验的摘要，以及根据您指定的标准最有效的值配置。</p>
+
+<p>我们想要选择那些给出最佳性能的超参数。这相当于一个优化问题，具体来说，就是在一个紧集<em> A. </em>上优化一个函数<em> f(x) </em>(也就是说，作为超参数值的函数的性能)的问题。我们可以用数学方法把它写成:</p>
+
+<div><img class="fm-editor-equation" src="img/1b2c95c0-1900-4be2-942a-1c35f559a5be.png" style="width:62.33em;height:4.00em;"/></div>
+
+<p>我们以函数<em> (1-x) <sup> ex </sup> </em>为例，该函数在<em> x = 0 </em>处有一个最大值<em> f(x) = 1 </em>，所以<em> arg max </em>为<em> 0 </em>。</p>
+
+<p>很多优化设置，比如这个，都假设目标函数<em> f(x) </em>有一个已知的数学形式，是凸的，或者很容易计算。但是这些特征不适用于寻找超参数的问题，其中函数是未知的并且评估起来很昂贵。这就是贝叶斯优化发挥作用的地方。</p>
+
+<p>为了实现超参数调优，Google 使用了一种叫做<strong>高斯过程土匪</strong>的算法，这是贝叶斯优化的一种形式。</p>
+
+<p>当函数的数学形式未知或者计算起来很昂贵时，贝叶斯优化是一种非常强大的技术。其背后的主要思想是基于数据计算目标函数的后验分布(使用著名的贝叶斯定理)，然后选择好的点来尝试这个分布。</p>
+
+<p>为了使用贝叶斯优化，我们需要一种方法来灵活地对目标函数的分布进行建模。这比在实数上建模一个分布要稍微复杂一些，因为我们需要一个这样的分布来代表我们对于每个<em> x </em>的关于<em> f(x) </em>的信念。如果<em> x </em>包含连续的超参数，那么将会有无穷多个<em> x </em>我们必须为其建模<em> f(x) </em>，也就是为其构造一个分布。对于这个问题，高斯过程是一个特别优雅的技术。实际上，他们推广了多维高斯分布，并且确实存在足够灵活来模拟任何目标函数的版本。</p>
+
+<p>上述过程通常如下图所示:</p>
+
+<div><img src="img/920da612-d83c-42ae-9ae5-3f4a61a250e1.png" style=""/></div>
+
+<p>我们用迭代的结果更新高斯模型，这进一步帮助识别要为模型测试的正确的下一个超参数样本集；该结果进一步改进了我们的高斯模型，以识别要挑选的正确的超参数集。</p>
+
+<p>高斯分布的细节超出了本书的范围，但是对于这个练习，我们将采用 Google 的方法(作为一个黑盒)并使用 Google Cloud 实现超参数调整。</p>
+
+
+
+
+
+            
+
+
+
+            
+
+        
+
+    </body>
+
+
+
+</html>
+<html xmlns:epub="http://www.idpf.org/2007/ops">
+
+    <head>
+
+        <title>Hyperparameter tuning in Google Cloud</title>
+
+        
+
+        <meta charset="utf-8"/>
+
+<meta content="urn:uuid:c0dc9385-c68c-47e3-9ef8-4abf6976fdcb" name="Adept.expected.resource"/>
+
+    </head>
+
+
+
+    <body>
+
+        
+
+
+
+                            
+
+                    <h1 class="header-title">谷歌云中的超参数调整</h1>
+
+                
+
+            
+
+            
+
+                
+
+<p>为了运行刚刚布置好的高斯过程，我们必须允许我们的模型构建在 Google Cloud 上运行，以便可以进行超参数调整。</p>
+
+<p>为了运行超参数调整，以下是基本组件:</p>
+
+<ul>
+
+<li>数据文件及其位置</li>
+
+<li>模型文件</li>
+
+<li>超参数配置文件</li>
+
+<li>安装文件</li>
+
+<li><kbd>__init__</kbd>文件</li>
+
+</ul>
+
+<p>假设我们在 Google Cloud ML 引擎上运行模型，数据应该驻留在一个云桶中，以便 ML 引擎可以访问它。</p>
+
+<p>这可以通过在云外壳中执行以下操作来实现:</p>
+
+<pre><strong>gsutil mb gs://my-mnist-bucket</strong><br/><strong>gsutil cp -r data/mnist.pkl gs://my-mnist-bucket/data/mnist.pkl</strong></pre>
+
+<p>注意，使用前面的步骤，我们已经创建了一个名为<kbd>my-mnist-bucket</kbd>的 bucket，并将我们的数据复制到这个 bucket 中。前面的代码应该会创建一个名为<kbd>data</kbd>的目录，并在该目录中创建<kbd>mnist.pkl</kbd>文件:</p>
+
+<div><img src="img/59110e1b-da58-43b9-87c7-27a8b80cb10c.jpg" style=""/></div>
+
+
+
+
+
+            
+
+
+
+            
+
+        
+
+    </body>
+
+
+
+</html>
+<html xmlns:epub="http://www.idpf.org/2007/ops">
+
+    <head>
+
+        <title>The model file</title>
+
+        
+
+        <meta charset="utf-8"/>
+
+<meta content="urn:uuid:c0dc9385-c68c-47e3-9ef8-4abf6976fdcb" name="Adept.expected.resource"/>
+
+    </head>
+
+
+
+    <body>
+
+        
+
+
+
+                            
+
+                    <h1 class="header-title">模型文件</h1>
+
+                
+
+            
+
+            
+
+                
+
+<p><strong> </strong>模型文件应该位于同时包含<kbd>__init__.py</kbd>文件的文件夹中。</p>
+
+<p>让我们创建一个名为<kbd>trainer</kbd>的文件夹，其中包含模型文件和<kbd>__init__</kbd>文件:</p>
+
+<pre>mkdir trainer<br/>cd trainer</pre>
+
+<p>前面的代码创建了<kbd>trainer</kbd>文件夹，并将目录更改为新创建的文件夹。</p>
+
+<p>让我们继续创建如下模型文件:</p>
+
+<pre>vim mnist_mlp_lr_numsteps.py</pre>
+
+<p>将以下代码插入先前创建的文件中:</p>
+
+<pre>from __future__ import print_function<br/><br/>import argparse<br/>import pickle <br/>from datetime import datetime <br/>import numpy as np<br/>from tensorflow.python.lib.io import file_io # for better file I/O<br/>import sys<br/>import tensorflow as tf<br/><br/>def train_model(train_file='data/mnist.pkl',job_dir='./tmp/mnist_mlp', num_steps = 1, lr=0.1, **args):<br/>  # logs_path gives access to the logs that are generated by the previous epochs of model<br/>  logs_path = job_dir + '/logs/' + str(datetime.now().isoformat())<br/>  print('Using logs_path located at {}'.format(logs_path))<br/>  # by default floats are considered as string<br/>  # Good idea to convert them back into floats<br/>  lr=float(lr)<br/>  num_steps=float(num_steps)<br/>  batch_size = 1024<br/>  num_classes = 10<br/>  # Reading in the pickle file. Pickle works differently with Python 2 vs 3<br/>  # In Python 2 the following code would be:<br/>  # f = file_io.FileIO(train_file, mode='r')<br/>  # data = pickle.load(f)<br/>  f = file_io.FileIO(train_file, mode='rb') <br/>  data = pickle.load(f,encoding='bytes') <br/>  (x_train, y_train), (x_test, y_test) = data<br/>  # Converting the data from a 28X28 shape to 784 columns<br/>  x_train = x_train.reshape(60000, 784)<br/>  x_train = x_train.astype('float32')<br/>  x_test = x_test.reshape(10000, 784)<br/>  x_test = x_test.astype('float32')<br/>  x_train /= 255<br/>  x_test /= 255<br/>  # Specifying the type of following labels<br/>  y_train = y_train.astype(np.int32)<br/>  y_test = y_test.astype(np.int32)<br/>  <br/>  # Creating the estimator following input functions <br/>  train_input_fn = tf.estimator.inputs.numpy_input_fn(<br/>    x={"x2": np.array(x_train)},<br/>    y=np.array(y_train),<br/>    num_epochs=None,<br/>    batch_size=batch_size,<br/>    shuffle=True)<br/>  test_input_fn = tf.estimator.inputs.numpy_input_fn(<br/>    x={"x2": np.array(x_test)},<br/>    y=np.array(y_test),<br/>    num_epochs=1,<br/>    shuffle=False)<br/>  # Specifying the columns as numeric columns<br/>  feature_x = tf.feature_column.numeric_column("x2", shape=(784))<br/>  feature_columns = [feature_x]<br/>  num_hidden_units = [1000]<br/>  # Building the estimator using DNN classifier<br/>  # This is where the learning rate hyper parameter is passed<br/>  model = tf.estimator.DNNClassifier(feature_columns=feature_columns,<br/>                                   hidden_units=num_hidden_units,<br/>                                   activation_fn=tf.nn.relu,<br/>                                   n_classes=num_classes,<br/>                   optimizer=tf.train.AdagradOptimizer(learning_rate = lr))<br/>  # Passing the other parameter: num_steps<br/>  model.train(input_fn=train_input_fn, steps=num_steps) <br/>  # Fetching the model results<br/>  result = model.evaluate(input_fn=test_input_fn)<br/>  print('Test loss:', result['average_loss'])<br/>  print('Test accuracy:', result['accuracy'])<br/>  <br/>if __name__ == '__main__':<br/>  # Parse the input arguments for common Cloud ML Engine options<br/>  # There are 4 arguments that we need to give, as per the preceding model specification <br/>  # training file location, job directory, number of steps and learning rate<br/>  parser = argparse.ArgumentParser()<br/>  parser.add_argument(<br/>    '--train-file',<br/>    help='Cloud Storage bucket or local path to training data')<br/>  parser.add_argument(<br/>    '--job-dir',<br/>    help='Cloud storage bucket to export the model and store temp files')<br/>  parser.add_argument(<br/>    '--num-steps',<br/>    help='number of steps')<br/>  parser.add_argument(<br/>    '--lr',<br/>    help='learning rate') <br/>  <br/>  args = parser.parse_args()<br/>  arguments = args.__dict__<br/>  train_model(**arguments)</pre>
+
+
+
+
+
+            
+
+
+
+            
+
+        
+
+    </body>
+
+
+
+</html>
+<html xmlns:epub="http://www.idpf.org/2007/ops">
+
+    <head>
+
+        <title>Configuration file</title>
+
+        
+
+        <meta charset="utf-8"/>
+
+<meta content="urn:uuid:c0dc9385-c68c-47e3-9ef8-4abf6976fdcb" name="Adept.expected.resource"/>
+
+    </head>
+
+
+
+    <body>
+
+        
+
+
+
+                            
+
+                    <h1 class="header-title">配置文件</h1>
+
+                
+
+            
+
+            
+
+                
+
+<p>一旦建立了模型文件，我们需要在同一个 trainer 文件夹中提供配置文件，以便 ML engine 知道需要调整的参数，以及参数的典型最小值和最大值。</p>
+
+<p>我们在<kbd>trainer</kbd>文件夹中创建如下配置文件:</p>
+
+<pre>vim hptune.yaml</pre>
+
+<p>以下代码插入到前面的文件中:</p>
+
+<pre>trainingInput:<br/>  pythonVersion: "3.5"<br/>  scaleTier: CUSTOM<br/>  masterType: standard_gpu<br/>  hyperparameters:<br/>    goal: MAXIMIZE<br/>    hyperparameterMetricTag: accuracy<br/>    maxTrials: 10<br/>    maxParallelTrials: 1<br/>    params:<br/>      - parameterName: num-steps<br/>        type: INTEGER<br/>        minValue: 200<br/>        maxValue: 10000<br/>        scaleType: UNIT_LINEAR_SCALE<br/>      - parameterName: lr<br/>        type: DOUBLE<br/>        minValue: 0.001<br/>        maxValue: 0.1<br/>        scaleType: UNIT_LOG_SCALE</pre>
+
+<p>在前面的代码块中，我们指定了要运行的 Python 版本，还指定了它是要在 CPU 还是 GPU 上运行。</p>
+
+<p>在<kbd>hyperparameters</kbd>部分，我们已经指定了我们需要优化的度量是准确性(注意<kbd>model.evaluate</kbd>的输出是<kbd>accuracy</kbd>、<kbd>loss</kbd>、<kbd>average loss</kbd>和<kbd>global step</kbd>)；目标是最大化它。</p>
+
+<p>此外，我们还指定了要运行的最大试验数量和可以运行的最大并行试验数量(当云配置有多个关联的核心时会发生变化)。</p>
+
+<p><kbd>params</kbd>部分包含需要修改的参数、变量类型以及最小值和最大值。</p>
+
+<p><kbd>ScaleType</kbd>表示将应用于参数的缩放类型:</p>
+
+<table>
+
+<tbody>
+
+<tr>
+
+<td>
+
+<p><strong>值</strong></p>
+
+</td>
+
+<td>
+
+<p><strong>描述</strong></p>
+
+</td>
+
+</tr>
+
+<tr>
+
+<td>
+
+<p><kbd>UNIT_LINEAR_SCALE</kbd></p>
+
+</td>
+
+<td>
+
+<p>将可行空间线性缩放到(0，1)。</p>
+
+</td>
+
+</tr>
+
+<tr>
+
+<td>
+
+<p><kbd>UNIT_LOG_SCALE</kbd></p>
+
+</td>
+
+<td>
+
+<p>用对数将可行空间缩放到(0，1)。整个可行空间必须是严格正的。</p>
+
+</td>
+
+</tr>
+
+<tr>
+
+<td>
+
+<p><kbd>UNIT_REVERSE_LOG_SCALE</kbd></p>
+
+</td>
+
+<td>
+
+<p>将可行空间反向对数缩放到(0，1)。结果是靠近可行空间顶部的值比靠近底部的点分散得更多。整个可行空间必须是严格正的。</p>
+
+</td>
+
+</tr>
+
+</tbody>
+
+</table>
+
+
+
+
+
+            
+
+
+
+            
+
+        
+
+    </body>
+
+
+
+</html>
+<html xmlns:epub="http://www.idpf.org/2007/ops">
+
+    <head>
+
+        <title>Setup file</title>
+
+        
+
+        <meta charset="utf-8"/>
+
+<meta content="urn:uuid:c0dc9385-c68c-47e3-9ef8-4abf6976fdcb" name="Adept.expected.resource"/>
+
+    </head>
+
+
+
+    <body>
+
+        
+
+
+
+                            
+
+                    <h1 class="header-title">安装文件</h1>
+
+                
+
+            
+
+            
+
+                
+
+<p>在某些情况下，我们可能不得不安装非预构建的包。在这种情况下,<kbd>setup.py</kbd>文件就派上了用场:</p>
+
+<pre>from setuptools import setup, find_packages<br/>setup(name='mnist_mlp_lr_numsteps',<br/>      version='1.0',<br/>      packages=find_packages(),<br/>      include_package_data=True,<br/>      install_requires=[<br/>          'keras',<br/>          'h5py'],<br/>      zip_safe=False)</pre>
+
+<p>在前面的代码中，可以包含运行模型文件所需的附加包。</p>
+
+
+
+
+
+            
+
+
+
+            
+
+        
+
+    </body>
+
+
+
+</html>
+<html xmlns:epub="http://www.idpf.org/2007/ops">
+
+    <head>
+
+        <title>The __init__ file</title>
+
+        
+
+        <meta charset="utf-8"/>
+
+<meta content="urn:uuid:c0dc9385-c68c-47e3-9ef8-4abf6976fdcb" name="Adept.expected.resource"/>
+
+    </head>
+
+
+
+    <body>
+
+        
+
+
+
+                            
+
+                    <h1 class="header-title">__init__ 文件</h1>
+
+                
+
+            
+
+            
+
+                
+
+<p>对于 Cloud ML engine 来说，要为我们正在构建的模块创建一个包，它需要为该模块创建一个包。对于要创建的包，需要在<kbd>trainer</kbd>文件夹中创建<kbd>__init__.py</kbd>文件。</p>
+
+<p>为此，我们将运行以下代码:</p>
+
+<pre>touch trainer/__init__.py</pre>
+
+<p>现在整个设置都准备好了，我们按如下方式运行作业:</p>
+
+<pre>export BUCKET_NAME=my-mnist-bucket<br/>export JOB_NAME="mnist_mlp_hpt_train_$(date +%Y%m%d_%H%M%S)"<br/>export JOB_DIR=gs://$BUCKET_NAME/$JOB_NAME<br/>export REGION=us-east1<br/>export HPTUNING_CONFIG=hptune.yaml<br/>gcloud ml-engine jobs submit training $JOB_NAME \<br/> --job-dir $JOB_DIR \<br/> --runtime-version 1.6 \<br/> --config $HPTUNING_CONFIG \<br/> --module-name trainer.mnist_mlp_lr_numsteps \<br/> --package-path ./trainer \<br/> --region $REGION \<br/> -- \<br/> --train-file gs://$BUCKET_NAME/data/mnist.pkl \<br/> --num-steps 100 \<br/> --lr 0.01</pre>
+
+<p>请注意，我们指定了数据所在的存储桶名称，以及需要存储日志的作业名称和目录。需要设置区域并指定配置文件。</p>
+
+<p>此外，使用包的名称空间点符号将<kbd>--module-name</kbd>参数设置为应用程序主模块的名称。</p>
+
+<p>注意，在指定 region 之后，我们有一个空白，表示现在是参数的开始(它们是训练文件位置、步数和学习速率)。</p>
+
+<p>我们在前面的代码中指定的步数和学习率是默认版本，一旦传递给 ML 引擎作业，它们就会被更改。</p>
+
+<p>代码的输出可以在我们运行的作业的培训输出中看到，如下所示:</p>
+
+<div><img src="img/a8a1fc4e-70ba-476f-9e52-f1eba7f6b915.png" style=""/></div>
+
+<p>然后可以从先前的输出中选择最佳超参数。我们可以看到,<strong> 0.0149 </strong>的学习率和<strong> 7658 </strong>的步数产生了比我们之前测试的两个场景更高的测试数据集准确性。</p>
+
+
+
+
+
+            
+
+
+
+            
+
+        
+
+    </body>
+
+
+
+</html>
+<html xmlns:epub="http://www.idpf.org/2007/ops">
+
+    <head>
+
+        <title>Summary</title>
+
+        
+
+        <meta charset="utf-8"/>
+
+<meta content="urn:uuid:c0dc9385-c68c-47e3-9ef8-4abf6976fdcb" name="Adept.expected.resource"/>
+
+    </head>
+
+
+
+    <body>
+
+        
+
+
+
+                            
+
+                    <h1 class="header-title">摘要</h1>
+
+                
+
+            
+
+            
+
+                
+
+<p>在本章中，我们了解了不同的参数组合如何影响最终精度测量，以及使用 Cloud ML 引擎进行超参数调整如何有助于进一步提高精度。</p>
+
+<p>在下一章中，我们将学习如何识别过度拟合，并通过设置正确的参数和定义适当的架构，使我们的模型对以前未见过的数据更加稳健。</p>
+
+
+
+
+
+            
+
+
+
+            
+
+        
+
+    </body>
+
+
+
+</html></body></html>

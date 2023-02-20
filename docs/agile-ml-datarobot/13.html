@@ -1,0 +1,235 @@
+<html><head/><body>
+
+
+
+
+
+
+
+
+
+
+
+<style type="text/css">body{margin:1em;background-color:transparent!important;}#sbo-rt-content *{text-indent:0pt!important;}#sbo-rt-content .bq{margin-right:1em!important;}</style>
+
+<div><div><h1 id="_idParaDest-132"><em class="italic"> <a id="_idTextAnchor139"/>第十章</em>:推荐系统</h1>
+
+			<p>在本章中，我们将了解什么是推荐系统，讨论它们的各种类型，并通过一个基于内容的推荐系统的<strong class="bold"> DataRobot </strong>实现来工作。在本章中，<strong class="bold">推荐系统</strong>、<strong class="bold">推荐系统</strong>、<strong class="bold">推荐引擎</strong>和<strong class="bold">推荐引擎</strong>可以互换使用。</p>
+
+			<p>最简单的形式是，推荐系统向用户或买家推荐潜在相关的商品。在当今的商业环境中，企业倾向于销售大量的物品、产品或服务，使得用户或购买者更难联系到他们想要的产品或服务。本章解释了推荐引擎在当前商业领域的普遍性。</p>
+
+			<p>虽然这本书不能涵盖推荐系统的每个方面，但我们将讨论如何利用 DataRobot 来构建和(从其进行预测)推荐引擎，并给出这些系统的概念性概述，以及对其类型的简要讨论。因此，在本章结束时，您将学习如何利用 DataRobot 来构建基于内容的推荐引擎。本章的主要主题包括以下内容:</p>
+
+			<ul>
+
+				<li>推荐系统的概念介绍</li>
+
+				<li>构建推荐系统的一种方法</li>
+
+				<li>在 DataRobot 中定义和设置推荐系统</li>
+
+				<li>在 DataRobot 中构建推荐系统</li>
+
+				<li><a id="_idTextAnchor143"/> <a id="_idTextAnchor144"/>用 DataRobot 做推荐系统预测</li>
+
+			</ul>
+
+			<h1 id="_idParaDest-133"><a id="_idTextAnchor145"/>技术要求</h1>
+
+			<p>本章的大部分内容要求访问 DataRobot 软件。该代码示例基于一个相对较小的数据集 Book-Crossing，由三个表组成，其操作是用<strong class="bold"> Jupyter Notebook </strong>执行的。</p>
+
+			<p>看看下面的视频，看看在<a href="https://bit.ly/3HxcNUL">https://bit.ly/3HxcNUL</a>运行的代码。</p>
+
+			<h2 id="_idParaDest-134"><a id="_idTextAnchor146"/>跨账簿数据集</h2>
+
+			<p>用于说明在构建推荐系统中使用 DataRobot 的示例<a id="_idIndexMarker469"/>基于 Cai-Nicolas Ziegler 及其同事的图书交叉数据集。该数据集在 http://www2.informatik.uni-freiburg.de/~cziegler/BX/的<a href="http://www2.informatik.uni-freiburg.de/~cziegler/BX/">被访问。</a><a id="_idTextAnchor147"/></p>
+
+			<p class="callout-heading">注意</p>
+
+			<p class="callout">在使用这个数据集之前，本书的作者已经通知了数据集的所有者关于它在本书中的使用。</p>
+
+			<p class="callout">Cai-Nicolas Ziegler，Sean M. McNee，Joseph A. Konstan，Georg Lausen (2005 年)。通过主题多样化改进推荐列表。第 14 届国际万维网会议论文集(WWW '05) 。2005 年 5 月 10 日至 14 日，日本千叶。</p>
+
+			<p>这些数据是在 2004 年 8 月至 9 月的四周购书社区收集的。接下来的三个表以 CSV 格式提供，构成了这个数据集。</p>
+
+			<ul>
+
+				<li><code>User-ID</code>表示为整数。还提供了用户的<code>Location</code>和<code>Age</code>值。</li>
+
+				<li><code>ISBM</code>、<code>Book-Title</code>、<code>Book-Author</code>、<code>Year-Of-Publication</code>、<code>Publisher</code>。</li>
+
+				<li><code>Book-Rating</code>值要么隐含为<code>0</code>，要么明确介于<code>1</code>和<code>10</code>之间(数字越大，评级越好)。然而，在这个项目的背景下，我们将只关注对模型开发明确的评级。该表还包括<code>User-ID</code>和<code>ISBN</code>值。</li>
+
+			</ul>
+
+			<h1 id="_idParaDest-135">推荐系统的概念介绍</h1>
+
+			<p>企业有向顾客推荐产品或服务的悠久历史。例如，走进一家书店，你很可能会看到其他顾客购买的畅销书清单。这是一种简单的推荐系统，因为它给买家一个潜在产品的快照。</p>
+
+			<p>为了在数字经济中取胜，企业变得越来越以客户为中心。<strong class="bold">以客户为中心</strong>意味着公司的目标是将<a id="_idIndexMarker474"/>客户的需求放在首位。尽管如此，由于顾客的需求和顾客本身一样多种多样，商家需要采取独特的方式来推销他们的产品。这部分解释了<strong class="bold">基于人气的推荐系统</strong>的失败，因为它们没有考虑到买家独特的<a id="_idIndexMarker475"/>特征。因此，随着数字化程度的提高、业务种类的增加以及客户需求的多样化，这种方法不太可能成功。</p>
+
+			<p>有趣的是，数据科学工具可以提供多种方法，通过以多种方式考虑买家的需求，使推荐系统更加智能。</p>
+
+			<p>在介绍不同类型的推荐系统时，我们将继续使用书店的例子。</p>
+
+			<p>首先，推荐系统的<strong class="bold">基于项目的协同过滤</strong>方法<a id="_idIndexMarker476"/>根据购买者的产品购买历史以及这些<em class="italic">产品</em>与其他产品的关系，向图书购买者提出产品建议。同样，如果个人购买了<em class="italic">图书 A </em>，并且<em class="italic">图书 A </em>与<em class="italic">图书 B </em>关联，则建议使用<em class="italic">图书 B </em>。第二种方法，<strong class="bold">基于用户的协同过滤</strong>，在提出建议时考虑<em class="italic">购买者</em>之间的<a id="_idIndexMarker477"/>相似性。这样，如果<em class="italic">买家 A </em>与<em class="italic">买家 B </em>相似，并且<em class="italic">买家 A </em>购买<em class="italic">图书 C </em>，那么<em class="italic">图书 C </em>将<a id="_idIndexMarker478"/>推荐给<em class="italic">买家 B </em>。第三种方法，<strong class="bold">基于内容的推荐</strong>，在提出建议时同时考虑图书和用户特征。最后，<strong class="bold">混合系统</strong>方法<a id="_idIndexMarker479"/>在推荐中使用基于协作和基于内容的方法的组合。很容易看出这两种方法各有优缺点。现在，我们将深入了解这些方法，以及如何使用 DataRobot 在系统上构建基于内容的推荐。</p>
+
+			<h1 id="_idParaDest-136">构建推荐系统的方法</h1>
+
+			<p>推荐系统<a id="_idIndexMarker480"/>旨在向买家推荐相关的<a id="_idIndexMarker481"/>产品。由于它们能够考虑买家的独特性，智能推荐引擎已经为企业创造了数十亿美元的收入，并帮助买家找到相关产品。它们代表着消费者和企业的双赢。已经引入了各种数据驱动的方法来创建智能推荐系统。推荐系统有三种主要方法:协同过滤系统、基于内容的系统和混合系统。让我们在下面的小节中讨论每一种方法。</p>
+
+			<h2 id="_idParaDest-137"><a id="_idTextAnchor151"/>协同过滤推荐系统</h2>
+
+			<p>协同过滤推荐系统背后的核心思想是利用他人过去的行为来推断个人可能感兴趣的内容。协作过滤方法利用产品和用户之间的历史交互的数据存储。<em class="italic">表 10.1 </em>给出了用户评分书的交互矩阵。每个用户用 1 到 5 的数字给一本书打分，5 代表最高水平的享受。如果没有评级，则认为个人没有读过这本书。有两大类协同过滤:<em class="italic">基于项目的</em>协同过滤和<em class="italic">基于用户的</em>协同过滤。</p>
+
+			<div><div><img src="img/Figure_10.01_B17159.jpg" alt="Table 10.1 – User/product interaction matrix&#13;&#10;" width="975" height="623"/>
+
+				</div>
+
+			</div>
+
+			<p class="figure-caption">表 10.1-用户/产品互动矩阵</p>
+
+			<p><em class="italic">基于项目的协同过滤</em>系统(或<strong class="bold">项目到项目的协同算法</strong>)找到项目之间的相似性<a id="_idIndexMarker484"/>，并基于这些相似性提出建议。这种方法的基础是根据<a id="_idIndexMarker485"/>物品与这些人之前喜欢或购买的物品的相似程度向他们推荐物品。利用<em class="italic">表 10.1 </em>，基于<a id="_idIndexMarker486"/>条目的过滤方法将很容易看到<em class="italic">图书 C </em>和<em class="italic">图书 E </em>被之前的读者以相似的方式评级。基于这种项目关系，如果个人对<em class="italic">图书 C </em>评价很高，则会推荐<em class="italic">图书 E </em>，反之亦然。所以，由于<em class="italic">用户 5 </em>对<em class="italic">书 E </em>评价很高，并且没有看过<em class="italic">书 C </em>，所以提出了<em class="italic">书 C </em>的推荐，因为他们喜欢<em class="italic">书 C </em>的可能性很大。</p>
+
+			<p>利用<em class="italic">基于用户的协同过滤</em>系统，在<em class="italic">用户</em>之间发现相似性，并基于这些进行推荐。<strong class="bold">用户对用户的协作算法</strong>旨在发现具有相似行为<a id="_idIndexMarker487"/>或处于相同行为邻域的用户，如通过他们的历史行为所建立的。然后，该算法会考虑他们的偏好并提出建议。这些推荐系统的核心思想是假设如果个人<em class="italic">与</em>相似，那么<em class="italic">喜欢的</em>也会相似。从<em class="italic">表 10.1 </em>中可以推断出<em class="italic">用户 2 </em>和<em class="italic">用户 4 </em>有相似的图书兴趣。因为<em class="italic">用户 4 </em>对<em class="italic">图书 D </em>评价很高，所以<em class="italic">用户 2 </em>喜欢<em class="italic">图书 D </em>的可能性被认为很高，因此推荐。正如我们所见，两种协同过滤方法都基于相似性的概念。</p>
+
+			<p>相似性度量为推荐提供了基础。有几个相似性度量标准，其中最流行的是<a id="_idIndexMarker488"/><strong class="bold">皮尔逊相关系数</strong>和<strong class="bold">余弦相似度</strong>。其他人已经在<em class="italic">邻域</em>上进行这种<a id="_idIndexMarker489"/>相似性测量。利用<strong class="bold">K-最近邻</strong>算法<a id="_idIndexMarker490"/>来分别找到与被推荐或被推荐到的项目或用户最近的项目或用户。</p>
+
+			<p>因为<a id="_idIndexMarker491"/>交互数据集很容易获得，所以构建<a id="_idIndexMarker492"/>协同过滤比基于内容的系统要容易得多，这将在接下来的章节中讨论。然而，推荐系统的协作方法有一些缺点。在<em class="italic">表 10.1 </em>的上下文中，引入了一个没有历史记录的新用户<em class="italic">用户 6 </em>。很容易看出，协同过滤系统将很难向这个用户进行推荐。对于没有历史数据的项目，问题是类似的。这个问题，也称为<a id="_idIndexMarker493"/><strong class="bold">冷启动</strong>问题，是有据可查的。<strong class="bold">数据稀疏</strong>是<a id="_idIndexMarker494"/>另一个通常与协同过滤相关的问题。大多数平台和大型企业都有买家和产品。尽管如此，最活跃的用户只会购买一小部分可用产品。因此，在为这些引擎提供动力时，有意义地计算相似性所需的数据存在缺口。</p>
+
+			<h2 id="_idParaDest-138">基于内容的推荐系统</h2>
+
+			<p><em class="italic">基于内容的推荐系统</em>根据商品特征和用户<a id="_idIndexMarker495"/>档案提出建议。这种方法有一个<a id="_idIndexMarker496"/>不同类型的数据结构作为支撑。基于内容的系统是<code>1</code>和<code>5</code>，模型是基于回归的，因为它预测一个区间变量。这个模型成为一个基于内容的推荐引擎。</p>
+
+			<p>从前面的讨论中，我们可以看到，基于内容的系统可以很容易地缓解冷启动问题，因为书籍和用户可能有一些形式的描述。与协同过滤系统相比，基于内容的系统更具可扩展性，因为在生产环境中，可以在需要时轻松地进行预测，而不必同时对所有用户和产品进行预测。重要的是，即使用户只评价或购买少数产品，基于内容的系统仍然表现良好，因为它们关注的是描述，而不一定是用户或产品。也就是说，当项目的特征不容易获得时，大多数基于内容的系统都会遇到困难。在某些情况下，为产品生成属性可能会很困难(例如，如果产品是或有图像或声音)。在这种情况下，基于内容的系统将没有描述可以分析。此外，由于日益增长的在线隐私问题，用户的人口统计信息可能不容易获得。协同过滤和基于内容的推荐方法的局限性导致了混合系统的使用。</p>
+
+			<h2 id="_idParaDest-139"><a id="_idTextAnchor153"/>混合推荐系统</h2>
+
+			<p><em class="italic">混合推荐系统</em>是<a id="_idIndexMarker500"/>推荐系统的<a id="_idIndexMarker499"/>集成方法。混合系统通过利用两种或多种推荐策略的组合来向用户产生推荐。通过这样做，他们减轻了归因于任何一种策略的局限性，从而受益于<em class="italic">的众人智慧。</em></p>
+
+			<p>混合系统有几种方法。最常用的(也是最容易实现的)是<strong class="bold">加权方法</strong>。这里，来自独立推荐系统的分数被合计以给出总体推荐分数。聚合方法各不相同，可以包括基本平均、应用规则和使用线性函数。<strong class="bold">分阶段方法</strong>也可以<a id="_idIndexMarker502"/>部署。这通常包括将推荐系统的结果作为输入特征集成到另一个推荐系统中。因此，<em class="italic">阶段 1 </em>系统的输出成为<em class="italic">阶段 2 </em>系统的附加输入。<strong class="bold">切换方法</strong>包括<a id="_idIndexMarker503"/>使用规则在不同的推荐系统之间切换，以在给定的上下文中利用它们的优势。例如，如果协同过滤被认为给出更好的结果，则切换机制可以使用协同过滤方法，但是当有冷启动时，它可以改变为基于内容的方法。与基于内容的系统相比，混合系统的一个优势<a id="_idIndexMarker504"/>是在难以确定项目特征时能够提出建议<a id="_idIndexMarker505"/>。正如将在第 11 章 、<em class="italic">使用地理空间数据、自然语言处理和图像处理</em>中演示的，DataRobot 具有针对图像和文本数据的高级特征提取功能。</p>
+
+			<h1 id="_idParaDest-140">在 DataRobot 中定义和设置推荐系统</h1>
+
+			<p>DataRobot 由于其从图像、音频和文本数据中提取特征的能力，有效地管理了基于内容的<a id="_idIndexMarker508"/>推荐系统的<a id="_idIndexMarker506"/>特征可用性限制。除了 DataRobot 的自动化 ML 模型流程之外，这意味着它能够充分利用基于内容方法的优势，同时弥补这种方法的功能不可用限制。正如在<em class="italic">技术需求</em>一节中所描述的，我们示例中使用的数据集由三个表组成。这包括用户表(呈现用户的简档)、图书表(概述图书的特征)和评级表(包含用户图书评级)。因为我们有一个描述书籍的表，和另一个描述用户的表，所以整合这些表和评级就为基于内容的推荐系统奠定了基础。为此，我们使用了 Jupyter 笔记本。<em class="italic">图 10.1 </em>显示了我们接收数据集、操作数据集、合并表并将其写回 CSV 文件的脚本:</p>
+
+			<p class="figure-caption"> </p>
+
+			<div><div><img src="img/Figure_10.02_B17159.jpg" alt="Figure 10.1 – Data manipulations in Jupyter Notebook&#13;&#10;" width="1448" height="593"/>
+
+				</div>
+
+			</div>
+
+			<p class="figure-caption">图 10.1-Jupyter 笔记本中的数据操作</p>
+
+			<p>在<a id="_idIndexMarker510"/>评级表上<code>rating</code>的值<a id="_idIndexMarker511"/>为<code>0</code>的行被排除在外，因为评级是<a id="_idIndexMarker512"/>隐式的。在<em class="italic">使用 DataRobot </em>进行推荐系统预测一节中，这些行将<a id="_idIndexMarker513"/>用于演示如何使用推荐引擎进行预测。通过更改标题来操作表格，并将<code>ratings</code>、<code>books</code>和<code>users</code>的值合并到一个表格中，每一行都有一个用户和一本书的描述，以及一个评级。数据快照如<em class="italic">表 10.2 </em>所示。尽管我们可以使用 Python API 方法在 Jupyter Notebook 中创建 DataRobot 项目(如第 12 章 、<em class="italic"> DataRobot Python API </em>中所述)，但为了保持一致性，我们将数据下载为文件:<code>rating.csv</code>。</p>
+
+			<div><div><img src="img/Figure_10.03_B17159.jpg" alt="Table 10.2 – Data snapshot&#13;&#10;" width="1405" height="631"/>
+
+				</div>
+
+			</div>
+
+			<p class="figure-caption">表 10.2-数据快照</p>
+
+			<p>按照<a href="B17159_06_Final_NM_ePub.xhtml#_idTextAnchor104"> <em class="italic">第 6 章</em></a><em class="italic">中建立的<a id="_idIndexMarker514"/>流程，用 DataRobot </em>建立模型，我们为推荐系统创建了一个 DataRobot 项目。当<a id="_idIndexMarker515"/>这样做时，我们将<code>rating.csv</code>文件<a id="_idIndexMarker516"/>拖入初始项目窗口。此<a id="_idIndexMarker517"/>打开图<em class="italic">10.2</em>所示的窗口。对于每一行，由于图书评级被用作用户兴趣的指标，所以它可以被用作目标变量。由于目标变量<code>ratings</code>的性质，该推荐系统的 ML 模型将是回归模型类型。</p>
+
+			<div><div><img src="img/Figure_10.04_B17159.jpg" alt="Figure 10.2 – DataRobot project initiation window &#13;&#10;" width="1301" height="537"/>
+
+				</div>
+
+			</div>
+
+			<p class="figure-caption">图 10.2–data robot 项目启动窗口</p>
+
+			<p>不出所料，<a id="_idIndexMarker518"/>的收视率在<code>1</code>到<code>10</code>之间。理想情况下，我们<a id="_idIndexMarker519"/>将删除带有隐式<a id="_idIndexMarker520"/>(属于<code>0</code>)评级和<code>user_ID</code>字段<a id="_idIndexMarker521"/>的行，以创建用于建模的健壮数据集。接下来要做的是建立推荐系统的 ML 模型。</p>
+
+			<h1 id="_idParaDest-141">在 DataRobot 中构建推荐系统</h1>
+
+			<p><a id="_idIndexMarker522"/>无人驾驶<code>user_id</code>在<strong class="bold">群体 ID 特征</strong>领域的优势之一。</p>
+
+			<p>如<a href="B17159_06_Final_NM_ePub.xhtml#_idTextAnchor104"> <em class="italic">第 6 章</em> </a>、<em class="italic">使用 DataRobot </em>建立模型中所述，在模型创建期间，当模型<strong class="bold">库</strong>选项卡中的搜索字段中出现<code>Training Schedule</code>或简称为<code>Training</code>时，DataRobot 开始开发 ML 模型。这将调出相关型号列表(参见<em class="italic">图 10.3 </em>):</p>
+
+			<div><div><img src="img/Figure_10.05_B17159.jpg" alt="Figure 10.3 – Selecting the advanced modeling approaches most suitable for recommender systems&#13;&#10;" width="1399" height="718"/>
+
+				</div>
+
+			</div>
+
+			<p class="figure-caption">图 10.3-选择最适合推荐系统的高级建模方法</p>
+
+			<p>除了<a id="_idIndexMarker527"/>选择这些建模方法将<a id="_idIndexMarker528"/>包括在要创建的模型列表中，模型<code>Autopilot Stage 1</code>基于<code>Informative Features</code>，然后进行所有五次<code>Cross Validation</code>运行。最后单击<strong class="bold">运行任务</strong>将这些任务包含在处理队列中。</p>
+
+			<p>创建模型后，下一步是评估它们的准确性。在此之前，检查<strong class="bold">相对重要性</strong>图来检查我们的模型是否符合常识是很重要的。从<em class="italic">图 10.4 </em>中可以明显看出，通过<strong class="bold"> Insight </strong>窗口打开<strong class="bold">变量重要性</strong>窗口为我们提供了探索这些模型的机会:</p>
+
+			<div><div><img src="img/Figure_10.06_B17159.jpg" alt="Figure 10.4 – Variable importance&#13;&#10;" width="1416" height="540"/>
+
+				</div>
+
+			</div>
+
+			<p class="figure-caption">图 10.4–可变重要性</p>
+
+			<p>旁边的值<code>London</code>和标题的一个方面(例如，<code>Kingdom</code>)可以被解释为对模型有影响。因此，在这个简化的例子中，创建了一个高阶特征，即<code>London</code>和<code>Kingdom</code>之间的交互。因此，根据这种新创建的高阶特征的存在，评级预测变化很大。</p>
+
+			<p>在型号选择中，使用<a id="_idIndexMarker531"/>确定的<code>Keras Slim Residual Neural Network Regressor using Adaptive Training Schedule (1 Layer: 64 Units)</code>是性能最好的型号(见<em class="italic">图 10.5 </em>)。需要强调的是，在某些情况下，衡量推荐系统模型的准确性并不简单。想象一下，在这种情况下，当个人购买一本书时，我们只能有一个评级<code>1</code>，否则它将是<code>0</code>。天真地衡量模型的准确性变得有限，因为<code>0</code>评级并不一定意味着个人对某个项目不感兴趣。这是因为有可能这个人从未读过这本书。因为一个好的推荐系统会推荐那些其特征与一个人的简档相一致的项目，作为一个潜在的未读书籍来阅读，所以它很可能有很大比例的误报。这是因为，尽管他们目前的评级是<code>0</code>，但有问题的用户很可能会有兴趣阅读他们。在这种情况下，<strong class="bold">召回</strong>类型成为评估模型性能的一个更重要的指标。鉴于我们只确定个人购买物品的情况，孤立地评估这些情况是合理的。因此，<a id="_idIndexMarker532"/>模型准确性预测正确阅读的书籍<a id="_idIndexMarker533"/>的程度，通常被称为<strong class="bold">召回</strong>，成为更合适的度量。</p>
+
+			<div><div><img src="img/Figure_10.07_B17159.jpg" alt="Figure 10.5 – Leaderboard tab for recommendation systems&#13;&#10;" width="1229" height="718"/>
+
+				</div>
+
+			</div>
+
+			<p class="figure-caption">图 10.5–推荐系统的排行榜选项卡</p>
+
+			<p>对于一个推荐系统，在决定使用哪个模型时，准确性和预测速度是非常重要的考虑因素。作为这个讨论的基础，重要的是理解有两种主要的方法来使用推荐系统进行预测。第一种方法是按项目对用户组合进行批量评分，其中项目还没有被用户阅读。随着项目和用户的增加，该数据集呈指数级增长。第二种方法是<em class="italic">实时预测</em>。例如，想象一个人来到一个电子商务平台。该个人的数据和产品的数据被快速评分，并且建议几乎立即被评分。在这两种情况下，预测的速度是商业成功的关键。DataRobot <code>Keras Slim Residual Neural Network Regressor using Adaptive Training Schedule (1 Layer: 64 Units)</code>为<code>1.6746</code>，其预测速度为每 1000 次预测<code>35.57</code> ms。一些 blender 模型的验证分数<a id="_idIndexMarker534"/>看起来更好，但是<a id="_idIndexMarker535"/>在预测速度方面要弱得多。</p>
+
+			<div><div><img src="img/Figure_10.08_B17159.jpg" alt="Figure 10.6 – DataRobots' Speed vs Accuracy chart&#13;&#10;" width="1202" height="683"/>
+
+				</div>
+
+			</div>
+
+			<p class="figure-caption">图 10.6-数据机器人的速度与准确度图表</p>
+
+			<p>这表明，尽管这个模型非常准确，但它在预测方面非常慢。<strong class="bold">速度与准确度</strong>图表展示了几种型号的速度和准确度的快照。可以使用<strong class="bold">模型比较</strong>工具<a id="_idIndexMarker536"/>进行更深入的成对比较。为了<a id="_idIndexMarker537"/>继续预测的讨论，我们现在将 tu <a id="_idTextAnchor156"/> <a id="_idTextAnchor157"/> <a id="_idTextAnchor158"/> rn 用于在 DataRobot 中进行推荐系统预测。</p>
+
+			<h1 id="_idParaDest-142">使用 DataRobot 进行推荐系统预测</h1>
+
+			<p>从 DataRobot 上的<a id="_idIndexMarker539"/>推荐引擎创建<a id="_idIndexMarker538"/>建议非常简单。我们使用拖放方法(如前几章所述)，因为我们的预测数据集很小。对于较大的数据集(超过 1 GB)，推荐系统通常会使用 DataRobot 预测 API。创建模型和进行预测的 API 方法在<a href="B17159_12_Final_NM_ePub.xhtml#_idTextAnchor176"> <em class="italic">第 12 章</em> </a>、<em class="italic"> DataRobot Python API </em>中有深入的介绍。</p>
+
+			<p>我们的预测数据集大小为 64 MB，因此拖放方法是合适的。对于这种预测方法，我们从原始数据集中指定想要使用的列。理想情况下，我们至少需要一个项目和用户的标识符。如图 10.7 中的<em class="italic">所示，我们已经选择将<code>ISBN</code>、<code>user_id</code>和<code>title</code>字段包含在我们的预测中。我们将预测数据集拖放到指定区域。像往常一样，这个数据集被快速评估，我们看到了<strong class="bold">运行外部测试</strong>或<strong class="bold">计算预测</strong>选项。</em></p>
+
+			<div><div><img src="img/Figure_10.09_B17159.jpg" alt="Figure 10.7 – A recommendation engine prediction setup&#13;&#10;" width="1442" height="694"/>
+
+				</div>
+
+			</div>
+
+			<p class="figure-caption">图 10.7-推荐引擎预测设置</p>
+
+			<p>此时，我们<a id="_idIndexMarker540"/>点击<code>.csv</code>文件(见<em class="italic">表 10.3 </em>)。如前所述，预测集是从隐含评级的原始数据集中提取的(因此评级得分为零)。因此，预测数据集仅具有可能的人-项目交互的有限样本。一些用户(例如，<code>8</code>为<code>user_id</code>的用户)有大约<code>10</code>项得分，而一些用户只有<code>1</code>项得分。在理想情况下，个人看不到的所有项目都将被评级。也就是说，提供给用户的建议是按照预测兴趣的顺序进行的。对于用户<code>8</code>，首先提供标题为<code>A Second Chicken Soup for the Woman's Soul (Chicken Soup for the Soul Series)</code>的图书。在某些情况下，会使用 top <em class="italic"> n </em>建议。在我们的图书案例中，前<em class="italic"> n </em>是指，对于每个用户，前<em class="italic"> n </em>本书是根据他们的预测值选择的。</p>
+
+			<div><div><img src="img/Figure_10.10_B17159.jpg" alt=" Table 10.3 – A recommendation engine sample prediction&#13;&#10;" width="1181" height="598"/>
+
+				</div>
+
+			</div>
+
+			<p class="figure-caption">表 10.3-推荐引擎样本预测</p>
+
+			<p>使用 DataRobot 可以将选中的模型<a id="_idIndexMarker542"/>部署为<strong class="bold"> REST </strong> API，如<a href="B17159_08_Final_NM_ePub.xhtml#_idTextAnchor116"> <em class="italic">第八章</em> </a>、<em class="italic">模型评分和部署</em>所示，然后可以通过 DataRobot API 调用对数据进行评分(我们将在<a href="B17159_12_Final_NM_ePub.xhtml#_idTextAnchor176"> <em class="italic">第十二章</em> </a>、<em class="italic"> DataRobot Python API </em>中讨论)。一些 DataRobot 模型可以作为<strong class="bold"> JAR </strong>文件<a id="_idIndexMarker543"/>下载，这些文件<a id="_idIndexMarker544"/>可以与其他应用<a id="_idIndexMarker545"/>集成以进行实时预测。在其他地方，可以使用不同的人-项目交互进行批量预测，然后将<a id="_idIndexMarker546"/>存储在大数据存储表中，如<strong class="bold">谷歌云 BigQuery </strong>。</p>
+
+			<h1 id="_idParaDest-143"><a id="_idTextAnchor160"/>总结</h1>
+
+			<p>在这一章中，我们介绍并评价了推荐系统的不同方法。我们研究了基于内容和协同过滤推荐系统的数据结构要求，并讨论了它们的基本假设。然后，我们指出 DataRobot 在从具有挑战性的数据类型(例如，图像数据)中提取特征方面的优势，这些数据类型通常会限制基于内容的系统的使用。然后，我们举例说明了 DataRobot 在使用一个基于小数据集的基于内容的推荐系统来构建和做出预测方面的用途。</p>
+
+			<p>需要强调的是，这个项目使用的数据集由多种数据类型组成。DataRobot 能够提取特征并集成不同的数据类型来创建 ML 模型。在下一章中，我们将探讨在创建 ML 模型时，如何将数据集与图像、文本和位置数据结合使用。</p>
+
+		</div>
+
+	</div>
+
+</body></html>

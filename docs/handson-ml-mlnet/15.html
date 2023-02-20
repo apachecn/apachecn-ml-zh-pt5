@@ -1,0 +1,435 @@
+<html><head/><body>
+
+
+    
+        <title>Training and Building Production Models</title>
+        
+        <meta charset="utf-8"/>
+    
+
+    
+        
+
+                            
+                    <h1 class="header-title">培训和构建生产模型</h1>
+                
+            
+            
+                
+<p>当我们进入本书的最后一部分时，本章提供了在生产环境中使用机器学习的概述。至此，您已经学习了 ML.NET 提供的各种算法，并且创建了一套三个生产应用程序。有了所有这些知识，你的第一个想法可能会是:我如何才能立即创建下一个杀手级机器学习应用程序？在开始回答这个问题之前，本章将帮助你为这个旅程的下一步做好准备。如前几章所讨论和利用的，训练模型有三个主要部分:特征工程、样本收集和创建训练管道。在本章中，我们将重点关注这三个组成部分，扩展您如何成功创建生产模型的思维过程，并提供一些建议工具，以便能够通过生产级培训渠道重复这一成功。</p>
+<p>在本章中，我们将讨论以下内容:</p>
+<ul>
+<li>调查特征工程</li>
+<li>获取训练和测试数据集</li>
+<li>创建您的模型构建管道</li>
+</ul>
+
+
+            
+
+            
+        
+    
+
+
+
+
+
+
+    
+        <title>Investigating feature engineering</title>
+        
+        <meta charset="utf-8"/>
+    
+
+    
+        
+
+                            
+                    <h1 class="header-title">调查特征工程</h1>
+                
+            
+            
+                
+<p>正如我们在前面章节中所讨论的，特征是模型构建过程中最重要的组成部分之一，客观上也是最重要的组成部分。当处理一个新问题时，出现的主要问题是:你将如何解决这个问题？例如，网络安全领域的一个常见漏洞是隐写术的使用。隐写术可以追溯到公元前 440 年，是一种将数据隐藏在容器中的做法。这个容器包括绘画、填字游戏、音乐和图片等等。在网络安全领域，隐写术用于隐藏文件中的恶意有效载荷，否则这些文件会被忽略，如图像、音频和视频文件。</p>
+<p>以下面一篮子食物为例。这张使用在线隐写工具创建的图像中嵌入了信息；看看你是否能在下图中发现任何不寻常的模式:</p>
+<p class="CDPAlignCenter CDPAlign"><img class="alignnone size-full wp-image-678 image-border" src="img/87343f3c-14ed-4e7f-96bf-0c8027ac76ed.png" style="width:35.92em;height:26.92em;"/></p>
+<p>今天的大多数工具可以屏蔽复杂和纯色图像中的内容，以至于您作为最终用户甚至不会注意到—如前面的示例所示。</p>
+<p>继续这个场景，您现在可能需要回答的一个快速问题是:文件中是否包含另一种文件格式？另一个要考虑的因素是你的问题的范围。试图回答上述问题会导致深入分析递归解析器使用的每一种文件格式，这是非常耗时的——这不是马上就能解决的事情。一个更好的选择是将问题的范围扩大到分析音频文件或图像文件。进一步思考这个过程，让我们将问题的范围扩大到特定的图像类型和有效负载类型。</p>
+
+
+            
+
+            
+        
+    
+
+
+
+
+
+
+    
+        <title>PNG image files with embedded executables</title>
+        
+        <meta charset="utf-8"/>
+    
+
+    
+        
+
+                            
+                    <h1 class="header-title">嵌入可执行文件的 PNG 图像文件</h1>
+                
+            
+            
+                
+<p>让我们深入这个更具体的问题:我们如何在<strong>便携式网络图形</strong> ( <strong> PNG </strong>)文件中检测 Windows 可执行文件？对于那些好奇的人来说，特别选择 PNG 文件背后的原因是，由于其良好的图像质量与文件大小的比率，它们是视频游戏和互联网中使用的一种非常常见的无损图像格式。这种程度的使用为攻击者在你的机器上获取 PNG 文件创造了一个接口，作为最终用户的你对此毫不犹豫，而专有格式或 Windows <strong>可执行文件</strong> ( <strong> EXE </strong>)可能会引起最终用户的警觉。</p>
+<p>在下一节中，我们将把 PNG 文件分解为以下步骤:</p>
+<p class="CDPAlignCenter CDPAlign"><img class="alignnone size-full wp-image-603 image-border" src="img/292aec1c-411c-4fc1-a039-bb0d67ddaa4c.png" style="width:14.67em;height:12.42em;"/></p>
+<p>为了更深入地研究 PNG 文件格式，PNG 的规范可以在这里找到:<a href="http://libpng.org/pub/png/spec/1.2/PNG-Contents.html">http://libpng.org/pub/png/spec/1.2/PNG-Contents.html</a></p>
+
+
+            
+
+            
+        
+    
+
+
+
+
+
+
+    
+        <title>Creating a PNG parser</title>
+        
+        <meta charset="utf-8"/>
+    
+
+    
+        
+
+                            
+                    <h1 class="header-title">创建 PNG 解析器</h1>
+                
+            
+            
+                
+<p>现在让我们深入剖析 PNG 文件格式的特性，以便驱动一个潜在的模型来检测隐藏的有效载荷。PNG 文件由连续的块构成。每个数据块由一个标题描述字段组成，后面跟着一个数据有效载荷。一个 PNG 文件需要的组块有<strong> IHDR </strong>、<strong> IDAT、</strong>和<strong> IEND </strong>。根据规范，各部分必须按此顺序出现。下面将对每一部分进行解释。</p>
+<p>块前面的第一个元素是实现检查，以确保文件实际上是一个 PNG 图像文件。这种检查一般被称为<strong>文件魔法检查</strong>。在我们的数字世界中使用的大多数文件都有独特的签名，这使得解析和保存这些文件变得更加容易。</p>
+<p>对于那些对其他文件格式的签名感兴趣的人，可以在这里找到一个详细的列表:<a href="https://www.garykessler.net/library/file_sigs.html">https://www.garykessler.net/library/file_sigs.html</a></p>
+<p>PNG 文件特别以下列字节开头:</p>
+<pre>137, 80, 78, 71, 13, 10, 26, 10</pre>
+<p>通过使用这些文件魔术字节，我们可以利用<kbd>SequenceEqual</kbd>。NET 方法来比较文件数据的第一个字节序列，如下面的代码所示:</p>
+<pre>using var ms = new MemoryStream(data);<br/><br/>byte[] fileMagic = new byte[FileMagicBytes.Length];<br/><br/>ms.Read(fileMagic, 0, fileMagic.Length);<br/><br/>if (!fileMagic.SequenceEqual(FileMagicBytes))<br/>{<br/>     return (string.Empty, false, null);<br/>}</pre>
+<p>如果<kbd>SequenceEqual</kbd>方法检查了<kbd>FileMagicBytes</kbd>属性并且不匹配，我们返回 false。在这种情况下，该文件不是 PNG 文件，因此，我们希望停止进一步解析该文件。</p>
+<p>从这一点，我们现在将迭代文件的块。在任何时候，如果字节设置不正确，都应该注意到这一点，因为 Microsoft Paint 或 Adobe PhotoShop 会按照 PNG 文件格式的规范保存文件。另一方面，恶意生成器可能会违反 PNG 文件格式的规范，如下所示:</p>
+<pre class="mce-root">while (ms.Position != data.Length)<br/>{<br/>    byte[] chunkInfo = new byte[ChunkInfoSize];<br/><br/>    ms.Read(chunkInfo, 0, chunkInfo.Length);<br/><br/>    var chunkSize = chunkInfo.ToInt32();<br/><br/>    byte[] chunkIdBytes = new byte[ChunkIdSize];<br/><br/>    ms.Read(chunkIdBytes, 0, ChunkIdSize);<br/><br/>    var chunkId = Encoding.UTF8.GetString(chunkIdBytes);<br/><br/>    byte[] chunk = new byte[chunkSize];<br/><br/>    ms.Read(chunk, 0, chunkSize);<br/><br/>    switch (chunkId)<br/>    {<br/>        case nameof(IHDR):<br/>            var header = new IHDR(chunk);<br/><br/>            // Payload exceeds length<br/>            if (data.Length &lt;= (header.Width * header.Height * MaxByteDepth) + ms.Position)<br/>            {<br/>                break;<br/>            }<br/><br/>            return (FileType, false, new[] { "SUSPICIOUS: Payload is larger than what the size should be" });<br/>        case nameof(IDAT):<br/>            // Build Embedded file from the chunks<br/>            break;<br/>        case nameof(IEND):<br/>            // Note that the PNG had an end<br/>            break;<br/>    }<br/>}</pre>
+<p>对于每个块，我们读取<kbd>ChunkInfoSize</kbd>变量，它被定义为 4 个字节。这个<kbd>ChunkInfoSize</kbd>数组一旦被读取，就包含要读取的块的大小。除了确定我们要读取的块类型之外，我们还读取 4 个字符的字符串(<kbd>IHDR</kbd>、<kbd>IDAT</kbd>、<kbd>IEND</kbd>)的 4 字节块。</p>
+<p>一旦我们有了块的大小和类型，我们就可以构建每个块的类对象表示。对于这个代码示例的范围，我们将只查看 IHDR 类的一个片段，它包含高级图像属性，如尺寸、位深度和压缩:</p>
+<pre>public class IHDR<br/>{<br/>    public Int32 Width;<br/><br/>    public Int32 Height;<br/><br/>    public byte BitDepth;<br/><br/>    public byte ColorType;<br/><br/>    public byte Compression;<br/><br/>    public byte FilterMethod;<br/><br/>    public byte Interlace;<br/><br/>    public IHDR(byte[] data)<br/>    {<br/>        Width = data.ToInt32();<br/><br/>        Height = data.ToInt32(4);<br/>    }<br/>}</pre>
+<p>我们将只提取<kbd>Width</kbd>和<kbd>Height</kbd>属性，它们是前 8 个字节(每个 4 个字节)。对于这个例子，我们也利用一个扩展方法将一个字节数组转换成一个<strong> <kbd>Int32</kbd> </strong>数组。在大多数情况下，BitConverter 将是理想的场景，但是，对于这个代码示例，我希望简化数据的顺序访问，例如在检索前面提到的<kbd>Height</kbd>属性时，偏移 4 个字节。</p>
+<p>前面提到的 IDAT 块是实际的图像数据，也是包含嵌入式有效负载的潜在块。顾名思义，IEND 只是告诉 PNG 解析器文件是完整的，也就是说，IEND 块中没有有效载荷。</p>
+<p>一旦文件被解析，我们返回文件类型(<strong>PNG</strong>)——无论它是否是一个有效结构化的 PNG 文件——我们注意到任何可疑的事情，比如文件大小是否比它应该的大得多，给定宽度、高度和最大位深度(24)。对于这些注释中的每一个，它们都可以被规范化，以及生产模型中的有效/无效标志。此外，这些可以有一个简单枚举的数字表示。</p>
+<p>对于那些对完整应用程序的源代码感兴趣的人，请参考<a href="https://github.com/jcapellman/virus-tortoise">https://github.com/jcapellman/virus-tortoise</a>，它利用了在<a href="5f67e3b8-56bd-47ab-8a72-4f00b239d517.xhtml">第 9 章</a>、<em>中的<em>创建文件分类应用程序</em>部分中显示的许多相同的原理，使用具有 ASP.NET 内核的 ML.NET</em>。<br/> <br/>进一步看这个例子，遍历包含实际图像数据和潜在可执行有效载荷的 IDAT 块，将完成生产应用程序中的提取器。</p>
+<p>现在，我们已经了解了构建生产级别的要素所需的工作量，让我们开始构建生产培训数据集。</p>
+
+
+            
+
+            
+        
+    
+
+
+
+
+
+
+    
+        <title>Obtaining training and testing datasets</title>
+        
+        <meta charset="utf-8"/>
+    
+
+    
+        
+
+                            
+                    <h1 class="header-title">获取训练和测试数据集</h1>
+                
+            
+            
+                
+<p>现在我们已经完成了对特征工程的讨论，下一步是获取数据集。对于某些问题，这可能非常困难。例如，当试图预测别人没有做过的事情或新兴领域的事情时，拥有一个训练集来进行训练会比我们前面的例子中找到恶意文件更困难。</p>
+<p>另一个要考虑的方面是多样性和数据是如何分解的。例如，考虑你如何使用 ML.NET 提供的异常检测训练器，基于行为分析预测恶意的 Android 应用程序。当考虑建立你的数据集时，我认为大多数 Android 用户并没有一半的应用程序是恶意的。因此，即使是恶意的和良性的(50/50)训练和测试集的分解也可能过度适合恶意的应用程序。弄清楚并分析你的目标用户将会遇到的实际表现是至关重要的，否则你的模型可能会出现误报或漏报，这两种情况你的最终用户都不会满意。</p>
+<p>训练和测试数据集时要考虑的最后一个因素是如何获取数据集。由于您的模型在很大程度上基于训练和测试数据集，因此找到代表您的问题集的真实数据集至关重要。使用前面的隐写术示例，如果您未经验证就提取了随机的 PNG 文件，则有可能在坏数据上训练模型。对此的缓解是检查 IDAT 组块中隐藏的有效载荷。同样，PNG 示例中对实际文件的验证也很关键。当您在生产应用程序中只运行 PNG 文件时，对混合在 PNG 文件中的 JPG、BMP 或 GIF 文件的训练也可能导致误报或漏报。因为其他图像格式的二进制结构不同于 PNG，所以这种不具代表性的数据会使训练集偏向不支持的格式。</p>
+<p>对于网络安全领域的人来说，如果很难获得各种文件类型的本地数据源，virus total(<a href="https://www.virustotal.com">https://www.virustotal.com</a>)和 Reversing Labs(<a href="https://www.reversinglabs.com">https://www.reversinglabs.com</a>)提供大量的文件数据库供付费下载。</p>
+
+
+            
+
+            
+        
+    
+
+
+
+
+
+
+    
+        <title>Creating your model-building pipeline</title>
+        
+        <meta charset="utf-8"/>
+    
+
+    
+        
+
+                            
+                    <h1 class="header-title">创建您的模型构建管道</h1>
+                
+            
+            
+                
+<p>创建要素提取器并获得数据集后，下一个要建立的元素是模型构建管道。下图可以更好地显示模型构建管道的定义:</p>
+<p class="CDPAlignCenter CDPAlign"><img class="alignnone size-full wp-image-679 image-border" src="img/96a12aa1-920c-40d8-bc92-2e0771fde4fb.png" style="width:12.67em;height:16.17em;"/></p>
+<p>对于每个步骤，我们将在下一节讨论它们如何与您选择的管道相关联。</p>
+
+
+            
+
+            
+        
+    
+
+
+
+
+
+
+    
+        <title>Discussing attributes to consider in a pipeline platform</title>
+        
+        <meta charset="utf-8"/>
+    
+
+    
+        
+
+                            
+                    <h1 class="header-title">讨论在管道平台中要考虑的属性</h1>
+                
+            
+            
+                
+<p>有相当多的管道工具可用于内部部署，无论是在云中还是作为<strong> SaaS </strong> ( <strong>软件作为</strong> <strong> a </strong> <strong>服务</strong>)服务。我们将回顾行业中几个比较常用的平台。但是，无论您选择哪种平台，以下几点都是需要记住的几个要素:</p>
+<ul>
+<li>速度很重要，原因有几个。在构建初始模型时，迭代的时间非常重要，因为您很可能会调整训练集和超参数，以便测试各种组合。在流程的另一端，当您处于预生产或生产阶段时，与测试人员或客户(他们正在等待一个新的模型来解决问题或添加特性)进行迭代的时间在大多数情况下是至关重要的。</li>
+<li><strong>可重复性</strong>对于确保在给定相同数据集、特征和超参数的情况下每次都能重建完美模型也很重要。尽可能利用自动化是避免训练模型中人为错误的一种方法，同时也有助于提高可重复性。下一节将介绍的所有平台都提倡在启动新的培训课程后，在没有任何人工输入的情况下定义管道。</li>
+<li><strong>版本控制和跟踪比较</strong>很重要，这样可以确保在进行更改时，可以对它们进行比较。例如，无论是超参数(如快速树模型中树的深度)还是添加的额外样本，在迭代时跟踪这些变化都是至关重要的。假设，如果你做了一个记录在案的改变，而你的效率显著下降，你总是可以回去评估那个改变。如果您没有版本化或记录您的个人变化以供比较，这个简单的变化可能很难准确指出功效的下降。跟踪的另一个要素是跟踪一段时间内的进展，例如每季度或每年。这种级别的跟踪有助于描绘一幅画面，也有助于推动后续步骤或跟踪功效趋势，以便获得更多样本或添加更多功能。</li>
+<li>最后，<strong>质量保证</strong>很重要，原因有几个，而且几乎在所有情况下，对项目的成败都至关重要。想象一下，一个模型被直接部署到生产环境中，而没有任何额外的检查，由专门的质量保证团队执行手动和自动测试。自动化测试——简单到一组单元测试，以确保从发布前的模型到模型，再到生产，样本测试相同或更好——可能是一个很好的权宜之计，而不是一整套具有特定功效范围的自动化测试。</li>
+</ul>
+<p>在执行上一节中讨论的模型构建管道中的每个步骤时，应该考虑所有这四个元素。交付的最后一步取决于前面三个要素是否正确完成。实际交付取决于您的应用。例如，如果您正在创建一个 ASP.NET 应用程序，比如我们在第九章第一节中创建的应用程序，使用 ML.NET 和 ASP.NET 内核第三节中创建的应用程序，将 ML.NET 模型添加到您的 Jenkins 管道中是一个很好的方法，这样它会自动与您的部署捆绑在一起。</p>
+
+
+            
+
+            
+        
+    
+
+
+
+
+
+
+    
+        <title>Exploring machine learning platforms</title>
+        
+        <meta charset="utf-8"/>
+    
+
+    
+        
+
+                            
+                    <h1 class="header-title">探索机器学习平台</h1>
+                
+            
+            
+                
+<p>以下是我个人使用过的平台，和/或同事用来解决各种问题的平台。每个平台都有其优点和缺点，特别是考虑到我们试图解决的每个问题的独特性。</p>
+
+
+            
+
+            
+        
+    
+
+
+
+
+
+
+    
+        <title>Azure Machine Learning</title>
+        
+        <meta charset="utf-8"/>
+    
+
+    
+        
+
+                            
+                    <h1 class="header-title">Azure 机器学习</h1>
+                
+            
+            
+                
+<p>微软的 Azure 云平台除了提供机器学习平台之外，还为 Kubernetes、虚拟机和数据库提供了完整的平台。这个平台提供了到 Azure SQL 数据库、Azure 文件存储和公共 URL 的直接连接，这只是训练和测试集的一部分。Visual Studio Community 2019 内部免费提供了一个不可伸缩的轻量级版本。下面的截图显示了完整的用户界面:</p>
+<p class="CDPAlignCenter CDPAlign"><img class="alignnone size-full wp-image-605 image-border" src="img/be818c8d-cd8c-4887-8877-e7cac13cefaf.png" style="width:49.58em;height:27.83em;"/></p>
+<p>此外，非。NET 技术，如 TensorFlow、PyTorch 和 scikit-learn 都是完全支持的。流行的 Jupyter Notebook 和 Azure Notebook 等工具也完全支持。</p>
+<p>类似于 Apache Airflow，在 Azure Machine Learning 中也很容易检查运行历史以比较版本。</p>
+<p>支持上述模型构建管道的所有阶段。以下是 Azure 机器学习的一些利弊:</p>
+<p><strong>优点:</strong></p>
+<ul>
+<li>广泛集成到多个数据源中</li>
+<li>ML.NET 本地支持</li>
+<li>可以根据您的需求进行伸缩</li>
+<li>不需要基础设施设置</li>
+</ul>
+<p><strong>缺点:</strong></p>
+<ul>
+<li>培训时可能会很贵</li>
+</ul>
+
+
+            
+
+            
+        
+    
+
+
+
+
+
+
+    
+        <title>Apache Airflow</title>
+        
+        <meta charset="utf-8"/>
+    
+
+    
+        
+
+                            
+                    <h1 class="header-title">阿帕奇气流</h1>
+                
+            
+            
+                
+<p>Apache Airflow 是一个开源软件，它提供了创建几乎无限复杂的管道的能力。虽然不是本机支持的框架。NET 核心应用程序——如我们在本书中创建的那些——可以运行，只要。NET 核心运行时是用自包含标志安装或编译的。虽然学习曲线高于微软的 Azure 机器学习平台，但在某些情况下免费，特别是在简单的实验中，可能更有益。下面的截图是气流的 UI:</p>
+<p class="CDPAlignCenter CDPAlign"><img class="alignnone size-full wp-image-606 image-border" src="img/e7cf1548-8991-4e39-a9f5-a0f934e9a5f6.png" style="width:76.33em;height:49.75em;"/></p>
+<p>就像 Azure 机器学习一样，管道的可视化确实使特定管道的配置比 Apache Spark 更容易。然而，与 Apache Spark 非常相似，安装和配置(取决于您的技能水平)可能会令人望而生畏，尤其是在 pip 安装之后。启动和运行的一个更简单的方法是使用预构建的 Docker 容器，比如 Puckel 的 Docker 容器(<a href="https://hub.docker.com/r/puckel/docker-airflow">https://hub.docker.com/r/puckel/docker-airflow</a>)。</p>
+<p>以下是阿帕奇气流的一些利弊:</p>
+<p><strong>优点:</strong></p>
+<ul>
+<li>免费和开源</li>
+<li>4 年多来的文档和示例</li>
+<li>在 Windows、Linux 和 macOS 上运行</li>
+</ul>
+<p><strong>缺点:</strong></p>
+<ul>
+<li>设置复杂(尤其是使用官方 pip 说明)</li>
+<li>。NET 本身不受支持</li>
+</ul>
+
+
+            
+
+            
+        
+    
+
+
+
+
+
+
+    
+        <title>Apache Spark</title>
+        
+        <meta charset="utf-8"/>
+    
+
+    
+        
+
+                            
+                    <h1 class="header-title">阿帕奇火花</h1>
+                
+            
+            
+                
+<p>Apache Spark 是另一个开源工具，虽然通常用于大数据管道，但也可以配置用于特征提取、培训和大规模模型生产。当内存和 CPU 限制阻碍您构建模型的能力时，例如，使用大规模数据集进行训练时，我个人看到 Apache Spark 扩展到利用多个 64C/128T AMD 服务器，最大化超过 1tb 的 ram。我发现这个平台比 Apache Airflow 或 Azure 的机器学习平台更难建立，但是，一旦建立起来，它会非常强大。下面的截图展示了 Apache Spark 的 UI:</p>
+<p class="CDPAlignCenter CDPAlign"><img class="alignnone size-full wp-image-607 image-border" src="img/b43f5783-5d07-426a-ba4f-16044cd96c75.png" style="width:62.42em;height:23.33em;"/></p>
+<p>在微软的 Apache Spark 页面(<a href="https://dotnet.microsoft.com/learn/data/spark-tutorial/intro">https://dot net . Microsoft . com/learn/data/Spark-tutorial/intro</a>)上可以找到一个很好的分步安装指南，适用于 Windows 和 Linux。该指南确实消除了一些未知因素，但是，与 Azure 或 Airflow 相比，它仍然不容易启动和运行。以下是 Apache Spark 的一些优点和缺点:</p>
+<p><strong>优点:</strong></p>
+<ul>
+<li>免费和开源</li>
+<li>。微软的. NET 绑定</li>
+<li>由于其悠久的历史(&gt; 5 年)，有大量的文档</li>
+<li>在 Windows、macOS 和 Linux 上运行</li>
+</ul>
+<p><strong>缺点:</strong></p>
+<ul>
+<li>可能很难配置、启动和运行</li>
+<li>对 IT 基础设施变化敏感</li>
+</ul>
+<p>微软为 Apache Spark 编写了一个. NET 绑定，并免费发布:<a href="https://dotnet.microsoft.com/apps/data/spark">https://dotnet.microsoft.com/apps/data/spark</a>。这些绑定可用于 Windows、macOS 和 Linux。</p>
+
+
+            
+
+            
+        
+    
+
+
+
+
+
+
+    
+        <title>Summary</title>
+        
+        <meta charset="utf-8"/>
+    
+
+    
+        
+
+                            
+                    <h1 class="header-title">摘要</h1>
+                
+            
+            
+                
+<p>在本章的课程中，我们深入探讨了生产就绪模型训练的内容，从最初的目的问题到经过训练的模型。通过这次深入研究，我们已经检查了通过生产思维过程和特征工程来创建详细特征所需的努力程度。然后，我们回顾了挑战、解决培训问题的方法以及如何测试数据集问题。最后，我们还深入探讨了使用完全自动化的流程来构建实际模型管道的重要性。</p>
+<p>在下一章中，我们将利用 WPF 应用程序中预先构建的张量流模型来确定提交的图像是否包含某些对象。本次深度探索将探索 ML.NET 如何为张量流模型提供易于使用的界面。</p>
+
+
+            
+
+            
+        
+    
+
+
+</body></html>

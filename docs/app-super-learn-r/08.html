@@ -1,0 +1,348 @@
+<html><head/><body>
+
+
+	
+		<title>C12624_08_ePub_Final_SZ</title>
+		
+	
+	
+		<div><h1 id="_idParaDest-312"><em class="italics"> <a id="_idTextAnchor315"/>第八章:</em></h1>
+		</div>
+		<div><h1 id="_idParaDest-313"><a id="_idTextAnchor316"/>模型部署</h1>
+		</div>
+		<div><h2>学习目标</h2>
+			<p>本章结束时，您将能够:</p>
+			<ul>
+				<li class="bullets">使用 R plumber 包将 ML 模型部署为 API</li>
+				<li class="bullets">使用 AWS SageMaker、AWS Lambda 和 AWS API Gateway 开发无服务器 API</li>
+				<li class="bullets">使用 AWS CloudFormation 从头开始创建基础架构</li>
+				<li class="bullets">使用 Docker 容器将 ML 模型部署为 API</li>
+			</ul>
+			<p>在本章中，我们将学习如何在 AWS 和 Docker 容器上托管、部署和管理模型。</p>
+		</div>
+		<div><h2 id="_idParaDest-314"><a id="_idTextAnchor317"/>简介</h2>
+			<p>在前一章中，我们研究了模型改进，并探索了超参数调整中的各种技术，以提高模型性能并为给定用例开发最佳模型。下一步是将机器学习模型部署到生产中，以便它可以很容易地被大型软件产品使用或集成到其中。</p>
+			<p>大多数数据科学专业人士认为，当我们有了最佳模型时，开发机器学习模型的过程以超参数调整结束。事实上，如果机器学习模型没有被部署和(或)与其他软件服务/产品集成到一个大型技术生态系统中，它的价值和影响是有限的(大多是徒劳的)。机器学习和软件工程绝对是两个独立的学科。大多数数据科学家对软件工程生态系统的理解能力有限，同样，软件工程师对机器学习领域的理解也有限。因此，在大型企业中，当他们构建产品时，机器学习用例会演变为软件产品的主要功能，因此需要数据科学家和软件工程师进行合作。然而，在大多数情况下，软件工程师和数据科学家之间的合作极具挑战性，因为双方都发现对方的领域非常难以理解。</p>
+			<p>多年来，大公司投入了大量精力来开发工具和资源，以帮助数据科学家轻松采用一些软件工程组件，反之亦然。这些工具使得两个学科之间的协作更加容易，加速了开发大规模企业级机器学习产品的过程。</p>
+			<p>在这一章中，我们将了解一些将机器学习模型部署为 web 服务的方法，这些 web 服务可以轻松地与大型软件生态系统中的其他服务集成。我们还将讨论模型部署的不同方法和最佳实践的优缺点。</p>
+			<h2 id="_idParaDest-315">什么是 API？</h2>
+			<p>在深入研究模型部署的具体细节之前，我们需要研究一个简化模型部署整个过程的重要软件工程课题，那就是一个<strong class="keyword">应用程序接口</strong>，俗称<strong class="keyword"> API </strong>。API 是一组明确定义的方法，用于各种软件组件之间的通信。随着 API 的出现，软件开发变得简单多了。比方说，如果开发人员想开发一个 iPhone 应用程序，为图像添加一些滤镜，他们不需要编写完整的代码来从手机摄像头捕捉图像，将其保存到库中，然后对其应用特定于应用程序的滤镜。相反，他们可以使用手机摄像头 API，这提供了一种与摄像头通信的简单方法，并且只需专注于编写将滤镜添加到图像的代码。简而言之，API 是异构软件组件相互通信的手段。</p>
+			<p>在一个大型软件产品中，会有几个组件负责一个特定的任务。这些组件通过一种定义好的语言进行交互，确保数据、事件和警报的顺畅交流。</p>
+			<p>以下是 API 的一些显著特征:</p>
+			<ul>
+				<li>API 有助于<strong class="bold">模块化</strong>软件应用程序，并能够构建更好的产品。</li>
+				<li>API 为软件工程师所熟知，并且与语言无关。因此，用完全不同的语言或系统开发的异构应用程序也可以有效地相互通信。</li>
+				<li>服务之间的通信也是使用一种公共语言来实现的，即<strong class="keyword"> JavaScript 对象符号</strong>(简称，<strong class="keyword"> JSON </strong>)。然而，也有其他流行的语言，例如，XML。</li>
+				<li>They also support HTTP, which means APIs are accessible through web browsers (such as Google Chrome or Mozilla Firefox) or a tool such as <em class="italics">Postman</em>.<h4>注意</h4><p class="callout">Postman 是一个免费的工具，它在一个 API 的整个生命周期中提供易于使用的服务，例如设计、调试、测试、记录、监控和发布。它可以在 Windows、Linux 和 macOS 平台上下载。你可以在 https://www.getpostman.com/.了解更多关于邮递员的信息</p></li>
+			</ul>
+			<p>我们对 RESTful APIs 的开发特别感兴趣，即通过 HTTP 进行通信的 API。RESTful APIs 也称为<strong class="bold">REST API</strong>，有两种主要类型的方法:</p>
+			<ul>
+				<li><strong class="bold"> GET 方法</strong>:当我们想从一个服务中读取数据时使用。</li>
+				<li><strong class="bold"> POST 方法</strong>:当我们想要发送数据给一个服务的时候使用。</li>
+			</ul>
+			<p>其他几种方法是<strong class="bold">头</strong>、<strong class="bold">放</strong>、<strong class="bold">删</strong>。</p>
+			<p>将机器学习模型部署为(web 服务)REST APIs 简化了一个服务与其他服务的集成过程。软件工程师喜欢使用 REST APIs，由于该服务是语言无关的，所以我们在用自己选择的语言开发模型方面有巨大的优势。软件工程师可以使用 Python、Java、Ruby 或许多其他语言中的一种来开发其他服务，而我们可以用 R、Python、Julia 等语言来开发模型，并且有效、轻松地将服务集成到大型软件产品中。</p>
+			<p>现在我们对 API 有了一个相当好的理解，让我们来理解如何在 R 中将 ML 模型部署为 API。</p>
+			<h2 id="_idParaDest-316"><a id="_idTextAnchor319"/>水管工简介</h2>
+			<p>Plumber 是一个 R 包，它帮助将 R 函数翻译成 HTTP API，可以从网络中的其他机器调用，从而实现系统之间的通信。通过使用 R plumber，我们将能够实现所讨论的优点，例如开发模块化的、语言不可知的、基于公共通信语言(JSON)的 HTTP rest APIs，这些 API 提供了系统间通信的定义路径。使用水管工非常简单。通过几行代码，我们可以将现有的 R 函数转换成可以作为端点的 web 服务。</p>
+			<p>在本章中，我们将扩展我们在<em class="italics">第 7 章</em>、<em class="italics">模型改进</em>中构建的相同模型和用例，使用<code>mlbench</code>库中的<code>PimaIndiasDiabetes</code>数据集对患者是否为糖尿病患者进行分类。稍后，我们将扩展相同的用例，使用 Docker 容器和无服务器应用程序将模型部署为 web 服务。</p>
+			<h3 id="_idParaDest-317">练习 98:使用 Plumber 开发一个 ML 模型并将其部署为 Web 服务</h3>
+			<p>在本练习中，我们将使用三个独立变量开发一个逻辑回归模型，并使用 Plumber 将其部署为 REST API。我们将创建一个简单的二进制分类模型，并使用<code>plumber</code>包的服务通过定义 HTTP get 和 post 方法将模型包装成 API。</p>
+			<p>执行以下步骤来完成练习:</p>
+			<ol>
+				<li>使用 RStudio 或 Jupyter Notebook 创建一个名为<code>model.R</code>的 R 脚本。</li>
+				<li>Load the required libraries and build a logistic regression model. Now, define the <code>get</code> methods that accept the input parameters and return the prediction as an outcome:<pre>#----------Code listing for model.R-----------------------------
+library(mlbench)
+data(PimaIndiansDiabetes)
+df&lt;-PimaIndiansDiabetes</pre><h4>注意</h4><p class="callout">这些数据取自 UCI 机器学习数据库的存储库，网址如下:</p><p class="callout">ftp://ftp.ics.uci.edu/pub/machine-learning-databases</p><p class="callout">http://www.ics.uci.edu/~mlearn/MLRepository.html</p><p class="callout">Friedrich Leisch 将其转换为 R 格式。</p></li>
+				<li>使用<code>df</code> DataFrame 对象:<pre>model&lt;-glm(diabet-es~pregnant+glucose+pressure, data=df,
+           family=binomial(link='logit'))</pre>训练逻辑回归模型</li>
+				<li>使用额外的<code>#' @get /</code>构造:<pre>#' @get /predict_data
+function(pregnant, glucose, pressure){</pre>将 API 端点定义为一个函数</li>
+				<li>在函数中，使用<code>as.numeric</code>命令:<pre>  pregnant &lt;- as.numeric(pregnant)
+  glucose &lt;- as.numeric(glucose)
+  pressure &lt;- as.numeric(pressure)</pre>将参数转换成<code>numeric</code>值</li>
+				<li>然后，创建一个 DataFrame，其列名与上一步相同:<pre>  sample &lt;- data.frame(pregnant=pregnant,                       glucose=glucose,                       pressure=pressure)</pre></li>
+				<li>使用新创建的<code>sample</code>数据框架对训练好的模型进行预测:<pre>  y_pred&lt;-ifelse(predict(model,newdata=sample)&gt;0.5,"yes","no")</pre></li>
+				<li>Package the result as a <code>list</code> for the function's return call and complete/close the function definition with <code>}</code> parentheses:<pre>  list(Answer=y_pred)
+}</pre><p>前面的练习演示了带有一个额外构造的常规 R 模型代码。我们开发的模型相当简单，只有三个自变量和一个因变量(不像我们在<em class="italics">第 7 章</em>、<em class="italics">模型改进】</em>中看到的八个自变量)。我们还创建了一个接受三个输入参数的函数，每个参数代表模型的一个独立变量。当我们将模型部署为 REST API 时，这个函数将被用作端点。我们在函数之前添加了一个额外的构造(参考前面练习的第四步):</p><pre>#' @get /predict_data</pre><p>这个结构定义了<code>predict_data</code>端点将服务于 GET 请求。我们为这个端点定义的函数接受三个没有默认值的参数。现在让我们安装<code>plumber</code>包，并使用 web 服务器进行调用。</p><p>最终完成的<code>model.R</code>文件应该是这样的:</p><pre>#----------Code listing for model.R-----------------------------
+library(mlbench)
+data(PimaIndiansDiabetes)
+df&lt;-PimaIndiansDiabetes
+model&lt;-glm(diabet-es~pregnant+glucose+pressure, data=df,
+           family=binomial(link='logit'))
+#' @get /predict_data
+function(pregnant, glucose, pressure){
+  pregnant &lt;- as.numeric(pregnant)
+  glucose &lt;- as.numeric(glucose)
+  pressure &lt;- as.numeric(pressure)
+  sample &lt;- data.frame(pregnant=pregnant,                       glucose=glucose,                       pressure=pressure)
+  y_pred&lt;-ifelse(predict(model,newdata=sample)&gt;0.5,"yes","no")
+  list(Answer=y_pred)
+}</pre><h4>注意</h4><p class="callout">也可以参考 GitHub 网址:https://GitHub . com/TrainingByPackt/Applied-Supervised-Learning-with-R/blob/master/lesson 08/Docker/model . R。</p></li>
+				<li>创建另一个名为<code>main.R</code>的 R 脚本。现在，安装<code>plumber</code>包并加载到内存中，然后使用<code>plumb</code>函数部署 R 函数，如下图:<pre>#-------main.R-----------------
+install.packages("plumber")
+library(plumber)
+# (The previous code snippet is supposed to be save as 'model.R')</pre></li>
+				<li>使用以下命令将 R 文件传递给<code>plumb</code>函数:<pre>pr &lt;- plumber::plumb("model.R")
+pr$run(port=8080,host='127.0.0.1')</pre></li>
+				<li>After executing the previous code, the plumber library creates a web server within your <code>localhost</code> and responds to the requests. To test whether the endpoint functions we wrote are functioning in the expected way, we will invoke the endpoint from the browser.<h4>注意</h4><pre>#' @get /predict_data</pre><p>参数在<code>?</code>符号后传递到端点，多个参数用<code>&amp;</code>符号分隔。</p></li>
+				<li>因为我们将端点部署到了本地主机，也就是说，<code>8080</code>端口上的<code>127.0.0.1</code>,所以我们将有以下端点的 API 定义。使用浏览器调用 API:<pre>http://127.0.0.1:8080/predict_data?pregnant=1&amp;glucose=3&amp;pressure=1</pre></li>
+				<li>Execute the previous API definition, which will return the following prediction value:<pre>{"Answer":["no"]}</pre><p>为了测试 API，我们可以使用更好的工具，比如 Postman，而不是浏览器。postman(https://www.getpostman.com/)是目前 API 测试中最流行的工具之一。它可以在 Windows、Mac 和 Linux 平台上免费获得。使用 Postman 相对简单，不包含任何新的学习。</p><h4>注意</h4><p class="callout">如果您想了解有关 Postman 的更多详细信息，可以浏览 https://learning . get Postman . com/docs/Postman/launching _ Postman/installation _ and _ updates/上提供的学习资源。</p></li>
+				<li>在为您的系统下载并安装 Postman 之后，您可以通过将它粘贴到输入窗口中来测试 API 端点，如下面的屏幕截图所示:</li>
+			</ol>
+			<div><div><img src="img/C12624_08_01.jpg" alt="Figure 8.1: Plumber UI&#13;&#10;"/>
+				</div>
+			</div>
+			<h6>图 8.1:管道工用户界面</h6>
+			<p>我们可以通过点击<strong class="bold">发送</strong>按钮来执行 API，结果显示在之前截图的高亮区域。观察 Postman 的输出，我们可以看到我们的机器学习模型已经作为 API 端点成功部署。</p>
+			<h3 id="_idParaDest-318">使用水管工部署模型的挑战</h3>
+			<p>我们可以看到，使用 plumber 将模型部署为 API 很简单，只需几行额外的代码就可以轻松完成。<code>plumber</code>包提供了我们在这个练习中没有探索的额外特性。以下是一些值得探讨的重要主题:</p>
+			<ul>
+				<li><strong class="bold">过滤器</strong>:过滤器可以用来定义一个带有传入请求流的<em class="italics">管道</em>。该功能有助于进一步模块化部署逻辑和工作流。您可以在 https://www . RP lumber . io/docs/routing-and-input . html # filters 了解更多信息。</li>
+				<li><strong class="bold">错误处理</strong>:随着应用程序越来越大，应用程序的代码库和复杂性也呈指数级增长。添加异常处理程序并简化应用程序的调试过程变得越来越重要。您可以在 https://www . RP lumber . io/docs/rendering-and-output . html # error-handling 了解更多信息。</li>
+			</ul>
+			<p>这些方法有一个主要的缺点。虽然在单个主机上设置端点相对容易，但是在不同的系统上部署相同的解决方案时可能会遇到问题。这些问题可能是由于系统架构、软件版本、操作系统等方面的差异而产生的。为了减轻您在部署端点时可能面临的冲突，一种技术是使流程与环境无关，也就是说，在一个主机系统中开发的解决方案可以在具有不同体系结构、平台或操作系统的任何其他主机中顺利部署。这可以通过使用<strong class="bold"> Docker 容器</strong>和 plumber 进行部署来实现，而不是直接使用 plumber。</p>
+			<h2 id="_idParaDest-319">前码头时代的简史</h2>
+			<p>在深入研究 Docker 工具之前，我们先了解一些背景和历史。</p>
+			<p>在与环境无关的框架中部署应用程序的挑战已经在早期使用虚拟化解决了，也就是说，整个应用程序、依赖项、库、必要的框架以及操作系统本身都被虚拟化并打包为可在主机上部署的解决方案。多个虚拟环境可以在一个基础架构上运行(称为<strong class="bold">虚拟机管理程序</strong>，应用程序变得与环境无关。然而，这种方法有一个主要的缺点。将整个操作系统打包到一个应用程序的<strong class="bold">虚拟机</strong> ( <strong class="bold"> VM </strong>)中会使软件包变得沉重，并经常导致内存和计算资源的浪费。</p>
+			<p>解决这个问题的更直观的方法是从包中排除操作系统，只包含与应用程序相关的库和依赖项。此外，启用一种机制，使包与基础设施无关，从而保持应用程序的轻量级。Docker 就是这个时候推出的。以下视觉效果从较高的层面展示了 Docker 是如何临时解决以前由虚拟机解决的问题的:</p>
+			<div><div><img src="img/C12624_08_02.jpg" alt="Figure 8.2: The architectural difference between a virtual machine and a Docker container&#13;&#10;"/>
+				</div>
+			</div>
+			<h6>图 8.2:虚拟机和 Docker 容器之间的架构差异</h6>
+			<p>现在让我们更详细地了解 Docker 容器。</p>
+			<h2 id="_idParaDest-320"><a id="_idTextAnchor323"/>码头工人</h2>
+			<p>Docker 是一个简单的工具，它简化了使用容器开发、部署和执行软件应用程序的过程。一个<strong class="bold">容器</strong>类似于一个航运业容器，允许开发者打包整个应用程序及其依赖项，并作为一个包发送出去。一旦在一个系统上构建，这个包也可以在任何其他系统上工作，不管基础设施有什么不同。</p>
+			<p>使用 Docker，我们可以创建一个单独的文档(称为<strong class="bold"> Dockerfile </strong>)，它定义了为应用程序设置所需环境的简化步骤。Docker 文件随后用于构建一个<strong class="bold"> Docker 映像</strong>。容器是 Docker 图像的一个实例。对于同一个应用程序，我们有时可能有多个容器来帮助高流量应用程序的负载平衡。</p>
+			<h3 id="_idParaDest-321">使用 Docker 和 plumber 部署 ML 模型</h3>
+			<p>我们将利用与 Docker 相同的管道工应用程序进行与环境和基础设施无关的部署。首先，我们需要在我们的系统上下载并安装 Docker。很洒脱。创建一个帐户并从 https://www.docker.com/get-started.为您的系统下载 Docker。安装后，您可以通过在终端或 Windows PowerShell 中执行<code>docker</code>命令来验证 Docker 是否正在运行。</p>
+			<h3 id="_idParaDest-322"><a id="_idTextAnchor325"/>练习 99:为 R plumber 应用程序创建一个 Docker 容器</h3>
+			<p>在本练习中，我们将把之前创建的 plumber 应用程序扩展为 Docker 容器。为了开发可以毫无问题地部署到任何生产系统的环境无关模型，我们可以使用 Docker 容器部署一个管道工应用程序。然后，这些容器可以部署在任何其他支持 Docker 引擎的机器上。</p>
+			<p>执行以下步骤来完成练习:</p>
+			<ol>
+				<li value="1">定义一个 Dockerfile，如下图:<pre>FROM rocker/r-ver:3.5.0</pre></li>
+				<li>现在，使用下面的命令安装<code>plumber</code>包的库:<pre>RUN apt-get update -qq &amp;&amp; apt-get install -y  libssl-dev  libcurl4-gnutls-dev</pre></li>
+				<li>接下来，安装<code>plumber</code>包，如图:<pre>RUN R -e "install.packages(c('plumber','mlbench'))"</pre></li>
+				<li>现在，使用以下命令将当前目录中的所有文件复制到容器的当前文件夹中。这将把我们的<code>model.R</code>和<code>plumber.R</code>文件复制到一个容器:<pre>COPY / /</pre></li>
+				<li>接下来，定义一个要公开的端口，容器将被部署到这个端口:<pre>EXPOSE 8080</pre></li>
+				<li>Define the first script to run when the container starts after the build:<pre>ENTRYPOINT ["Rscript", "main.R"]</pre><p>现在，我们的项目文件夹中有三个文件，如下图所示。请注意，Dockerfile 是一个没有扩展名的简单文本文件。从该文件夹内的终端运行<code>build</code>命令时，<strong class="bold"> Docker 引擎</strong>搜索 Docker 文件，并根据文档中提供的指令准备环境:</p><div><img src="img/C12624_08_03.jpg" alt="Figure 8.3: Project files&#13;&#10;"/></div><h6>图 8.3:项目文件</h6><p>包含前面步骤中定义的所有命令的最终 docker 文件如下所示:</p><pre>FROM rocker/r-ver:3.5.0
+RUN apt-get update -qq &amp;&amp; apt-get install -y  libssl-dev  libcurl4-gnutls-dev
+RUN R -e "install.packages(c('plumber','mlbench'))"
+COPY / /
+EXPOSE 8080
+ENTRYPOINT ["Rscript", "main.R"]</pre></li>
+				<li>We can now build the Docker image from the Dockerfile using the <code>docker build</code> command, as follows:<pre>docker build -t r_ml_demo .</pre><p><code>r_ml_demo</code>后的<code>.</code>表示 Dockerfile 存在于当前文件夹中。构建过程需要一段时间，因为它创建了包含所有必需依赖项的容器映像。一旦构建了映像，我们就可以使用下面的命令运行 Docker 映像，方法是将机器的<code>8080</code>端口映射到容器发布的<code>8080</code>端口。</p></li>
+				<li>Run the Docker image using the following command:<pre>docker run --rm -p 8080:8080 r_ml_demo</pre><h4>注意</h4><p class="callout">可以在 https://GitHub . com/TrainingByPackt/Applied-Supervised-Learning-with-R/tree/master/lesson 08/Docker 查阅 GitHub 的完整代码。</p></li>
+			</ol>
+			<p>可以用我们使用 Postman 测试我们的管道工应用程序的相同方式再次测试该容器，我们将得到完全相同的结果。因此，我们可以使用 plumber 和 Docker 在任何其他系统上部署一个 R 应用程序，而不用考虑操作系统和缺失的库。</p>
+			<h4>注意</h4>
+			<p class="callout">Docker 无法安装在 Windows Home edition 上。只有 Windows Pro 版支持虚拟机监控程序。</p>
+			<h3 id="_idParaDest-323">使用 plumber 部署 R 模型的缺点</h3>
+			<p>虽然这个过程有一些容易和快速实现的优点，但它也有一些缺点。plumber 的主要缺点是为大型复杂用例扩展应用程序端点。这里的比例指的是端点被调用的次数以及可以通过端点调用的数据量。</p>
+			<p>使用 plumber 的一个主要缺点是它不直接支持向端点传递 JSON 对象、数组或列表。当我们处理超过 20 个独立变量的更大的模型时，这就成了一个瓶颈。前一个用例，在<em class="italics">练习 2 </em>，<em class="italics">为 R Plumber 应用程序</em>创建 Docker 容器，是一个相当小的轻量级模型，有三个独立变量。因此，API 的定义简短明了。然而，随着参数数量的增加(这在真实的生产模型中肯定会发生)，管道工模型端点定义将不是最好的选择。此外，plumber 框架对于大型复杂软件用例来说并不理想。围绕该框架的小社区、缺乏适当的文档和有限的支持，使得将模型部署到大规模机器学习产品或服务中成为一个有风险的选择。</p>
+			<p>让我们看看如何利用云服务来部署 R ML 模型。</p>
+			<h2 id="_idParaDest-324"><a id="_idTextAnchor327"/>亚马逊网络服务</h2>
+			<p>亚马逊网络服务公司(Amazon Web Services)是领先的云服务提供商。随着云的出现，技术行业在利用云服务而不是自托管服务构建大规模企业应用程序的过程中发生了巨大的转变。云服务市场的其他主要参与者有微软、谷歌和 IBM。虽然所有领先的云提供商都有一套详尽的服务来构建各种软件应用程序，但在本章的范围内，我们将只关注 AWS。强烈建议您从其他云提供商(不限于谷歌或微软)探索类似用例的替代服务。</p>
+			<p>AWS 有大量现成的服务，可以用来开发任何规模的大型、复杂的企业应用程序，而无需前期投入。你按量付费，也有大量服务可以免费探索和测试一年(有一定限制)。对于我们将在接下来的练习中执行的一组实验的范围，自由层应该足够了。如果您还没有 AWS 帐户，请在 https://AWS . Amazon . com/free/activate-your-free-tier-account/创建一个。</p>
+			<p>在注册过程中，您需要一张有效的信用卡/借记卡。在练习中，我们将只利用 AWS 的免费层服务。</p>
+			<p>我们可以采用几种方法来使用云服务部署机器学习模型。有些可能非常适合小型应用程序，有些适合中型和中等复杂的应用程序，还有一些适合大型和非常复杂的应用程序。我们将探索一种方法，这种方法具有最少的软件工程，但提供有效的灵活性，并且可以轻松地扩展到大规模应用程序中，同时可以轻松地集成到复杂的应用程序中。</p>
+			<p>使用 API 并将机器学习模型作为 API 来交付，使得将服务集成到其他应用程序的整个过程相当简单。</p>
+			<h2 id="_idParaDest-325"><a id="_idTextAnchor328"/>AWS sage maker 简介</h2>
+			<p><strong class="bold">亚马逊 SageMaker </strong>是一项云服务，为开发者和数据科学家提供了一个快速构建、训练和部署机器学习模型的平台。这是一项极其有效的服务，可帮助开发知识有限的数据科学家部署高度可扩展的 ML 模型，同时抽象出基础设施和底层服务的全部复杂性。</p>
+			<p>SageMaker 使用定义的资源将模型作为 API 部署的整个过程自动化，并创建一个可以用于其他 AWS 服务中推理的<em class="italics">端点</em>。为了使端点能够被其他外部应用程序推断出来，我们需要使用另外两个 AWS 服务来编排请求流，这两个服务分别叫做<strong class="keyword"> AWS API 网关</strong>和<strong class="keyword"> AWS Lambda </strong>。我们将在本章的后面探索这些新服务。</p>
+			<p>现在，让我们开始使用 AWS SageMaker 部署我们的模型。</p>
+			<h3 id="_idParaDest-326"><a id="_idTextAnchor329"/>使用 SageMaker 部署 ML 模型端点</h3>
+			<p>默认情况下，SageMaker 不提供创建 R 模型的直接方法，但是 Amazon 提供了一个简单的替代方法。AWS 通过<strong class="bold"> AWS CloudFormation </strong>以代码的形式提供<strong class="bold">基础设施的功能，也就是说，我们可以在一项服务中对项目的基础设施资源的供应和设置的整个流程进行编码。借助 CloudFormation 模板，我们可以根据自己的需求自动配置技术堆栈，并多次重复使用。亚马逊提供了一个清晰而详细的指南，使用 CloudFormation 模板在 SageMaker 上开始使用 R 笔记本。</strong></p>
+			<p>要了解更多信息，您可以参考 https://AWS . Amazon . com/blogs/machine-learning/using-r-with-Amazon-sage maker/上的指南，以详细了解该过程。</p>
+			<h3 id="_idParaDest-327"><a id="_idTextAnchor330"/>练习 100:将 ML 模型部署为 SageMaker 端点</h3>
+			<p>在本练习中，我们将部署一个 ML 模型作为 SageMaker 端点。</p>
+			<p>执行以下步骤来完成练习:</p>
+			<ol>
+				<li value="1">登录您的 AWS 帐户，启动 CloudFormation 脚本来创建一个 R notebook。</li>
+				<li>Now, access the CloudFormation template from https://amzn.to/2ZzUM28 to create the R Notebook on SageMaker.<p>接下来，我们将使用之前的 CloudFormation 模板在 AWS 中创建和启动堆栈。</p></li>
+				<li>点击模板；它直接将您导航到 CloudFormation 服务，如下图所示。云形成模板(这是一个 YAML 文件)托管在一个公共的 S3 桶中，并且已经被添加到<strong class="bold">指定一个亚马逊 S3 模板 URL </strong>下的输入框中。点击<strong class="bold">下一步</strong>按钮，导航至<strong class="bold">详情</strong>页面:<div> <img src="img/C12624_08_04.jpg" alt="Figure 8.4: CloudFormation—Create Stack page&#13;&#10;"/> </div> <h6>图 8.4:云形成-创建堆栈页面</h6></li>
+				<li>在下一页上，指定将用于登录 EC2 实例的 SSH 密钥对。这是访问我们在云中提供的云实例或虚拟机的安全方式。如果您还没有为您的帐户创建密钥，您可以使用 Amazon 网站上提供的步骤创建一个:https://docs . AWS . Amazon . com/AWS C2/latest/user guide/ec2-key-pairs . html # having-ec2-create-your-key-pair。</li>
+				<li>一旦创建了密钥对，或者如果您已经有了一个密钥对，它将出现在突出显示的框中的下拉列表中，如下面的屏幕截图所示。选择您的密钥对，点击<strong class="bold">下一个</strong>按钮:<div> <img src="img/C12624_08_05.jpg" alt="Figure 8.5: Creating a key pair&#13;&#10;"/> </div> <h6>图 8.5:创建密钥对</h6></li>
+				<li>在下一个<strong class="bold">选项</strong>页面，我们可以直接点击<strong class="bold">下一个</strong>按钮，导航到下一个页面。</li>
+				<li>最后，在查看页面上，选择<strong class="bold">我承认 AWS CloudFormation 可能会创建具有自定义名称的 IAM 资源</strong>复选框，并单击<strong class="bold">下一步</strong>按钮。</li>
+				<li>该过程将创建堆栈(可能需要一段时间才会显示在屏幕上，1-2 分钟后刷新屏幕)。创建完成后，您将看到 CloudFormation 下的堆栈已准备好，如下面的屏幕截图所示。输出选项卡将包含用于登录的 SSH 命令；复制突出显示部分中的值，并在终端或命令提示符下运行命令:<div> <img src="img/C12624_08_06.jpg" alt="Figure 8.6: Stacks—SSH key&#13;&#10;"/> </div> <h6>图 8.6:堆栈—SSH 密钥</h6></li>
+				<li>在从终端运行 SSH 命令时，它将端口<code>8787</code>转发到您的计算机，同时连接到新的实例。连接后，打开浏览器窗口，在地址栏中键入<code>https://127.0.0.1:8787</code>打开 RStudio 登录页面。默认用户名和密码设置为<code>rstudio</code>。输入用户名和密码，点击<strong class="bold">登录</strong>按钮:<div> <img src="img/C12624_08_07.jpg" alt="Figure 8.7: RStudio—Sign In page&#13;&#10;"/> </div> <h6>图 8.7:r 工作室—登录页面</h6></li>
+				<li>登录到 RStudio，用任意名称创建一个新的 R 脚本，比如说<code>Sagemaker.R</code>，加载必要的库，并准备好 SageMaker 会话:<pre>library(reticulate)
+library(readr)</pre></li>
+				<li>启动 SageMaker 会话，并定义默认存储桶以及会话要使用的角色:<pre>sagemaker &lt;- import('sagemaker')
+session &lt;- sagemaker$Session()
+bucket &lt;- session$default_bucket()
+role_arn &lt;- session$expand_role('sagemaker-service-role')</pre></li>
+				<li>安装<code>mlbench</code>包并为我们的用例加载数据。在下面的命令中，我们将首先为再现性设置<code>seed</code>:<pre>set.seed(2019)
+install.packages("mlbench")
+library(mlbench)
+data(PimaIndiansDiabetes) 
+df&lt;- PimaIndiansDiabetes</pre></li>
+				<li>为了探索 SageMaker 的自动化超参数调优，我们将在与上一个相同的用例上开发一个 XGBoost 模型，而不是一个逻辑回归模型。因此，我们需要数字类型的目标变量和所有自变量。此外，SageMaker 希望数据的形式是第一列是目标变量:<pre>df$diabetes &lt;- ifelse(df$diabetes == "yes",1,0)</pre></li>
+				<li>将目标变量作为数据集的第一列:<pre>df&lt;- df[,c(9,1:8)]</pre></li>
+				<li>使用以下命令创建 70%的训练数据集和 30%的测试数据集:<pre>train_index &lt;- sample(seq_len(nrow(df)),floor(0.7 * nrow(df)))
+train &lt;- df[train_index,]
+test &lt;- df[-train_index,]</pre></li>
+				<li>将从<code>df</code>数据帧创建的训练和测试数据写入内存，并将 CSV 文件上传至 AWS 上的 S3 存储桶。该会话已经定义了一个默认的存储桶，因此，我们可以直接使用带有路径和所需结构的<code>upload_data</code>命令将数据集上传到我们的默认 S3 存储桶:<pre>write_csv(train, 'diabetes_train.csv', col_names = FALSE)
+write_csv(test, 'diabetes_test.csv', col_names = FALSE)
+s3_train &lt;- session$upload_data(path = 'diabetes_train.csv', 
+                                bucket = bucket, 
+                                key_prefix = 'data')
+s3_test &lt;- session$upload_data(path = 'diabetes_test.csv', 
+                               bucket = bucket, 
+                               key_prefix = 'data')</pre></li>
+				<li>Define the train and test dataset (validation data) for the SageMaker session:<pre>s3_train_input &lt;- sagemaker$s3_input(s3_data = s3_train,
+                                     content_type = 'csv')
+s3_test_input &lt;- sagemaker$s3_input(s3_data = s3_test,
+                                    content_type = 'csv')</pre><p>SageMaker 提供了 AWS 优化的预配置容器，可以直接用于模型训练。我们需要从托管我们资源的同一地区选择一个集装箱基地。在这种情况下，是<strong class="bold"> us-east-1 </strong>。</p></li>
+				<li>在 S3: <pre>containers &lt;- list('us-west-2' = 
+'433757028032.dkr.ecr.us-west-2.amazonaws.com/xgboost:latest',
+                   'us-east-1' = 
+'811284229777.dkr.ecr.us-east-1.amazonaws.com/xgboost:latest',
+                   'us-east-2' =
+ '825641698319.dkr.ecr.us-east-2.amazonaws.com/xgboost:latest',
+                   'eu-west-1' =
+ '685385470294.dkr.ecr.eu-west-1.amazonaws.com/xgboost:latest')</pre>定义估算器的容器和输出文件夹</li>
+				<li>使用以下命令选择估算器的容器:<pre>container &lt;- containers[session$boto_region_name][[1]]</pre></li>
+				<li>如下图所示定义输出文件夹:<pre>s3_output &lt;- paste0('s3://', bucket, '/output')</pre></li>
+				<li>定义 SageMaker 估算器、作业和输入数据。这里，我们需要提供我们希望用于模型训练过程的实例类型，我们将选择<code>ml.m5.large</code> : <pre>estimator &lt;- sagemaker$estimator$Estimator(image_name = container,
+                                           role = role_arn,
+                                           train_instance_count = 1L,
+                                           train_instance_type = 'ml.m5.large',
+                                           train_volume_size = 30L,
+                                           train_max_run = 3600L,
+                                           input_mode = 'File',
+                                           output_path = s3_output,
+                                           output_kms_key = NULL,
+                                           base_job_name = NULL,
+                                           sagemaker_session = NULL)</pre></li>
+				<li>Set the hyperparameters of interest for the model and define the training and validation datasets for the model as a list:<pre>estimator$set_hyperparameters(num_round = 100L)
+job_name &lt;- paste('sagemaker-train-xgboost', format(Sys.time(), '%H-%M-%S'), 
+                             sep = '-')
+input_data &lt;- list('train' = s3_train_input,
+                   'validation' = s3_test_input)</pre><h4>注意</h4><p class="callout">你可以阅读更多关于不同类型的例子，可用于在 https://aws.amazon.com/sagemaker/pricing/instance-types/.的模型训练的目的</p></li>
+				<li>训练/适应我们定义的模型。模型训练过程需要一段时间(大约 10-12 分钟)。在后台，SageMaker 将提供一个我们在模型定义中定义的实例，触发必要的后台操作来编排训练过程，最后，训练模型:<pre>estimator$fit(inputs = input_data, job_name = job_name)</pre></li>
+				<li>Deploy the train model as an endpoint. We will have to, again, provide the type of instance we would want SageMaker to provision for the model inference. Since this is just a sample model, we can choose the instance with the lowest configuration. This process will also take some time, as SageMaker will orchestrate a series of services in the background to deploy the model as an endpoint:<pre>model_endpoint &lt;- estimator$deploy(initial_instance_count = 1L,
+                                   instance_type = 'ml.t2.medium')
+model_endpoint$content_type &lt;- 'text/csv'
+model_endpoint$serializer &lt;- sagemaker$predictor$csv_serializer</pre><p>在模型端点被创建之后，我们可以通过用正确形式的测试数据调用它来测试它。因为我们将测试数据保存为 CSV 文件，所以我们将传递逗号分隔的文本以序列化为 JSON 格式。因此，我们为端点指定<code>text/csv</code>和<code>csv_serializer</code>。让我们为快速测试准备一个样本测试数据提要。</p></li>
+				<li>首先，使用下面的命令复制测试数据集:<pre>one_test &lt;- test</pre></li>
+				<li>接下来，删除目标变量:<pre>one_test$diabetes&lt;-NULL</pre></li>
+				<li>使用以下命令创建一个测试样本:<pre>test_sample &lt;- as.matrix(one_test[7, ])</pre></li>
+				<li>现在，删除列名:<pre>dimnames(test_sample)[[2]] &lt;- NULL</pre></li>
+				<li>使用我们在上一步中创建的样本数据的模型端点进行预测。调用 SageMaker 端点并传递测试数据:<pre>predictions &lt;- model_endpoint$predict(test_sample)</pre></li>
+				<li>Now, print the result using the <code>print</code> command:<pre>print(ifelse(predictions&gt;0.5,"yes",'no'))</pre><p>输出如下所示:</p><pre>1] "no"</pre></li>
+			</ol>
+			<p>这个输出有助于我们理解模型已经被正确地部署，并且正在按预期运行。我们可以通过导航到 AWS 帐户中的 SageMaker 服务并从右侧边栏打开<em class="italics"> Endpoint </em>部分来检查端点是否已创建:</p>
+			<div><div><img src="img/C12624_08_08.jpg" alt="Figure 8.8: Endpoint page&#13;&#10;"/>
+				</div>
+			</div>
+			<h6>图 8.8:端点页面</h6>
+			<p>AWS 中的其他服务可以直接使用这个端点来调用和获取预测。唯一的要求是输入数据应该按预期提供。为了使 AWS 外部的其他服务能够访问我们的模型端点，我们需要使用 AWS API Gateway 和 AWS Lambda 来编排 API 请求。</p>
+			<h4>注意</h4>
+			<p class="callout">您可以在 GitHub 上的 https://GitHub . com/TrainingByPackt/Applied-Supervised-Learning-with-R/blob/master/lesson 08/R studio _ sage maker . R 访问完整的代码文件。</p>
+			<p>现在，在深入研究解决方案之前，让我们先研究一下这些服务。</p>
+			<h2 id="_idParaDest-328"><a id="_idTextAnchor331"/>亚马逊 Lambda 是什么？</h2>
+			<p>AWS Lambda 是一个事件驱动的无服务器计算平台，由亚马逊提供，作为亚马逊网络服务的一部分。它是一种计算服务，运行代码以响应事件，并自动管理该代码所需的计算资源。该服务使我们能够开发无服务器应用程序。术语无服务器表示我们实际上不需要管理和供应基础设施资源；相反，它们由云服务提供商管理，我们只为我们使用的东西付费，比如说，按事件或执行付费。AWS Lambda 可以配置为执行一个定义好的函数来响应一个特定的事件，比方说，当有人上传一个新文件到一个定义好的 S3 桶或者调用 AWS 中的另一个函数或者另一个服务。</p>
+			<h2 id="_idParaDest-329"><a id="_idTextAnchor332"/>什么是亚马逊 API 网关？</h2>
+			<p><strong class="bold"> Amazon API Gateway </strong>是一项完全托管的服务，让开发者可以轻松创建、发布、维护、监控和保护任何规模的 API。有了这项服务，我们可以开发 REST 和 WebSocket APIs，它们充当应用程序从其他后端服务访问数据、业务逻辑或功能的<em class="italics">前门</em>，同时保护私有网络中的后端服务。这些后端服务可以是运行在 AWS 上的任何应用程序。</p>
+			<p>我们服务的整体流程可以用下图表示:</p>
+			<div><div><img src="img/C12624_08_09.jpg" alt="Figure 8.9: Workflow of API Gateway, AWS Lambda, and SageMaker&#13;&#10;"/>
+				</div>
+			</div>
+			<h6>图 8.9:API 网关、AWS Lambda 和 SageMaker 的工作流程</h6>
+			<p>客户端(比如一个 web 浏览器)调用 Amazon API 网关的定义动作，并传递适当的参数值。API Gateway 将请求传递给 AWS Lambda，同时它还密封后端，以便 AWS Lambda 停留在受保护的私有网络中并在其中执行。</p>
+			<p>在我们的例子中，我们将使用 Lambda 来帮助我们将从 API Gateway 接收到的数据裁剪成 SageMaker 端点可以使用的适当形式。这是必要的，因为通过 REST API 传递的数据结构和 SageMaker 期望的数据结构是不同的。SageMaker 模型执行预测并将预测值返回给 AWS Lambda。Lambda 函数解析返回值并发送回 API Gateway，之后 API Gateway 用结果响应客户端。这整个流程是在我们没有实际供应任何基础设施的情况下编排的；它完全由 AWS 管理。</p>
+			<h4>注意</h4>
+			<p class="callout">亚马逊在一篇博客文章中进一步详细解释了这一工作流程。你可以在 https://AWS . Amazon . com/blogs/machine-learning/call-an-Amazon-sage maker-model-endpoint-using-Amazon-API-gateway-and-AWS-lambda/了解更多信息。</p>
+			<p>我们还需要应对另一个挑战。到今天为止，AWS Lambda 还不支持用 R 来定义函数。它支持 Python、Java、Go 和其他一些语言，但是 R 并不在列表中。lambda 函数将负责将 API 传递的数据转换成所需的形式。我们将利用 Python 脚本来完成这项任务。在未来，我们可以期待 AWS Lambda 支持 R。</p>
+			<p>现在我们已经有了关于必要服务的所需上下文，让我们在一个无服务器应用程序上部署我们的模型。</p>
+			<h2 id="_idParaDest-330">构建无服务器的 ML 应用程序</h2>
+			<p>无服务器计算是云计算的新范式。它允许我们构建和运行应用程序和服务，而无需考虑服务器。实际上，我们构建的应用程序仍然运行在云服务器上，但是服务器管理的整个过程是由云服务提供商完成的，比如 AWS。通过利用无服务器平台，我们可以构建和部署强大、大规模、复杂的应用程序，只需关注我们的应用程序代码，而不必担心服务器的供应、配置和管理。</p>
+			<p>我们在本章中探讨了 AWS 无服务器平台的一些重要组件，如 AWS Lambda，现在我们可以利用这些解决方案来构建一个机器学习应用程序，在这个应用程序中，我们可以只关注核心 ML 代码，而忘记供应基础架构和扩展应用程序。</p>
+			<h3 id="_idParaDest-331"><a id="_idTextAnchor334"/>练习 101:使用 API Gateway、AWS Lambda 和 SageMaker 构建无服务器应用程序</h3>
+			<p>在本练习中，我们将使用 AWS SageMaker 构建一个机器学习模型，并将其部署为一个端点(使用自动化 SageMaker 函数)。为了使模型端点能够被任何服务(AWS 内部或外部)调用，我们定义了一个 AWS Lambda 函数，并通过 API Gateway 将端点暴露给公共网络。</p>
+			<p>本练习的目的是创建一个无服务器的应用程序，它将使用我们在前一个练习中创建的 SageMaker 模型端点。</p>
+			<p>执行以下步骤:</p>
+			<ol>
+				<li value="1">在 AWS 中创建一个 IAM 角色，允许 Lambda 从 SageMaker 服务中执行端点。从 AWS 仪表板中，搜索<code>IAM</code>，并点击 IAM 页面上的<strong class="bold">角色</strong>选项:<div> <img src="img/C12624_08_10.jpg" alt="Figure 8.10: Creating IAM roles&#13;&#10;"/> </div> <h6>图 8.10:创建 InternationalAssociationofMachinists 国际机械师协会角色</h6></li>
+				<li>一旦<strong class="bold">角色</strong>页面加载，点击<strong class="bold">创建角色</strong>选项。</li>
+				<li>在<strong class="bold">创建角色</strong>页面上，选择<strong class="bold"> AWS 服务</strong>作为可信实体的类型，选择<strong class="bold">λ</strong>作为将使用该角色的服务。点击<strong class="bold">下一步:权限</strong>按钮继续:<div> <img src="img/C12624_08_11.jpg" alt="Figure 8.11: Selecting the AWS service option&#13;&#10;"/> </div> <h6>图 8.11:选择自动警报系统服务选项</h6></li>
+				<li>在<code>sagemaker</code>关键字上，选择<code>AmazonSageMakerFullAccess</code>策略，点击<strong class="bold">下一步:标签</strong>选项:<div> <img src="img/C12624_08_12.jpg" alt="Figure 8.12: The Create role screen&#13;&#10;"/> </div> <h6>图 8.12:创建角色屏幕</h6></li>
+				<li>在<strong class="bold">标签</strong>页面，可以直接点击<strong class="bold">下一个</strong>，进入最后一个页面给<strong class="bold">角色</strong>命名。</li>
+				<li>现在，在最后一页，添加一个合适的名字(比如说，<code>lambda_sagemaker_execution</code>)并点击<strong class="bold">创建角色</strong>。角色将被创建出来供我们使用:<div> <img src="img/C12624_08_13.jpg" alt="Figure 8.13: Review page—creating role&#13;&#10;"/> </div> <h6>图 8.13:查看页面-创建角色</h6></li>
+				<li>在 AWS 控制台中，搜索 AWS Lambda 并点击<strong class="bold">创建函数</strong>按钮。创建功能页面将有一些需要定义的输入。</li>
+				<li>选择<code>lambda_sagemaker_connection</code>)。</li>
+				<li>接下来，选择<code>lambda_sagemaker_execution</code>。点击<strong class="bold">创建功能</strong>按钮:<div> <img src="img/C12624_08_14.jpg" alt="Figure 8.14: Creating a function form&#13;&#10;"/> </div> <h6>图 8.14:创建函数表单</h6></li>
+				<li>Define a Python function that will accept the input request from the API, parse the payload, and invoke the SageMaker endpoint:<pre>import os, io, boto3, json, csv
+# grab environment variables
+ENDPOINT_NAME = os.environ['ENDPOINT_NAME']
+runtime= boto3.client('runtime.sagemaker')</pre><h4>注意</h4><p class="callout">端点名称将出现在端点部分下的 SageMaker 页面中。</p></li>
+				<li>We will additionally define the environment variable for the function that will store the SageMaker endpoint:<pre>def lambda_handler(event, context):
+    print("Received event: " + json.dumps(event, indent=2))
+    
+    #Load JSON data from API call
+    data = json.loads(json.dumps(event))
+    payload = data['data']
+    print(payload)
+    
+    #Invoke Sagemaker endpoint and pass Payload
+    response = runtime.invoke_endpoint(EndpointName=ENDPOINT_NAME,
+                                       ContentType='text/csv',
+                                       Body=bytes(str(payload),'utf'))
+    
+    result = json.loads(response['Body'].read().decode())
+    predicted_label = 'yes' if result &gt;0.5 else 'no'
+    return predicted_label</pre><h4>注意</h4><p class="callout">可以参考 GitHub 上的完整代码，网址为 https://GitHub . com/TrainingByPackt/Applied-Supervised-Learning-with-R/blob/master/lesson 08/Amazon _ Lambda _ function . py。</p></li>
+				<li>在 AWS 控制台中点击<code>API Gateway</code>，通过选择屏幕截图中突出显示的选项创建一个新的 API 函数。给这个 API 取一个合适的名字，比如:<code>api_lambda_connect</code> : <div> <img src="img/C12624_08_15.jpg" alt="Figure 8.15: Amazon API Gateway&#13;&#10;"/> </div> <h6>图 8.15:亚马逊应用程序接口网关</h6></li>
+				<li>从<strong class="bold">动作</strong>下拉菜单中，选择<strong class="bold">创建资源</strong>，添加合适的资源名称，然后点击<strong class="bold">创建资源</strong>按钮:<div> <img src="img/C12624_08_16.jpg" alt="Figure 8.16: Creating a new child resource&#13;&#10;"/> </div> <h6>图 8.16:创建新的子资源</h6></li>
+				<li>同样，从<strong class="bold">动作</strong>下拉菜单中，选择<strong class="bold">创建方法</strong>，并选择方法类型为<strong class="bold">发布</strong>。</li>
+				<li>选择<strong class="bold">集成类型</strong>为<strong class="bold">λ函数</strong>，并在输入标签中提及<strong class="bold">λ函数</strong>名称，如下图所示。接下来，点击<strong class="bold">保存</strong>按钮:<div> <img src="img/C12624_08_17.jpg" alt="Figure 8.17: Creating a Lambda function&#13;&#10;"/> </div> <h6>图 8.17:创建希腊字母的第 11 个函数</h6></li>
+				<li>接下来，选择<code>test</code>并点击<strong class="bold">部署</strong>选项。该 API 现在将被部署并准备好使用。</li>
+				<li>一旦部署了 API，我们可以通过导航到<code>https://****amazonaws.com/[deployment-stage]/[resource-name]/</code>找到要调用的 API 的 URL。</li>
+				<li>从邮递员那里调用 API。打开 Postman，选择一个<strong class="bold"> POST </strong>调用，粘贴我们从 API Gateway stage 复制的 URL。然后，点击<strong class="bold">正文</strong>，在正文中添加原始数据，即 JSON 格式化的测试数据，如下截图:<div> <img src="img/C12624_08_19.jpg" alt="Figure 8.19: Calling the API via Postman&#13;&#10;"/> </div> <h6>图 8.19:通过邮递员调用 API </h6></li>
+				<li>点击<strong class="bold">发送</strong>按钮，使用提供的原始数据调用 API。结果显示在下面的窗口中。</li>
+			</ol>
+			<p>我们收到了“否”的预测，这表明该模型已经作为无服务器应用程序成功部署。我们现在可以从世界上任何地方的浏览器或邮差中调用 API，并获得模型的预测。这个 API 可以与其他服务集成在一个更大的产品中，并且可以根据需要进行扩展。</p>
+			<h2 id="_idParaDest-332"><a id="_idTextAnchor336"/>删除所有云资源停止计费</h2>
+			<p>我们提供的所有资源都需要删除/终止，以确保不再对其计费。需要执行以下步骤，以确保在练习册中创建的所有资源都被删除:</p>
+			<ol>
+				<li value="1">登录 CloudFormation 并点击<strong class="bold">删除</strong>堆栈(我们为 RStudio 提供的堆栈)。</li>
+				<li>登录到 SageMaker，从右侧边栏打开端点，检查我们为练习创建的端点，并删除它。</li>
+				<li>登录 AWS Lambda 并删除我们为练习创建的 Lambda 函数。</li>
+				<li>登录 AWS API Gateway，删除我们为练习创建的 API。</li>
+			</ol>
+			<p><strong class="bold">关于 AWS SageMaker 的进一步说明</strong></p>
+			<p>我们利用亚马逊提供的算法的现有容器来训练模型。遵循这一步骤是为了使事情简单。我们可以将自己定制的训练算法带到 SageMaker，并利用该平台将模型部署为服务。SageMaker 负责编排后台资源的整个过程，以提供实例、配置模型工件和构建端点。然而，我们需要提供特定格式的数据和模型工件，以便 SageMaker 部署它。</p>
+			<h4>注意</h4>
+			<p class="callout">有关构建定制模型过程的更多详细信息，请访问 https://docs . AWS . Amazon . com/sage maker/latest/DG/build-model . html。</p>
+			<h3 id="_idParaDest-333"><a id="_idTextAnchor337"/>活动 13:使用水管工部署一个 R 模型</h3>
+			<p>在本活动中，我们将在 R 中开发一个回归模型，并使用 plumber 将其部署为 API 端点。我们将在 R 中使用监督学习的另一个用例，我们将使用不同的数据集建立一个回归模型，即<strong class="bold"> Boston Housing </strong>。该数据集在 R 的 Mlbench 库中可用，我们已经安装了该库，它提供了在给定一些房屋属性的情况下波士顿市内房屋的中值价格信息。</p>
+			<p>我们将编写两个 R 脚本:<code>model.r</code>用于存放回归模型和预测函数，而<code>plumber.R</code>用于存放将模型部署为 API 端点所需的函数。</p>
+			<h4>注意</h4>
+			<p class="callout">有关数据集的其他详细信息，请访问 https://www . rdocumentation . org/packages/ml bench/versions/2.1-1/topics/Boston housing。</p>
+			<p>执行以下步骤:</p>
+			<ol>
+				<li value="1">创建一个<code>model.r</code>脚本，它将加载所需的库、数据，并拟合一个回归模型和必要的函数来对看不见的数据进行预测。</li>
+				<li>加载<code>mlbench</code>库，其中有这个活动的数据。</li>
+				<li>将<code>BostonHousing</code>数据加载到数据帧<code>df</code>中。</li>
+				<li>使用<code>df</code>的前<code>400</code>行创建一个训练数据集，并使用剩余的行进行测试。</li>
+				<li>使用<code>lm</code>函数拟合逻辑回归模型，因变量为<code>medv</code>(中值)，自变量为<code>10</code>，如<code>crim</code>、<code>zn</code>、<code>indus</code>、<code>chas</code>、<code>nox</code>、<code>rm</code>、<code>age</code>、<code>dis</code>、<code>rad</code>、<code>tax</code>。</li>
+				<li>定义一个模型端点为<code>predict_data</code>；这将被用作管道工的 API 端点。</li>
+				<li>在该函数中，将参数转换为<code>numeric</code>和<strong class="bold">因子</strong>(因为 API 调用只会将它们作为字符串传递)。</li>
+				<li>将模型的 10 个独立特性包装成一个名为<code>sample</code>的 DataFrame，并为列使用相同的名称。</li>
+				<li>将<code>sample</code>数据帧传递给带有模型(在步骤 4 中创建)的预测函数，并返回预测值。</li>
+				<li>加载<code>plumber</code>库。</li>
+				<li>使用<code>plumb</code>函数创建一个管道工对象，并传递<code>model.r</code>文件(在第 1 部分中创建)。</li>
+				<li>通过将主机名作为<code>localhost</code>或<code>127.0.0.1</code>和一个端口(比如说<code>8080</code>)来运行 plumber 对象。</li>
+				<li>Test the deployed model using the browser or Postman and invoke the API.<p>API 调用:</p><p>http://127 . 0 . 0 . 1:8080/predict _ data？crim = 0.01 &amp; Zn = 18 &amp; indus = 2.3 &amp; chas = 0 &amp; NOx = 0.5 &amp; RM = 6 &amp; age = 65 &amp; dis = 4 &amp; rad = 1 &amp; tax = 242</p><p>最终输出如下:</p><pre>{"Answer":[22.5813]}Note</pre><h4>注意</h4><p class="callout">这项活动的解决方案可在 463 页找到。</p></li>
+			</ol>
+			<h2 id="_idParaDest-334"><a id="_idTextAnchor338"/>总结</h2>
+			<p>在这一章中，我们研究了如何使用 R 的 plumber 使用传统的基于服务器的部署策略来部署我们的机器学习模型，以及使用 plumber for R 和 Docker 容器的增强方法。然后，我们研究了如何使用云服务构建无服务器应用程序，以及如何使用最少的代码根据需要轻松扩展应用程序。</p>
+			<p>我们探索了各种 web 服务，如 Amazon Lambda、Amazon SageMaker 和 Amazon API Gateway，并研究了如何编排服务以将我们的机器学习模型部署为无服务器应用程序。</p>
+			<p>在下一章中，我们将着手一个顶点项目，根据现实世界中的一个问题撰写一篇最新的研究论文，并再现其结果。</p>
+		</div>
+	
+
+</body></html>

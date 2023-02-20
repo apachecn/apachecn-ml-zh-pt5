@@ -1,0 +1,179 @@
+<html><head/><body>
+
+
+
+
+
+<style type="text/css">body{margin:1em;background-color:transparent!important;}#sbo-rt-content *{text-indent:0pt!important;}#sbo-rt-content .bq{margin-right:1em!important;}</style>
+<div><div><h1 id="_idParaDest-15"><em class="italic"> <a id="_idTextAnchor014"/>第一章</em>:现代数据科学概述</h1>
+			<p>数据科学起源于 18 世纪早期，在过去的几十年里获得了极大的普及。</p>
+			<p>在本书中，您将学习如何在微软公共云基础设施 Azure 中运行数据科学项目。你将获得成为 Azure 认证数据科学家助理所需的所有技能。你将从这一章开始，这一章给出了贯穿全书的一些基本术语。然后，你将深入研究<strong class="bold"> Azure 机器学习</strong> ( <strong class="bold"> AzureML </strong>)服务。您将从提供工作区开始。然后，您将在 AzureML Studio web 界面中构建无代码、低代码的体验。然后，您将深入代码优先的数据科学实验，使用 AzureML <strong class="bold">软件开发工具包</strong> ( <strong class="bold"> SDK </strong>)。</p>
+			<p>在本章中，您将学习 DP 100 考试所需的一些基础数据科学相关术语。您将从了解数据科学项目的典型生命周期开始。然后，您将了解大数据以及 Apache Spark 技术如何使您能够针对大数据训练机器学习模型。然后，您将探索什么是<strong class="bold"> DevOps </strong>思维模式，以及它如何帮助您成为高效、多学科、敏捷团队的一员，构建机器学习增强的产品。</p>
+			<p>在本章中，我们将讨论以下主要话题:</p>
+			<ul>
+				<li>数据科学的发展</li>
+				<li>从事数据科学项目</li>
+				<li>在数据科学中使用 Spark</li>
+				<li>采用 DevOps 思维模式</li>
+			</ul>
+			<h1 id="_idParaDest-16"><a id="_idTextAnchor015"/>数据科学的演变</h1>
+			<p>如果你试图找到数据科学实践的根源，你可能会在文明的开端找到证据。在 18 世纪，政府出于税收目的收集人口和金融数据，这种做法被称为 T2 统计。随着时间的推移，这个术语的使用范围扩大到包括对所收集数据的总结和分析。1805 年，法国数学家阿德里安-玛丽·勒让德(Adrien-Marie Legendre)发表了一篇论文，描述了用于拟合线性方程的<a id="_idIndexMarker002"/><strong class="bold">最小二乘法</strong>，尽管大多数人认为卡尔·弗里德里希·高斯(Carl Friedrich Gauss)在几年后发表了完整的描述。1900 年，卡尔·皮尔逊在<em class="italic">哲学杂志</em>上发表了他对<a id="_idIndexMarker003"/>卡方统计量<strong class="bold">的观察，卡方统计量是数据科学中假设检验的基石。1962 年，约翰·图基，这位因<strong class="bold">快速傅立叶变换</strong>和<strong class="bold">盒图</strong>而闻名的科学家，发表了<a id="_idIndexMarker005"/>一篇论文，表达了他对数据分析的热情，以及统计学需要如何发展成为一门新的科学。</strong></p>
+			<p>另一方面，随着二十世纪中叶信息学的兴起，<strong class="bold">人工智能</strong> ( <strong class="bold"> AI </strong>)领域是<a id="_idIndexMarker006"/>在 1955 年由约翰·麦卡锡引入作为思考机器的官方术语。人工智能是计算机科学的一个领域，它开发可以模仿智能人类行为的系统。使用诸如<a id="_idIndexMarker007"/>作为<strong class="bold">信息处理语言</strong> ( <strong class="bold"> IPL </strong>)和<strong class="bold">列表处理器</strong> ( <strong class="bold"> LISP </strong>)的编程语言，开发人员正在编写可以操纵列表<a id="_idIndexMarker008"/>和各种其他数据结构来解决复杂问题的程序。1955 年，Arthur Samuel 的 checkers player 是第一款能够从已经玩过的游戏中学习的软件，它将棋盘状态和获胜的几率存储在缓存中。这个 checkers 程序可能是<strong class="bold">机器学习</strong>的第一个例子，这是人工智能的一个子领域<a id="_idIndexMarker009"/>，它利用历史数据和数据中编码的模式来训练模型，使系统能够模仿人类任务，而无需显式编码整个逻辑。事实上，您可以将机器学习模型视为软件代码，它是通过针对数据集训练算法来识别某些类型的模式而生成的。</p>
+			<p>2001 年，William S. Cleveland 发表了第一篇文章，其中术语<strong class="bold">数据科学</strong>以我们今天所指的方式使用，这是一门统计学、数据分析和信息学的交叉科学，试图解释基于数据的现象。</p>
+			<p>尽管大多数人将数据科学与机器学习相关联，但数据科学的范围要广得多，包括在实际的机器学习模型训练过程之前对数据的分析和准备，正如您将在下一节中看到的那样。</p>
+			<h1 id="_idParaDest-17">从事数据科学项目</h1>
+			<p>一个数据科学项目<a id="_idIndexMarker010"/>旨在为应用程序注入从数据中提取的智能。在这一部分中，您将发现此类项目中需要的常见任务和关键考虑事项。有许多成熟的生命周期过程，如<a id="_idIndexMarker011"/>如<strong class="bold">团队数据科学过程</strong> ( <strong class="bold"> TDSP </strong>)和<strong class="bold">数据挖掘的跨行业标准过程</strong> ( <strong class="bold"> CRISP-DM </strong>)，这些过程<a id="_idIndexMarker012"/>描述了典型项目中执行的迭代阶段。最常见的阶段如<em class="italic">图 1.1 </em>所示:</p>
+			<div><div><img src="img/B16777_01_001.jpg" alt="Figure 1.1 – The iterative stages of a data science project&#13;&#10;" width="1037" height="731"/>
+				</div>
+			</div>
+			<p class="figure-caption">图 1.1–数据科学项目的迭代阶段</p>
+			<p>尽管该图显示了阶段之间的一些指示性流程，但是如果需要，您可以自由地从一个阶段跳到任何其他阶段。此外，这种方法是迭代的，数据科学团队应该经历多次迭代，改进其业务理解和最终模型，直到满足成功标准。在本章的<em class="italic">采用 DevOps 思维</em>部分，你会读到更多关于迭代过程的好处。数据科学过程从业务理解阶段开始，您将在下一节中读到更多内容。</p>
+			<h2 id="_idParaDest-18"><a id="_idTextAnchor017"/>对业务问题的理解</h2>
+			<p>数据科学项目<a id="_idIndexMarker013"/>的第一阶段是业务理解阶段。在这一阶段，数据科学团队与业务利益相关者合作，定义一个简短、直截了当的问题，机器学习将尝试回答这个问题。</p>
+			<p><em class="italic">图 1.2 </em>显示了机器学习可以回答的五个最常见的问题:</p>
+			<div><div><img src="img/B16777_01_002.jpg" alt="Figure 1.2 – Five questions machine learning can answer&#13;&#10;" width="1650" height="655"/>
+				</div>
+			</div>
+			<p class="figure-caption">图 1.2–机器学习可以回答的五个问题</p>
+			<p>在每个问题的背后，都有一组您将使用的建模技术:</p>
+			<ul>
+				<li><strong class="bold">回归</strong>模型<a id="_idIndexMarker014"/>允许你根据一个或多个特征预测一个数值。例如，在<a href="B16777_08_Final_VK_ePub.xhtml#_idTextAnchor117"> <em class="italic">第 8 章</em> </a>，<em class="italic">用 Python 代码</em>做实验，你将试图预测一个数值，这个数值是基于你试图预测的值的前一年进行的 10 次测量。训练回归模型是一项由<strong class="bold">监督的</strong>机器学习任务，这意味着您<a id="_idIndexMarker015"/>需要提供足够的样本数据来训练模型，以预测所需的数值。</li>
+				<li><strong class="bold">分类</strong>模型<a id="_idIndexMarker016"/>允许你预测一组给定输入的类别标签。这个标签可以是简单的是/否标签，也可以是蓝色、绿色或红色。例如，在<a href="B16777_05_Final_VK_ePub.xhtml#_idTextAnchor072"> <em class="italic">第 5 章</em></a><em class="italic">让机器做模型训练</em>中，您将训练一个分类模型来检测客户是否会取消他们的电话订购。预测一个人是否会停止做某事被称为<strong class="bold">流失</strong>或<a id="_idIndexMarker017"/>流失检测。训练分类模型是一项受监督的机器学习任务，需要有标签的数据集来训练模型。标注数据集包含您希望模型预测的输入和标注。</li>
+				<li><strong class="bold">聚类</strong>是对数据进行分组的<strong class="bold">无监督</strong>机器学习任务<a id="_idIndexMarker018"/>。与前两种模型类型相比，聚类<a id="_idIndexMarker019"/>不需要任何训练数据。它对给定的数据集进行操作，并创建所需数量的聚类，将每个数据点分配给它所属的集合。聚类模型的一个常见用例是，当您试图在您的客户群中确定不同的消费群时，您将针对这些消费群开展特定的营销活动。</li>
+				<li><strong class="bold">推荐系统</strong>被<a id="_idIndexMarker020"/>设计为<a id="_idIndexMarker021"/>根据用户档案推荐最佳选项。搜索引擎、电子商店和流行的视频流平台利用这种类型的模型来产生关于下一步做什么的个性化建议。</li>
+				<li><strong class="bold">异常检测</strong>模型<a id="_idIndexMarker022"/>可以检测数据集或数据流中的异常值。离群值是不属于其余元素的项目，表示异常。例如，如果机器的振动传感器开始发送异常测量值，这可能是该设备即将出现故障的良好迹象。</li>
+			</ul>
+			<p>在业务理解阶段，您将尝试理解问题陈述并定义成功标准。对机器学习能做什么和不能做什么建立适当的预期是确保团队之间一致的关键。</p>
+			<p>在整个数据科学项目中，通常会有多轮业务理解。在探索数据集或训练模型后，数据科学团队获得了许多见解。将这些收集到的见解带给业务涉众，或者验证您团队的假设，或者对您正在处理的问题获得更多的见解，这是很有帮助的。例如，业务利益相关者可能会解释您可能在数据中发现的模式，但无法解释其基本原理。</p>
+			<p>一旦你很好地掌握了你试图解决的问题，你需要获得一些数据，探索它，甚至给它贴上标签，这些你将在下一节读到。</p>
+			<h2 id="_idParaDest-19"><a id="_idTextAnchor018"/>获取和探索数据</h2>
+			<p>在理解了你试图解决的<a id="_idIndexMarker024"/>问题之后，是时候<a id="_idIndexMarker025"/>收集数据来支持机器学习过程了。数据可以有多种形式和格式。它可以是存储在数据库系统中的结构良好的表格数据，甚至是存储在文件共享中的文件，如图像。最初，你不知道收集哪些数据，但你必须从某个地方开始。在寻找数据时，一个典型的轶事是相信总有一个 Excel 文件将包含关键信息，并且您必须不断地要求它，直到您找到它。</p>
+			<p>找到数据后，您必须对其进行分析，以了解数据集是否完整。数据通常存储在内部系统或<strong class="bold">在线事务处理</strong> ( <strong class="bold"> OLTP </strong>)数据库中，而这些数据库是<a id="_idIndexMarker026"/>无法轻易访问的。即使数据是可访问的，也不建议直接在源系统中浏览它，因为您可能会意外地影响托管数据的底层引擎的性能。例如，对销售表的复杂查询可能会影响电子商店解决方案的性能。在这些情况下，通常以文件格式导出所需的数据集，例如最具<a id="_idIndexMarker027"/>互操作性的<strong class="bold">逗号分隔值</strong> ( <strong class="bold"> CSV </strong>)格式或更适合分析处理的<strong class="bold"> Parquet </strong>格式。这些<a id="_idIndexMarker028"/>文件随后被上传到廉价的云存储中，可供进一步分析。</p>
+			<p>在微软 Azure 中，最常见的目标要么是存储帐户中的 Blob 容器，要么是<strong class="bold"> Azure Data Lake Gen 2 </strong>的文件系统<a id="_idIndexMarker029"/>中的文件夹，这提供了更细粒度的访问控制机制。使用工具<a id="_idIndexMarker030"/>可以一次性复制数据，例如<strong class="bold"> AzCopy </strong>或<strong class="bold"> Storage Explorer </strong>。如果你<a id="_idIndexMarker031"/>想要配置一个可重复的流程，可以按计划增加新数据，你可以使用更高级的工具，如<strong class="bold"> Azure Data Factory </strong>或<strong class="bold"> Azure Synapse Analytics </strong>的<a id="_idIndexMarker032"/>管道。在<a href="B16777_04_Final_VK_ePub.xhtml#_idTextAnchor053"> <em class="italic">第 4 章</em> </a>、<em class="italic">配置工作区</em>中，您将查看从本地提取数据所需的组件<a id="_idIndexMarker033"/>以及您可以从 AzureML 工作区内连接到的可用数据存储库，以访问各种数据集。在<a href="B16777_04_Final_VK_ePub.xhtml#_idTextAnchor053"> <em class="italic">第 4 章</em> </a>、<em class="italic">配置工作区</em>的<em class="italic">使用数据集</em>一节中，您将了解 AzureML 支持的数据集类型，以及如何探索它们以深入了解其中存储的信息。</p>
+			<p>收集数据时的一个常见任务是数据清理步骤。在此步骤中，您<a id="_idIndexMarker035"/>删除重复记录、估算缺失值或修复常见的数据输入问题。例如，您可以通过用<em class="italic">英国</em>替换<em class="italic">英国</em>记录来协调国家文本字段。在 AzureML 中，您可以在第六章 、<em class="italic">可视化模型培训和发布</em>中看到的设计器中执行这样的清理操作，或者通过第七章 、<em class="italic">azure ml Python SDK</em>中的笔记本体验来执行。虽然你可能会开始用 AzureML 做这些清理操作，但是随着项目的成熟，这些清理活动往往会在<strong class="bold"> Azure Data Factory </strong>或<strong class="bold"> Azure Synapse Analytics </strong>的管道<a id="_idIndexMarker036"/>中移动，这些管道<a id="_idIndexMarker037"/>将数据从源系统中取出。</p>
+			<p class="callout-heading">重要说明</p>
+			<p class="callout">在做数据清洗的时候，要注意<strong class="bold">牦牛毛</strong>。术语<em class="italic">牦牛毛</em>是在 90 年代创造的，用来描述<a id="_idIndexMarker038"/>的情况，当你在做一项任务时，你意识到你必须做另一项任务，这导致了另一项任务，以此类推。这一连串的任务可能会让你偏离最初的目标。例如，您可能意识到一些记录在国家文本字段示例中有无效的编码，但是您可以理解引用的国家。您决定更改 CSV 文件的导出编码，并意识到您使用的导出工具太旧，不支持 UTF-8。这将引导您寻找系统管理员来更新您的软件。不要走那条路，记下需要做什么，并把它添加到你的待办事项中。您可以在下一次迭代中修复这个问题，那时您将更好地理解您是否真正需要这个字段。</p>
+			<p>另一个常见的<a id="_idIndexMarker039"/>任务是标记数据集，特别是如果<a id="_idIndexMarker040"/>您将处理受监督的机器学习模型。例如，如果您正在管理一个数据集以预测客户是否会流失，您将不得不标记取消订阅的客户的记录。一个更复杂的标签案例是为社交媒体消息创建情感分析模型。在这种情况下，你需要获取信息，浏览它们，并给它贴上积极或消极情绪的标签。</p>
+			<p>在 AzureML Studio 中，您可以创建标注项目，从而扩展数据集的标注工作。AzureML 允许您定义文本标签或图像标签任务。然后，您让团队成员根据给定的指令标记数据。一旦团队开始标记数据，AzureML 会自动训练一个与您定义的任务相关的模型。当模型足够好时，它开始向贴标机提供建议，以提高其生产率。<em class="italic">图 1.3 </em>显示了标记项目创建向导和图像标记任务中当前可用的各种选项:</p>
+			<div><div><img src="img/B16777_01_003.jpg" alt="Figure 1.3 – Creating an AzureML labeling project &#13;&#10;" width="1312" height="1197"/>
+				</div>
+			</div>
+			<p class="figure-caption">图 1.3–创建 AzureML 标签项目</p>
+			<p>通过这个<a id="_idIndexMarker041"/>项目阶段，您应该已经发现了相关的<a id="_idIndexMarker042"/>源系统，并为机器学习训练生成了一个干净的数据集。在下一节中，您将学习如何创建额外的数据特征来帮助模型训练过程，这个过程被称为<a id="_idIndexMarker043"/>特征工程。</p>
+			<h2 id="_idParaDest-20"><a id="_idTextAnchor019"/>特色工程</h2>
+			<p>在<a id="_idIndexMarker044"/>特征工程<a id="_idIndexMarker045"/>阶段，您将生成新的数据特征，这些数据特征将更好地代表您试图解决的问题，并帮助机器从数据集学习。例如，以下代码块通过转换销售数据集的<code>product</code>列来创建一个名为<code>product_id</code>的新功能:</p>
+			<pre>product_map = { "orange juice": 1, "lemonade juice": 2 }
+dataset["product_id"] = dataset["product"].map(product_map)</pre>
+			<p>这个代码块使用<code>map</code>方法将文本转换成数值。<code>product</code>列被称为<a id="_idIndexMarker046"/>是<code>orange juice</code>或<code>lemonade juice</code>。如果在同一个数据集中有一个 1 到 5 的评级特征，那么它将是一个离散的数值变量，它可以接受有限数量的值，在这种情况下，只有<em class="italic"> 1 </em>、<em class="italic"> 2 </em>、<em class="italic"> 3 </em>、<em class="italic"> 4 </em>或<em class="italic"> 5 </em>。如果您有一个列记录客户购买了多少升或加仑，那么<a id="_idIndexMarker047"/>将是一个<strong class="bold">连续的</strong>数字变量<a id="_idIndexMarker048"/>，它可以接受任何大于或等于零的数值，比如半升。除了数值，日期字段也被视为连续变量。</p>
+			<p class="callout-heading">重要说明</p>
+			<p class="callout">虽然在前面的例子中，<code>product_id</code>特征是一个<strong class="bold">离散的</strong>数值变量，但像这样的特征通常被视为一个分类变量，正如你将在<a href="B16777_05_Final_VK_ePub.xhtml#_idTextAnchor072"> <em class="italic">第 5 章</em> </a>，<em class="italic">中看到的，让机器做模型训练</em>。</p>
+			<p>有许多特征化技术<a id="_idIndexMarker049"/>可用。指示性清单如下:</p>
+			<ul>
+				<li><strong class="bold">数字特征的缩放</strong>:这种<a id="_idIndexMarker050"/>技术将所有数字特征转换成易于比较的范围。例如，在<a href="B16777_08_Final_VK_ePub.xhtml#_idTextAnchor117"> <em class="italic">第八章</em></a><em class="italic">用 Python 代码</em>做实验，你将在医学测量的基础上训练一个机器学习模型。血糖测量值范围从 80 到 200 毫克/分升，而血压测量值范围从 60 到 128 毫米汞柱。这些数值使用它们的平均值按比例缩小，这种转换称为标准化<a id="_idIndexMarker051"/>或<strong class="bold"> Z 值</strong>归一化。它们的值最终在-1 比 1 的范围内，这使得机器能够提取更好的洞察力。</li>
+				<li><strong class="bold">拆分</strong>:将一列<a id="_idIndexMarker052"/>拆分成两个新特性是很常见的事情。比如将全名拆分为名和姓，以便进一步分析。</li>
+				<li><strong class="bold">宁滨</strong>:这种<a id="_idIndexMarker053"/>技术将连续的特征分组到不同的<a id="_idIndexMarker054"/>组或箱中，这些组或箱可能暴露关于你试图解决的问题的重要信息。例如，如果您有出生年份，您可以创建箱来分组不同的代。在这种情况下，出生年份在 1965 年至 1980 年之间的人将被称为<em class="italic">X</em>代，而出生年份在 1981 年至 1996 年之间的人将被称为<em class="italic">千禧一代</em>。通常使用您在<em class="italic">了解业务问题</em>一节中看到的聚类模型来产生群组并定义这些箱。</li>
+				<li><code>product</code>，您执行了标签编码。您将分类变量转换为数值变量。标签编码的一个典型例子是 t 恤尺寸，其中您将小号转换为<em class="italic"> 1 </em>，中号转换为<em class="italic"> 2 </em>，大号转换为<em class="italic"> 3 </em>。然而，在<code>product</code>示例<a id="_idIndexMarker056"/>中，您不小心定义了<code>orange juice</code> ( <code>1</code>)和<code>lemonade juice</code> ( <code>2</code>)之间的顺序，这可能会混淆机器学习算法。在这种情况下，您可以使用一键编码，而不是产生<code>product_id</code>特性的示例中使用的顺序编码。在这种情况下，您将引入两个二元特性，分别称为<em class="italic"> orange_juice </em>和<em class="italic"> lemonade_juice </em>。这些特性将接受<em class="italic"> 0 </em>或<em class="italic"> 1 </em>值，这取决于客户购买了哪种果汁。</li>
+				<li><strong class="bold">Generate lag features</strong>: If you<a id="_idIndexMarker057"/> deal with time-series data, you may need to produce features from values from preceding time. For example, if you are trying to forecast the temperature 10 minutes from now, you may need to have the current temperature and the temperature 30 minutes ago and 1 hour ago. These two additional past temperatures are lag features that you will have to engineer.<p class="callout-heading">重要说明</p><p class="callout">在大数据集中进行所有这些转换可能需要大量的内存和处理时间。这就是 Spark 等技术在并行处理过程中发挥作用的地方。您将在本章的<em class="italic">在数据科学中使用 Spark</em>一节中了解更多关于 Spark 的信息。</p></li>
+			</ul>
+			<p>在<a href="B16777_10_Final_VK_ePub.xhtml#_idTextAnchor147"> <em class="italic">第十章</em> </a>、<em class="italic">理解模型结果</em>中，你将使用<code>sklearn</code>库中的<code>MinMaxScaler</code>方法来缩放数字特征。</p>
+			<p>作为特征工程阶段的最后一步，您通常会删除不必要的或高度相关的<a id="_idIndexMarker058"/>特征，这一过程称为<strong class="bold">特征选择</strong>。您将<a id="_idIndexMarker059"/>删除不会用于训练机器学习模型的列。通过删除这些列，您可以减少将进行训练的计算机的内存需求，减少训练模型所需的计算时间，并且生成的模型将更小。</p>
+			<p>在创建这些功能时，合乎逻辑的是，您可能需要回到<em class="italic">获取和探索数据</em>阶段，甚至回到<em class="italic">理解业务问题</em>阶段，以获得更多数据和见解。不过，在某个时候，您的训练数据集将准备好训练模型，这将在下一节中介绍。</p>
+			<h2 id="_idParaDest-21"><a id="_idTextAnchor020"/>训练模型</h2>
+			<p>一旦你准备好数据集，机器学习训练过程就可以开始了。如果模型需要监督学习，并且您有足够的数据，您可以按照 70%比 30%或 80%比 20%的比例将它们拆分为训练数据集和验证数据集。您选择想要训练的模型类型，指定模型的训练<a id="_idIndexMarker061"/>参数(称为<strong class="bold">超参数</strong>，并训练模型。使用剩余的验证数据集，您根据<strong class="bold">度量</strong>评估训练模型的性能，并决定模型是否足够好以进入下一阶段，或者可能返回到<em class="italic">理解业务问题</em>阶段。监督模型的训练过程如图<em class="italic">图 1.4 </em>所示:</p>
+			<div><div><img src="img/B16777_01_004.jpg" alt="Figure 1.4 – Training a supervised machine learning model&#13;&#10;" width="1042" height="434"/>
+				</div>
+			</div>
+			<p class="figure-caption">图 1.4–训练监督机器学习模型</p>
+			<p>前面的陈述有几个变化:</p>
+			<ul>
+				<li>如果模型属于无监督学习类别，如聚类算法，您只需传递所有数据来训练模型。然后评估检测到的集群是否满足业务需求，修改超参数，然后重试。</li>
+				<li>如果你有一个模型<a id="_idIndexMarker062"/>需要监督学习，但没有足够的数据，那么<strong class="bold"> k 重交叉验证</strong>技术<a id="_idIndexMarker063"/>是常用的。使用 k-fold，您可以指定想要分割数据集的折叠次数。AzureML 使用<strong class="bold"> AutoML </strong>，如果数据少于 1000 行，则<a id="_idIndexMarker064"/>执行 10 次折叠；如果数据集在 1000 到 20000 行之间，则执行 3 次折叠。一旦你有了这些折叠，你就开始了一个迭代过程，在这个过程中你要做以下事情:<ol><li>保留一个折叠进行验证，并用剩下的折叠训练出一个新模型。</li><li>根据您保留的折叠评估生产的模型。</li><li>记录模型得分并丢弃模型。</li><li>重复<em class="italic">步骤 I </em>，保留另一个折叠进行验证，直到所有折叠都用于验证。</li><li>Produce the aggregated model's performance.<p class="callout-heading">重要说明</p><p class="callout">在机器学习研究文献中，有一种方法叫做<strong class="bold">半监督</strong>学习。在那种<a id="_idIndexMarker065"/>方法中，少量的已标记数据与大量的未标记数据相结合来训练模型。</p></li></ol></li>
+			</ul>
+			<p>不用训练一个单一的<a id="_idIndexMarker066"/>模型，评估结果，然后用一组不同的超参数再次尝试，您可以自动化这个过程并并行评估多个模型。这个过程被称为超参数调整，您将在第 9 章<a href="B16777_09_Final_VK_ePub.xhtml#_idTextAnchor136"><em class="italic"/></a><em class="italic">优化 ML 模型</em>中深入了解。在同一章中，您将了解如何自动化模型选择，这是一种被称为 AutoML 的 AzureML 功能。</p>
+			<p><strong class="bold">指标</strong>帮助<a id="_idIndexMarker067"/>您选择模型，使<a id="_idIndexMarker068"/>预测值和实际值之间的差异最小化。他们根据你训练的模型类型而不同<a id="_idIndexMarker069"/>。在<a id="_idIndexMarker070"/>回归<a id="_idIndexMarker071"/>模型中，度量试图<a id="_idIndexMarker072"/>最小化预测<a id="_idIndexMarker073"/>值和实际值之间的误差。最常见的有<strong class="bold">平均绝对误差</strong>(<strong class="bold">MAE</strong>)<strong class="bold">均方根误差</strong><strong class="bold"/>(<strong class="bold">RMSE</strong>)<strong class="bold">相对平方误差</strong>(<strong class="bold">RSE</strong>)<strong class="bold">相对绝对误差</strong> <strong class="bold">误差</strong>(<strong class="bold">RAE</strong>)<strong class="bold">决定系数</strong> ( 【T31</p>
+			<p>在分类模型中，度量标准略有不同，因为它们必须评估有多少结果是正确的，有多少是错误分类的。例如，在流失二进制分类问题中，有四种可能的结果:</p>
+			<ul>
+				<li>该模型预测客户会流失，客户也流失了。这被认为是<a id="_idIndexMarker074"/>一<strong class="bold">真阳性</strong> ( <strong class="bold"> TP </strong>)。</li>
+				<li>该模型预测客户会流失，但客户仍然忠诚。这个<a id="_idIndexMarker075"/>被认为是一个<strong class="bold">假阳性</strong> ( <strong class="bold"> FP </strong>)，因为模型关于顾客离开是错误的。</li>
+				<li>模型预测客户不会流失，结果客户流失了。这被认为是<a id="_idIndexMarker076"/>假阴性<strong class="bold"/>(<strong class="bold">FN</strong>)，因为该模型关于顾客忠诚度的预测是错误的。</li>
+				<li>该模型预测客户不会流失，并且客户保持忠诚。这是<a id="_idIndexMarker077"/>被认为是<strong class="bold">真阴性</strong> ( <strong class="bold"> TN </strong>)。</li>
+			</ul>
+			<p>这四个状态<a id="_idIndexMarker078"/>组成了<strong class="bold">混淆矩阵</strong>，如图<em class="italic">图 1.5 </em>所示:</p>
+			<div><div><img src="img/B16777_01_005.jpg" alt="Figure 1.5 – The classification model's evaluation&#13;&#10;" width="1641" height="1035"/>
+				</div>
+			</div>
+			<p class="figure-caption">图 1.5–分类模型的评估</p>
+			<p>通过这个混淆矩阵，您可以计算其他的<a id="_idIndexMarker079"/>指标，比如<strong class="bold">准确性</strong>，它计算评估测试中正确结果的总数(在本例中，<strong class="bold">1132</strong>TP+<strong class="bold">2708</strong>TN = 3840 条记录对<strong class="bold">2708</strong>+<strong class="bold">651</strong>+<strong class="bold">2229</strong>+<strong class="bold">1132</strong>= 6720 条记录)另一方面，<strong class="bold">精度</strong>或<strong class="bold">正预测值</strong> ( <strong class="bold"> PPV </strong>)评估<a id="_idIndexMarker081"/>有多少真预测实际上是真的(在这种情况下，<strong class="bold"> 1132 </strong> TP 对<strong class="bold"> 1132 </strong> + <strong class="bold"> 2229 </strong>总真预测)。<strong class="bold">回忆</strong>，也被称为<strong class="bold">灵敏度</strong>，测量有多少实际真值被正确<a id="_idIndexMarker083"/>分类(在这种情况下，<strong class="bold"> 1132 </strong> TP 对<strong class="bold"> 1132 </strong> + <strong class="bold"> 651 </strong>总实际真值)。根据您试图解决的业务问题，您将不得不在各种指标之间找到平衡，因为一个指标可能比其他指标更有帮助。例如，在新冠肺炎疫情期间，一个确定某人是否感染了回忆等于 1 的模型将识别所有被感染的患者。然而，它可能会意外地将一些未感染的错误分类，而其他指标(如 precision)可能会发现这些错误。</p>
+			<p class="callout-heading">重要说明</p>
+			<p class="callout">当您的模型与您的数据过于吻合时，请注意。这是我们称之为<strong class="bold">过度拟合</strong>的事情，它可能<a id="_idIndexMarker084"/>表明模型已经在你的训练数据集中识别出一种在现实生活中可能不存在的特定模式。这种模型在投入生产时往往表现不佳，并且在未知数据的基础上做出推断。过度拟合的一个常见原因是有偏见的训练数据集只暴露了真实世界示例的子集。另一个原因是目标泄漏，这意味着您试图预测的值以某种方式作为输入传递给模型，可能是通过使用目标列设计的功能。关于如何处理过度拟合和不平衡数据的指导，参见<em class="italic">延伸阅读</em>部分。</p>
+			<p>正如你到目前为止所看到的，在训练一个机器学习模型时，有<a id="_idIndexMarker085"/>许多事情需要考虑，并且贯穿本书，你将获得一些训练模型的实践经验。在大多数情况下，您必须选择的第一件事是运行培训流程的<a id="_idIndexMarker086"/>计算机的类型。目前你有两个选择，<strong class="bold">中央处理器</strong> ( <strong class="bold"> CPU </strong>)或者<strong class="bold">图形处理器</strong> ( <strong class="bold"> GPU </strong>)计算目标。两个目标都至少有一个 CPU，因为这是任何现代计算机的核心元素。不同的是，GPU 计算目标还提供了一些非常强大的图形卡，可以执行大规模并行数据处理，使训练速度快得多。为了利用 GPU，您正在训练的模型需要支持基于 GPU 的<a id="_idIndexMarker088"/>训练。GPU 通常在神经网络训练中使用<a id="_idIndexMarker089"/>框架，如<a id="_idIndexMarker090"/>如<strong class="bold"> TensorFlow </strong>、<strong class="bold"> PyTorch </strong>和<strong class="bold"> Keras </strong>。</p>
+			<p>一旦你训练了一个满足在数据科学项目的<em class="italic">理解业务问题</em>阶段定义的成功标准的机器学习模型，是时候将它操作化并开始用它进行推理了。这就是你将在下一节读到的内容。</p>
+			<h2 id="_idParaDest-22"><a id="_idTextAnchor021"/>部署模型</h2>
+			<p>谈到<a id="_idIndexMarker091"/>模型的可操作性，您有两种主要方法:</p>
+			<ul>
+				<li><strong class="bold">实时推理</strong>:<a id="_idIndexMarker092"/>模型总是被加载，等待在输入数据的基础上进行推理。典型的用例是基于用户输入调用模型进行预测的 web 和移动应用程序。</li>
+				<li><strong class="bold">批处理推断</strong>:每次调用批处理过程时都会加载模型，它<a id="_idIndexMarker093"/>会在即将到来的一批记录的基础上生成预测。例如，假设您已经训练了一个模型来识别图片中的人脸，并且您想要标记您硬盘上的所有图像。您将配置一个过程来对每个图像使用模型，并将结果存储在文本或 CSV 文件中。</li>
+			</ul>
+			<p>这两者之间的主要区别在于，您是否已经有了执行预测的数据。如果您已经有了数据并且它们没有改变，您可以在批处理模式下进行推断。例如，如果您试图预测下周比赛的足球比分，您可以运行一个批处理推理并将结果存储在数据库中。当客户要求特定的预测时，您可以从数据库中检索该值。然而，在足球比赛期间，预测最终比分的模型需要一些功能，如当前球员人数和受伤人数，这些信息将实时可用。在这些情况下，您可能希望部署一个公开 REST API 的 web 服务，在这里您发送所需的信息，模型进行实时推断。在第 12 章 、<em class="italic">用代码</em>操作模型中，你将深入研究实时和批处理方法。</p>
+			<p>在本节中，您<a id="_idIndexMarker094"/>回顾了数据科学项目的项目生命周期，并经历了所有阶段，从了解需要做什么一直到通过部署批处理或实时服务来操作模型。特别是对于实时流，您可能听说过<a id="_idIndexMarker095"/>术语<strong class="bold">结构化流</strong>，这是一个基于 Spark 的可扩展处理引擎，允许开发人员执行实时推理，就像他们在静态数据上执行批量推理一样。在下一节中，您将了解更多关于 Spark 的内容。</p>
+			<h1 id="_idParaDest-23"><a id="_idTextAnchor022"/>在数据科学中使用 Spark</h1>
+			<p>在 21 世纪初，大数据问题成为了现实。存储在数据中心的数据在数量和速度上都在增长。在 2021 年，当数据集的大小至少达到几个 TB 时，我们称之为大数据，而在大型组织中，甚至可以看到数 Pb 的数据。例如，当您在在线商店中存储用户与网站的交互以执行点击流分析时，这些数据集会以每天几千兆字节甚至每分钟的速度快速增长。</p>
+			<p>2009 年，加州大学伯克利分校启动了一个研究项目<a id="_idIndexMarker098"/>，试图提供处理大数据所需的并行计算工具。2014 年，Apache Spark 的第一个版本从这个研究项目中发布。该研究团队的成员成立了<a id="_idIndexMarker099"/>T2 数据公司，这是开源 Apache Spark 项目最重要的贡献者之一。</p>
+			<p>Apache Spark 提供了一个易于使用的可伸缩解决方案，允许人们以分布式方式在数据之上执行并行处理。Spark 架构背后的主要思想是驱动程序节点负责执行您的代码。您的代码被分割成较小的并行操作，这些操作可以针对较小的数据部分执行。这些较小的作业计划由工作节点执行，如图 1.6 中的<em class="italic">所示:</em></p>
+			<div><div><img src="img/B16777_01_006.jpg" alt="Figure 1.6 – Parallel processing of big data in a Spark cluster&#13;&#10;" width="1232" height="732"/>
+				</div>
+			</div>
+			<p class="figure-caption">图 1.6–Spark 集群中大数据的并行处理</p>
+			<p>例如，假设<a id="_idIndexMarker101"/>你想计算你的公司<a id="_idIndexMarker102"/>去年销售了多少产品。在这种情况下，Spark 可以运行 12 个作业来生成月度汇总，然后由另一个作业处理结果，汇总所有月份的汇总。如果您想将整个数据集加载到内存中，并从那里直接执行这些聚合，让我们来看看您在该计算机中需要多少内存。让我们假设一个月的销售数据存储在一个 1 GB 的 CSV 文件中。加载该文件需要大约 10 GB 的内存。被压缩的<code>pandas.</code> <code>DataFrame</code>对象。正如你所理解的，在内存中同时加载所有 12 个文件是一项不可能的任务。您需要并行处理，Spark 可以自动为您做到这一点。</p>
+			<p class="callout-heading">重要说明</p>
+			<p class="callout">拼花文件以分栏格式存储，这允许您部分加载所需的任意数量的栏。在 1 GB 的 Parquet 示例中，如果只从数据集中加载一半的列，可能只需要 20 GB 的内存。这也是拼花格式在分析荷载中广泛使用的原因之一。</p>
+			<p>Spark 是用<a id="_idIndexMarker104"/> Scala 编程语言编写的。它提供了 Scala、Python、Java、R 甚至 C#的 API。尽管如此，数据科学社区要么在 Scala 上工作以<a id="_idIndexMarker105"/>实现最大的计算性能，要么利用 Java 库生态系统或 Python，后者被现代数据科学社区广泛采用。当您编写 Python 代码以利用<a id="_idIndexMarker106"/> Spark 引擎时，您使用 PySpark 工具在 Spark 框架中稍后引入的<code>Spark.DataFrame</code>对象上执行操作。要从 Spark 的分布式特性中获益，您需要处理大数据集。这意味着，如果您只处理几十万条记录，甚至几百万条记录，Spark 可能会大材小用。</p>
+			<p>Spark 提供了两个机器学习库，<a id="_idIndexMarker107"/>旧的<code>Spark.DataFrame</code>结构，一个分布式数据集合，并提供了与 Python pandas 或 r 中使用的<code>DataFrame</code>对象相似的功能。此外，<code>pandas.DataFrame</code>操作在 Spark 上使用他们现有的编码技能。</p>
+			<p>AzureML 允许你在 PySpark 上执行 Spark 作业，要么使用其本地计算集群，要么通过将<a id="_idIndexMarker110"/>附加到<strong class="bold"> Azure 数据块</strong>或<strong class="bold"> Synapse Spark 池</strong>。虽然在本书中<a id="_idIndexMarker111"/>您不会编写任何 PySpark 代码，但是在<a href="B16777_12_Final_VK_ePub.xhtml#_idTextAnchor171"> <em class="italic">第 12 章</em> </a>，<em class="italic">用代码</em>操作化模型中，您将了解如何在不需要 Spark 或驱动程序节点的情况下实现类似的并行化优势。</p>
+			<p>无论您是用普通的 Python、PySpark、R 还是 Scala 编码，您都在产生一些代码工件，它们可能是更大系统的一部分。在下一节中，您将探索 DevOps 思维模式，这种思维模式强调软件工程师、数据科学家和系统管理员之间的沟通和协作，以更快地发布有价值的产品特性。</p>
+			<h1 id="_idParaDest-24"><a id="_idTextAnchor023"/>采用 DevOps 思维模式</h1>
+			<p>DevOps 是一种团队心态，试图将开发人员和系统操作人员之间的孤岛最小化，以缩短产品的开发生命周期。开发人员不断地改变产品来引入新的特性和修改现有的行为。另一方面，系统操作员需要保持生产系统稳定、正常运行。在过去，这两类人是孤立的，开发人员把新的软件扔给运营团队，运营团队试图把它部署到生产中。你可以想象，事情并不总是那么顺利，导致了这两个群体之间的摩擦。当谈到 DevOps 时，一个基本的实践是团队需要自治，并且应该包含所有需要的规程，包括<em class="italic">开发人员</em>和<em class="italic">操作人员</em>。</p>
+			<p>谈到数据科学，有些人将<a id="_idIndexMarker113"/>实践称为<strong class="bold"> MLOps、</strong>，但基本思想是相同的。一个团队应该自给自足，能够开发整体解决方案所需的所有组件，从引入数据的数据工程部分和模型的训练，一直到在生产中操作模型。这些团队通常以<strong class="bold">敏捷</strong>的方式工作，包含迭代方法，基于反馈寻求持续改进，如图 1.7 中的<em class="italic">所示:</em></p>
+			<div><div><img src="img/B16777_01_007.jpg" alt="Figure 1.7 – The feedback flow in an agile MLOps team&#13;&#10;" width="822" height="487"/>
+				</div>
+			</div>
+			<p class="figure-caption">图 1.7–敏捷 MLOps 团队中的反馈流程</p>
+			<p>MLOps 团队处理其积压工作，并执行您在数据科学项目部分的<em class="italic">工作中看到的迭代步骤。一旦模型准备好了，作为团队一部分的系统管理员就知道需要做什么来将模型投入<a id="_idIndexMarker114"/>生产。该模型受到密切监控，如果发现缺陷或性能下降，就会为 MLOps 团队创建一个 backlog 项，以便在下一个 sprint 中解决。</em></p>
+			<p>为了最小化生产中新特性的开发和部署生命周期，需要采用自动化。DevOps 团队的目标是最大限度地减少部署过程中的人工干预，并尽可能多地自动化可重复的任务。</p>
+			<p><em class="italic">图 1.8 </em>显示了使用 MLOps 思维开发实时模型时最常用的组件:</p>
+			<div><div><img src="img/B16777_01_008.jpg" alt="Figure 1.8 – Components usually seen in MLOps-driven data science projects&#13;&#10;" width="1321" height="793"/>
+				</div>
+			</div>
+			<p class="figure-caption">图 1.8–m lops 驱动的数据科学项目中常见的组件</p>
+			<p>让我们来分析一下这些<a id="_idIndexMarker115"/>组件:</p>
+			<ul>
+				<li>ARM 模板允许你<a id="_idIndexMarker116"/>自动部署 Azure 资源。这使得团队能够快速启动和关闭开发、测试甚至生产环境。这些工件存储在 Azure DevOps 的 Git 版本控制存储库中。使用 Azure DevOps 管道自动部署多个环境。你将在<a href="B16777_02_Final_VK_ePub.xhtml#_idTextAnchor026"> <em class="italic">第二章</em> </a>、<em class="italic">部署 Azure 机器学习工作区资源</em>中读到 ARM 模板。</li>
+				<li>使用<strong class="bold"> Azure 数据工厂</strong>，数据<a id="_idIndexMarker117"/>科学团队协调从源系统中提取和清理数据。数据被复制到一个数据湖中，这个数据湖可以从 AzureML 工作区访问。Azure Data Factory 使用 ARM 模板来定义其编排管道，这些模板存储在 Git 存储库中以跟踪变化，并能够部署在多个环境中。</li>
+				<li>在 AzureML 工作区内，数据科学家正在编写他们的代码。最初，他们开始在 Jupyter 笔记本上工作。笔记本是一些想法原型化的一个很好的方式，你会在<a href="B16777_07_Final_VK_ePub.xhtml#_idTextAnchor102"> <em class="italic">第七章</em> </a>，<em class="italic">AzureML Python SDK</em>中看到。随着项目的进展，脚本从笔记本中导出，并组织成编码脚本。所有这些代码工件都被版本控制到 Git 中，使用<a id="_idIndexMarker118"/>终端和命令，如图 1.9 所示:</li>
+			</ul>
+			<div><div><img src="img/B16777_01_009.jpg" alt="Figure 1.9 – Versioning a notebook and a script file using Git within AzureML&#13;&#10;" width="1650" height="716"/>
+				</div>
+			</div>
+			<p class="figure-caption">图 1.9–在 AzureML 中使用 Git 对笔记本和脚本文件进行版本控制</p>
+			<ul>
+				<li>当一个模型被定型时，如果它比当前生产中的模型表现得更好，它将在 AzureML 中注册，并发出一个事件。这个事件由 AzureML DevOps 插件捕获，它触发测试环境中模型的自动部署。模型在该环境中进行测试，如果所有测试都通过，并且在<strong class="bold">应用洞察</strong>中没有记录错误，应用洞察是<a id="_idIndexMarker119"/>监控部署，工件可以<a id="_idIndexMarker120"/>自动部署到下一个环境，一直到生产。</li>
+			</ul>
+			<p>确保<a id="_idIndexMarker121"/>代码和模型质量的能力在这个自动化过程中起着至关重要的作用。在 Python 中，您可以使用各种工具，如 Flake8、Bandit 和 Black，来确保代码质量，检查常见的安全问题，并一致地格式化您的代码库。您还可以使用<code>pytest</code>框架来编写您的功能测试，其中您将针对黄金数据集测试模型结果。使用<code>pytest</code>，您甚至可以执行集成测试来验证端到端系统是否如预期那样工作。</p>
+			<p>采用 DevOps 是一个永无止境的旅程。每次重复这个过程，团队都会变得更好。诀窍是在端到端的开发和部署过程中建立信任，以便每个人都有信心做出更改并在生产中部署它们。当过程失败时，理解失败的原因并从你的错误中学习。建立防止未来失败的机制并继续前进。</p>
+			<h1 id="_idParaDest-25"><a id="_idTextAnchor024"/>总结</h1>
+			<p>在本章中，您了解了数据科学的起源以及它与机器学习的关系。然后，您了解了数据科学项目的迭代性质，并发现了您将从事的各个阶段。从问题理解阶段开始，您将获取和探索数据，创建新功能，训练模型，然后部署以验证您的假设。然后，您看到了如何使用 Spark 生态系统扩展大数据文件的处理。在上一节中，您发现了 DevOps 思维模式有助于敏捷团队更加高效，这意味着他们可以在短时间内开发和部署新产品特性。您看到了 MLOps 驱动的团队中常用的组件，并且您看到在该图的中心，您可以找到 AzureML。</p>
+			<p>在下一章，你将学习如何部署 AzureML 工作空间，并理解你将在本书的数据科学旅程中使用的 Azure 资源。</p>
+			<h1 id="_idParaDest-26"><a id="_idTextAnchor025"/>延伸阅读</h1>
+			<p>本节提供了一个有用的网络资源列表，可以帮助您增加本章中所涉及主题的知识:</p>
+			<ul>
+				<li>AzCopy 命令行工具，用于将 blobs 和文件复制到存储帐户:<a href="http://aka.ms/azcopy">http://aka.ms/azcopy</a>。</li>
+				<li>Azure Storage Explorer 是一款管理你所有 Azure 云存储资源的免费工具:<a href="https://azure.microsoft.com/features/storage-explorer/">https://azure.microsoft.com/features/storage-explorer/</a>。</li>
+				<li><em class="italic">数据湖的搭便车指南</em>是关于构建数据湖时的关键考虑和最佳实践的广泛指南:【https://aka.ms/adls/hitchhikersguide】T2。</li>
+				<li>用 AzureML 优化数据处理:<a href="https://docs.microsoft.com/azure/machine-learning/concept-optimize-data-processing">https://docs . Microsoft . com/azure/machine-learning/concept-optimize-data-processing</a>。</li>
+				<li>考拉项目:<a href="https://koalas.readthedocs.io">https://Koalas . readthedocs . io</a>。</li>
+				<li>防止模型过拟合和处理不平衡数据的指导:<a href="https://docs.microsoft.com/azure/machine-learning/concept-manage-ml-pitfalls">https://docs . Microsoft . com/azure/machine-learning/concept-manage-ml-陷阱</a>。</li>
+				<li>面向在 AzureML 和 Azure DevOps 中工作的数据科学家和应用程序开发人员的 MLOps 指南:<a href="https://aka.ms/MLOps">https://aka.ms/MLOps</a>。</li>
+			</ul>
+		</div>
+	</div>
+</body></html>

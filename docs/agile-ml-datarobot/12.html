@@ -1,0 +1,263 @@
+<html><head/><body>
+
+
+
+
+
+
+
+
+
+
+
+<style type="text/css">body{margin:1em;background-color:transparent!important;}#sbo-rt-content *{text-indent:0pt!important;}#sbo-rt-content .bq{margin-right:1em!important;}</style>
+
+<div><div><h1 id="_idParaDest-123"><a id="_idTextAnchor124"/> <a id="_idTextAnchor125"/> <em class="italic">第九章</em>:预测与时间序列建模</h1>
+
+			<p>在这一章中，我们将了解什么是时间序列，并将了解如何使用 DataRobot 对它们进行建模。时间序列建模在商业中越来越有用。然而，与预测相关的挑战使得许多熟练的数据科学家很难成功地进行时间序列建模，并且这种形式的建模也非常耗时。DataRobot 提供了一个自动化的过程，使数据科学家能够以有效和高效的方式执行时间序列项目。在本章中，我们将介绍预测的概念，强调其商业重要性和内在挑战，并说明如何使用 DataRobot 建立其模型。</p>
+
+			<p>本章结束时，你将学会如何利用 DataRobot 建立时间序列预测模型。此外，我们将研究如何用这些模型进行预测。作为高级主题的一部分，我们将进一步构建多系列时间序列的模型。以下是本章将涉及的主要主题:</p>
+
+			<ul>
+
+				<li>时间序列预测和建模的概念介绍</li>
+
+				<li>定义和设置时间序列项目</li>
+
+				<li><a id="_idTextAnchor126"/> <a id="_idTextAnchor127"/>建立时间序列预测模型<a id="_idTextAnchor128"/>并了解其模型结果</li>
+
+				<li><a id="_idTextAnchor129"/> <a id="_idTextAnchor130"/>用时间序列模型进行预测</li>
+
+				<li>时间序列建模高级主题</li>
+
+			</ul>
+
+			<h1 id="_idParaDest-124"><a id="_idTextAnchor131"/>技术要求</h1>
+
+			<p>本章的某些部分需要使用 DataRobot 软件和一些数据操作工具。大多数例子处理小数据集，因此可以通过 Excel 处理。我们将在本章中使用的数据集在下面描述。</p>
+
+			<h2 id="_idParaDest-125"><a id="_idTextAnchor132"/>家电能源预测数据集</h2>
+
+			<p>这个<a id="_idIndexMarker415"/>数据集可以在<em class="italic">加州大学欧文分校</em> ( <em class="italic"> UCI </em>)机器学习知识库(<a href="https://archive.ics.uci.edu/ml/datasets/Appliances+energy+prediction#">https://archive . ics . UCI . edu/ml/datasets/Appliances+energy+prediction #</a>)访问。</p>
+
+			<p class="callout-heading">数据集引用</p>
+
+			<p class="callout"><em class="italic"> Luis M. Candanedo </em>，<em class="italic"> Véronique Feldheim </em>，<em class="italic"> Dominique Deramaix </em>，<em class="italic">低能耗住宅中电器能源使用的数据驱动预测模型</em>，<em class="italic">能源与建筑</em>，<em class="italic">第 140 卷</em>，<em class="italic">2017 年 4 月 1 日</em>，<em class="italic">第 81-97 页</em>，<em class="italic">ISSN 0378-0378</em></p>
+
+			<p>该数据集捕捉室内和室外环境中不同房间的温度和湿度，以及不同设备在一段时间内的能耗。每 10 分钟捕获一次数据。这是时间序列数据集的典型示例。数据以<code>.csv</code>格式提供，网站还提供了各种特性的描述。该数据集中的所有要素都是数值要素。数据集还包括两个随机变量，使问题变得有趣。</p>
+
+			<h1 id="_idParaDest-126"><a id="_idTextAnchor133"/>时间序列预测建模的概念介绍</h1>
+
+			<p>商业环境的动态本质使得时间成为商业成功的关键资源。因此，企业需要在决策中考虑时间因素。商业环境中的变化速度很快，这使得组织能够采取快速而深思熟虑的行动。分析技术为组织提供了能够预测未来的工具，以便决策者有足够的时间来确保他们的决策符合组织目标。组织使用特定时间的数据来预测未来一段时间的销售量。其他作者将时间序列建模与预测模型区分开来。在本章中，我们交替使用该术语，并认为<strong class="bold">时间序列预测</strong>涉及使用高级分析来获得见解，从而利用基于时间的数据指导业务决策。</p>
+
+			<p>时间序列预测支持业务规划的许多方面。通过预测，可以优化人力和其他形式的资源规划，以确保实现预期的结果。通过预测，现金流、利润和预算预测得到更严格的确立，从而减少了人为偏见。销售预测会受到几个可控和不可控因素的影响。某些随时间变化的消费因素往往会影响销售量。这些因素包括人口、顾客口味和兴趣的变化。此外，需求对通货膨胀等更广泛的经济变量很敏感，这些变量也会随时间变化。因此，除了<strong class="bold">滞后</strong>或历史销售之外，使用一些可以作为这些消费者和经济变量的代理的特征变得相关。由于其中一些变量很难获得，分析师在对未来结果进行建模时往往会局限于一些历史值和数量。</p>
+
+			<p>虽然对时间序列的详细讨论超出了本书的范围，但是，理解建模时间序列的特性使它们更具挑战性是有意义的。除了本书前几章讨论的其他形式的预测建模的困难之外，时间序列建模还带来了额外的挑战。线性回归建模的假设之一是观测值的独立性，即观测值或数据行是独立的。然而，这种假设不可避免地被时间序列建模打破。在时间序列中，<strong class="bold">自相关</strong>自然发生，因为不同时间段的观测值相似。也有可能高度校正的观测值不会连续出现，在这种情况下<strong class="bold">季节性</strong>就会出现。当固定时间范围内的观察值具有较高的相关性时，系列被认为是季节性的。事实上，这些是观测值的周期性波动。假日期间类似的机票销量让这一点变得生动起来。季节性确实可能发生，但没有遵循固定的时间框架，这被描述为<strong class="bold">周期性</strong>。合格周期通常需要比序列的其他属性大得多的数据集，因为周期性主要与外部因素有关，如商业环境中的宏观经济或政治变化。</p>
+
+			<p>自相关也产生了<strong class="bold">线性</strong>，这是一个描述总体趋势的概念，其中连续观测值是相似的，尽管它们以遵循线性趋势的方式变化。由于这种线性趋势，尽管有时会有一些综合波动，但特定时间范围的平均值将遵循一种模式，但不太可能相同，因此使用<strong class="bold">移动平均</strong> ( <strong class="bold"> MA </strong>)和<strong class="bold">自回归</strong>方法来表示时间序列。然而，序列仍然可以通过其统计属性随时间变化的程度来表征。当它们具有与时间无关的恒定均值和方差时，它们被认为是平稳的。最有趣的是，尽管在统计上有问题，一些时间序列数据具有这些属性的组合。航班量就是一个很好的例子。虽然随着时间的推移逐渐增加，但由于是季节性的，在经济低迷时期，这一数字通常会下降。在这个例子中，我们可以看到季节性、周期性和线性的元素。</p>
+
+			<p>另一个有时迷失在细节中的概念是<strong class="bold">可操作性</strong>。可操作性是利益相关者根据分析或模型的结果采取行动的能力，数据科学家关注预测的准确性<a id="_idIndexMarker421"/>是非常常见的<a id="_idIndexMarker420"/>。虽然准确性很重要，但更重要的是为决策者提供可操作的指导。一个让你今天就采取行动的预测比一个更准确但不可行的预测更有价值。在定义预测问题时必须小心谨慎，以确保正在开发的模型的可操作性。</p>
+
+			<p>本节前面的讨论强调了使时间序列建模对典型的数据科学家来说更具挑战性的属性。DataRobot 开发了独特的流程，使数据科学家(包括统计数据有限的科学家)能够创建复杂而稳健的时间序列模型。在接下来的部分，我们将看看如何在 DataRobot 中定义和设置时间序列问题。</p>
+
+			<h1 id="_idParaDest-127"><a id="_idTextAnchor134"/>定义和设置时间序列项目</h1>
+
+			<p>在<a href="B17159_04_Final_NM_ePub.xhtml#_idTextAnchor087"> <em class="italic">第四章</em> </a>、<em class="italic">为 DataRobot 准备数据</em>，通过到<a href="B17159_08_Final_NM_ePub.xhtml#_idTextAnchor116"> <em class="italic">第八章</em> </a>、<em class="italic">模型评分和部署</em>，我们探讨了 DataRobot 中基本模型的创建、理解、评分和部署。我们看到 DataRobot 自动为我们构建了几个模型，然后我们可以使用这些构建的模型对数据集进行评分。此外，在我们选择了最符合我们需求的模型后，DataRobot 为我们提供了一个部署所选模型的流程。由于时间序列建模和其他形式的预测建模之间的差异，我们将在本节中探讨如何通过在 DataRobot 中有效地定义和设置时间序列项目来缓解问题。</p>
+
+			<p>我们将使用 DataRobot 探索时间序列建模的数据集是我们在第 4 章 、<em class="italic">为 DataRobot 准备数据</em>中探索的<a href="B17159_04_Final_NM_ePub.xhtml#_idTextAnchor087"> <em class="italic">设备能源预测数据集。该项目的目标是预测能源使用量。这个能源使用时间序列数据集具有来自不同数据源的 4 个半月的 10 分钟读数。首先，数据包括房间的温度和湿度。这些使用无线传感器网络进行监控，数据每 10 分钟存储一次。房子里九个房间的每一个都存储了该时间段的温度和湿度读数。第二，有外部数据提供附近机场(公共来源)的详细信息，这些信息与屋外的天气信息有关，间隔也是 10 分钟。这包括风速、能见度、露点、压力和湿度。该信息与使用日期和时间的数据合并。此外，与日期和时间一致的电器和照明使用被附加到数据集。</em></a></p>
+
+			<p>在这个数据集中，很容易看出这个时间序列预测的目标是预测能源使用。直接<a id="_idIndexMarker424"/>影响变量是室内的温度<a id="_idIndexMarker425"/>和大气压力；然而，屋外天气的外部数据很重要。我们创建了计算房子中九个房间平均条件的功能。此外，我们还设计了一些功能来捕捉平均室内温度和外部温度之间的差异，以及平均室内压力和外部压力之间的差异。由于我们有两个时间序列(电器使用和照明使用)，我们将以两种方式处理这个问题。首先，作为一个<code>.csv</code>文件，如下面的截图所示:</p>
+
+			<div><div><img src="img/B17159_09_01.jpg" alt="Figure 9.1 – Choosing a target variable for time series&#13;&#10;" width="1153" height="487"/>
+
+				</div>
+
+			</div>
+
+			<p class="figure-caption">图 9.1-为时间序列选择目标变量</p>
+
+			<p>项目名为<code>Energy_Prediction</code>，选择的目标变量为<code>total_energy</code>(灯光和电器使用量之和)。我们进行如下操作:</p>
+
+			<ol>
+
+				<li>After selecting a target variable, we select a time variable and the nature of the time-based modeling. Clicking the <code>date</code> feature, which specifies the date and times of all readings, as illustrated in the following screenshot: <div><img src="img/B17159_09_02.jpg" alt="Figure 9.2 – Choosing a time-aware function and time variable&#13;&#10;" width="1328" height="607"/></div><p class="figure-caption">图 9.2–选择时间感知函数和时间变量</p></li>
+
+				<li>点击<strong class="bold">设置时间感知模型</strong>按钮并选择时间特性后，平台会请求构建时间感知模型的类型。有两个选项——<strong class="bold">带回溯测试的自动时间序列预测</strong>和<strong class="bold">带回溯测试的自动机器学习</strong>，如下所述:<ul><li><strong class="bold">Automated time series forecasting with backtesting</strong>—This option considers previous data in predicting future data. With time series, there is a need to forecast multiple future points. A case in point for this type of time-aware project could be estimating departmental stores' daily sales for the next month using data from their last year's sales. <p><strong class="bold">带回溯测试的自动机器学习</strong>—自动机器学习选项，有时也称为<strong class="bold">超时验证</strong>，基本上是<a id="_idIndexMarker430"/>在一行<a id="_idIndexMarker431"/>中创建基于时间的特征，然后使用典型的预测模型预测<a id="_idIndexMarker432"/>该行的目标变量。这里，我们不使用典型的交叉验证方案；相反，这种方法使用旧数据进行训练，保留新数据进行回溯测试。我们项目的上下文问题属于预测类别类型，因此选择了该选项，如下面的屏幕截图所示:</p></li></ul></li>
+
+			</ol>
+
+			<div><div><img src="img/B17159_09_03.jpg" alt="Figure 9.3 – Time-aware modeling options&#13;&#10;" width="941" height="317"/>
+
+				</div>
+
+			</div>
+
+			<p class="figure-caption">图 9.3–时间感知建模选项</p>
+
+			<p>一旦我们选择了<strong class="bold">带回溯测试的自动时间序列预测</strong>选项，我们就会看到一个<strong class="bold">时间感知建模</strong>选项选项卡(参见<em class="italic">图 9.3 </em>)。这里，有几个选项需要仔细选择。我们表示模型<a id="_idIndexMarker434"/>提取多远的数据进行预测，以及模型预测多远的未来。让我们首先考虑<strong class="bold">特征推导窗口</strong>选项。该<strong class="bold">滚动窗口</strong>突出了一个滞后，基于该滞后，时间序列模型的特征和统计数据相对于做出预测的时间而导出(<strong class="bold">预测点</strong>)。滚动窗口相对于预测点来表示，并随着时间的推移自动向前移动。在理想情况下，该窗口应该覆盖数据中的一个季节周期。本质上，这个窗口通常回答这个问题:<em class="italic">我们的模型用来进行预测的数据延伸了多远？</em>此外，在窗口结束和您的预测时间之间应该有足够的时间来满足任何仍限制这一时间差距的数据接收延迟，确保<a id="_idIndexMarker435"/>数据足够新。这个时期被称为<strong class="bold">盲史</strong>。在我们的例子中，我们已经假设一个小时的时间足以允许任何盲历史，因此将预测点之前的间隔设置为 60 分钟。考虑到我们的数据仅限于 4 个半月，在我们的问题<a id="_idIndexMarker436"/>的上下文中，季节性将是日夜使用。因此，我们已经<a id="_idIndexMarker437"/>将我们的滚动窗口设置为 2 天(2，880 分钟)，考虑到最初的 60 分钟预测点差距，这相当于 2，940 分钟</p>
+
+			<p>第二个考虑是针对<strong class="bold">预测窗口</strong>选项。这定义了，相对于预测点，我们预测的未来有多远。这有两个要素:首先，当预测开始时。预测应该为采取行动提供足够的时间，但不要在太远的未来，以确保这些预测足够准确。其次，我们选择我们的预测结束。这取决于出发点以及我们问题的性质。所以，这个方面回答了这个问题:<em class="italic">预测应该向前推进多远？</em>对于手头的问题，我们选择了一个<strong class="bold">可操作化差距</strong>，即预测点和 1 天(1440 分钟)预测窗口开始之间的差距。此外，滚动窗口设置为 1 天，考虑到我们的可操作性差距，滚动窗口变为 2，880 分钟。</p>
+
+			<p>在本节中设置了时间序列预测项目后，我们现在将探索构建模型的过程，从了解功能列表及其分布到查看它们对评估模型的影响。</p>
+
+			<h1 id="_idParaDest-128"><a id="_idTextAnchor135"/>建立时间序列预测模型并了解其模型结果</h1>
+
+			<p>类似于我们在<a href="B17159_04_Final_NM_ePub.xhtml#_idTextAnchor087"> <em class="italic">第 4 章</em> </a>、<em class="italic">为 DataRobot </em>准备数据，到<a href="B17159_08_Final_NM_ePub.xhtml#_idTextAnchor116"> <em class="italic">第 8 章</em> </a>、<em class="italic">模型评分和部署</em>中查看的项目，一旦我们完成了<a id="_idIndexMarker438"/>初始配置，我们向上滚动并单击<strong class="bold">开始</strong>按钮。通过这样做，DataRobot 自动为这个项目建立时间序列<a id="_idIndexMarker439"/>模型。在我们评估模型之前，了解平台提取的特征的性质将是有用的。DataRobot 从数据中提取与其他预测模型显著不同的特征，如以下屏幕截图所示:</p>
+
+			<div><div><img src="img/B17159_09_04.jpg" alt="Figure 9.4 – Feature lists&#13;&#10;" width="1076" height="662"/>
+
+				</div>
+
+			</div>
+
+			<p class="figure-caption">图 9.4–功能列表</p>
+
+			<p>在<strong class="bold">特征列表</strong>选项卡下显示的列表<a id="_idIndexMarker440"/>是作为<strong class="bold">探索性数据分析</strong> ( <strong class="bold"> EDA </strong>)的一部分构建的，并逐项列出 DataRobot 在创建模型时采用的不同特征列表。许多特性列表涉及<strong class="bold">派生特性</strong>，这些特性是基于时间序列的属性自动创建的。本节稍后将对衍生特征进行进一步讨论。很容易看出，一些列表涉及从原始数据中提取的特征(例如，<strong class="bold">时间序列提取的特征</strong>)。另一些只包含从日期创建的特征，而一些被评估为信息性的。大多数列表似乎是不同类型的组合(例如，<strong class="bold">时间序列信息特征</strong>)。重要的是，特性列表提供了每个<a id="_idIndexMarker441"/>特性列表名称的描述和特性数量。可能成为<a id="_idIndexMarker442"/> pivotal 的功能列表是作为<strong class="bold">排行榜</strong>功能的一部分呈现的，如下图所示，它指导我们最终选择型号:</p>
+
+			<div><div><img src="img/B17159_09_05.jpg" alt="Figure 9.5 – Model leaderboard&#13;&#10;" width="1327" height="654"/>
+
+				</div>
+
+			</div>
+
+			<p class="figure-caption">图 9.5–型号排行榜</p>
+
+			<p><strong class="bold">排行榜</strong>功能提供了针对数据机器人项目构建的模型的见解。它提供了关于模型名称和<strong class="bold">标识符</strong>(<strong class="bold">id</strong>)、它们的准确性度量以及它们的类型、版本和模型开发的样本大小的信息。然而，时间序列建模有一些不同之处，如下所述。首先，样本大小存在于数据范围中。这是由于时间序列数据集基于时间的性质。与其他建模形式不同，数据的时间顺序确实会影响结果；因此，在时间范围内选择数据。在这种情况下，如图 9.5 中的<em class="italic">所示，我们的模型是使用 3 个月、21 小时和 51 分钟的数据构建的。其次，代替<strong class="bold">验证</strong>和<strong class="bold">交叉验证</strong>列，我们有<strong class="bold">回溯测试 1 </strong>和<strong class="bold">所有回溯测试</strong>列。回溯测试逻辑上遵循关于样本大小的讨论(参见<a href="B17159_06_Final_NM_ePub.xhtml#_idTextAnchor104"> <em class="italic">第 6 章</em> </a>、<em class="italic">用 DataRobot </em>建模)。回溯测试提供了对数据子集的模型性能的评估。然而，与典型的验证不同，数据是按时间顺序排列的，回溯测试的大小和次数可以根据需要改变。我们在这个示例项目中使用了默认的回溯测试设置，以便数据以这样的方式进行分区，即只有一个回溯测试分区可用于建模。最后，对于时间序列建模项目，似乎有更多的特性列表。与其他预测项目类型一样，可以使用<strong class="bold">排行榜</strong>功能上的任何栏目订购或选择模型。</em></p>
+
+			<p>有<a id="_idIndexMarker443"/>个度量标准可以用来评估时间<a id="_idIndexMarker444"/>序列预测模型。这当然要看车型。对于回归型的结果，一些<a id="_idIndexMarker445"/>提倡使用<strong class="bold">均方根误差</strong> ( <strong class="bold"> RMSE </strong>)。问题的本质在确定评估的度量标准时仍然是至关重要的。也就是说，<strong class="bold">基准模型</strong>在排行榜上的作用对于评估其他模型来说是至关重要的<a id="_idIndexMarker446"/>。基线模型在进行预测时采用最新的值。因此，将模型与基线预测蓝图进行比较在模型<a id="_idIndexMarker447"/>评估中起着至关重要的作用，因为它在某种程度上回答了以下问题:<em class="italic">我们的模型在多大程度上优于来自最近数据的天真预测？</em> DataRobot 提供<strong class="bold">平均绝对标度误差</strong> ( <strong class="bold"> MASE </strong>)，将感兴趣模型的<strong class="bold">平均绝对误差</strong> ( <strong class="bold"> MAE </strong>)与基线模型的<a id="_idIndexMarker448"/>进行比较。例如，<strong class="bold"> Eureqa 广义加性模型(250 代)</strong>模型，如下图所示，对于<strong class="bold">回溯测试 1 </strong>，其比较比率约为 0.76。这表明 Eureqa 模型比基线要好 24%。由于<strong class="bold">维持</strong>指标可能会突出数据中的重大变化，因此它应包含在模型评估中，但不能单独使用。评估模型时的其他指示包括在本章的<em class="italic">时序建模</em>部分的高级主题中。可以点击模型名称来提供关于数据及其过程的详细见解。我们现在使用<strong class="bold"> Eureqa 广义加性模型(250 代)</strong>的例子，转向我们认为对时间序列预测独特的模型:</p>
+
+			<div><div><img src="img/B17159_09_06.jpg" alt="Figure 9.6 – Impact of original features&#13;&#10;" width="1333" height="663"/>
+
+				</div>
+
+			</div>
+
+			<p class="figure-caption">图 9.6–原始特征的影响</p>
+
+			<p><strong class="bold">理解</strong>选项卡为我们呈现了<strong class="bold">特征影响</strong>、<strong class="bold">特征影响</strong>、<strong class="bold">预测解释</strong>和<strong class="bold">字云</strong>能力，这些我们已经在<a href="B17159_07_Final_NM_ePub.xhtml#_idTextAnchor110"> <em class="italic">第 7 章</em> </a>、<em class="italic">模型理解和可解释性</em>中遇到过。<strong class="bold">特征影响</strong>显示<a id="_idIndexMarker449"/>特征<a id="_idIndexMarker450"/>对模型整体准确性的相对贡献程度。点击<strong class="bold">特征影响</strong>选项卡，打开<strong class="bold">原始特征</strong>页面(参见<em class="italic">图 9.6 </em>)。原始要素是数据集中的要素。</p>
+
+			<p><code>total_energy (1440 minute average baseline)</code>中的另一个选项卡是基于时间序列的静态特性构建的，如下图所示。这是因为它强调了平均 1440 分钟基线能量对模型准确性的重要性:</p>
+
+			<div><div><img src="img/B17159_09_07.jpg" alt="Figure 9.7 – Impact of derived features&#13;&#10;" width="1336" height="662"/>
+
+				</div>
+
+			</div>
+
+			<p class="figure-caption">图 9.7-衍生特征的影响</p>
+
+			<p>从图 9.7 中可以明显看出，相当数量的衍生特征似乎是从时间序列的平稳特性中产生的，这本身就可以表明该时间序列相当平稳。也就是说，在得出这个结论时<a id="_idIndexMarker451"/>需要谨慎<a id="_idIndexMarker452"/>，因为我们的数据集只包含 4 个半月的数据；例如，我们的数据集仅涵盖 2016 年 1 月至 2016 年 5 月，因此没有考虑夏末、秋季和初冬这几个月。因此，如果我们使用覆盖更长时间范围的数据集，就会出现季节性。</p>
+
+			<p>DataRobot 创建了利用时间序列属性来提高其模型准确性的功能。虽然在这个项目中并不明显，但由于季节性或周期性，DataRobot 会确定何时出现周期性变化，并相应地创建功能。基于此信息，它接下来检测季节性模式—例如，在一个时间范围内发生的季节性可以通过从时间范围的开始向上计数或从时间范围的结束向下计数来定义。因此，该平台可以检测和构建一些功能，例如，使用三月最后一个星期六的能源使用情况来预测四月最后一个星期六的能源使用情况。以类似的方式，DataRobot 使用基于<strong class="bold">差异</strong>的特性来提高模型性能。它可以利用三月第一周的平均使用率作为预测四月第一周使用率的特征。</p>
+
+			<p>转到<strong class="bold">描述</strong>选项卡，打开<strong class="bold">蓝图</strong>选项卡，我们将看到时序项目建模过程中涉及的各个阶段。正如下面的<a id="_idIndexMarker453"/>截图中所详述的，我们可以很快体会到<a id="_idIndexMarker454"/>这与前面章节中遇到的其他预测项目没有太大的不同:</p>
+
+			<div><div><img src="img/B17159_09_08.jpg" alt="Figure 9.8 – Model blueprint&#13;&#10;" width="1325" height="662"/>
+
+				</div>
+
+			</div>
+
+			<p class="figure-caption">图 9.8–模型蓝图</p>
+
+			<p>我们现在已经花了时间来构建和理解时间序列预测模型。下一个合乎逻辑的步骤是使用我们选择的模型进行预测。</p>
+
+			<h1 id="_idParaDest-129"><a id="_idTextAnchor136"/>利用时间序列模型进行预测</h1>
+
+			<p>DataRobot 为我们提供了无痛预测的工具。有两种方法可以预测时间序列。对于小于 1 <strong class="bold">千兆字节</strong> ( <strong class="bold">千兆字节</strong>)的小数据集，可以使用<strong class="bold">排行榜</strong>功能上的<strong class="bold">进行预测</strong>选项卡进行预测。这包括设置和上传预测数据集，然后在<strong class="bold">拖放新数据集</strong> <strong class="bold">用户界面</strong> ( <strong class="bold"> UI </strong>)功能中对其进行评分。对于非常大的数据集，需要部署模型，并使用<strong class="bold">应用编程接口</strong> ( <strong class="bold"> API </strong>)进行预测。在这一章中，我们将讨论进行预测的第一种方法。关于 DataRobot，通用模型部署和 API 的使用在<a href="B17159_12_Final_NM_ePub.xhtml#_idTextAnchor176"> <em class="italic">第 12 章</em> </a>、<em class="italic"> DataRobot Python API </em>中详细讨论。</p>
+
+			<p>排行榜对时间序列模型评分的拖放方式与传统模型有所不同，详见<a href="B17159_08_Final_NM_ePub.xhtml#_idTextAnchor116"> <em class="italic">第八章</em> </a>、<em class="italic">模型评分与部署</em>。当<strong class="bold"> Make Predictions </strong>选项卡打开时，DataRobot 简要概述了进行预测所需数据的新近性和数量。该大纲与在模型开发期间作为配置的一部分而建立的预测窗口以及衍生的特征基本一致。如下面的屏幕截图所示，预测数据集需要预测点之前 60 分钟之外至少 4，320 分钟的历史数据。此外，当模型包括涉及<a id="_idIndexMarker456"/>早期时段中特征的衍生特征时，早期时段也包括在数据集要求中。因为所讨论的模型具有 24 小时差异衍生特征，所以这将要求增加到 5，820 分钟。这个 5，820 分钟的要求包括初始 60 分钟预测点差距窗口、4，320 分钟基本预测要求数据和 1，440 分钟附加的派生差异特征。这使得该模型能够在 1，440 分钟的可操作化差距之后，比预测点提前 2，880 分钟进行预测。这里介绍了其中的一些功能:</p>
+
+			<div><div><img src="img/B17159_09_09.jpg" alt="Figure 9.9 – Make Predictions window&#13;&#10;" width="1216" height="646"/>
+
+				</div>
+
+			</div>
+
+			<p class="figure-caption">图 9.9–进行预测窗口</p>
+
+			<p>为了进行<a id="_idIndexMarker457"/>预测，如果数据格式与训练数据一致，则进行如下操作:</p>
+
+			<ol>
+
+				<li value="1">点击<strong class="bold">导入数据</strong>，这允许从本地源、统一资源定位符 ( <strong class="bold"> URL </strong>)、еxіѕtіng dаtа ѕоurсеѕ、爱尔兰目录获取数据。如果在默认预测点之后没有找到<a id="_idIndexMarker458"/>行，DataRobot 将生成一个模板。为此，预测窗口内不得有空行，并且模板文件必须满足上传大小限制条件。文件上传后，DataRobot 设置预测点，并包含满足预测窗口预期所需的行。</li>
+
+				<li>Click on the <strong class="bold">Compute predictions</strong> button after uploading the data, as illustrated in the following screenshot, since the uploaded prediction file is the most recent, without gaps and the fill number of rows expected:<div><img src="img/B17159_09_10.jpg" alt="Figure 9.10 – Computing time series predictions&#13;&#10;" width="1322" height="571"/></div><p class="figure-caption">图 9.10–计算时间序列预测</p><p><em class="italic">图 9.10 </em>中的<strong class="bold">预测设置</strong>按钮提供了<a id="_idIndexMarker459"/>预测的选项，预测点不是最近的，或者改变了预测的范围。</p></li>
+
+				<li>要进行这种改变，点击<strong class="bold">预测设置</strong>按钮，默认打开<strong class="bold">预测点预测</strong>标签，如下图所示。此窗口提供了一个预测点滑动选项卡选择器，可以通过滑动或输入实际时间值来配置。但是，无效日期会被禁用:</li>
+
+			</ol>
+
+			<div><div><img src="img/B17159_09_11.jpg" alt="Figure 9.11 – Forecast Point Predictions settings&#13;&#10;" width="1177" height="663"/>
+
+				</div>
+
+			</div>
+
+			<p class="figure-caption">图 9.11–预测点预测设置</p>
+
+			<p>如前所述，选择作为预测点的时间是有限制的。预测点必须小于或等于最近的预测点。在本项目中，这是<strong class="bold"> 2016-05-27 19:00:00:00 </strong>，这是最近的数据行时间，具有<strong class="bold"> 1440 </strong>分钟的可操作间隙。可以进行类似的操作来改变<a id="_idIndexMarker460"/>预测日期范围。<strong class="bold">预测范围预测</strong>功能理想情况下用于验证模型，而不是进行未来预测。</p>
+
+			<p>在本节中，我们强调了确保时间序列模型的预测数据集与训练模型的预测数据集相似的重要性。我们继续进行预测，并解释模型的其他结果。接下来，我们将探索涉及使用 DataRobot 进行时间序列建模的更高级的主题。</p>
+
+			<h1 id="_idParaDest-130"><a id="_idTextAnchor137"/>时间序列建模的高级主题</h1>
+
+			<p>在本章中，我们学习了如何在 DataRobot 中配置、构建和使用基本时间序列预测模型进行预测。在上一节中，我们的注意力集中在构建具有一次性序列的模型上。然而，你可能会遇到不得不做出多时间序列预测的情况。在能源利用问题的背景下，我们可能想要预测灯和电器的使用。在其他地方，能源公司可能希望在同一模型中预测不同城市或家庭的能源使用量。我们现在将深入研究解决这种性质的问题。此外，我们将探索其他先进的方法可能用于评估我们的时间序列模型的未来方式。最后，我们将承认预定事件对时间序列的作用，并强调 DataRobot 为处理这种可能性所做的规定。</p>
+
+			<p>这个项目使用的数据集突出了灯和其他电器的能源使用。对于早期的项目，我们将所有使用量加起来作为我们的目标变量，但在这个项目(名为<code>Energy_Prediction_2</code>)中，将构建模型来预测每种设备类型的使用量。这个数据集现在有两个系列，这意味着时间戳可以重复出现，但是每个系列中的时间戳必须是唯一的。区分列<code>Device_type</code>是用途所属的设备类型的 ID。在确定项目具有时间意识并选择其类型为<code>Device_type</code>之后:</p>
+
+			<div><div><img src="img/B17159_09_12.jpg" alt="Figure 9.12 – Multi-series time series forecasting setup&#13;&#10;" width="1226" height="636"/>
+
+				</div>
+
+			</div>
+
+			<p class="figure-caption">图 9.12–多系列时间序列预测设置</p>
+
+			<p>对于这个项目，我们有兴趣进一步评估我们的模型。因此，在<code>5 + Holdout</code>内定制<a id="_idIndexMarker462"/>我们的预测窗口的后续工作。下面的屏幕截图详细描述了此配置的设置，我们可以看到定型、验证和维持数据是如何从初始数据中划分出来的。需要强调的是，为了设置回溯测试，我们必须考虑数据中任何形式的季节性、周期性和/或周期性，并确保每个折叠至少有一个这样的实例。这是因为每个回溯测试本身应该是一个完整的数据集，所以在每个回溯测试中需要考虑季节性、周期性和周期性。验证和间隙长度也可以改变。该项目的默认长度设置为超过 13 小时 9 分钟。您可以在这里看到配置:</p>
+
+			<div><div><img src="img/B17159_09_13.jpg" alt="Figure 9.13 – Backtest configuration&#13;&#10;" width="935" height="651"/>
+
+				</div>
+
+			</div>
+
+			<p class="figure-caption">图 9.13–回溯测试配置</p>
+
+			<p>配置好<a id="_idIndexMarker463"/>回溯测试后，我们点击<strong class="bold">开始</strong>来训练模型。创建模型时，评估过程类似于单时间序列模型。如下面的截图所示，我们可以看到<strong class="bold">所有回溯测试</strong>指标，该指标测量模型在所有回溯测试中的平均性能。因此，它提供了一种有趣的方法，不仅可以快速评估模型性能，还可以快速评估数据模式随时间的一致性:</p>
+
+			<div><div><img src="img/B17159_09_14.jpg" alt="Figure 9.14 – Accuracy over time&#13;&#10;" width="1351" height="660"/>
+
+				</div>
+
+			</div>
+
+			<p class="figure-caption">图 9.14–精度随时间的变化</p>
+
+			<p>模型<strong class="bold">评估</strong>选项卡中的<strong class="bold">随时间的准确性</strong>功能使用户能够对其模型随时间的变化进行可视化<a id="_idIndexMarker464"/>和深入评估(参见<em class="italic">图 9.14 </em>)。在这里，预测和实际被直观地呈现出来。在此窗口中，您可以选择一个<strong class="bold">系列来绘制</strong>设置，并更改<strong class="bold">回溯测试</strong>和<strong class="bold">预测距离</strong>设置。在业务环境中，这种视图有助于理解是否存在表现不佳的时期，这可能暗示了数据中没有表示的业务方面。<strong class="bold">预测准确性</strong>窗口，如以下屏幕截图所示，是另一个重要的表示方法，表明模型性能如何随着预测距离的变化而变化:</p>
+
+			<div><div><img src="img/B17159_09_15.jpg" alt="Figure 9.15 – Forecasting Accuracy window&#13;&#10;" width="1354" height="557"/>
+
+				</div>
+
+			</div>
+
+			<p class="figure-caption">图 9.15–预测准确度窗口</p>
+
+			<p><strong class="bold">预测准确度</strong>窗口突出显示了对未来进行预测时模型性能的变化。这个视图允许我们评估模型的性能<a id="_idIndexMarker465"/>随着时间的推移在哪里是相似的，这表明模型何时可以在业务中使用。此外，当使用 MASE 性能指标时，它强调了模型的性能大大超过基线模型的性能。如图 9.15 中的<em class="italic">所示，该模型在<strong class="bold">回溯测试 1 </strong>中的表现似乎在+1，960 分钟左右开始明显优于基准模型。稳定性视图为用户提供了跨时间范围的分数度量。</em></p>
+
+			<p>随着对性能更好的模型的追求，需要对建模范例进行一些改变。可用于时间序列建模的默认模型可能无法提供所需的性能。在这种情况下，如第六章 、<em class="italic">用 DataRobot </em>建立模型中所解释的，模型库为我们提供了选择传统<a id="_idIndexMarker466"/>时间序列模型的选项，如<strong class="bold">自回归综合移动平均</strong> ( <strong class="bold"> ARIMA </strong>)和更新的<a id="_idIndexMarker467"/>模型，如 Keras <strong class="bold">长短期记忆</strong> ( <strong class="bold"> LSTM </strong>)和<strong class="bold">XGBoost</strong>(根据所研究的时间序列<a id="_idIndexMarker468"/>的性质，这些建模方法有时会表现出更好的性能。</p>
+
+			<h1 id="_idParaDest-131"><a id="_idTextAnchor138"/>总结</h1>
+
+			<p>在这一章中，我们广泛地研究了 DataRobot 如何被用来建立时间序列模型。我们简要讨论了时间序列建模给企业带来的独特机遇，以及它给分析师和数据科学家带来的挑战。我们使用 DataRobot 创建了单个和多个时间序列模型。我们还描述了如何使用 DataRobot 建立的模型进行预测。随后讨论了 DataRobot 时序功能的高级方面。</p>
+
+			<p>预测对商业来说极其重要，因为它有能力在考虑时间相关变量的情况下预测未来可能发生的事情。另一个有商业价值的领域是能够表明不同客户对各种产品的兴趣。这就是推荐系统的用武之地。</p>
+
+			<p>在下一章<a href="B17159_10_Final_NM_ePub.xhtml#_idTextAnchor139"> <em class="italic">第十章</em></a><em class="italic">推荐系统</em>中，我们来看看 DataRobot 是如何被用来构建推荐引擎的。</p>
+
+		</div>
+
+	</div>
+
+</body></html>

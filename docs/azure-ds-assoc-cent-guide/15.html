@@ -1,0 +1,473 @@
+<html><head/><body>
+
+
+
+
+
+<style type="text/css">body{margin:1em;background-color:transparent!important;}#sbo-rt-content *{text-indent:0pt!important;}#sbo-rt-content .bq{margin-right:1em!important;}</style>
+<div><div><h1 id="_idParaDest-160">第十二章:用代码操作模型</h1>
+			<p>在这一章中，你将学习如何操作你在本书中已经训练过的机器学习模型。您将探索两种方法:通过托管可用于进行推理的 REST API 来公开实时端点，并扩展您的管道创作知识，以便在大数据的基础上并行、高效地进行推理。您将从在工作区中注册一个模型来跟踪工件开始。然后，你会发布一个 REST API 这将允许您的模型与第三方应用程序集成，如<strong class="bold"> Power BI </strong>。接下来，您将创建一个管道，在几分钟内以非常经济的方式处理 50 万条记录。</p>
+			<p>在本章中，我们将讨论以下主题:</p>
+			<ul>
+				<li>了解各种部署选项</li>
+				<li>在工作空间中注册模型</li>
+				<li>部署实时端点</li>
+				<li>创建批处理推理管道</li>
+			</ul>
+			<h1 id="_idParaDest-161"><a id="_idTextAnchor172"/>技术要求</h1>
+			<p>您将需要访问 Azure 订阅。在该订阅中，您将需要一个<code>packt-azureml-rg</code>。你将需要一个<code>Contributor</code>或者<code>Owner</code>T3。如果你按照第二章 、<em class="italic">部署 Azure 机器学习工作区资源</em>中的说明，这些资源应该已经对你可用了。</p>
+			<p>此外，你需要对<strong class="bold"> Python </strong>语言有一个基本的了解。本章中的代码片段针对 Python 版或更高版本。您还应该熟悉在 AzureML studio 中使用笔记本；这一点在<a href="B16777_07_Final_VK_ePub.xhtml#_idTextAnchor102"> <em class="italic">第 7 章</em> </a>，<em class="italic">AzureML Python SDK</em>中有所涉及。</p>
+			<p>本章假设您已经注册了您在第十章 、<em class="italic">理解模型结果</em>中生成的<strong class="bold">贷款</strong>数据集。它还假设您已经创建了一个名为<strong class="bold"> cpu-sm-cluster </strong>的计算集群，如第 7 章<a href="B16777_07_Final_VK_ePub.xhtml#_idTextAnchor102"><em class="italic"/></a><em class="italic">azure ml Python SDK</em>的<em class="italic">使用计算目标</em>部分所述。</p>
+			<p class="callout-heading">重要说明</p>
+			<p class="callout">AzureML 在不断更新。如果您在使用本书中的代码示例时遇到任何问题，请尝试通过将以下代码添加到新的笔记本单元格中来升级您的 AzureML SDK:</p>
+			<p class="callout"><code>!pip install --upgrade azureml-core azureml-sdk[notebooks]</code></p>
+			<p class="callout">然后，重新启动 Jupyter 内核，正如你在<em class="italic">训练中所学的一个贷款审批模型</em>章节的<a href="B16777_10_Final_VK_ePub.xhtml#_idTextAnchor147"> <em class="italic">第十章</em> </a>，<em class="italic">了解模型结果</em>。此外，尝试从本书的 GitHub 页面下载最新版本的笔记本。如果问题仍然存在，请在本书的 GitHub 页面上打开一个问题。</p>
+			<p>你可以在 http://bit.ly/dp100-ch12 的 GitHub 上找到这一章的所有笔记本和代码片段。</p>
+			<h1 id="_idParaDest-162"><a id="_idTextAnchor173"/>了解各种部署选项</h1>
+			<p>自从<a href="B16777_08_Final_VK_ePub.xhtml#_idTextAnchor117"> <em class="italic">第八章</em></a><em class="italic">试验 Python 代码</em>以来，我们一直在研究 Python 代码。到目前为止，您已经训练了<a id="_idIndexMarker873"/>各种模型，基于度量评估了<a id="_idIndexMarker874"/>，并使用<strong class="bold"> joblib </strong>库的<code>dump</code>方法保存了训练好的模型。AzureML 工作空间允许您通过在模型注册中心注册来存储和版本化那些工件，我们在第 5 章 ，<em class="italic">中讨论过让机器做模型训练</em>。注册模型允许您对保存的模型和关于特定模型的元数据进行版本化，例如根据各种度量标准的性能。您将在<em class="italic">在工作区</em>注册模型部分学习如何从 SDK 注册模型。</p>
+			<p>一旦注册了模型，您必须决定您想要如何操作该模型，要么通过部署实时端点，要么通过创建批处理过程，如<em class="italic">图 12.1 </em>所示:</p>
+			<div><div><img src="img/B16777_12_001.jpg" alt="Figure 12.1 – A path from training to operationalization&#13;&#10;" width="1225" height="589"/>
+				</div>
+			</div>
+			<p class="figure-caption">图 12.1-从培训到运作的路径</p>
+			<p>就模型处理传入数据的方式而言，有两个主要类别:</p>
+			<ul>
+				<li><code>predict_proba</code>你训练的分类器的方法。在本章的<em class="italic">部署实时端点</em>一节中，你会读到更多关于这个场景的内容。</li>
+				<li><strong class="bold">批量推理</strong>:在<a href="B16777_05_Final_VK_ePub.xhtml#_idTextAnchor072"> <em class="italic">第五章</em> </a>，<em class="italic">让机器做模型训练</em>，你训练了一个 AutoML 模型<a id="_idIndexMarker877"/>来搅动客户预测。该模型使用诸如<a id="_idIndexMarker878"/>消费者在过去 6 至 12 个月的活动等特征进行训练。让我们假设你想评估你所有的客户，并为那些可能流失的客户开展营销活动。您必须运行一次性流程，读取所有客户信息，计算所需的特性，然后调用每个特性的模型来生成预测。结果<a id="_idIndexMarker879"/>可以存储在一个 CSV 文件中，供营销部门使用。在这种方法中，您只需要在短时间内使用模型，也就是说，只在进行预测时使用。您不需要实时端点，例如您在第 5 章<a href="B16777_05_Final_VK_ePub.xhtml#_idTextAnchor072"><em class="italic"/></a>、<em class="italic">中部署的端点，让机器进行模型训练</em>，因为您不需要模型进行特别的推断。您可以在本章的<em class="italic">创建批处理推理管道</em>一节中了解更多关于这个场景的信息。</li>
+			</ul>
+			<p>所有模型都可以用于实时或批量推理。由您来决定您是需要特别的模型推理，还是需要生成和存储推理结果的预定过程。以批处理模式操作模型往往更具成本效益，因为您可以利用低优先级的计算集群来执行推理。在这种情况下，您不需要花钱就能拥有一个等待实时推断的实时端点基础设施。</p>
+			<p>在下一节中，您将通过培训和注册您将在本章剩余部分使用的模型来开始操作化的道路。</p>
+			<h1 id="_idParaDest-163"><a id="_idTextAnchor174"/>在工作空间中注册模型</h1>
+			<p>注册一个模型<a id="_idIndexMarker880"/>可以让你保留训练过的<a id="_idIndexMarker881"/>模型的不同版本。每个模型版本都有工件和元数据。在元数据中，您可以保留引用来试验运行和数据集。这允许您跟踪用于训练模型的数据、训练模型的运行 ID 以及实际的模型工件本身之间的传承，如图<em class="italic">图 12.2 </em>所示:</p>
+			<div><div><img src="img/B16777_12_002.jpg" alt="Figure 12.2 – Building the lineage from the training dataset all the way to the registered model&#13;&#10;" width="963" height="269"/>
+				</div>
+			</div>
+			<p class="figure-caption">图 12.2–从训练数据集一直到注册模型构建谱系</p>
+			<p>在这个部分中，您<a id="_idIndexMarker882"/>将训练一个模型，并且<a id="_idIndexMarker883"/>将它注册到您的<a id="_idIndexMarker884"/> AzureML 工作空间中。执行<a id="_idIndexMarker885"/>以下步骤:</p>
+			<ol>
+				<li>导航到 AzureML studio web 界面的<strong class="bold">笔记本</strong>部分。</li>
+				<li>Create a folder, named <code>chapter12</code>, and then create a notebook named <code>chapter12.ipynb</code>, as shown in <em class="italic">Figure 12.3</em>: <div><img src="img/B16777_12_003.jpg" alt="Figure 12.3 – Adding the chapter12 notebook to your working files&#13;&#10;" width="1022" height="849"/></div><p class="figure-caption">图 12.3–将第 12 章笔记本添加到您的工作文件中</p></li>
+				<li>Add and execute<a id="_idIndexMarker886"/> the following code<a id="_idIndexMarker887"/> snippets in separate notebook<a id="_idIndexMarker888"/> cells. You will start by getting a reference<a id="_idIndexMarker889"/> to the workspace resources:<pre>from azureml.core import Workspace, Experiment
+ws = Workspace.from_config()
+loans_ds = ws.datasets['loans']
+experiment = Experiment(ws, "chapter-12-train")</pre><p>在前面的代码中，您<a id="_idIndexMarker890"/>获得了一个对工作区的引用，即<code>chapter-12-train</code>。</p></li>
+				<li>Split the dataset into training and validation using the following code:<pre>training_data, validation_data = loans_ds.random_split(
+                       percentage = 0.8, seed=42)
+X_train = training_data.drop_columns('approved_loan') \
+            .to_pandas_dataframe()
+y_train = training_data.keep_columns('approved_loan') \
+            .to_pandas_dataframe().values.ravel()
+X_validate = validation_data.drop_columns('approved_loan') \
+                .to_pandas_dataframe()
+y_validate = validation_data.keep_columns('approved_loan') \
+                .to_pandas_dataframe().values.ravel()</pre><p>该代码将数据集分成 80%的定型数据和 20%的验证数据。<code>seed</code>参数初始化<code>random_split</code>方法的内部随机状态，允许您对数据分割进行硬编码，并在每次调用该代码时生成相同的<code>training_data</code>和<code>validation_data</code>。</p><p>这里，<code>X_train</code>是一个包含<code>income</code>、<code>credit_cards</code>和<code>age</code>特性的<code>pandas</code>、<code>DataFrame</code>(即除了<code>approved_loan</code>之外的所有列)。</p><p>相比之下，<code>y_train</code>包含了你想要预测的值。首先，加载一个只包含<code>approved_loan</code>列的<code>pandas</code> <code>DataFrame</code>。然后，将数据帧转换成一个<code>values</code>属性。这个数组的每一行都有一个元素<a id="_idIndexMarker894"/>数组。例如，<em class="italic"> [[0]，[1]] </em>表示两条记录:一条未审批的贷款，值为<em class="italic"> 0 </em>，一条已审批的贷款，值为<em class="italic"> 1 </em>。接下来，您调用<code>ravel</code>方法来展平数组，这将给定的示例转换为<em class="italic"> [0，1] </em>。虽然您可以使用<a id="_idIndexMarker895"/>直接使用<code>pandas</code> <code>DataFrame</code>来训练<a id="_idIndexMarker896"/>模型，但是一条警告消息<a id="_idIndexMarker897"/>将通知您自动<a id="_idIndexMarker898"/>约定已经发生，提示您使用您在该单元格中观察到的<code>ravel</code>方法。</p><p>对将用于评估模型性能的<code>X_validate</code>数据帧和<code>y_validate</code>数组重复相同的过程。</p></li>
+				<li>Train a model and log the achieved accuracy using the following code:<pre>from sklearn.linear_model import LogisticRegression
+from sklearn.metrics import accuracy_score
+run = experiment.start_logging()
+sk_model = LogisticRegression()
+sk_model.fit(X_train, y_train)
+y_predicted = sk_model.predict(X_validate)
+accuracy = accuracy_score(y_validate, y_predicted)
+print(accuracy)
+run.log("accuracy", accuracy)
+run.complete()</pre><p>在这里，您从实验中的一次运行开始，如<em class="italic">步骤 3 </em>中所定义的。您将使用这个运行来注册模型训练过程的度量、日志和工件。然后，您训练一个<code>LogisticRegression</code>模型，并使用<code>accuracy_score</code>函数来计算训练好的模型的精度。接下来，打印计算出的精度，并将其作为运行中的一个指标记录下来。最终，你的<code>complete</code>跑来敲定了它的执行。</p></li>
+				<li>Now that<a id="_idIndexMarker899"/> you have a trained model referenced<a id="_idIndexMarker900"/> by the <code>sk_model</code> variable, you<a id="_idIndexMarker901"/> are going to save it using<a id="_idIndexMarker902"/> the following code:<pre>import os
+import joblib
+os.makedirs('./model', exist_ok=True)
+joblib.dump(value=sk_model,
+            filename=
+              os.path.join('./model/','model.joblib'))</pre><p>首先，创建一个名为<code>model</code>的文件夹。该文件夹的名称并不重要。在那个文件夹中，你使用<code>joblib</code>库<code>dump</code>训练好的模型。模型存储在名为<code>model.joblib</code>的文件中。</p><p class="callout-heading">重要说明</p><p class="callout"><code>.joblib</code>文件扩展名不标准，只要一致就可以随便用。有些人使用<code>.pkl</code>文件扩展名，这在过去被使用，因为我们使用 Python 的内置<code>pickle</code>模块来序列化 Python 对象结构。如今，<code>joblib</code>库是由<strong class="bold"> scikit-learn </strong>提出的推荐方式，因为它在序列化大型 NumPy 数组方面更高效，这在训练好的模型中很常见<a id="_idIndexMarker903"/>。</p></li>
+				<li>Now that you<a id="_idIndexMarker904"/> have the artifacts ready, you can<a id="_idIndexMarker905"/> register the model<a id="_idIndexMarker906"/> using the following<a id="_idIndexMarker907"/> code:<pre>from sklearn import __version__ as sk_version
+from azureml.core import Model
+run.upload_folder("model", "./model")
+model = run.register_model(
+        model_name="chapter12-loans",
+        model_path="./model/",
+        tags={ "accuracy": accuracy},
+        properties={ "accuracy": accuracy},
+        model_framework= Model.Framework.SCIKITLEARN,
+        model_framework_version= sk_version,
+        datasets=[("training", loans_ds)]
+)</pre><p>在第一行中，您导入了<code>sklearn</code>包的<code>__version__</code>变量，这是一个显示您的环境中当前加载的版本的字符串。然后，为该变量创建一个别名(使用<code>as</code>语句)，并在代码中将其引用为<code>sk_version</code>。这是您用来训练模型的<code>sklearn</code>库的版本。此外，您从 AzureML SDK 导入了<code>Model</code>类，以便在下面的代码行中将其用作引用。</p><p>导入您的引用后，您将在<em class="italic">步骤 6 </em>中创建的本地<code>./model</code>文件夹的内容上传到运行的输出中，位于名为<code>model</code>的文件夹下。这允许 AzureML 访问您将要注册的工件；否则，您将收到一个<code>ModelPathNotFoundException</code>错误。</p><p>准备好所有的先决条件后，您就可以注册模型了。这个模型将被命名为<code>chapter12-loans</code>(<code>model_name</code>参数)，使用的是刚刚上传到运行输出的<code>model</code>文件夹(<code>model_path</code>参数)中的工件。您<a id="_idIndexMarker908"/>将精确度指定为该模型的标签(<code>tags</code>参数)和属性(<code>properties</code>参数)。您指示<a id="_idIndexMarker910"/>您使用了<code>SCIKITLEARN</code>框架(<code>model_framework</code>参数)来训练<a id="_idIndexMarker911"/>模型，并且您指定了您使用的框架版本(<code>model_framework_version</code>参数)。在最后一行，您指定您使用了<code>loans_ds</code>数据集作为<code>training</code>数据集(<code>datasets</code>参数)。</p><p class="callout-heading">重要说明</p><p class="callout">如果您尝试重新运行同一个单元格，将会出现一个<em class="italic">资源冲突</em>错误，因为您不能覆盖已经存在于运行输出文件夹中的文件。如果您通过使用<code>#</code>作为行前缀来注释掉<code>upload_folder</code>行，并重新运行该单元，您将使用特定运行中已经存在的工件来注册同一模型的新版本。</p></li>
+				<li>导航至<code>Model.Framework.SCIKITLEARN</code>。这种类型的部署被认为是无代码部署，这是 AzureML 为受支持的框架提供的一种功能。否则，需要指定一个评分文件；这是我们将在<em class="italic">部署实时端点</em>部分讨论的内容。</li>
+				<li>If you want to register a pretrained model that you downloaded from the internet, you will<a id="_idIndexMarker920"/> not have a <code>Run</code> object to call the <code>register_model</code> method. You can use the <code>register</code> method of the <code>Model</code> class, as demonstrated in the following code snippet:<pre>from azureml.core import Model
+offline_model = Model.register(
+        ws,
+        model_name="chapter12-pre-trained-loans",
+        model_path="./model/",
+        properties={"accuracy": 0.828},
+        model_framework= "ScikitLearn",
+        model_framework_version= "0.22.2.post1"
+) </pre><p>在前面的代码中，您在 AzureML 工作空间(<code>ws</code>变量)中将位于<em class="italic">本地</em> <code>model</code>文件夹(<code>model_path</code>参数)中的工件注册为名为<code>chapter12-pre-trained-loans</code>(<code>model_name</code>参数)的模型。这是一个使用<code>sklearn</code>库的版本<code>0.22.2.post1</code>(<code>model_framework_version</code>参数)(<code>model_framework_version</code>参数)训练的模型。此外，其精确度<code>0.828</code>作为模型属性存储。</p></li>
+				<li>If you had a process<a id="_idIndexMarker921"/> to train new models, such as the scheduled<a id="_idIndexMarker922"/> pipeline that you created in <a href="B16777_11_Final_VK_ePub.xhtml#_idTextAnchor160"><em class="italic">Chapter 11</em></a>, <em class="italic">Working with Pipelines</em>, you will have to verify whether the newly<a id="_idIndexMarker923"/> trained model has better metrics than the one already registered. Then, if it is better, proceed with the registration of the model. To do that, you can use code<a id="_idIndexMarker924"/> similar to the following:<pre>from sklearn.linear_model import RidgeClassifier
+new_model = RidgeClassifier(solver='svd')
+new_model.fit(X_train, y_train)
+y_predicted = new_model.predict(X_validate)
+accuracy = accuracy_score(y_validate, y_predicted)
+registered_model = Model(ws, name="chapter12-loans")
+r_version = registered_model.version
+r_acc = float(registered_model.properties['accuracy'])
+if accuracy &gt; r_acc:
+    print(f"New model has better accuracy {accuracy}")
+else:
+    print(f"Registered model with version {r_version}" \
+           " has better accuracy {r_acc}")</pre><p>在前面的代码中，您训练了一个基于<code>RidgeClassifier</code>的模型，它使用了在<em class="italic">步骤 7 </em>中注册的<code>chapter12-loans</code>。<code>registered_model</code>变量<a id="_idIndexMarker926"/>与您在<em class="italic">步骤 7 </em>中获得的<code>model</code>变量具有相同的引用；只是，这一次，您使用<code>Model</code>类<a id="_idIndexMarker928"/>而不是通过注册<a id="_idIndexMarker929"/>一个模型来创建那个<a id="_idIndexMarker927"/>引用。从该模型中，您可以读取<code>version</code>属性和<code>accuracy</code>属性。您可以从模型的<code>tags</code>字典而不是<code>properties</code>字典中检索精度。您将精度值转换为浮点数，因为标记和属性将其值存储为字符串。接下来，将新模型的精度与已经注册的精度进行比较(存储在<code>r_acc</code>变量中)。如果新型号比注册的型号好，则打印一条消息。在这种情况下，您重复<em class="italic">步骤 6 </em>和<em class="italic">步骤 7 </em>来存储模型，然后注册模型的新的改进版本。</p><p class="callout-heading">重要说明</p><p class="callout">要注册新的型号版本，只需要用相同的名称注册新型号即可。通过注册一个同名的新模型，AzureML 会自动为你创建一个新版本。</p></li>
+				<li>Optionally, as<a id="_idIndexMarker930"/> a last step, delete the locally stored<a id="_idIndexMarker931"/> model using the following code:<pre>import shutil
+shutil.rmtree('./model',ignore_errors=True)</pre><p>这段代码删除了您在<em class="italic">步骤 6 </em>中创建的<code>model</code>文件夹<a id="_idIndexMarker932"/>，包括<a id="_idIndexMarker933"/>您不再需要的序列化模型。<code>ignore_errors</code>参数允许您运行这个单元格，即使文件夹不存在也不会产生任何错误。</p></li>
+			</ol>
+			<p>在本节中，您在笔记本上的 Jupyter 内核中训练了一个模型。然后，您在您的工作区内注册了模型。您可以在第十一章 、<em class="italic">使用管道</em>的<em class="italic">创作管道</em>部分的<em class="italic">步骤 11 </em>中使用相同的注册码来注册<code>run=Run.get_context()</code>方法，然后您需要上传序列化模型并注册模型，就像您在<em class="italic">步骤 7 </em>中所做的那样。作为一个额外的活动，尝试修改<code>train_model.py</code>脚本和<code>chapter11.ipynb</code>来创建一个管道，该管道注册了在管道中被训练的模型。这个活动的一个潜在解决方案可以在<code>train_model_and_register.py</code>脚本中找到。这可以在位于<a href="http://bit.ly/dp100-ch11">http://bit.ly/dp100-ch11</a>的 GitHub 库的<code>step02</code>文件夹中找到。</p>
+			<p>在下一节中，您将开始操作您在这一节中注册的模型，方法是将它部署为一个服务于实时推理的 web 服务。</p>
+			<h1 id="_idParaDest-164"><a id="_idTextAnchor175"/>部署实时端点</h1>
+			<p>让我们想象一下，您有一个电子银行解决方案，其中包含客户申请贷款的流程。你要正确设定顾客的期望，并为他们可能的拒绝做好准备。当客户提交贷款申请表时，您要调用您在工作区部分的<em class="italic">注册模型中注册的模型，即名为<strong class="bold"> chapter12-loans </strong>的模型，并传入客户在申请表上填写的信息。如果模型预测贷款不会被批准，贷款请求的确认<a id="_idIndexMarker936"/>页面上会出现一条消息，让客户为贷款请求可能被拒绝做好准备。</em></p>
+			<p><em class="italic">图 12.5 </em>显示了一个过于简化的架构，用于描述从客户开始到模型实时端点的请求流:</p>
+			<p class="figure-caption"> </p>
+			<div><div><img src="img/B16777_12_005.jpg" alt="Figure 12.5 – An oversimplified e-banking architecture showing the flow &#13;&#10;of requests from the customer to the model&#13;&#10;" width="829" height="496"/>
+				</div>
+			</div>
+			<p class="figure-caption">图 12.5–一个过于简化的电子银行架构，显示了从客户到模型的请求流程</p>
+			<p>部署模型最简单的方法是通过 AzureML 为特定的<a id="_idIndexMarker937"/>机器学习框架提供的无代码部署方法，包括您在上一节中使用的<a id="_idIndexMarker938"/>的<code>sklearn</code>库。执行<a id="_idIndexMarker939"/>以下步骤:</p>
+			<ol>
+				<li value="1">转到<code>chapter12.ipynb</code>笔记本，添加下面的代码，以获得对您在上一节中创建的<strong class="bold"> chapter12-loans </strong>模型的最新版本的引用:<pre>from azureml.core import Workspace, Model
+ws = Workspace.from_config()
+model = Model(ws, name="chapter12-loans")</pre></li>
+				<li>To deploy a real-time endpoint, use the following code:<pre>no_code_service = Model.deploy(ws, "no-code-loans",
+                               [model])
+no_code_service.wait_for_deployment(show_output=True)</pre><p>这段代码部署一个名为<code>no-code-loans</code>的新实时端点服务，然后等待部署完成。</p></li>
+				<li>To get the scoring<a id="_idIndexMarker940"/> URI for the newly deployed endpoint, use the following code:<pre>print(no_code_service.scoring_uri)</pre><p>这是一个格式为<a href="http://guid.region.azurecontainer.io/score">http://guid.region.azurecontainer.io/score</a>的 URL，<a id="_idIndexMarker941"/>用<strong class="bold"> JSON </strong>有效载荷接受<strong class="bold"> POST </strong>请求，如下所示:</p><pre>{"data": [[2000,2,45]]}</pre><p>这个有效载荷<a id="_idIndexMarker942"/>将为一个月收入为 2000、拥有两张信用卡<a id="_idIndexMarker943"/>并且年龄为 45 岁的客户触发一个推断请求。您可以使用诸如<strong class="bold">邮递员</strong>或<strong class="bold"> curl </strong>之类的工具来创建这样一个 HTTP 请求<a id="_idIndexMarker944"/>并调用端点。</p></li>
+				<li>Instead of making an HTTP request using a tool such as <code>curl</code>, you can use the <code>no_code_service</code> reference and invoke the <code>run</code> method by passing in the JSON payload that you would normally send to the service:<pre>import json
+input_payload = json.dumps({
+    'data': [[2000, 2, 45], [2000, 9, 45]],
+    'method': 'predict'
+})
+output = no_code_service.run(input_payload)
+print(output)</pre><p>前面的代码导入了<code>json</code>库，这有助于将对象序列化为 JSON 字符串。您使用<code>dumps</code>方法创建有效负载。请注意，有效载荷与您在<em class="italic">步骤 3 </em>中看到的简单版本略有不同。在这个例子中，不是传递单个客户的信息，而是传递两个客户的信息:一个是您之前传递的，另一个是有<em class="italic"> 9 </em>信用卡而不是<em class="italic"> 2 </em>的。此外，您要指定调用哪个方法。默认情况下，模型的方法名是<code>predict</code>，这是您在前面章节中用来进行推论的方法。最后，打印输出，看起来应该如下所示:</p><pre>{'predict': [0, 1]}</pre><p>前面的结果表明，第一笔贷款将被拒绝，而第二笔贷款将被批准。</p><p>大多数分类<a id="_idIndexMarker945"/>模型提供了另一种叫做<code>predict_proba</code>的方法，它返回一个数组<a id="_idIndexMarker946"/>，其中包含每个标签的概率。在<code>loans</code>批准案例中，这个数组将只包含 2 个总计为 1 的概率，即贷款获得批准的概率和被拒绝的概率。如果您将方法名称从<code>predict</code>更改为<code>predict_proba</code>并重新执行该单元，您将得到以下结果:</p><pre>{'predict_proba': [[0.998, 0.002], [0.173, 0.827]]}</pre><p>前面的结果表明，该模型对第一笔贷款将被拒绝的置信度为 99.8%，对第二笔贷款将被批准的置信度为 82.7%。</p></li>
+				<li>或者，导航至<code>chapter12-demanding-loans</code>。您指定它需要<code>1</code> CPU 和<code>1.5</code> GB 内存。注意，如果您在工作区部分的<em class="italic">注册模型的<em class="italic">步骤 11 </em>中删除了<code>model</code>文件夹，这段代码将无法注册新的模型，因为它将无法找到模型工件。</em></li>
+				<li>为了节省成本，您应该使用下面的代码删除服务:<pre>no_code_service.delete()</pre></li>
+			</ol>
+			<p>到目前为止，您已经使用无代码方法部署了一个实时端点，它将模型部署为一个容器实例。只有在使用特定的支持模型来训练模型时，这才是可行的。在下一节中，您将学习如何使用更高级的选项来部署模型。</p>
+			<h2 id="_idParaDest-165"><a id="_idTextAnchor176"/>了解模型部署选项</h2>
+			<p>在上一节中，您使用无代码方法部署了<a id="_idIndexMarker950"/>模型。在幕后，AzureML 使用了一个包含所有必需的模型依赖关系的<code>environment</code>，在我们的例子中是<code>sklearn</code>，生成一个 Python 脚本来加载模型并在数据到达端点时做出推断，并使用一个<code>AciServiceDeploymentConfiguration</code>类发布了一个 ACI 服务。</p>
+			<p>如果您有一个用不支持的框架训练的模型<a id="_idIndexMarker951"/>，或者如果您想要更好地控制部署模型，您可以使用 AzureML SDK 类部署模型，如图 12.7 所示:</p>
+			<div><div><img src="img/B16777_12_007.jpg" alt="Figure 12.7 – The components required in a real-time endpoint deployment&#13;&#10;" width="1650" height="344"/>
+				</div>
+			</div>
+			<p class="figure-caption">图 12.7–实时端点部署所需的组件</p>
+			<p>这里，<strong class="bold">推理配置</strong>类指定了模型依赖关系。它需要一个入口脚本来加载模型并处理传入的请求，以及一个入口脚本将在其中执行的环境。这个环境包含模型加载和进行推理所需的所有依赖项。</p>
+			<p>入口脚本应该有以下两种方法:</p>
+			<ul>
+				<li><code>Init</code>:在这个步骤中，脚本将训练好的模型加载到内存中。根据您如何将模型的状态<a id="_idIndexMarker952"/>存储到磁盘，您<a id="_idIndexMarker953"/>可以使用相应的方法来反序列化模型。例如，如果您使用了<code>joblib</code>库来序列化您的模型，那么您可以使用同一个库的<code>load</code>方法来将其加载到内存中。有些模型提供了自己的序列化和反序列化方法，但过程是相同的；已定型模型的状态保存在一个或多个文件中，您可以稍后使用这些文件将已定型模型加载到内存中。根据模型的大小，初始化阶段可能需要很长时间。较小的<code>sklearn</code>模型应该在几毫秒内加载到内存中，而较大的神经网络可能需要几秒钟才能加载。</li>
+				<li><code>run</code>:这是当实时端点接收到数据集进行推断时调用的方法。在这个方法中，您必须使用加载在<code>init</code>代码<a id="_idIndexMarker954"/>中的模型来调用它提供的预测方法，以便对传入的数据进行推断<a id="_idIndexMarker955"/>。如前所述，大多数<a id="_idIndexMarker956"/>模型都提供了<code>predict</code>方法，您可以调用该方法并将其传递到您想要进行<a id="_idIndexMarker957"/>推理的数据中。大多数分类模型都提供了一个额外的方法，称为<code>predict_proba</code>，它返回每个类别的概率。自动预测模型提供了<code>forecast</code>方法，而不是<code>predict</code>方法。在进行预测时，神经网络有一种不同的方法。例如，在 TensorFlow 的第一个版本中，您必须通过一个<code>session.run()</code>方法调用来调用一个预测方法。</li>
+			</ul>
+			<p>一旦您配置了模型依赖项，您需要决定您想要在哪里部署模型。AzureML SDK <a id="_idIndexMarker958"/>提供了三个类:<code>LocalWebserviceDeploymentConfiguration</code>、<code>AciServiceDeploymentConfiguration</code>和<code>AksServiceDeploymentConfiguration</code>。这些允许<a id="_idIndexMarker959"/>你在本地机器上部署成 ACI 或者<strong class="bold"> Azure Kubernetes 服务</strong> ( <strong class="bold"> AKS </strong>)，如图<em class="italic">图 12.8 </em>所示:</p>
+			<div><div><img src="img/B16777_12_008.jpg" alt="Figure 12.8 – Picking the right compute target for your model&#13;&#10;" width="1378" height="827"/>
+				</div>
+			</div>
+			<p class="figure-caption">图 12.8–为您的模型选择正确的计算目标</p>
+			<p>正如您可能已经收集到的，在<em class="italic">图 12.8 </em>中，您可以通过指定您希望服务监听的端口来部署到您的本地计算机。这是一个很好的方法，可以用来调试模型的任何潜在加载问题，或者验证与本地计算机上的其余系统<a id="_idIndexMarker960"/>的集成。下一个选择是使用 ACI，这意味着测试环境或小规模生产环境。在<code>AciServiceDeploymentConfiguration</code>类中只能使用 CPU，不能使用 GPU。通过将<code>auth_enabled</code>参数设置为<code>True</code>，您可以使用基于密钥的认证来保护端点。这个身份验证方法<a id="_idIndexMarker961"/>要求您将一个静态密钥作为<strong class="bold">授权</strong>头传递到 HTTP 请求中。</p>
+			<p>另一方面，<code>AksServiceDeploymentConfiguration</code>在 AKS 集群中部署服务。如果您的模型可以使用 GPU，并且您要部署到的集群具有支持 GPU 的节点，那么您就可以使用 GPU。这种部署配置允许您在基于密钥的身份验证和基于令牌的身份验证之间进行选择。基于令牌的认证<a id="_idIndexMarker962"/>要求最终用户从保护 Azure 工作区的<strong class="bold"> Azure Active Directory </strong>获取访问令牌，这将允许您访问部署在其中的端点。与基于密钥的身份验证(ACI 中唯一可用的选项)相比，此令牌是短暂的，并且隐藏了呼叫者的身份。AKS 部署的另一个生产就绪特性是动态伸缩的能力，以处理传入请求数量的波动。在手头的电子银行场景中，客户倾向于在工作时间访问电子银行解决方案，而系统在晚上基本上是空闲的。此外，在月底，传入流量达到峰值。在这种工作负载下，您希望能够扩展您的端点，以在需要时适应流量的增加。AKS 可以自动启动模型的多个容器，并在传入流量显著增加时在它们之间进行流量负载平衡。当流量恢复正常时，它只能保留一个容器作为潜在传入流量的热备用。</p>
+			<p>现在您对部署选项有了更好的理解，您将使用您在<em class="italic">图 12.7 </em>中看到的类在 ACI <a id="_idIndexMarker964"/>中部署相同的模型:</p>
+			<ol>
+				<li value="1">The first thing you will need to create is the entry script. Underneath the <strong class="bold">chapter12</strong> folder, create a new folder named <strong class="bold">script</strong> and place a <strong class="bold">score.py</strong> file inside it, as shown in <em class="italic">Figure 12.9</em>: <div><img src="img/B16777_12_009.jpg" alt="Figure 12.9 – Adding the score.py file for the real-time endpoint&#13;&#10;" width="766" height="909"/></div><p class="figure-caption">图 12.9–为实时端点添加 score.py 文件</p></li>
+				<li>In the <code>init</code> method, you are getting the path of the serialized model using the <code>AZUREML_MODEL_DIR</code> environment variable. When AzureML spins up the Docker image that will be serving the model, this variable points to the folder where the model is located; for example, <code>/tmp/azureml_umso8bpm/chapter12-loans/1</code> could be the location where you find the first version of the <code>chapter12-loans</code> model. In that folder, the actual artifact, named <code>model.joblib</code>, is located in the <code>model</code> folder, which you uploaded in <em class="italic">Step 5</em> of the <em class="italic">Deploying real-time endpoints</em> section. You use <code>os.path.join</code> to get the final path of the model, and then you load the model in a <code>global</code> variable named <code>model</code>. If you want to use the AzureML SDK to get the location of the model, you could use <code>model_path = Model.get_model_path(model_name, version=version)</code>, which uses the same environment variable under the hood. However, note that you would need to install the AzureML SDK in your environment to be able to import the <code>Model</code> class from it; this is something that is not necessary with the preceding code.<p class="callout-heading">重要说明</p><p class="callout">请注意，您正在使用<code>print</code>将模型路径和传入的<code>raw_data</code>写入控制台。您将在<em class="italic">应用洞察监控</em>部分了解如何查看这些消息。</p><p>在<code>run</code>方法中，当<a id="_idIndexMarker967"/>试图读取请求的输入时，使用<code>try</code> <code>except</code>块来捕捉潜在的错误。如果出现这样的错误，异常将被序列化为一个字符串(使用<code>str()</code>方法)，并返回给最终用户。注意，将异常返回给调用者是一种安全反模式，因为您可能会意外地将有价值的信息暴露给潜在的攻击者，但这在调试时很有帮助。您可以<a id="_idIndexMarker968"/>使用<code>print</code>语句或更高级的库(如<code>try</code>块)来反序列化传入的 JSON 负载，而不是返回错误消息，如<em class="italic">部署实时端点</em>部分的<em class="italic">步骤 3 </em>所示。然后，通过<code>init</code>方法调用已经加载到内存中的<code>model</code>对象的<code>predict</code>方法。接下来，您将模型结果作为一个列表返回，该列表将被序列化为一个数组。</p><p class="callout-heading">重要说明</p><p class="callout">您永远不会直接调用<code>init</code>或<code>run</code>方法。AzureML 将把另一段代码放入最终的 Docker 映像中，这是 HTTP 推理服务器。这个服务器将负责在服务器启动时调用您的<code>init</code>方法，并将传入的 HTTP 数据传递给<code>run</code>方法。此外，您在<code>run</code>方法中返回的结果将被序列化为一个<strong class="bold"> JSON </strong>并返回给调用者。</p></li>
+				<li>The next thing you need is an <code>Environment</code> that has all of the necessary dependencies to run the <code>score.py</code> script that you created. Open your <code>chapter12.ipynb</code> notebook<a id="_idIndexMarker969"/> and add the following code inside a new cell:<pre>from azureml.core import Environment
+from azureml.core.conda_dependencies import CondaDependencies 
+import sklearn
+myEnv= Environment(name="sklearn-inference")
+myEnv.Python.conda_dependencies = CondaDependencies()
+myEnv.Python.conda_dependencies.add_conda_package(
+               f"scikit-learn=={sklearn.__version__}")
+myEnv.Python.conda_dependencies.add_pip_package(
+               "azureml-defaults&gt;=1.0.45")</pre><p>在前面的代码中，您创建了一个<code>Environment</code>，如<a href="B16777_08_Final_VK_ePub.xhtml#_idTextAnchor117"> <em class="italic">第 8 章</em> </a>、<em class="italic">使用 Python 代码</em>中所示。您添加了<code>scikit-learn</code> <code>azureml-defaults</code> <code>pip</code>包，它包含了将模型作为 web 服务托管的必要功能。因为您正在构建自己的<code>Environment</code>，所以您需要添加这个包并至少使用版本 1.0.45。这是您可以用来运行评分脚本的最基本的环境。此外，AzureML 提供了一个您可以使用的管理环境，例如<code>AzureML-sklearn-0.24.1-ubuntu18.04-py37-cpu-inference</code>，它包含了您使用在<code>sklearn</code>版本 0.24.1 中训练的模型做出推理请求所需的一切。</p></li>
+				<li>You have defined everything that is needed by the <code>InferenceConfig</code> class. Add a new cell and type<a id="_idIndexMarker971"/> in the following code to put everything together:<pre>from azureml.core.model import InferenceConfig
+inference_config = InferenceConfig(
+                      source_directory= "./script",
+                      entry_script='score.py', 
+                      environment=myEnv)</pre><p>这段代码创建了用模型进行推理所需的配置。它使用位于<code>script</code>文件夹中的<code>score.py</code>文件，并在<code>myEnv</code>环境中执行该文件，这是您在<em class="italic">步骤 3 </em>中定义的。</p></li>
+				<li>Now you have two out of the three components depicted in <em class="italic">Figure 12.7</em>. In this step, you will create an <code>AciServiceDeploymentConfiguration</code> class, and you will deploy the model in ACI. In a new cell, add the following code:<pre>from azureml.core.webservice import AciWebservice
+deployment_config = AciWebservice.deploy_configuration(
+                    cpu_cores=1, memory_gb=1)
+service = Model.deploy(ws, "aci-loans", [model], 
+                inference_config, deployment_config)
+service.wait_for_deployment(show_output=True)</pre><p>这里，我们使用<code>AciWebservice</code>类来获取您想要部署的容器实例的部署配置。在前面的代码中，您指定需要 1 个 CPU 内核和 1gb RAM。然后，您将模型部署到一个名为<code>aci-loans</code>的新服务中，并等待部署完成。</p><p class="callout-heading">重要说明</p><p class="callout">如果您在尝试部署容器时遇到问题，您可以查看打印输出中的错误消息或使用<code>service.get_logs()</code>方法。最有可能的是，这是您在<code>score.py</code>脚本中的代码库的问题。您可以通过安装<code>azureml-inference-server-http</code> pip 包并运行以下命令来本地测试代码:</p><p class="callout"><code>5001</code>。调试这种情况的另一种方法是使用<code>LocalWebservice</code>，我们将在后面讨论。如果您的代码没有问题，那么您可能会遇到内存问题。这应该可以在服务日志中看到。在这种情况下，请参考下一节，了解如何对模型进行概要分析，以确定其资源需求。</p></li>
+				<li>To test the deployed<a id="_idIndexMarker972"/> service, you can use the following code, which is similar to the one that you used in the previous section:<pre>import json
+input_payload = json.dumps({
+    'data': [[2000, 2, 45]]
+})
+output = service.run(input_payload)
+print(output)</pre><p>请注意，您在<em class="italic">部署实时端点</em>部分的<em class="italic">步骤 4 </em>中使用的有效负载的<code>method</code>属性不会对该部署产生任何影响，并且会从有效负载中省略。如果您想支持这个属性，您必须在<code>score.py</code>文件的<code>run</code>方法中编写代码来读取该属性并调用模型的相应方法。</p></li>
+				<li>为了节省成本，在完成测试后，使用下面的代码删除服务:<pre>service.delete()</pre></li>
+				<li>If you want to deploy<a id="_idIndexMarker973"/> the same service in your local computer, you can use the following code:<pre>from azureml.core.webservice import LocalWebservice
+deployment_config = LocalWebservice.deploy_configuration(port=1337)
+service = Model.deploy(ws, "local-loans", [model], inference_config, deployment_config)
+service.wait_for_deployment()</pre><p>不使用<code>AciWebservice</code>类，而是使用<code>LocalWebservice</code>创建一个本地服务来监听端口<code>1337</code>。如果您在本地计算机上运行笔记本，您需要访问<code>http://localhost:1337</code>并查看服务端点的健康状态。现在您已经在 AzureML 笔记本中运行了这段代码，本地计算机就是您正在处理的计算实例。查看名为<code>service.delete()</code>代码的计算实例的端口<code>1337</code>，如<em class="italic">步骤 7 </em>所示。</p></li>
+			</ol>
+			<p>类似于<code>AciWebservice</code>和<code>LocalWebservice</code>，你可以使用<code>AksWebservice</code>创建一个<code>AksServiceDeploymentConfiguration</code>。在部署它时，您需要在<code>Model.deploy</code>方法中指定一个额外的参数，即<code>deployment_target</code>参数。该参数允许您指定您想要将模型部署到的<code>AksCompute</code>推理集群。</p>
+			<p>除了您之前看到的本地计算机、ACI 和 AKS 部署选项，AzureML 还提供了<a id="_idIndexMarker974"/>多种其他部署选项。例如，<strong class="bold"> Azure Functions </strong>允许你在一个无服务器的基础设施中运行你的模型，而<strong class="bold"> Azure App Services </strong>将模型作为一个传统的 web 应用来托管，它总是<a id="_idIndexMarker975"/>准备好为传入的请求提供服务。另一方面，您可以使用<strong class="bold">物联网边缘</strong>，这允许您在边缘设备上部署服务，如 Raspberry <a id="_idIndexMarker976"/> Pi 或基于 GPU 的 Jetson Nano。最后，您甚至可以将模型打包到 Docker 容器映像中，该映像可以在隔离的 air gap 数据中心中运行。</p>
+			<p>在本节中，您部署了<a id="_idIndexMarker977"/>一个 ACI 实时推理端点，请求 1 个 CPU 内核和 1 GB RAM。在下一节中，您将探索如何通过分析模型的性能来优化您的资源需求。</p>
+			<h2 id="_idParaDest-166"><a id="_idTextAnchor177"/>分析模型的资源需求</h2>
+			<p>在将产品投入生产之前，通常会进行压力测试。本质上，该测试用请求<a id="_idIndexMarker979"/>轰炸<a id="_idIndexMarker978"/>实时端点，并测量端点的响应性和性能。您可以对您的模型做一些类似的事情，以了解您需要什么类型的资源来使它们按预期执行。例如，您可能需要确保所有的推理都在 200 毫秒内完成。</p>
+			<p>在本节中，您将创建一个测试数据集，用于对实时端点<a id="_idIndexMarker980"/>进行压力测试，并观察其性能。数据集中的每一行将包含一个推理请求。</p>
+			<p>导航到您的<code>chapter12.ipynb</code>笔记本并执行以下步骤:</p>
+			<ol>
+				<li value="1">In a new cell, add the following code:<pre>loans_ds = ws.datasets['loans']
+prof_df = loans_ds.drop_columns('approved_loan') \
+                        .to_pandas_dataframe()
+prof_df['sample_request'] = \
+    "{'data':[[" + prof_df['income'].map(str) \
+  + ","+ prof_df['credit_cards'].map(str) \
+  + "," + prof_df['age'].map(str) + "]]}"
+prof_df = prof_df[['sample_request']]
+prof_df.head()</pre><p>这段代码加载<code>loans</code>数据集，删除我们不需要的<code>approved_loan</code>列，并将其加载到<code>pandas</code> <code>DataFrame</code>中。接下来，您创建一个名为<code>sample_request</code>的新列，它连接这些列以产生如下所示的字符串:</p><pre>{"data": [[2000,2,45]]}</pre><p>然后，您只保留<a id="_idIndexMarker981"/>那一列，并打印前 5 行，以验证请求看起来像预期的那样。请注意，数据是否是我们用来训练模型的数据并不重要。甚至可能是随机记录。我们只关心我们将发出的请求的数量，而不关心推理结果将会是什么样子。</p></li>
+				<li>Store the newly created dataset inside the workspace using the following code:<pre>from azureml.core import Dataset
+dstore = ws.get_default_datastore()
+loan_req_ds = Dataset.Tabular.register_pandas_dataframe(
+    dataframe=prof_df,
+    target=(dstore,"/samples/loans-requests"),
+    name="loans-requests",
+    description="Sample requests for the loans model")</pre><p>前面的代码将 DataFrame 注册为<code>loans-requests</code>数据集。数据存储在默认数据存储的<code>/samples/loans-requests</code>中。<code>loans_req_ds</code>变量引用了新注册的<code>tabular</code> <code>Dataset</code>。</p></li>
+				<li>Now that you have the necessary data, you can start the model profiling process using the following code:<pre>profile = Model.profile(ws,
+              'chapter12-loan',
+              [model], inference_config,
+              input_dataset=loan_req_ds,
+              cpu=2, memory_in_gb=1)
+profile.wait_for_completion(True)
+print(profile.get_details())</pre><p>注意，profile 方法需要您在上一节的模型部署中使用的<code>model</code>和<code>inference_config</code>。此外，您<a id="_idIndexMarker982"/>需要指定用于执行分析的 ACI 大小。在前面的代码中，您请求 2 个 CPU 和 1gb RAM。分析可能需要很长时间，有时超过 20 分钟。分析完成后，您将会看到结果，包括作为<code>recommendedCpu</code>的 1 个 CPU 和作为<code>recommendedMemoryInGB</code>值的 0.5 GB RAM。</p><p class="callout-heading">重要说明</p><p class="callout">模型概要文件的名称在工作空间中应该是唯一的。如果您试图在不更改名称的情况下重新运行第 3 步的代码，将会出现错误。</p></li>
+			</ol>
+			<p>在幕后，执行了一个名为<code>ModelProfile</code> run 的实验，该实验使用该模型部署了一个 ACI 服务。一旦服务启动并运行，流程将发送您在<strong class="bold"> loan_req_ds </strong>数据集中指定的 500 个请求，并记录模型的响应时间，同时监控已部署容器实例的 CPU 和内存利用率。AzureML <a id="_idIndexMarker983"/>可以根据这些统计数据建议您应该为实时端点配置的 CPU 和内存。</p>
+			<p>在下一节中，您将使用这些值来部署 ACI 服务。接下来，您将探索如何在部署到生产环境后监控其性能，并使用<strong class="bold">应用洞察</strong>记录传入的数据。</p>
+			<h2 id="_idParaDest-167"><a id="_idTextAnchor178"/>利用应用洞察进行监控</h2>
+			<p>正如您在<a href="B16777_02_Final_VK_ePub.xhtml#_idTextAnchor026"> <em class="italic">第二章</em> </a>，<em class="italic">部署 Azure 机器学习工作区资源</em>中所了解到的，当您部署 AzureML 工作区时，一个名为<code>packtlearningm&lt;random_number&gt;</code>的 Application Insights 帐户被部署在同一个资源组中。这个 Azure 资源<a id="_idIndexMarker984"/>允许你监控<a id="_idIndexMarker985"/>应用程序的性能。特别是对于 web 应用程序，例如您正在<a id="_idIndexMarker986"/>部署的实时端点，Application Insights 允许您监控请求和响应时间、端点的失败率、代码中出现的任何潜在异常，甚至是您希望从代码库发出的日志跟踪。</p>
+			<p>在前面的<em class="italic">理解模型部署选项</em>部分中，您创建了一个包含几个<code>print</code>语句的<code>score.py</code>文件。这些消息写在端点的控制台内部，可以通过调用<code>service.get_logs()</code>方法或导航到部署的<strong class="bold">部署日志</strong>选项卡来找到，如图<em class="italic">图 12.10 </em>所示:</p>
+			<div><div><img src="img/B16777_12_010.jpg" alt="Figure 12.10 – The model path and incoming raw_data logged in the console of the container instance&#13;&#10;" width="1152" height="1125"/>
+				</div>
+			</div>
+			<p class="figure-caption">图 12.10–容器实例的控制台中记录的模型路径和传入的 raw_data</p>
+			<p>这种方法的问题是日志不能持久保存。如果您重新部署<a id="_idIndexMarker988"/>容器实例，您将丢失日志。此外，如果您部署了多个模型，您将需要一个集中的位置来共同监控所有这些模型。这是 Application Insights 为您的解决方案带来的众多优势中的两个。</p>
+			<p>回到您的<code>chapter12.ipynb</code>笔记本，重新部署 ACI 容器，并为其启用应用洞察。在新单元格内，添加以下代码:</p>
+			<pre>from azureml.core.webservice import AciWebservice
+deployment_config = AciWebservice.deploy_configuration(
+   cpu_cores=1, memory_gb=0.5, enable_app_insights= True)
+service = Model.deploy(ws, "aci-loans", [model], inference_config, deployment_config)
+service.wait_for_deployment(show_output=True) </pre>
+			<p>注意，您正在使用在<em class="italic">分析模型资源需求</em>部分中推荐的<code>1</code> CPU 内核和<code>0.5</code> GB RAM。此外，请注意，您通过传递<code>enable_app_insights= True</code>参数来启用部署配置中的应用程序洞察。如果您已经部署了服务，并且希望为其启用应用程序洞察，则可以使用以下代码来更新其配置:</p>
+			<pre>service.update(enable_app_insights=True)</pre>
+			<p>让我们向服务发送几个<a id="_idIndexMarker989"/>请求，以便更好地了解<a id="_idIndexMarker990"/> Application Insights 能为您做什么。在新单元格内，添加以下代码:</p>
+			<pre>import json
+input_payload = json.dumps({'data': [[2000, 2, 45], [2000, 9, 45]]})
+for x in range(10):
+   print(service.run(input_payload))</pre>
+			<p>这段代码向服务发送<em class="italic"> 10 </em>个相同的请求，一个接一个，生成一些应该记录在 Application Insights 中的人工流量。找到指向 Azure 门户并直接位于 Application Insights 资源内部的 URL 的最简单方法是访问端点的信息页面，如图<em class="italic">图 12.11 </em>所示:</p>
+			<div><div><img src="img/B16777_12_011.jpg" alt="Figure 12.11 – The Application Insights URL that is associated with your AzureML workspace&#13;&#10;" width="1247" height="1053"/>
+				</div>
+			</div>
+			<p class="figure-caption">图 12.11–与您的 AzureML 工作空间相关联的应用洞察 URL</p>
+			<p>请注意，这个<strong class="bold">应用洞察 url </strong>链接并不特定于<strong class="bold"> aci-loans </strong>部署。这个链接<a id="_idIndexMarker991"/>对你所有的实时端点都是一样的，允许你<a id="_idIndexMarker992"/>集中监控你所有的实时端点。点击该链接将进入应用洞察，如图<em class="italic">图 12.12 </em>所示:</p>
+			<div><div><img src="img/B16777_12_012.jpg" alt="Figure 12.12 – Application Insights showing the 10 requests that you sent with the last code&#13;&#10;" width="1650" height="816"/>
+				</div>
+			</div>
+			<p class="figure-caption">图 12.12–应用洞察显示了您用最后一个代码发送的 10 个请求</p>
+			<p>在这个仪表板上，您可以单击图表并深入查看信号详情；或者您可以查看您的应用程序正在控制台内部编写的所有跟踪信息<a id="_idIndexMarker993"/>。要查看<a id="_idIndexMarker994"/>它们，导航到<strong class="bold">监控</strong> | <strong class="bold">日志</strong>，点击<strong class="bold">跟踪</strong>，选择想要调查的时间范围，点击<strong class="bold">运行</strong>按钮。您应该看到所有的<strong class="bold"> STDOUT </strong>消息都出现在结果中，并且您可以深入查看细节，如图<em class="italic">图 12.13 </em>所示:</p>
+			<div><div><img src="img/B16777_12_013.jpg" alt="Figure 12.13 – Reading all of the traces emitted by your model's real-time &#13;&#10;endpoint in Application Insights&#13;&#10;" width="1650" height="1504"/>
+				</div>
+			</div>
+			<p class="figure-caption">图 12.13–在 Application Insights 中读取模型的实时端点发出的所有跟踪</p>
+			<p>在这个<strong class="bold">日志</strong>部分，您可以使用一种强大的类似 SQL 的语言<strong class="bold"> Kusto </strong>创建<a id="_idIndexMarker995"/>复杂的<a id="_idIndexMarker996"/>查询。您甚至可以基于这些查询创建自动的<a id="_idIndexMarker997"/>警报，例如，当您在过去 30 分钟内拒绝了超过 100 笔贷款时，您会收到通知。</p>
+			<p class="callout-heading">重要说明</p>
+			<p class="callout">Application Insights 支持一次记录高达 64 KB 的小负载。如果您计划记录更多内容，例如，超过 64 KB 数据的小批量输入，您应该考虑使用 AzureML SDK 的<code>DataCollector</code>类。此类允许您将数据直接记录到存储帐户中；但是，只有在 AKS 中部署时，它才可用。</p>
+			<p>在进入下一部分之前，不要忘记删除已部署的服务，以防止 ACI 服务的任何意外费用。您可以从 studio experience 中的<strong class="bold">资产</strong> | <strong class="bold">端点</strong>列表中删除服务，或者通过使用以下代码行来删除服务:</p>
+			<pre>service.delete()</pre>
+			<p>在本节中，您<a id="_idIndexMarker999"/>学习了如何在生产环境中部署实时端点后对其进行监控。在<em class="italic">图 12.12 </em>中，你可能已经注意到<a id="_idIndexMarker1000"/>有几个<code>swagger</code>文件。在下一节中，您将学习如何修复那些失败的请求，并支持与想要使用您的模型结果的第三方应用程序的丰富集成。</p>
+			<h2 id="_idParaDest-168"><a id="_idTextAnchor179"/>与第三方应用集成</h2>
+			<p>到目前为止，您已经部署了<a id="_idIndexMarker1001"/>一个接受数组数组作为输入的 web 服务。这是一个隐晦的输入，您需要向任何想要使用您的实时端点的人解释。在<a href="B16777_05_Final_VK_ePub.xhtml#_idTextAnchor072"> <em class="italic">第 5 章</em> </a>，<em class="italic">让机器做模型训练</em>中，你读到了<code>swagger</code>文件，它可以用来生成代码来自动消费你的端点。为了生成<a id="_idIndexMarker1002"/>这样的文件，您可以使用开源的<code>inference-schema</code>包，并用元数据装饰您的代码，这些元数据将驱动<code>swagger.json</code>文件的生成。</p>
+			<p>为了使您的模型更容易被第三方应用程序使用，您应该接受以下有效负载:</p>
+			<pre>{"data":[{"income": 2000, "credit_cards": 2, "age": 45}]}</pre>
+			<p>在这里，您将<a id="_idIndexMarker1003"/>需要创建一个新版本的<a id="_idIndexMarker1004"/>评分文件。你可以直接从 GitHub 页面下载修改后的<code>score_v2.py</code>版本，而不是克隆和编辑现有的评分文件，如<em class="italic">技术要求</em>部分所述。在<strong class="bold">笔记本</strong>区，右键点击<strong class="bold">脚本</strong>文件夹中的<strong class="bold"> score.py </strong>文件，选择<strong class="bold">复制</strong>命令，复制该文件，如图<em class="italic">图 12.14 </em>所示:</p>
+			<div><div><img src="img/B16777_12_014.jpg" alt="Figure 12.14 – Creating the v2 file of the entry script&#13;&#10;" width="1023" height="517"/>
+				</div>
+			</div>
+			<p class="figure-caption">图 12.14–创建入口脚本的 v2 文件</p>
+			<p>将克隆命名为<code>score_v2.py</code>，并修改代码，使其看起来像下面的代码块:</p>
+			<pre>import os
+import joblib
+from inference_schema.schema_decorators import input_schema, output_schema
+import pandas as pd
+from inference_schema.parameter_types.pandas_parameter_type import PandasParameterType
+import numpy as np
+from inference_schema.parameter_types.numpy_parameter_type import NumpyParameterType</pre>
+			<p>在脚本<a id="_idIndexMarker1005"/>文件的开头，您正在导入额外的助手类，稍后将在代码中使用它们。注意<a id="_idIndexMarker1006"/>你将不再需要<code>json</code>模块:</p>
+			<pre>def init():
+    global model
+    model_path = os.path.join(os.getenv(\
+"AZUREML_MODEL_DIR"), "model/model.joblib")
+    model = joblib.load(model_path)</pre>
+			<p>您不会修改<code>init</code>方法:</p>
+			<pre>data_sample = pd.DataFrame(
+    {
+        "income": pd.Series([2000.0], dtype="float64"),
+        "credit_cards": pd.Series([1], dtype="int"),
+        "age": pd.Series([25], dtype="int")
+    }
+)
+output_sample = np.array([0])</pre>
+			<p>在前面的代码块中，您创建了一个<code>pandas</code> <code>DataFrame</code>，它将作为包含在传入请求的<code>data</code>属性中的对象的样本。这个<code>data_sample</code>对象有一个<code>income</code>特征，就是<code>float64</code>，还有<code>credit_cards</code>和<code>age</code>特征，都是整数。类似地，对于输出，您将<code>output_sample</code>定义为 NumPy 数组或数值。您可以在以下代码块的装饰器中使用<code>data_sample</code>和<code>output_sample</code>对象:</p>
+			<pre>@input_schema("data", PandasParameterType(data_sample))
+@output_schema(NumpyParameterType(output_sample))
+def run(data):
+    try:
+        result = model.predict(data)
+        return result.tolist()
+    except Exception as e:
+        error = str(e)
+        return error</pre>
+			<p>这里，您使用带有<code>@input_schema</code>装饰器的<code>data_sample</code>对象。此外，使用<code>PandasParameterType</code>，这表明名为<code>pandas</code> <code>DataFrame</code>的参数遵循由<code>data_sample</code>示例定义的模式。您使用<code>@output_schema</code>装饰器来指定您的服务返回<a id="_idIndexMarker1007"/>一个 NumPy 数组作为输出，类似于<code>output_sample</code>。一旦您配置了这些模式，您会注意到您不需要在<code>run</code>方法中对传入的有效负载进行反序列化。<code>data</code>对象是已经反序列化的<code>pandas</code> <code>DataFrame</code>。</p>
+			<p>如果您想处理二进制文件而不是表格数据，例如，处理一个图像，您可以使用<code>@rawhttp</code>指令，它会将原始 HTTP 请求传递给您的<code>run</code>方法。处理普通的 HTTP 请求给了您更大的灵活性，包括设置响应头；这是<a id="_idIndexMarker1009"/>在配置<strong class="bold">跨源资源共享</strong> ( <strong class="bold"> CORS </strong>)等安全特性时需要的东西。您可以在本章的<em class="italic">延伸阅读</em>部分找到资源来了解更多关于这些高级场景的信息。</p>
+			<p>现在您已经准备好了<code>score_v2.py</code>脚本文件的代码，您需要发布实时端点。要为新评分函数创建实时端点，请在笔记本的单元格内添加以下代码:</p>
+			<pre>from azureml.core.model import InferenceConfig
+from azureml.core.webservice import AciWebservice
+myEnv.Python.conda_dependencies.add_pip_package("inference_schema[pandas-support]&gt;=1.1.0")
+inference_config = InferenceConfig(source_directory= "./script", entry_script='score_v2.py', environment=myEnv)
+deployment_config = AciWebservice.deploy_configuration( cpu_cores=1, memory_gb=0.5)
+service = Model.deploy(ws, "aci-loans", [model], inference_config, deployment_config)
+service.wait_for_deployment(show_output=True)</pre>
+			<p>在前面的代码中，您将<a id="_idIndexMarker1010"/>附加到<code>myEnv</code>依赖关系中的<code>inference_schema</code> pip 包，这是您在前面的<em class="italic">理解模型部署选项</em>部分中定义的。请注意，您正在安装带有额外的<code>pandas-support</code>的包，这将包括<code>pandas</code>包。您的<code>score_v2.py</code>文件所依赖的<code>numpy</code>依赖项将由 pip 自动安装，因为它是<code>pandas</code>包的依赖项。</p>
+			<p>接下来，您指定<a id="_idIndexMarker1011"/>您正在使用<code>score_v2.py</code>入口脚本并部署新服务。新服务将有一个<code>swagger.json</code>文件，供 Power BI 等第三方应用程序读取并自动理解如何调用您的模型。您可以让神气活现的 URI 在端点页面上指向该文件，如图<em class="italic">图 12.11 </em>所示。在端点的页面上，您应该注意到<strong class="bold"> Test </strong>选项卡已经得到了增强，可以指导您需要提供哪些字段来调用模型。在代码方面，您可以使用以下有效负载来调用模型:</p>
+			<pre>import json
+service = ws.webservices['aci-loans']
+input_payload = json.dumps({"data":[
+    {"income": 2000,"credit_cards": 2,"age": 45},
+    {"income": 2000, "credit_cards": 9,"age": 45}
+]})
+print(service.run(input_payload))
+input_payload = json.dumps({'data': [
+    [2000, 2, 45], [2000, 9, 45]
+]})
+print(service.run(input_payload))</pre>
+			<p>在继续下一节之前，请确保使用以下代码删除您刚刚部署的 ACI 服务:</p>
+			<pre>service.delete()</pre>
+			<p>到目前为止，您一直在部署实时推理端点，这些端点可以通过 REST API 满足特定的推理请求。在下一节中，您将学习如何使用<code>ParallelRunStep</code>部署能够并行处理大数据的批处理推理管道。</p>
+			<h1 id="_idParaDest-169"><a id="_idTextAnchor180"/>创建批量推理管道</h1>
+			<p>在<a href="B16777_11_Final_VK_ePub.xhtml#_idTextAnchor160"> <em class="italic">第 11 章</em> </a>、<em class="italic">使用管道</em>中，您学习了如何创建协调多个步骤的管道。可以使用 REST API 调用这些管道，类似于您在上一节中创建的实时端点<a id="_idIndexMarker1013"/>。一个关键的区别是，在实时端点中，基础设施是持续开启的，等待请求到达，而在发布的管道中，集群只有在管道被触发后才会加速。</p>
+			<p>您可以使用这些管道在驻留在数据集中的数据之上编排批处理推断。例如，让我们假设你刚刚训练了你在本章中一直使用的<code>loans</code>模型。您希望针对所有待定贷款请求运行模型，并存储结果；这样，您就可以针对贷款可能被拒的客户开展电子邮件活动。最简单的方法是创建一个单独的<code>PythonScriptStep</code>，它将按顺序处理每个记录并将结果存储在输出文件夹中，正如您在第 11 章 、<em class="italic">的<a href="B16777_11_Final_VK_ePub.xhtml#_idTextAnchor160"> <em class="italic">中了解到的那样，使用管道</em>。您可以不这样做，而是将数据集分成多个批处理，然后在集群的每个节点内运行的多个进程中并行处理它们，如图<em class="italic">图 12.15 </em>所示:</a></em></p>
+			<div><div><img src="img/B16777_12_015.jpg" alt="Figure 12.15 – Parallel processing big datasets by splitting them into smaller &#13;&#10;batches and processing them in parallel&#13;&#10;" width="1650" height="759"/>
+				</div>
+			</div>
+			<p class="figure-caption">图 12.15-通过将大数据集分割成较小的批次并并行处理它们来并行处理大数据集</p>
+			<p>在本节中，您将创建一个批处理管道，它将使用您在本章中训练的<code>chapter12-loans</code>模型进行推理。您已经有了一个名为<code>loans</code>的数据集，但是它太小了，无法展示<code>ParallelRunStep</code>如何通过并行化<a id="_idIndexMarker1014"/>推理来帮助您加速。通过重复复制相同的数据帧，您将生成一个大 1，024 倍的新数据集。然后，您将创建一个类似于您在第 11 章 、<em class="italic">使用管道</em>中创建的管道。这一次，您将使用<code>ParallelRunConfig</code>和<code>ParallelRunStep</code>类来并行处理数据集。配置类需要一个入口脚本，类似于您在上一节中看到的入口脚本。此外，您需要定义以下两种方法:</p>
+			<ul>
+				<li><code>init()</code>:该方法加载模型<a id="_idIndexMarker1015"/>，并为即将到来的批次准备流程。此方法不会产生任何输出。</li>
+				<li><code>run(mini_batch)</code>:这个方法做实际的数据处理。这个方法将被多次调用<a id="_idIndexMarker1016"/>，每次传递一个不同的<code>mini_batch</code>参数。您必须返回一个数组，其中包含您在该函数中作为输出处理的每个项目的一行。例如，如果<code>mini_batch</code>参数有 100 行，而您返回一个包含 98 项的数组，那么您将会指出您未能处理其中的 2 条记录。如果<a id="_idIndexMarker1017"/>正在处理<code>TabularDataset</code>，那么<code>mini_batch</code>参数可以是一个<code>pandas</code> <code>DataFrame</code>，如果正在处理<code>FileDataset</code>，那么它可以是一个包含需要处理的文件路径的数组。</li>
+			</ul>
+			<p>导航到您的<code>chapter12.ipynb</code>笔记本并执行以下步骤:</p>
+			<ol>
+				<li value="1">Start by getting<a id="_idIndexMarker1018"/> a reference to the workspace, the dataset, and the compute cluster you are going to use for your pipeline:<pre>from azureml.core import Workspace
+ws = Workspace.from_config()
+loans_ds = ws.datasets['loans']
+compute_target = ws.compute_targets['cpu-sm-cluster']</pre><p>代码应该是不言自明的，就像你在第 11 章 、<em class="italic">使用管道</em>中使用的那样。</p></li>
+				<li>Create a new, bigger dataset based on the <code>loans</code> dataset:<pre>from azureml.core import Dataset
+loans_df = loans_ds.drop_columns('approved_loan') \  
+                   .to_pandas_dataframe()
+for x in range(10):
+    loans_df = loans_df.append(loans_df)
+dstore = ws.get_default_datastore()
+pending_loans_ds =\
+Dataset.Tabular.register_pandas_dataframe(
+    dataframe=loans_df,
+    target=(dstore,"/samples/pending-loans"),
+    name="pending-loans",
+    description="Pending loans to be processed")</pre><p>在前面的代码中，您将<code>loans</code> <code>DataFrame</code>加载到内存中，而没有<code>approved_loan</code>列。这个数据集只包含 500 行。然后，将数据集追加到自身 10 次。这将创建一个包含 512，000 行的更大的数据集，您将其注册为<code>pending-loans</code>。</p></li>
+				<li>Now, it's time to create<a id="_idIndexMarker1019"/> the script that will be processing this dataset. In the <code>chapter12</code> folder, add a <code>pipeline_step</code> folder and then add a <code>tabular_batch.py</code> file with the following contents:<pre>from azureml.core import Model
+import joblib
+def init():
+    global model
+    model_path = Model.get_model_path("chapter12-loans")
+    model = joblib.load(model_path)
+def run(mini_batch):
+    print(mini_batch.info())
+    mini_batch["approved"] = model.predict(mini_batch)
+    return mini_batch.values.tolist()</pre><p>这个脚本有两个方法，如前所述。在<code>init</code>方法中，您使用<code>Model</code>类的<code>get_model_path</code>方法来获取您目前一直使用的模型的位置。从脚本的角度来看，模型将驻留在运行脚本的同一台计算机上的一个文件夹中。然后，使用<code>joblib</code>将模型加载到名为<code>model</code>的<code>global</code>变量中。在<code>run</code>方法中，您打印传入数据帧的大小，然后创建一个名为<em class="italic"> approved </em>的新列，在其中存储所有的模型推断。您为处理的每一行返回一个包含四元素数组的列表，类似于以下记录:</p><pre>[7298, 2, 35, 1]
+[4698, 7, 70, 0]</pre><p>如果您要处理<code>FileDataset</code>而不是本节中正在处理的<code>TabularDataset</code><a id="_idIndexMarker1020"/>，对应的<code>file_batch.py</code>文件将如下所示:</p><pre>def init():
+    print('Load model here')
+def run(mini_batch):
+    output = []
+    for file_path in mini_batch:
+        output.append([file_path, 0])
+    return output</pre><p>像往常一样，在<code>init</code>方法中加载你的模型，例如，一个将实现图像分类的神经网络。在<code>run</code>方法中，<code>mini_batch</code>参数是一个数组，包含您需要处理的文件的文件路径。您可以遍历这些文件，并使用您的模型进行推理。作为输出，您返回模型的文件名和结果，如下例所示:</p><pre>['/path/sample_cat.jpg', 0]
+['/path/sample_dog.jpg', 1]</pre><p>在<em class="italic">第 5 步</em>中，您将会看到这些结果将会聚集在<code>ParallelRunConfig</code>中定义的一个文件中。</p></li>
+				<li>You will need to create an environment<a id="_idIndexMarker1021"/> to execute your pipeline step. Add the following code inside a cell:<pre>from azureml.core import Environment
+from azureml.core.conda_dependencies import CondaDependencies 
+import sklearn
+pEnv= Environment(name="sklearn-parallel")
+pEnv.Python.conda_dependencies = CondaDependencies()
+pEnv.Python.conda_dependencies.add_conda_package(f"scikit-learn=={<a id="_idTextAnchor181"/>sklearn.__version__}")
+pEnv.Python.conda_dependencies.add_pip_package("azureml-core")
+pEnv.Python.conda_dependencies.add_pip_package("azureml-dataset-runtime[pandas,fuse]")</pre><p>您需要安装<code>scikit-learn</code> conda 包，就像您到目前为止一直在做的那样。为了让<code>ParallelRunConfig</code>工作，你需要包含<code>azureml-core</code>和<code>azureml-dataset-runtime[pandas,fuse]</code> <code>pip</code>包。</p></li>
+				<li>Next, create the <code>ParallelRunConfig</code> class that configures how the run will split the workload and what script to use for data processing. Add the following code inside a new notebook cell:<pre>from azureml.pipeline.steps import ParallelRunConfig
+parallel_ru<a id="_idTextAnchor182"/>n_config = ParallelRunConfig(
+    source_directory='pipeline_step',
+    entry_script='tabular_batch.py',
+    mini_batch_size='100Kb',
+    error_threshold=-1,
+    output_action='append_row',
+    append_row_file_name="loans_outputs.txt",
+    environment=pEnv,
+    compute_target=compute_target, 
+    node_count=1,
+    process_count_per_node=2
+)</pre><p>在这里，您将运行位于<code>pipeline_step</code>文件夹中的<code>tabular_batch.py</code>脚本。您将把数据集分成更小的批次，大约 100 KB。如果您正在处理一个<code>FileDataset</code>，您将需要指定放入每个批处理的文件数量。这里，<code>error_threshold</code>指定在处理数据时应该忽略的记录或文件故障的数量。<code>-1</code>意味着你可以接受任何数量的处理错误。<code>output_action</code>参数接受<code>append_row</code>值或<code>summary_only</code>值。使用<code>append_row</code>值，您可以请求将来自<code>run</code>方法调用的所有输出附加到一个名为<code>parallel_run_step.txt</code>的输出文件中，除非您通过<code>append_row_file_name</code>参数覆盖它，如前面的示例所示。该文件中记录的顺序<a id="_idIndexMarker1022"/>没有保证，因为记录是并行处理的。通常，您会返回客户 ID，或者贷款申请 ID，以及模型的推断。使用该 ID，您可以将原始记录与模型的预测联系起来。在当前的例子中，我们没有任何 ID；因此，我们返回整行，就像我们在<em class="italic">步骤 3 </em>的<code>tabular_batch.py</code>脚本中所做的那样。</p><p>接下来，您指定将在其中执行这个管道步骤的环境和集群。最后，您指定这个管道步骤将在单个节点中运行，并且它将为每个参与节点启动两个流程。如果您使用两个节点，您将有四个进程并行运行。在当前示例中，两个并行进程足以在几分钟内完成处理。</p><p>如果您有一个繁重的处理脚本，需要超过 60 秒来处理您指定的<code>mini_batch_size</code>参数，您可以通过设置<code>run_invocation_timeout</code>参数来增加超时值。</p></li>
+				<li>As a next step, you will define<a id="_idIndexMarker1023"/> the output location of <code>append_row_file_name</code> that you specified earlier:<pre>from azureml.data import OutputFileDatasetConfig
+datastore = ws.get_default_datastore()
+step_output = OutputFileDatasetConfig(
+    name= "results_store",
+    destination=(datastore, '/inferences/loans/'))</pre><p>您将把这个聚合文件存储在默认的数据存储中，在<code>/inferences/loans/</code>文件夹下。</p></li>
+				<li>Now it's time to create the first and only step of the pipeline, that is, <code>ParallelRunStep</code>:<pre>from azureml.pipeline.steps import ParallelRunStep
+parallel_step = ParallelRunStep(
+    name='chapter12-parallel-loans',
+    inputs=[pending_loans_ds.as_named_input('loans')],
+    output=step_output,
+    parallel_run_config=parallel_run_config,
+    allow_reuse=False
+)</pre><p>将该步骤命名为<code>chapter12-parallel-loans</code>，并传递您之前在<em class="italic">步骤 2 </em>中注册的<code>pending_loans_ds</code>数据集。输出存储在您在<em class="italic">步骤 6 </em>中创建的<code>OutputFileDatasetConfig</code>中。指定该步骤不能重复使用(<code>allow_reuse</code>)；这允许您多次触发管道，以便总是获得数据集中的最新数据以及最新注册的模型。</p></li>
+				<li>使用下面的代码创建并执行<a id="_idIndexMarker1024"/>一个管道:<pre>from azureml.core import Experiment
+from azureml.pipeline.core import Pipeline
+pipeline = Pipeline(workspace=ws, steps=[parallel_step])
+pipeline_run = Experiment(ws, 'chapter12-parallel-run').submit(pipeline)</pre></li>
+				<li>You can watch the execution logs by using the <code>RunDetails</code> widget with the following code:<pre>from azureml.widgets import RunDetails
+RunDetails(pipeline_run).show()</pre><p>或者，您可以使用以下代码等待执行完成:</p><pre>pipeline_run.wait_for_completion(show_output=True)</pre></li>
+				<li>从那时起，您可以发布甚至调度管道，如第十一章 、<em class="italic">使用管道</em>中所讨论的。</li>
+			</ol>
+			<p>你可以在 AzureML studio 中访问管道，观察输出和它产生的日志，如图<em class="italic">图 12.16 </em>所示。请注意，您将发现一个节点和两个流程。每个流程都有多个<code>run</code>方法<a id="_idIndexMarker1025"/>调用。每次调用<code>run</code>方法时，都会传入一个需要 117.3 KB 内存的数据帧，这接近您在前面的<em class="italic">步骤 5 </em>中请求的 100 KB:</p>
+			<div><div><img src="img/B16777_12_016.jpg" alt="Figure 12.16 – The logs from the parallel execution showing the information of the mini_batch DataFrame&#13;&#10;" width="1638" height="1354"/>
+				</div>
+			</div>
+			<p class="figure-caption">图 12.16–显示 mini_batch 数据帧信息的并行执行日志</p>
+			<p>在本节中，您学习了如何创建<a id="_idIndexMarker1026"/>一个批处理管道，它可以并行处理大量数据。这就是您需要了解的考试操作选项，包括实时模式和批处理模式。</p>
+			<h1 id="_idParaDest-170"><a id="_idTextAnchor183"/>总结</h1>
+			<p>在本章中，您探索了使用本书中培训的机器学习模型的各种方法。您可以进行实时推断，或者以经济高效的方式批量处理大量记录。您首先注册了用于推理的模型。从那里，您可以在 ACI 中部署一个实时端点用于测试，或者在 AKS 中部署一个实时端点用于需要高可用性和自动扩展的生产工作负载。您探索了如何分析您的模型，以确定托管实时端点的推荐容器大小。在此之后，您发现了应用洞察，它允许您监控生产端点并识别潜在的生产问题。通过 Application Insights，您注意到您生成的实时端点没有公开第三方应用程序(如 Power BI)自动使用您的端点所需的<code>swagger.json</code>文件。您修改了评分函数，以包含关于模型输入和输出的元数据，从而完成了本章的实时推理部分。</p>
+			<p>然后，您转到了批处理推理方面，在这里，您创建了一个可以在几分钟内并行处理 50 万条记录的管道。将这种并行化与低优先级计算相结合，您可以在推理更大的数据量时节省大量成本。</p>
+			<p>恭喜你！您已经完成了探索 AzureML 工作空间基本功能的旅程。现在，您可以在工作空间中进行机器学习实验，并且可以使用适合您试图解决的业务问题的选项来操作生成的模型。有了这些知识，你应该能够顺利通过<em class="italic"> DP-100 </em>考试、<em class="italic">在 Azure </em>上设计和实现数据科学解决方案。</p>
+			<h1 id="_idParaDest-171"><a id="_idTextAnchor184"/>问题</h1>
+			<p>在每一章中，你会发现一些问题来验证你对所讨论主题的理解:</p>
+			<ol>
+				<li value="1">You want to deploy a real-time endpoint that will handle transactions from a live betting website. The traffic from this website will have spikes during games and will be very low during the night. Which of the following compute targets should you use?<p>a.anticlonusindex 抗痉挛的指数</p><p>b.计算机实例</p><p>c.计算集群</p><p>d.问</p></li>
+				<li>You want to monitor a real-time endpoint deployed in AKS and determine the average response time of the service. Which monitoring solution should you use?<p>a.anticlonusindex 抗痉挛的指数</p><p>b.Azure 容器注册表</p><p>c.应用洞察</p></li>
+				<li>You have a computer vision model, and you want to process 100 images in parallel. You author a pipeline with a parallel step. You want to process 10 images at a time. Which of the following <code>ParallelRunConfig</code> parameters should you set?<p>a.<code>mini_batch_size=10</code></p><p>b.<code>error_threshold=10</code></p><p>c.<code>node_count=10</code></p><p>d.<code>process_count_per_node=10</code></p></li>
+			</ol>
+			<h1 id="_idParaDest-172"><a id="_idTextAnchor185"/>延伸阅读</h1>
+			<p>本节提供了一个有用的 web 资源列表，帮助您扩展 AzureML SDK 和本章中使用的各种代码片段的知识:</p>
+			<ul>
+				<li>来自 scikit-learn 的模型持久性指南:<a href="https://scikit-learn.org/stable/modules/model_persistence.html">https://scikit-learn . org/stable/modules/model _ persistence . html</a></li>
+				<li>使用 Postman 测试 REST API:<a href="https://www.postman.com/product/api-client/">https://www.postman.com/product/api-client/</a></li>
+				<li>发出 web 请求的<strong class="bold"> curl </strong>命令行工具:【https://curl.se/】T2</li>
+				<li>使用 OpenCensus 监控 Python 应用:<a href="https://docs.microsoft.com/azure/azure-monitor/app/opencensus-python">https://docs . Microsoft . com/azure/azure-monitor/app/open census-Python</a></li>
+				<li>如何使用推理服务器在本地测试您的条目脚本:<a href="https://docs.microsoft.com/azure/machine-learning/how-to-inference-server-http">https://docs . Microsoft . com/azure/machine-learning/how-to-inference-server-http</a></li>
+				<li>将模型打包到自治 Docker 容器中:<a href="https://docs.microsoft.com/azure/machine-learning/how-to-deploy-package-models">https://docs . Microsoft . com/azure/machine-learning/how-to-deploy-package-models</a></li>
+				<li>ONNX 机器学习格式，用于存储可在多个平台加载的模型:<a href="https://docs.microsoft.com/azure/machine-learning/concept-onnx">https://docs . Microsoft . com/azure/machine-learning/concept-ONNX</a></li>
+				<li>应用洞察简介:<a href="https://docs.microsoft.com/azure/azure-monitor/app/app-insights-overview">https://docs . Microsoft . com/azure/azure-monitor/app/app-Insights-overview</a></li>
+				<li>Kusto 查询语言介绍:<a href="https://docs.microsoft.com/azure/data-explorer/kusto/concepts/">https://docs . Microsoft . com/azure/data-explorer/Kusto/concepts/</a></li>
+				<li>高级实时端点入口脚本创作指南:<a href="https://docs.microsoft.com/azure/machine-learning/how-to-deploy-advanced-entry-script">https://docs . Microsoft . com/azure/machine-learning/how-to-deploy-advanced-entry-script</a></li>
+				<li>在 Power BI 中集成 AzureML 模型:<a href="https://docs.microsoft.com/power-bi/transform-model/dataflows/dataflows-machine-learning-integration#azure-machine-learning-integration-in-power-bi">https://docs . Microsoft . com/Power-BI/transform-model/data flows/data flows-machine-learning-integration # azure-machine-learning-integration-in-Power-BI</a></li>
+				<li>利用<code>ParallelRunStep</code>类训练上百个模型:<a href="https://github.com/microsoft/solution-accelerator-many-models">https://github . com/Microsoft/solution-accelerator-many-models</a></li>
+			</ul>
+		</div>
+	</div>
+</body></html>

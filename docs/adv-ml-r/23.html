@@ -1,0 +1,223 @@
+<html><head/><body><html xmlns:epub="http://www.idpf.org/2007/ops">
+
+    <head>
+
+        <title>Creating a Package</title>
+
+        
+
+        <meta charset="utf-8"/>
+
+<meta content="urn:uuid:edef0689-6ba8-4dfc-93a3-190fd7a9b9a4" name="Adept.expected.resource"/>
+
+    </head>
+
+
+
+    <body>
+
+        
+
+
+
+                            
+
+                    <h1 class="header-title">创建包</h1>
+
+                
+
+            
+
+            
+
+                
+
+<p>“如果你想要你从未拥有过的东西，你必须做你从未做过的事情。”</p>
+
+<p>托马斯·杰斐逊</p>
+
+<p>我们将通过创建您自己的 R 包的过程来结束这本书。如果你正在这样做，我建议你开始。我已经将<a href="">第 1 章</a>、<em>准备和理解数据</em>中的大部分数据准备功能放入我自己的包中。我不打算把它放在 CRAN 上，也不打算把它放在任何软件包上，可能除了像葛底斯堡文件这样的美国内战数据包。那么为什么要创建一个包呢？如果您要创建代码并将其投入生产，为什么不创建一个带有版本控制、示例和其他特性的包呢？另外，使用 RStudio，这很容易做到。因此，我们将使用一个简单的例子和一个小函数来展示它有多简单。</p>
+
+
+
+
+
+            
+
+
+
+            
+
+        
+
+    </body>
+
+
+
+</html>
+<html xmlns:epub="http://www.idpf.org/2007/ops">
+
+    <head>
+
+        <title>Creating a new package</title>
+
+        
+
+        <meta charset="utf-8"/>
+
+<meta content="urn:uuid:edef0689-6ba8-4dfc-93a3-190fd7a9b9a4" name="Adept.expected.resource"/>
+
+    </head>
+
+
+
+    <body>
+
+        
+
+
+
+                            
+
+                    <h1 class="header-title">创建新的包</h1>
+
+                
+
+            
+
+            
+
+                
+
+<p>在开始之前，您需要加载两个包:</p>
+
+<pre>&gt; install.packages("roxygen2")<br/><br/>&gt; install.packages("devtools")</pre>
+
+<p class="CDPAlignLeft CDPAlign">您现在想要在 RStudio 中打开<strong>文件</strong>并选择<strong>新项目</strong>，这会将您置于这一点:</p>
+
+<p class="CDPAlignCenter CDPAlign"><img class="alignnone size-full wp-image-752 image-border" src="img/f401bc60-7c12-4463-b87d-db4e8a140db6.png" style="width:32.17em;height:22.83em;"/></p>
+
+<p>根据需要选择一个新目录，并指定<strong> R 包</strong>，如下图所示:</p>
+
+<p class="CDPAlignCenter CDPAlign"><img class="alignnone size-full wp-image-753 image-border" src="img/d869e9c0-367f-4963-8fa2-07bcc03e50bc.png" style="width:34.33em;height:24.33em;"/></p>
+
+<p>现在，您将命名您的包——我创造性地将它命名为一个包——并选择 Create Project:</p>
+
+<p class="CDPAlignCenter CDPAlign"><img class="alignnone size-full wp-image-754 image-border" src="img/605d05ed-0476-43ba-bec5-a8fc13062a32.png" style="width:34.17em;height:24.42em;"/></p>
+
+<p>转到 RStudio 中的 Files 选项卡，您应该会看到几个文件，如下所示:</p>
+
+<p class="CDPAlignCenter CDPAlign"><img class="alignnone size-full wp-image-755 image-border" src="img/263d1fec-4d56-4353-b3fd-c6d2423c2e06.png" style="width:40.75em;height:20.92em;"/></p>
+
+<p>注意名为<kbd>R</kbd>的文件夹。这就是我们将为我们的包放置<kbd>R</kbd>函数的地方。但是首先，点击描述并相应地填写，然后保存。下面是我的版本，它将是一个将数据帧中所有缺失值编码为零的函数:</p>
+
+<p class="CDPAlignCenter CDPAlign"><img class="alignnone size-full wp-image-756 image-border" src="img/6b330d4b-70f6-4fc2-8082-f613c348dac8.png" style="width:30.00em;height:19.50em;"/></p>
+
+<p>我已经离开进口和建议空白。这是加载其他包的地方，比如 tidyverse 或 caret。现在，打开<kbd>R</kbd>文件夹中的<kbd>hello.R</kbd>功能，全部删除。以下格式将很好地工作:</p>
+
+<ul>
+
+<li>标题:当然是你的包装标题</li>
+
+<li>描述:简短的描述</li>
+
+<li>Param:该函数的参数；争论</li>
+
+<li>返回:返回的值</li>
+
+<li>示例:提供如何使用该功能的任何示例</li>
+
+<li>导出:在这里，写下你想要的函数</li>
+
+</ul>
+
+<p>下面是我们要使用的函数，它将所有 NAs 归零:</p>
+
+<pre>#' @title package<br/>#'<br/>#' @description Turns NAs in a dataframe into zeroes<br/>#'<br/>#' @param dataframe<br/>#'<br/>#' @return dataframe<br/>#'<br/>#' @examples<br/>#' dataset &lt;- matrix(sample(c(NA, 1:5), 25, replace = TRUE), 5)<br/>#' df &lt;- as.data.frame(dataset)<br/>#' package::na2zero(df)<br/>#'<br/>#' @export<br/><br/>na2zero &lt;- function(dataframe)<br/>{<br/> dataframe[is.na(dataframe)] &lt;- 0<br/> return(dataframe)<br/>}</pre>
+
+<p>您现在将转到构建-配置构建工具，您应该会在此处结束:</p>
+
+<p class="CDPAlignCenter CDPAlign"><img class="alignnone size-full wp-image-750 image-border" src="img/35f27037-3d3a-412c-9dd0-91e634f66adf.png" style="width:33.92em;height:31.33em;"/></p>
+
+<p>单击“使用 Roxygen 生成文档”的复选标记。这样做将创建这个弹出窗口，您可以关闭它并点击 OK。你可能想把你的函数从<kbd>hello.R</kbd>重命名为相关的名字。现在是构建您的包的关键时刻了。为此，请单击构建-清理并重新构建。</p>
+
+<p>现在您可以搜索您的包了，它应该会出现:</p>
+
+<p class="CDPAlignCenter CDPAlign"><img class="alignnone size-full wp-image-757 image-border" src="img/f7eed779-8b3e-4768-8bb0-1d98bfd219ba.png" style="width:39.00em;height:8.42em;"/></p>
+
+<p>点击它并浏览文档:</p>
+
+<p class="CDPAlignCenter CDPAlign"><img class="alignnone size-full wp-image-758 image-border" src="img/cf29f592-2341-46d7-ac9d-1e0318fe3008.png" style="width:32.08em;height:24.00em;"/></p>
+
+<p>你有它，一个无用的包，但是想想你可以通过打包你自己的或者你喜欢的函数做什么，任何继承你代码的人都会感谢你。</p>
+
+
+
+
+
+            
+
+
+
+            
+
+        
+
+    </body>
+
+
+
+</html>
+<html xmlns:epub="http://www.idpf.org/2007/ops">
+
+    <head>
+
+        <title>Summary</title>
+
+        
+
+        <meta charset="utf-8"/>
+
+<meta content="urn:uuid:edef0689-6ba8-4dfc-93a3-190fd7a9b9a4" name="Adept.expected.resource"/>
+
+    </head>
+
+
+
+    <body>
+
+        
+
+
+
+                            
+
+                    <h1 class="header-title">摘要</h1>
+
+                
+
+            
+
+            
+
+                
+
+<p>在这最后一章，我们经历了创建 R 包的过程，它可以帮助你和你的团队将你的代码投入生产。我们为我们的包创建了一个用户定义的函数，但是您唯一的限制是您的想象力。这本书的主要章节到此结束。我希望你喜欢它，并能实现这里的方法，以及你随着时间的推移学到的其他方法。谢谢大家！</p>
+
+
+
+
+
+            
+
+
+
+            
+
+        
+
+    </body>
+
+
+
+</html></body></html>

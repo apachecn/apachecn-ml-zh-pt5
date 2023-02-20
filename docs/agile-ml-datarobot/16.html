@@ -1,0 +1,251 @@
+<html><head/><body>
+
+
+
+
+
+
+
+
+
+
+
+<style type="text/css">body{margin:1em;background-color:transparent!important;}#sbo-rt-content *{text-indent:0pt!important;}#sbo-rt-content .bq{margin-right:1em!important;}</style>
+
+<div><div><h1 id="_idParaDest-164"><a id="_idTextAnchor186"/> <a id="_idTextAnchor187"/> <em class="italic">第十三章</em>:模型治理与 MLOps</h1>
+
+			<p>在前面的章节中，我们学习了如何构建、理解和部署模型。我们现在将学习如何管理这些模型，以及如何在运营中负责任地使用这些模型。在前面的章节中，我们讨论了理解业务问题的方法、模型运行的系统以及使用模型预测的潜在后果。<strong class="bold"> MLOps </strong>是由<strong class="bold">机器学习和 DevOps </strong>组成的单词。它由在企业内高效、可靠和有效地操作<strong class="bold">机器学习</strong> ( <strong class="bold"> ML </strong>)模型的生产的过程和实践组成。MLOps 旨在通过确保生产模型的结果具有高质量和自动化到位，来确保持续满足商业价值和监管要求。它提供了一个集中的系统来管理生产中所有 ML 模型的整个生命周期。</p>
+
+			<p>MLOps 内的活动涵盖模型部署的所有方面，提供生产中模型的实时跟踪准确性，提供冠军挑战者流程，该流程使用实时数据持续学习和评估模型，跟踪模型偏差和公平性，并提供<strong class="bold">模型治理</strong>框架，以确保模型在满足监管要求的同时继续提供业务影响。在<a href="B17159_08_Final_NM_ePub.xhtml#_idTextAnchor116"> <em class="italic">第 8 章</em> </a>、<em class="italic">模型评分和部署</em>中，我们介绍了 DataRobot 平台上的模型部署。</p>
+
+			<p>此外，在<a href="B17159_08_Final_NM_ePub.xhtml#_idTextAnchor116"> <em class="italic">第 8 章</em> </a>、<em class="italic">模型评分和部署</em>中，我们广泛涵盖了生产中模型监控的各个方面。鉴于模型治理在 MLOps 过程中扮演的关键角色，在这一章中，我们将介绍模型治理框架。模型监控的一个关键方面是确保模型没有偏见，对所有受模型影响的人都是公平的，这一点我们将在本章中探讨。之后，我们将更深入地了解如何启用 MLOps 的其他方面，包括如何维护和监控模型。因此，我们将讨论以下主要话题:</p>
+
+			<ul>
+
+				<li><a id="_idTextAnchor188"/>治理模式</li>
+
+				<li>解决模型偏差和公平性问题</li>
+
+				<li>实施 MLOps</li>
+
+				<li><a id="_idTextAnchor189"/>生产中的通知和变更模型</li>
+
+			</ul>
+
+			<h1 id="_idParaDest-165"><a id="_idTextAnchor190"/>技术要求</h1>
+
+			<p>本章的大部分内容要求访问 DataRobot 软件。这个例子利用了一个相对较小的数据集，<strong class="bold">图书交叉</strong>，由三个表组成，其操作在前面的<a href="B17159_10_Final_NM_ePub.xhtml#_idTextAnchor139"> <em class="italic">第 10 章</em> </a>，<em class="italic">推荐系统</em>中有描述。如数据描述中所述，除了在第 10 章 、<em class="italic">推荐系统</em>中使用的字段外，我们还将创建新的字段。</p>
+
+			<h2 id="_idParaDest-166"><a id="_idTextAnchor191"/>跨账簿数据集</h2>
+
+			<p>用于说明模型治理各个方面的例子与第十章<a href="B17159_10_Final_NM_ePub.xhtml#_idTextAnchor139"><em class="italic"/></a><em class="italic">推荐系统</em>中<a id="_idIndexMarker663"/>构建推荐系统的例子相同。该数据集是基于蔡和他的同事(<a href="http://www2.informatik.uni-freiburg.de/~cziegler/BX/">和</a>)的图书交叉数据集。这些数据是在 2004 年 8 月至 9 月间从图书交叉社区收集的，历时 4 周。</p>
+
+			<p class="callout-heading">重要说明</p>
+
+			<p class="callout">在使用该数据集之前，本书的作者已经告知数据集的所有者该数据集在本书中的用法:</p>
+
+			<p class="callout">蔡-尼古拉·齐格勒、肖恩·m·麦克尼、约瑟夫·a·康斯坦、格奥尔格·劳森(2005 年)。通过主题多样化改进推荐列表。第 14 届国际万维网会议录(WWW 2005)。2010 年 5 月至 2014 年，2005 年，日本千叶</p>
+
+			<p>随后的三个表以<code>.csv</code>格式提供，组成了这个数据集。<a id="_idTextAnchor192"/></p>
+
+			<ul>
+
+				<li>用户:该表显示了用户的概况，匿名化<code>User-ID</code>并显示为整数。还提供了用户<code>Location</code>和<code>Age</code>。</li>
+
+				<li>书籍:此表包含书籍的特征。其特征包括<code>ISBM</code>、<code>Book-Title</code>、<code>Book-Author</code>、<code>Year-Of-Publication</code>、<code>Publisher</code>。</li>
+
+				<li>评级:该表显示了评级。每一行都提供了用户对一本书的评价。<code>Book-Rating</code>要么隐含为<code>0</code>，要么明确介于<code>1</code>和<code>10</code>之间(越高越受赞赏)。然而，在这个项目的背景下，我们将只关注对模型开发明确的评级。该表还包括<code>User-ID</code>和<code>ISBN</code>字段。</li>
+
+			</ul>
+
+			<p>此外，使用 Excel，我们<a id="_idIndexMarker664"/>使用 age 和 rating 列创建了两个额外的字段。我们创建了<code>RatingClass</code>字段，它将超过<code>7</code>的评分视为<code>High</code>评分，否则为<code>Low</code>。同样，我们创建了<code>AgeGroup</code>字段；这个阶层 40 岁以上为<code>Over Forty</code>，25 岁以下为<code>Under 25</code>，否则就简单的认为是<code>Between 25 and 40</code>。最后，我们删除了缺少年龄列的数据行。</p>
+
+			<h1 id="_idParaDest-167"><a id="_idTextAnchor193"/>治理模式</h1>
+
+			<p>使用 ML 治理的组织定义了一个规则和控制框架，用于管理与模型开发、生产和后期生产监控相关的 ML 工作流。ML 的商业重要性是众所周知的。尽管如此，投资并购的公司中只有一小部分实现了收益。一些企业努力确保 ML 项目的结果与他们的战略方向保持一致。重要的是，许多组织都受法规的约束，例如最近在欧盟和欧洲经济区内实施的通用数据保护法规，这影响了这些模型及其输出的使用。一般来说，企业需要控制其 ML 的使用，以确保满足监管要求，并不断实现战略目标和价值。</p>
+
+			<p>建立治理框架可以确保数据科学家能够专注于其角色的创新部分，即解决新问题。有了治理，数据科学家在评估他们的模型向企业交付的商业价值、评估模型的生产性能以及检查是否存在数据漂移方面花费的时间更少了。模型治理简化了所有生产模型的模型版本控制和变更跟踪过程。这始终是 ML 审计跟踪的一个关键方面。此外，当生产中的模型遇到异常和性能变化时，可以设置通知来提醒涉众。当性能显著下降时，生产中的模型可以与性能更好的挑战者模型无缝交换。尽管此流程可能需要其他利益相关方的审查和授权，但它比典型的数据科学工作流简单直接得多。</p>
+
+			<p>很明显，在整个过程中管理模型是一项复杂且耗时的任务。如果没有工具支持，数据科学团队很容易错过关键步骤。DataRobot 等工具使这项任务变得更容易，确保许多必需的任务自动执行。这种易用性有时也会让团队不假思索地使用这些工具。这也很危险。因此，需要明智地混合使用 DataRobot 等工具，并建立流程控制和审查，以确保适当的治理。</p>
+
+			<p>DataRobot 的 MLOps 为组织提供了 ML 模型治理框架，有助于风险管理。使用模型治理工具，业务主管可以跟踪重要的业务度量，并确保持续满足<a id="_idIndexMarker666"/>法规要求。他们可以轻松评估模型在生产中的性能，以确保模型符合目的。此外，有了治理，模型的商业重要性在部署之前就被定义了。这确保了当模型对业务至关重要时，对模型的某些更改需要在这些更改完全实现之前得到涉众的审查和授权。根据道德规范，使用 ML 模型有望实现公平的流程。因此，模型的输出应该清除任何形式的偏见。在本章的后续章节中，除了 MLOps 的其他方面，我们还将研究如何在开发和生产中减轻 ML 模型中的偏差。</p>
+
+			<h1 id="_idParaDest-168"><a id="_idTextAnchor194"/>解决模型偏差和公平性问题</h1>
+
+			<p>最大似然法的一个关键特征在于它从过去学习来预测未来。这意味着未来的预测会受到过去的影响。一些训练数据集的结构<a id="_idIndexMarker667"/>可能会在 ML 模型中引入偏差。这些偏见是基于人类系统中显而易见的不公平。众所周知，偏见会维持模型之前存在的偏见和不公平，并可能导致意想不到的后果。一个无法理解人类偏见的人工智能系统反映了(如果不是加剧了)训练数据集中存在的偏见。很容易理解为什么女性比男性更容易接受 ML 模型预测的低工资。在一个类似的例子中，使用历史数据驱动的 ML 模型的信用卡公司可以被引导向来自少数族裔背景的个人提供更高的利率。这种<strong class="bold">无根据的关联</strong>是由训练数据集中固有的人为偏见造成的。在模型开发中，将充满偏见的特性与不带偏见的特性放在一起是不公平的。在预测个人信用时，公平的过程会考虑个人的支付历史，但当预测基于其家庭的支付历史时，不公平的结果是可能的。</p>
+
+			<p>监督学习模型可能特别不公平，因为某些数据具有循环依赖性。例如，要获得信用卡，人们需要信用记录，而要有信用记录，就需要信用卡。由于模型对信用评估至关重要，因此有些人几乎不可能获得信用卡。此外，关于某些亚群体的有限数据使他们更容易受到偏见的影响。这是因为这些组的训练数据中的最小结果分布变化可能会扭曲该组成员的预测结果。这些都指向了 ML 模型应该管理偏差和支持公平过程的程度。</p>
+
+			<p>许多行业——比如医疗保健、保险和银行——采取具体措施来防范监管预期中的任何形式的偏见和不公平。虽然解决人类中的偏倚具有内在的挑战性，但解决 ML 偏倚稍微容易一些。因此，作为 ML 治理的一部分，解决 ML 偏见可能是确保他们的产品不会放大对 ML 系统的道德方面的怀疑的关键。</p>
+
+			<p>在解决潜在的不必要的结果时，DataRobot 引入了偏见和公平性监测和控制功能。这种能力是在模型开发期间选择和配置的。让我们后退一步，演示如何在 DataRobot 中解决偏见问题。与典型平台一样，我们按照前面章节中的描述上传数据。在项目配置窗口中(在<em class="italic">图 13.1 </em>中)，我们打开<strong class="bold">高级选项</strong>和<strong class="bold">偏差和公平</strong>选项卡:</p>
+
+			<ol>
+
+				<li>It is within this tab that we define protected features, how fairness is established and measured, as well as the target variable. We specify the fields in the prediction dataset that need to be protected. These are entered in the <code>AgeGroup</code> field is selected as to be protected (see <em class="italic">Figure 13.1</em>). In some industry datasets, attributes such as sex, ethnicity, age, and religion must be selected. In this way, DataRobot manages and presents metrics to measure any potential model bias within each of the protected fields:<div><img src="img/B17159_13_01.jpg" alt="Figure 13.1 – Configuring bias and fairness during the model development&#13;&#10;" width="1076" height="936"/></div><p class="figure-caption">图 13.1–在模型开发期间配置偏倚和公平性</p></li>
+
+				<li>接下来是<code>High</code>的<code>RatingClass</code>级。这使得能够在目标变量的这个水平上测量偏差。</li>
+
+				<li><code>Proportional Parity</code>、<code>Equal Parity</code>、<code>Prediction Balance</code>、<code>True Favorable Rate &amp; True Unfavorable Rate Parity</code>、<code>Favorable Predictive &amp; Unfavorable Predictive Value Parity</code>。</li>
+
+				<li>If a user is unsure of the metric to choose, they can click on <strong class="bold">Help Me Choose</strong>, which presents <a id="_idIndexMarker670"/>a further set of questions. Answering these questions presents a recommendation of a <strong class="bold">Fairness Metric</strong> value, as shown in <em class="italic">Figure 13.2</em>: <div><img src="img/B17159_13_02.jpg" alt="Figure 13.2 – Fairness Metric recommendation&#13;&#10;" width="1313" height="1313"/></div><p class="figure-caption">图 13.2–公平性指标建议</p><p>在选择我们的指标时，因为我们对我们的模型在年龄组成员中具有相似的预测准确性非常感兴趣，所以选择了<strong class="bold">等误差</strong>选项，以响应我们想要如何测量模型公平性。由于我们的结果分布在高低之间有些平衡，我们选择<strong class="bold">No</strong>to<strong class="bold">有利的目标结果是否出现在很小比例的人口中？</strong>提问。随后，DataRobot 建议<strong class="bold">真实有利比率&amp;真实不利比率平价</strong>。在整个过程中，该平台提供了选项的描述，并对推荐的指标以及其他指标进行了解释。</p></li>
+
+				<li>点击<em class="italic">图 13.3 </em>中呈现的<code>AgeGroup</code> <code>Light Gradient Boosting on Elastic Predictions</code>模型低于默认阈值:</li>
+
+			</ol>
+
+			<div><div><img src="img/B17159_13_03.jpg" alt="Figure 13.3 – Per-Class Bias exploration&#13;&#10;" width="1650" height="823"/>
+
+				</div>
+
+			</div>
+
+			<p class="figure-caption">图 13.3-每类偏差探究</p>
+
+			<p>根据这一<a id="_idIndexMarker672"/>结果，该模型在预测<code>Between 25 and 40</code>类别中个人的真正不利结果(的<code>Low</code>评级)方面的准确性低于其他两个类别。该课程的分数低于默认的 80%阈值。80%的默认阈值适用于<code>Between 25 and 40</code>类。<em class="italic">图 13.4 </em>展示了<strong class="bold">跨类准确性</strong>(一组更全面的准确性指标)如何用于评估跨受保护类的准确性:</p>
+
+			<div><div><img src="img/B17159_13_04.jpg" alt="Figure 13.4 – Cross-Class Accuracy examination&#13;&#10;" width="1650" height="693"/>
+
+				</div>
+
+			</div>
+
+			<p class="figure-caption">图 13.4-跨类别准确性检查</p>
+
+			<p><code>AgeGroup</code>阶级。正如图 13.4 中<em class="italic">的结果所示，在所有精度测量中，<code>Between 25 and 40</code>类的<a id="_idIndexMarker673"/>模型的精度似乎较低。因为，正如前面提到的，当它是有利的类别时，模型的性能在各个类别之间是相似的，只有对于<code>Between 25 and 40</code>类别的不利结果的较低真实比率似乎影响模型的公平性。因为模型从过去的数据中学习，探索可能导致这种偏差的特征对于采取进一步的行动可能是至关重要的。<em class="italic">图 13.5 </em>显示了<strong class="bold">跨类数据差异</strong>能力，该能力深入探究了为什么在 ML 模型中存在偏差:</em></p>
+
+			<div><div><img src="img/B17159_13_05.jpg" alt="Figure 13.5 – A Cross-Class Data Disparity comparison between two age classes&#13;&#10;" width="1650" height="573"/>
+
+				</div>
+
+			</div>
+
+			<p class="figure-caption">图 13.5-两个年龄组的跨组数据差异比较</p>
+
+			<p>为了探究模型偏差背后的基本原理，<code>Age-Group</code>特性似乎会影响模型的准确性。这是因为作为预测变量的<code>Age-Group</code>与其他变量相比将具有最大的差异，因为它与预测变量相同。<code>year</code>书的数据差异较小，但比<code>Age-Group</code>功能更重要。对右侧图表中<a id="_idIndexMarker674"/>年份分布的进一步检查(<em class="italic">图 13.6 </em>)显示，与<code>Between 25 and 40</code>组相比，<code>Over Forty</code>组似乎对较老的书籍和缺少年份的书籍进行了更多的评级。相反，<code>Between 25 and 40</code>这一批人似乎比他们的老同行更喜欢新书。</p>
+
+			<p>当模型偏差超过企业设定的阈值时，需要采取措施来管理这种不公平性。解决这种不公平的选项包括删除可能导致偏差的特征并重新训练模型，或者将模型更改为更符合道德的模型。大多数时候，这些变化最终会影响模型的整体准确性。然而，在我们的例子中，<code>Light Gradient Boosting on Elastic Predictions</code>并不是我们表现最好的模型。DataRobot 在其偏差和公平性工具<a id="_idTextAnchor195"/>中具有<strong class="bold">偏差与准确性</strong>排行榜比较功能(参见<em class="italic">图 13.6 </em>):</p>
+
+			<div><div><img src="img/B17159_13_06.jpg" alt="Figure 13.6 – Bias vs Accuracy leaderboard&#13;&#10;" width="1650" height="957"/>
+
+				</div>
+
+			</div>
+
+			<p class="figure-caption">图 13.6–偏差与精度排行榜</p>
+
+			<p><code>Keras Residual AutoInt Classifier using Training Schedule</code>是最准确的模型，符合伦理标准。在这种情况下，该模型可以部署到<a id="_idIndexMarker675"/>生产中。值得注意的是，目前许多监管机构通常不接受基于神经网络的模型，但这种情况在未来可能会发生变化。</p>
+
+			<p>关于评估 ML 模型偏差和公平性的流程预计将集成到数据科学工作流中，以确保模型结果支持公平的流程。随着关于道德人工智能的对话在各行各业变得越来越普遍，这变得更加重要。在了解了确保模型公平的方法之后，我们现在将在下一节中继续部署公平模型、监控生产中的模型性能以及实现 MLOps 的其他方面。</p>
+
+			<h1 id="_idParaDest-169"><a id="_idTextAnchor196"/>实施 MLOps</h1>
+
+			<p>DataRobot 通过其 MLOps 套件提供了一些功能，使用户不仅能够在生产中部署模型，还能够治理、监控和管理生产中的模型。在前面的章节中，我们已经了解了如何在平台上部署模型，以及如何使用 Python API 客户端。MLOps 提供了自动化的模型监控功能，可以跟踪生产中模型的服务健康、准确性和数据漂移。生产模型的自动化实时监控确保了模型具有高质量的输出。此外，当出现性能退化时，利益相关者会得到通知，因此可以采取措施。</p>
+
+			<p>在本节中，我们将重点关注本书第八章 、<em class="italic">模型评分和部署</em>中未涉及的模型监控方面。我们研究了如何通过服务运行状况和数据漂移功能来检查部署服务的质量，以及训练数据和预测数据之间的下划线特征分布随时间的变化。久而久之，更近的数据与目标变量被引入部署。然后，DataRobot 可以检查模型的初始预测，并确定模型在生产中的实际准确性。DataRobot 还提供了在生产中不同型号之间切换的能力。本节重点介绍生产模型准确性的评估、通知的设置以及在生产中切换模型。</p>
+
+			<p>正如您现在所猜测的，一旦部署了模型，数据科学团队的工作就不会结束。我们现在必须在生产中监控我们的模型。在模型被部署之后，在参与关于模型监控的对话之前，我们需要控制个人可以对那些部署做什么。利益相关者的角色和责任是 MLOps 治理的重要方面。ML 解决方案的成功实施依赖于角色的清晰定义以及利益相关者在 ML 模型生产生命周期中的实际职责。正如<em class="italic">图 13.7 </em>所强调的，当与其他利益相关者共享部署时，每个利益相关者都被赋予一个角色，该角色定义了他们对该部署的访问级别:</p>
+
+			<div><div><img src="img/B17159_13_07.jpg" alt="Figure 13.7 – Sharing deployments&#13;&#10;" width="1309" height="963"/>
+
+				</div>
+
+			</div>
+
+			<p class="figure-caption">图 13.7–共享部署</p>
+
+			<p>要打开部署共享窗口(如图<em class="italic">图 13.7 </em>所示)，在模型部署后，选择右上角的部署操作按钮(三重虚线图标)。然后，<strong class="bold">分享</strong>被选中。在这里，这个<strong class="bold">分级预测</strong>部署<a id="_idIndexMarker677"/>与利益相关者<a href="mailto:ben@aaaa.com">ben@aaaa.com</a>分享。重要的是，这个人被赋予了用户的角色。对于<strong class="bold">用户</strong>角色，该涉众可以读写。实际上，他们可以查看部署、使用预测、查看部署清单、使用 API 获取数据，以及向部署添加其他用户。<strong class="bold">所有者</strong>级别拥有额外的管理权限，可以执行关键业务操作，比如删除部署、替换模型以及编辑部署元数据。最低的用户角色是<strong class="bold">消费者</strong>，它只允许涉众通过 API 途径消费预测。</p>
+
+			<p>生产模型监控确保模型在开发过程中继续交付高质量的业务影响。这种质量的下降是生产数据分布变化或特征影响内生变量程度变化的结果。例如，使用的变化会影响客户流失，这是一个对企业很重要的变量。在假期期间，自然减员的预测会更高。如果企业没有预料到这种分布或数据漂移的变化，这种流失预测的波动会引起企业的担忧。同样，预测变量对业务结果的影响程度也可能发生变化。一个例子是价格对购买倾向的影响。在疫情的高峰期，个人在购买非必需品时要保守得多。现在，想象一下为疫情之前生产的非必需品建立的生产中购买倾向模型的准确性。很容易看出，模型的准确性在生产中会很快下降，从而对业务绩效产生重大影响。这种情况需要在部署后监控模型的性能。</p>
+
+			<p>在<a href="B17159_08_Final_NM_ePub.xhtml#_idTextAnchor116"> <em class="italic">第 8 章</em> </a>、<em class="italic">模型评分和部署</em>中，我们介绍了数据漂移，它检查训练数据集和生产数据集之间的分布变化，同时说明它们的特征重要性。在这里，我们的重点将转移到监控生产过程中变量对结果的影响。这种影响的变化可以通过监控生产模型的准确性来确定，这是 DataRobot 提供的一项功能。作为<strong class="bold">部署设置</strong>窗口的一部分，如图<em class="italic">图 13.8 </em>所示，有一个<strong class="bold">精度</strong>选项卡:</p>
+
+			<div><div><img src="img/B17159_13_08.jpg" alt="Figure 13.8 – Deployment window for accuracy setup&#13;&#10;" width="1573" height="1183"/>
+
+				</div>
+
+			</div>
+
+			<p class="figure-caption">图 13.8-准确度设置的部署窗口</p>
+
+			<p><strong class="bold">精度</strong>选项卡提供对生产模型精度的洞察。这种能力允许用户<a id="_idIndexMarker679"/>随时检查他们的生产模型的性能。为了计算生产模型的准确性，需要提供实际结果。上传实际值后，为了生成精确度，需要填写一组字段。其中包括<strong class="bold">实际响应</strong>和<strong class="bold">关联 ID </strong>字段，以及可选字段，<strong class="bold">作用于</strong>和<strong class="bold">时间戳</strong>(参见<em class="italic">图 13.9 </em>):</p>
+
+			<div><div><img src="img/B17159_13_09.jpg" alt="Figure 13.9 – Accuracy setup features&#13;&#10;" width="1234" height="708"/>
+
+				</div>
+
+			</div>
+
+			<p class="figure-caption">图 13.9-精度设置特征</p>
+
+			<p><code>RatingClass</code>。为了将其链接到较早的预测数据集，请求本例中的<code>rowid</code>来启用该连接。值得注意的是，有时由于模型的预测，企业采取的行动最终会影响结果。为了在计算精度时考虑这种可能性，可选择请求<strong class="bold">作用于</strong>和<strong class="bold">时间戳</strong>变量(参见<em class="italic">图 13.10 </em>选择这些特征):</p>
+
+			<div><div><img src="img/B17159_13_10.jpg" alt="Figure 13.10 – Production accuracy identification feature selection&#13;&#10;" width="1650" height="1092"/>
+
+				</div>
+
+			</div>
+
+			<p class="figure-caption">图 13.10-生产精度识别特征选择</p>
+
+			<p>选择<a id="_idIndexMarker681"/>强制变量后，点击<strong class="bold">保存</strong>按钮。这将关闭计算，然后打开<strong class="bold">精度</strong>窗口，显示模型的生产精度。生产模型的性能以图块和图形时间序列的形式呈现。<em class="italic">图 13.11 </em>显示了<strong class="bold">展开精度</strong>窗口。选择<strong class="bold"> LogLoss </strong>、<strong class="bold"> AUC </strong>、<strong class="bold"> Accuracy </strong>、<strong class="bold"> Kolmogorov-Smirmov </strong>和<strong class="bold"> Gini Norm </strong>度量块。<strong class="bold"> Start </strong>显示模型在开发过程中针对维持数据集的性能。看来这个模型在生产中比在培训中更好。通过自定义图块，可以选择其他指标及其顺序。<strong class="bold">精度随时间变化图</strong>显示了模型的精度是如何随时间变化的。图表中最左侧的绿色点表示开发期间模型相对于维持数据集的准确性:</p>
+
+			<div><div><img src="img/B17159_13_11.jpg" alt="Figure 13.11 – production model performance assessment over time&#13;&#10;" width="1650" height="716"/>
+
+				</div>
+
+			</div>
+
+			<p class="figure-caption">图 13.11-一段时间内的生产模型性能评估</p>
+
+			<p><code>Low</code>。有一个<a id="_idIndexMarker682"/>选项可以改变正在探索的职业。值得注意的是，通过这些，可以监控不同级别的<code>AgeClass</code>保护变量的模型的准确性。这可以通过在<strong class="bold">段属性</strong>选项中选择<code>AgeClass</code>，然后在<strong class="bold">段值</strong>字段中选择任一级别来完成。虽然在目前的场景中，生产准确性反映了数据漂移的准确性，但是可以配置通知，以便在指标偏离对业务产生负面影响时通知利益相关方。在下一节中，我们将讨论这些通知，以及如何在部署中更改模型。</p>
+
+			<h1 id="_idParaDest-170"><a id="_idTextAnchor197"/>生产中的通知和变更模型</h1>
+
+			<p>在这一章中，我们已经确定了为什么模型的商业影响会衰减，以及在 DataRobot 平台中跟踪这种影响的方法<a id="_idIndexMarker683"/>。在端到端预测过程完全自动化且人工干预有限的情况下，通知利益相关方生产模型性能的任何重大变化的系统变得至关重要。DataRobot 可以针对服务健康、数据漂移和准确性方面的重大变化发送通知。这些通知可以在<strong class="bold">部署</strong>窗口中设置和配置:</p>
+
+			<ol>
+
+				<li value="1">From the <strong class="bold">Settings</strong> tab, select <strong class="bold">Notifications</strong>. As shown in <em class="italic">Figure 13.12</em>, three options are presented: notifications being sent for all events, notifications for critical <a id="_idIndexMarker685"/>events, and no notifications being sent. Notifications for all events <a id="_idIndexMarker686"/>are sent by email; all changes to the deployments are emailed to the owner:<div><img src="img/B17159_13_12.jpg" alt="Figure 13.12 – Deployment Notifications setup&#13;&#10;" width="892" height="858"/></div><p class="figure-caption">图 13.12–部署通知设置</p><p>在<em class="italic">图 13.12 </em>中，通知被设置为只通知我关键的部署活动。该设置意味着当部署中出现关键活动时，涉众会得到通知。</p></li>
+
+				<li>The <code>1:00</code>. There are options to set notifications to occur anywhere between an hourly and quarterly monitoring cadence. When the box is unchecked, the notification is disabled: <div><img src="img/B17159_13_13.jpg" alt="Figure 13.13 – Monitoring notification setup&#13;&#10;" width="1449" height="1035"/></div><p class="figure-caption">图 13.13–监控通知设置</p></li>
+
+				<li><code>Last 7 days</code>通知，表示将前七天的数据分布与训练数据的分布进行比较。</li><li>Being a feature drift metric, the <code>0.2</code>. Some features can be excluded from drift tracking using the <code>0.45</code> is entered as the <code>0.45</code> are deemed as <code>0.45</code>) drifts beyond a <code>0.2</code> <p>b.当五个或更多低重要性特征具有显著漂移时，发送失败通知</p><p>c.当一个或多个高重要性特征具有漂移<code>0.45</code>时，发送失败通知</p></li>
+
+				<li>Notifications pertaining to the <code>AUC</code>, <code>Accuracy</code>, <code>Balance Accuracy</code>, <code>LogLoss</code>, and <code>FVE Binomial</code>, among others. In this case, <code>Logloss</code> is chosen.<p>b.选择<code>percent</code>变更。</p><p>c.然后在<code>1:00</code>为<code>Every day</code>设置规则。这些可以配置为每日和每季度之间的任意频率。</p></li>
+
+				<li>After this setup, clicking the <strong class="bold">Save new setting</strong> button activates the notification routine. However, it is noteworthy that any stakeholder who has access to <a id="_idIndexMarker691"/>the deployment can configure the notifications they want to receive. When models' changes become significant, it might become <a id="_idIndexMarker692"/>necessary to replace the model in the deployment.<p>生产模型的性能往往会随着时间而衰减。这就需要模型来替换部署中的模型。在 MLOps 产品中，DataRobot 提供模型替换功能。要更改部署中的模型，您可以导航到<strong class="bold">部署概述</strong>窗口。从<strong class="bold">展开概述</strong>窗口右侧的<strong class="bold">动作</strong>按钮中选择<strong class="bold">更换型号</strong>选项(参见<em class="italic">图 13.14 </em>):</p></li>
+
+				<li>Clicking the <strong class="bold">Replace model</strong> option presents a <strong class="bold">Paste DataRobot model URL</strong> request. This URL is for the location at which the new model can be found when opened from the leaderboard:<div><img src="img/B17159_13_14.jpg" alt="Figure 13.14 – Production model replacement&#13;&#10;" width="882" height="575"/></div><p class="figure-caption">图 13.14-生产模型替换</p></li>
+
+				<li>当<code>Accuracy</code>、<code>Data Drift</code>、<code>Errors</code>、<code>Scheduled Refresh</code>、<code>Scoring Speed</code>时。如<em class="italic">图 13.15 </em>所示，此时选择<code>Data Drift</code>。</li>
+
+				<li>最后，点击<strong class="bold">接受并替换</strong>:</li>
+
+			</ol>
+
+			<div><div><img src="img/B17159_13_15.jpg" alt="Figure 13.15 – Selecting the rationale for model replacement&#13;&#10;" width="1096" height="646"/>
+
+				</div>
+
+			</div>
+
+			<p class="figure-caption">图 13.15–选择模型替换的基本原理</p>
+
+			<p>替换了部署中的模型后，此部署的未来预测将使用更新后的模型。需要强调的是，型号更换只能由部署<a id="_idIndexMarker696"/>负责人<a id="_idIndexMarker695"/>执行。有些情况下，模型的商业影响非常大。在这种情况下，建议在切换模型之前，在合成或模拟环境中测试新模型或挑战者模型。在典型的数据科学工作流中，冠军/挑战者模型场景已经建立。在这里，挑战者模型计算预测，它们的性能与生产中的冠军相比较。随着测试和影响分析的完成，我们现在准备部署我们的模型。DataRobot 为数据科学家提供了在 challenger 生产过程中测试多个 challenger 模型的能力。这简化了更换型号时的型号选择过程。</p>
+
+			<p>MLOps 还提供了由不同的利益相关者审查模型中的变更的能力。为了实现这一点，模型在其部署中被分配了重要性级别。这些重要性级别取决于模型结果对业务的战略商业影响、预测量和监管预期。此后，重要性级别决定了谁需要在实施部署更改之前审查这些更改。</p>
+
+			<h1 id="_idParaDest-171"><a id="_idTextAnchor198"/>总结</h1>
+
+			<p>在这一章中，我们强调了建立一个指导在商业中使用 ML 模型的框架的价值。ML 治理能力支持用户确保 ML 模型在满足监管期望的同时继续交付商业价值。此外，我们对不同层次的利益相关者可以对 ML 部署做什么进行控制。在某些行业，有必要在任何决策过程中认真考虑偏见的影响。因为 ML 模型是基于可能受到人类偏见影响的数据，所以这些模型可能会加剧这种偏见。因此，我们探索了在模型开发期间和之后减轻 ML 偏倚的方法。</p>
+
+			<p>我们还研究了特征对结果变量的影响。这种变化可能会对业务成果产生重大影响，因此需要监控模型成果在生产中的表现。在这一章中，我们探讨了随着时间的推移评估模型性能的方法。重要的是，我们学会了如何在数据漂移或/和模型准确性发生重大变化时配置通知。此外，我们还研究了如何根据需要将生产中的模型转换为挑战者。</p>
+
+			<p>我们还强调了其他一些没有在本章中深入讨论的 MLOps 特性。在下一章中，我们将着眼于我们所认为的 DataRobot 和自动化 ML 的未来。此外，鉴于本书并未涵盖 DataRobot 的所有内容，并且该平台一直在扩展其功能，在下一章中，我们将指出一些可以获得进一步开发的其他信息的地方。</p>
+
+		</div>
+
+	</div>
+
+</body></html>

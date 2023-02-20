@@ -1,0 +1,203 @@
+<html><head/><body>
+
+
+
+
+
+
+
+
+
+
+
+<style type="text/css">body{margin:1em;background-color:transparent!important;}#sbo-rt-content *{text-indent:0pt!important;}#sbo-rt-content .bq{margin-right:1em!important;}</style>
+
+<div><div><h1 id="_idParaDest-144">第十一章:使用地理空间数据、自然语言处理和图像处理</h1>
+
+			<p>在本书中，到目前为止，我们主要关注数字和分类特征。大数据并非总是如此，因为随着大数据而来的是越来越多的数据种类。图像、文本和地理空间数据在获取洞察力和为最复杂的问题提供解决方案方面变得越来越有价值。例如，最近，<strong class="bold">基于位置的</strong>数据已经被用来提高广告活动的效果。例如，可以根据用户的位置向用户显示不同的广告；如果他们是咖啡爱好者并且靠近咖啡店，推送通知可以被发送到他们的移动设备。在其他情况下，基于高级文本分析或自然语言处理的聊天机器人为企业提供了解决客户问题的有效途径。最有趣也是解决商业问题的新兴方法是使用<strong class="bold">多模态</strong>数据集，它在同一个项目中结合了不同的变量类型。</p>
+
+			<p>可以理解的是，分析不同变量类型的主题本身就足以在一本书中涵盖。然而，提供不同变量类型分析的概述是 DataRobot 在构建涉及文本、图像和位置数据的多模态模型中使用的基础。牢记这一点，在本章中，我们将深入研究文本、图像和地理空间数据的定义和分析方法。此后，我们将使用 DataRobot 构建一个模型并进行预测，该模型利用了多模态数据集在预测房价方面的独特性。因此，将涉及的主题如下:</p>
+
+			<ul>
+
+				<li>地理空间、文本和图像数据的概念性介绍</li>
+
+				<li>在 DataRobot 中定义和设置多模态数据</li>
+
+				<li>在 DataRobot 中使用多模态数据集构建模型</li>
+
+				<li>在 DataRobot 中使用多模态数据集进行预测</li>
+
+			</ul>
+
+			<h1 id="_idParaDest-145"><a id="_idTextAnchor162"/>技术要求</h1>
+
+			<p>本章中进行的大多数分析和建模都需要访问 DataRobot 软件。一些操作是使用其他工具进行的，包括 MS Excel。本章中使用的数据集是房屋数据集。</p>
+
+			<h2 id="_idParaDest-146"><a id="_idTextAnchor163"/> <a id="_idTextAnchor164"/>房屋数据集</h2>
+
+			<p>房屋数据集可以在伊曼·哈迈德·艾哈迈德的 GitHub 账户(<a href="https://github.com/emanhamed">https://github.com/emanhamed</a>)访问。这个数据集中的每一行代表一个特定的房子。初始特征集描述了它的特征、价格、邮政编码、卧室、浴室、厨房的图像和正面视图。没有丢失数据。我们继续根据卧室、浴室、城市、国家、州的数量以及房产的实际大小，为每栋房子开发文本描述。在其他地方，邮政编码被转换为纬度和经度，并作为列添加到数据集。GitHub 链接提供了关于基本功能的更多信息，数据以<code>.csv</code>格式提供。</p>
+
+			<p class="callout-heading">数据集引用</p>
+
+			<p class="callout">从视觉和文字特征估计房价。《第八届国际计算智能联合会议论文集》，<em class="italic">h . Ahmed e .</em>Moustafa m .<em class="italic">(2016)。(IJCCI 2016)ISBN 978-989-758-201-1，第 62-68 页。DOI:10.5220/0006040700620068</em></p>
+
+			<h1 id="_idParaDest-147">地理空间、文本和图像数据的概念性介绍</h1>
+
+			<p>就像我们使用不同的感官来整体理解我们周围的物体一样，<strong class="bold">机器学习</strong> ( <strong class="bold"> ML </strong>)模型也受益于来自不同类型的传感器和来源的数据。只有一种类型的数据(例如，数字或分类)会限制对模型的<a id="_idIndexMarker548"/>理解、可预测性和健壮性的水平。在本节中，我们将更深入地讨论不同数据类型在构建模型中的业务重要性、相关的挑战以及减轻这些挑战所需的预处理步骤。<a id="_idTextAnchor166"/> <a id="_idTextAnchor167"/></p>
+
+			<h2 id="_idParaDest-148"><a id="_idTextAnchor168"/>地理空间人工智能</h2>
+
+			<p>地理空间理解对某些行业的决策具有长期影响，包括矿产开发、保险、零售和房地产。虽然数据科学的商业重要性已经确立，但基于位置的人工智能才刚刚开始获得认可。ML 在提高业务绩效中的使用已经凸显了在构建预测模型时用基于位置的信息和特征扩充数据集的重要性。</p>
+
+			<p>典型的 ML 模型主要建立在分类和数字数据的基础上，为实现商业目标做出了巨大的贡献，但是决策不仅仅是由数字和分类信息决定的。事实上，这些事件发生在特定的地点。ML 模型需要基于位置的信息，以便位置上下文有效地呈现商业洞察和预测。在一个地方行得通，在另一个地方可能行不通。</p>
+
+			<p>使用 ML 和基于位置的信息的潜在商业影响伴随着几个挑战:</p>
+
+			<ul>
+
+				<li>缺乏数据集、工具和人际技能。</li>
+
+				<li>将 ML <a id="_idIndexMarker550"/>管道连接到本地基于位置的分析技术并不简单。</li>
+
+				<li>只有少数 R 和 Python 包具有地理空间功能。</li>
+
+				<li>理解这些能力需要对分析师进行进一步的教育和培训。</li>
+
+			</ul>
+
+			<p>DataRobot 的位置人工智能功能有助于缓解其中的一些挑战。位置 AI 功能通过添加地理空间分析和建模工具来补充现有的 AutoML 体验。使用 DataRobot，可以从数据集中选择位置要素，但位置 AI 功能使平台能够自动识别地理空间数据并创建地理空间要素。可以上传各种地理空间数据文件格式。其中包括 GeoJSON、Esri shapefiles、地理数据库、PostGIS 表以及传统的纬度和经度数据。</p>
+
+			<h2 id="_idParaDest-149"><a id="_idTextAnchor169"/>自然语言处理</h2>
+
+			<p>作为人类，我们通过大量的单词进行有效的交流，无论使用的单词量有没有限制。除了语言，肢体语言、语调和语境对有效沟通也至关重要。例如，使用同一套单词，<em class="italic">猫比狗大</em>和<em class="italic">狗比猫大</em>有不同的意思。自然，人类理解，得出结论，并基于自由文本对未来做出预测。自由文本的使用带来了有价值的信息，从中可以收获丰富的见解。然而，由于自由文本无法遵循一致的结构，它们给机器处理带来了挑战。</p>
+
+			<p>对话和其他形式的自由文本是杂乱和无结构的，因为它们不适合传统的行列表格。<strong class="bold">自然语言处理</strong> ( <strong class="bold"> NLP </strong>)位于数据科学和语言学的交汇点，涉及到系统地使用<a id="_idIndexMarker551"/>高级流程来分析、理解和从自由文本中提取数据。通过 NLP，科学家可以利用自由文本生成有价值的见解，然后将这些见解作为功能集成到构建性能更好的模型中。文本挖掘允许识别与特定结果相关联的独特单词或单词组。例如，在房价预测案例中，对房屋的描述提高了模型在估计房价时的可预测性。想想看，这种描述也有助于个人的购房决定。个人购房倾向影响房地产定价。NLP 算法可以识别单词排序的效果，并影响单词或短语以及单词在句子中的上下文。</p>
+
+			<p>自然语言处理是机器能够从文本中提取重要信息的关键。因此，NLP 允许机器通过给文本打分来决定自由文本中描述的情感，表明其对某个主题或事件的情感。同样，它有助于识别某些单词最有可能属于的类别。这种能力已经产生了一些应用，包括文本分类、命名实体识别、情感分析和文本摘要。</p>
+
+			<p>获取自由文本以提供有用的见解或集成到模型中并不是一件容易的事情。正如前面提到的，原始文本没有结构，所以需要引入结构。此外，许多单词有相同的意思，你可以让同一个单词在不同的上下文中有不同的意思。在一个典型的分析过程中，需要采取许多步骤来规范化自由文本。至少需要四个步骤:</p>
+
+			<ol>
+
+				<li>大多数文本处理的第一步是将文本语料库分割成独立的单词。这一步骤也被称为<strong class="bold">标记化</strong>，能够识别关键词和短语。分开的<a id="_idIndexMarker552"/>单词被称为令牌。n 元语法是文本分析的基本单位。</li>
+
+				<li>其次，有些单词对文章的意义贡献很小或没有贡献。这些都是<a id="_idIndexMarker553"/>一般常见的词；例如，在英语中，我们有诸如<em class="italic">的</em>、<em class="italic">的</em>、<em class="italic">的</em>和<em class="italic">这些</em>的单词。在文本挖掘的<a id="_idIndexMarker554"/>上下文中，这些词被称为干扰词，或者有时被称为停用词。所以，这个步骤叫做<strong class="bold">去噪</strong>。</li>
+
+				<li>之后，单词被转换成它们的词根意义。有几种方法可以解决这个问题。举例来说，<strong class="bold">词干</strong>通常通过删除某些字母来转换为词根。所以像<em class="italic">快乐</em>、<em class="italic">幸福</em>、<em class="italic">快乐</em>、<em class="italic">最快乐</em>这样的词，都会被归到词根<em class="italic"> happ </em>。因为同一个单词可能有多个意思，所以单词的消歧在文本处理中变得至关重要。词干化通过切断单词的前缀或后缀将单词返回到它们的词根，<strong class="bold">引理化</strong>检查单词的上下文以<a id="_idIndexMarker556"/>确保词干化后的单词被转换为称为<strong class="bold">引理</strong>的逻辑基。例如，单词<em class="italic">预计</em>被词干化后<a id="_idIndexMarker557"/>可能会返回给<em class="italic">和</em>。然而，在上下文中，<em class="italic"> ant </em>没有意义；因此，lemming 将确保单词<em class="italic">prevent</em>被保留。</li>
+
+				<li>A final, yet important, step is the process of <code>0</code> and <code>255</code>, referred to as <code>0</code> is shown as completely black, while <a id="_idIndexMarker562"/>completely white gives <code>255</code>. On the other hand, color images have 3D arrays with blue, green, and red layers. Like black <a id="_idIndexMarker563"/>on the grayscale images, each of those layers has its own values from <code>0</code> to <code>255</code>, where the final color is a combination of corresponding values on each of the three layers.<p>图像处理通常遵循预定义的步骤，从图像中提取与提取目的一致的有用且一致的特征。<code>.csv</code>文件放在图像文件夹旁边。为卧室、浴室、前视图和厨房创建了四个新的图像列。因此，<code>.csv</code>文件中的每个数据行都有指向其图像的路径，如<em class="italic">表 11.2 </em>所示。这些路径指向 ZIP 文件中相应图像文件的位置。在 ZIP 文件中，带有表格特性的<code>.csv</code>文件需要放到文件夹中，包含所有的图片。每个图像都有一个唯一的名称，与<code>.csv</code>文件上的图像路径列一致。ZIP 文件和<code>HousePrice</code>文件夹的设置如图<em class="italic">图 11.1 </em>所示。也就是说，数据集仍然可以使用人工智能目录来获取。这也使 DataRobot 能够连接到图像的其他数据源。此外，如果您可以使用 Paxata 工具，则可以在数据预处理中部署该工具:</p><div><img src="img/B17159_11_03.jpg" alt="Figure 11.3 – Data setup for the ZIP file (left) and image folder (right)&#13;&#10;" width="902" height="371"/></div><p class="figure-caption">图 11.3–ZIP 文件(左)和图像文件夹(右)的数据设置</p><p><em class="italic">图 11.1 </em>左图显示了如何设置 ZIP 文件。包含<a id="_idIndexMarker573"/>图像文件<code>Houses Dataset</code>的文件夹是<code>HousePrice.csv</code>文件旁边的<a id="_idIndexMarker574"/>。右边的<a id="_idIndexMarker575"/>图像显示了<code>Houses Dataset</code>文件夹中的<a id="_idIndexMarker576"/>图像文件。这里，图像被标记，位置与数据上的单元格一致，<code>HousePrice.csv</code>(如<em class="italic">表 11.2 </em>所示)。数据设置完成后，下一步是开始模型开发。</p><h1 id="_idParaDest-152">在 DataRobot 中使用多模态数据集构建模型</h1><p>已经用多模态数据集完全设置了我们的 ZIP 文件，我们继续在 DataRobot 中启动项目。使用拖放方法的数据摄取类似于前面的<a id="_idIndexMarker577"/>项目，除了在这个<a id="_idIndexMarker578"/>案例中我们上传了 ZIP 文件。在上传 ZIP 文件之后，价格被选为目标变量。DataRobot <a id="_idIndexMarker579"/>自动检测文本、图像和地理空间字段(见<em class="italic">图 11.2 </em>)。几何要素是基于位置的要素，由原始数据集中的纬度和经度变量组成。除了纬度和经度坐标之外，位置要素还可以由其他本地地理空间<a id="_idIndexMarker582"/>格式构成，例如 Esri shapefiles、GeoJSON 和 PostGIS 数据库。这些可以使用拖放、人工智能目录或 URL 方法上传:</p><div><img src="img/B17159_11_04.jpg" alt="Figure 11.4 – Feature Name list&#13;&#10;" width="1165" height="659"/></div><p class="figure-caption">图 11.4–功能名称列表</p></li>
+
+				<li>The location-based visual representation of the listing price can be viewed by selecting the <code>Price</code> option in the <code>Feature Name</code> list. This <code>Geospatial Map</code> tab and clicking on the <code>Compute feature over map</code> button. As seen in <em class="italic">Figure 11.3</em>, the <code>Geospatial Maps</code> window offers a location-based analytics visualization of the dataset. It shows the distribution of properties over space – the number of houses in each area and their average prices: <div><img src="img/B17159_11_05.jpg" alt="Figure 11.5 – Geospatial Map&#13;&#10;" width="1479" height="616"/></div><p class="figure-caption">图 11.5-地理空间地图</p><p>地图图例提供了关于地图的重要信息。它突出显示了<a id="_idIndexMarker583"/>六边形的颜色显示了该位置的平均房价。在其他地方，它用六边形的高度来表示案件发生的频率。该 ESDA 功能不仅显示了地图上房价的<a id="_idIndexMarker585"/>视觉分布，还显示了不同区域的房屋数量。类似的地理空间分析可用于其他要素，如房屋面积变量和卧室。</p><p>这种对图像特征的初步检查可以通过选择任何图像变量来进行。这显示了<strong class="bold">特征名称</strong>列表中的图像样本。在这里，可以看到不同的图像特征，并按房价范围进行组织。</p></li>
+
+				<li>To further explore the image features at a property level, we click on <code>.csv</code> file with image paths, the images are integrated into the dataset (see <em class="italic">Figure 11.4</em>). For each of the rows, the images are clearly displayed. A further <a id="_idIndexMarker586"/>scroll <a id="_idIndexMarker587"/>will show the free <a id="_idIndexMarker588"/>text description of the listed properties. This multimodal dataset of text, location, and image features can now be used to build a more robust model and make predictions of house prices:<div><img src="img/B17159_11_06.jpg" alt="Figure 11.6 – The DataRobot view of the multimodal data&#13;&#10;" width="1085" height="601"/></div><p class="figure-caption">图 11.6–多模态数据的 DataRobot 视图</p></li>
+
+				<li>As with earlier projects, we click on <strong class="bold">Start</strong> to commence the model-building process. On completion <a id="_idIndexMarker589"/>of the modeling process, the models <a id="_idIndexMarker590"/>are evaluated <a id="_idIndexMarker591"/>using the <strong class="bold">RMSE metric</strong>. The leaderboard shows DataRobot has built 36 models in total. The <a id="_idIndexMarker592"/>top-performing is the <strong class="bold">Nystroem Kernel SVM Regressor</strong> model. <p>从<em class="italic">图 11.5 </em>中可以看出，打开模型会呈现其蓝图，概述为该模型准备数据所需的所有步骤。由于<a id="_idIndexMarker593"/>数据的多模态性质，预处理步骤相当复杂。DataRobot <a id="_idIndexMarker594"/>进行地理空间处理，集成了一些数字变量<a id="_idIndexMarker595"/>和高级图像和文本处理(后者在<em class="italic">图 11.5 </em>中不可见)。有关每个步骤的更多信息，请单击步骤框，了解建模步骤，并链接到该步骤的综合文档:</p><div><img src="img/B17159_11_07.jpg" alt="Figure 11.7 – The model blueprint for multimodal data modeling&#13;&#10;" width="1619" height="873"/></div><p class="figure-caption">图 11.7–多模态数据建模的模型蓝图</p></li>
+
+				<li>在<code>Area</code>内是房子最有冲击力的特征；接下来是<code>FullDescription</code>文本特征。此后，<code>Bedrooms</code>和<code>Image_kitchen</code>功能也随之出现。有趣的是，<code>Image_bathroom</code>似乎对模型的准确性有负面影响。这表明来自这些图像的见解导致模型偏离实际房价:</li>
+
+			</ol>
+
+			<div><div><img src="img/B17159_11_08.jpg" alt="Figure 11.8 – Feature Impact for multimodal models&#13;&#10;" width="1650" height="716"/>
+
+				</div>
+
+			</div>
+
+			<p class="figure-caption">图 11.8–多模态模型的特征影响</p>
+
+			<p>出于这个原因，引导<a id="_idIndexMarker596"/>模型远离改进的性能，我们使用<code>bathroom</code>图像来进行预测。通过这样做，我们将使用<code>bathroom</code>特性来<a id="_idIndexMarker598"/>演示 DataRobot 中可用的图像特性探索功能。DataRobot <a id="_idIndexMarker599"/>进行无监督学习，根据图像的相似性进行聚类。仍在<code>bathroom</code>的观点之内。我们可以看到 DataRobot 将相似的图像聚集在一起。似乎主要是白色商品的图像呈现在可视化的右侧和上部。我们可以根据房价过滤可视化:</p>
+
+			<div><div><img src="img/B17159_11_09.jpg" alt="Figure 11.9 – Image embedding&#13;&#10;" width="1574" height="874"/>
+
+				</div>
+
+			</div>
+
+			<p class="figure-caption">图 11.9–图像嵌入</p>
+
+			<p><code>image_bathroom</code>可变。看来<a id="_idIndexMarker602"/>这个模型主要是根据浴室里的白色固定装置做出预测的。这可能有助于理解为什么<code>image_bathroom</code>被认为对模型性能有负面影响。从白色灯具中提取可能会误导模型:</p>
+
+			<div><div><img src="img/B17159_11_10.jpg" alt="Figure 11.10 – Activation map&#13;&#10;" width="1650" height="771"/>
+
+				</div>
+
+			</div>
+
+			<p class="figure-caption">图 11.10–激活图</p>
+
+			<p>基于位置的信息带有补充其他数据类型的重要信息。然而，一些模型在某些地理区域中挣扎。检查模型的性能<a id="_idIndexMarker603"/>和考虑位置<a id="_idIndexMarker605"/>的<a id="_idIndexMarker604"/>使分析师能够对模型性能改进采取行动。DataRobot 的<strong class="bold">空间精度</strong>能力呈现了不同位置的模型残差的空间表示(参见<em class="italic">图 11.9 </em>中的示例)。该图表可引导分析师考虑某些领域较高残差背后的基本原理:</p>
+
+			<div><div><img src="img/B17159_11_11.jpg" alt="Figure 11.11 – Accuracy Over Space&#13;&#10;" width="1588" height="702"/>
+
+				</div>
+
+			</div>
+
+			<p class="figure-caption">图 11.11-空间精度</p>
+
+			<p>例如，正如<em class="italic">图 11.9 </em>中的<a id="_idIndexMarker606"/>所示，菲尼克斯地区的平均剩余价格高于大多数地区，超过 38 万美元。例如，这个地区可能被认为是低收入地区。这种可视化<a id="_idIndexMarker607"/>可以为数据科学家指出包含本地化经济指数的特征。这可能<a id="_idIndexMarker608"/>为高残差提供了一个解释。因此，包含这些功能可以提高模型的整体性能。用于测量准确性的数据分区可以通过在验证、交叉验证或维持分区之间改变来设置。此外，准确性度量类型和聚合可以根据用户的要求进行调整。</p>
+
+			<p>作为对其基于位置的功能工程的补充，DataRobot 基于位置的分析能力<a id="_idIndexMarker609"/>可以利用其位置感知来创建<code>eXtreme Gradient Boosted Trees Regressor (Gamma Loss)</code>模型的第四个最重要的<a id="_idIndexMarker610"/>功能，<code>GEO_KNL_K10_LAG1_Price</code>就是这样一个功能(见<em class="italic">图 11.10 </em>)。该特征使用通过距离增加的核大小来描述价格<a id="_idIndexMarker611"/>的空间依赖结构。也可以部署<strong class="bold"> k 最近邻</strong>方法:</p>
+
+			<div><div><img src="img/B17159_11_12.jpg" alt="Figure 11.12 – Spatial lag features&#13;&#10;" width="1655" height="802"/>
+
+				</div>
+
+			</div>
+
+			<p class="figure-caption">图 11.12-空间滞后特征</p>
+
+			<p>文本分析信息(如单词云)在<code>FullDescription</code>文本功能中不可用，这确实是该<a id="_idIndexMarker613"/>模型最具影响力的功能之一。虽然在模型蓝图上不可见(<em class="italic">图 11.10 </em>)，但文本变量使用<a id="_idIndexMarker614"/>另一个模型<code>Auto-Tuned Word N-Gram Text Modeler using token occurrences – FullDescription</code>进行评分，该模型主要使用<code>FullDescription</code>功能将分数转换为不同数量<a id="_idIndexMarker615"/>单词的令牌(如<em class="italic"> N-grams </em>中的<em class="italic"> N </em>)并进行评分。此后，该特征在链路规模上被转换并被标准化。对于文本相关的洞察，我们转向<strong class="bold">洞察</strong>视图，提供两个重要的文本洞察功能，<strong class="bold">词云</strong>和<strong class="bold">文本挖掘</strong>。</p>
+
+			<p><a id="_idIndexMarker616"/>中影响房价的<code>FullDescription</code>特征。字的大小，如图<em class="italic">图 11.11 </em>所示，突出了记号的频率，而颜色则暗示了它的效果系数。这个系数<a id="_idIndexMarker617"/>通常在-1.5 和 1.5 之间。单词的颜色越接近红色，系数越大，因此房价越高:</p>
+
+			<div><div><img src="img/B17159_11_13.jpg" alt="Figure 11.13 – Word Cloud for a multimodal dataset&#13;&#10;" width="1650" height="806"/>
+
+				</div>
+
+			</div>
+
+			<p class="figure-caption">图 11.13–多模态数据集的词云</p>
+
+			<p>我们可以<a id="_idIndexMarker618"/>假设当<code>FullDescription</code>变量包含单词 orange、<strong class="bold">、alameda county </strong>和 big 时，<a id="_idIndexMarker619"/>的价格可能会很高。同样，小户型的话，<strong class="bold">城市滨江</strong>，预计价格会更低<a id="_idIndexMarker620"/>。文本挖掘功能使用条形图显示类似于单词云的信息。</p>
+
+			<p>现在，我们已经能够使用多模态数据集构建模型，对其特征进行分析，并评估这些模型的性能，接下来我们将重点关注使用模型进行预测。</p>
+
+			<h1 id="_idParaDest-153">在 DataRobot 上使用多模态数据集进行预测</h1>
+
+			<p>在建立了一个模型之后，有许多方法可以对数据机器人进行预测。对于这个用例，我们<a id="_idIndexMarker621"/>将使用<code>Make Prediction</code>方法说明预测能力，该方法在<strong class="bold">预测</strong>选项卡的<a id="_idIndexMarker622"/>中可用。我们首先使用本章<em class="italic">在 DataRobot </em>中定义和设置多模态数据一节中的步骤概要创建一个预测 ZIP 文件数据集。开发的<a id="_idIndexMarker623"/>预测数据集要么被拖放到突出显示的区域，要么被本地导入。如<em class="italic">图 11.12 </em>所示，我们选择感兴趣的特征，包括预测数据集:</p>
+
+			<div><div><img src="img/B17159_11_14.jpg" alt="Figure 11.14 – Making a prediction from multimodal datasets&#13;&#10;" width="1448" height="881"/>
+
+				</div>
+
+			</div>
+
+			<p class="figure-caption">图 11.14–从多模态数据集进行预测</p>
+
+			<p>在这个图中，我们选择了<code>House_id</code>、<code>FullDescription</code>、<code>Bedrooms</code>、<code>City</code>和<code>State</code>。我们还可以看到，预测数据集有 400 栋房屋。最后是<code>.csv</code>文件，它包含所有请求的列(见<em class="italic">表 11.3 </em>):</p>
+
+			<div><div><img src="img/B17159_11_15.jpg" alt="Table 11.15 – A prediction table from a multimodal dataset&#13;&#10;" width="835" height="475"/>
+
+				</div>
+
+			</div>
+
+			<p class="figure-caption">表 11.15-来自多模态数据集的预测表</p>
+
+			<p><strong class="bold">预测</strong>列显示每一行的预测价格。这完成了使用多模态数据集进行预测的过程。正如预期的那样，在部署了由多模态数据集制成的模型之后，可以对它们进行预测。</p>
+
+			<h1 id="_idParaDest-154"><a id="_idTextAnchor175"/>总结</h1>
+
+			<p>在这一章中，我们已经探讨了如何从图像、位置和自由文本中获得洞察力。在此过程中，我们强调了这些数据类型带来的好处，以及每种数据类型带来的挑战。我们还指出了这些在主流中通常是如何处理的。我们继续使用 DataRobot 建立多模态数据集模型，并根据模型进行预测。我们还研究了从模型的位置、自由文本和图像方面获得洞察力的各种方法。通过演示使用多模态数据集建立模型的过程，我们展示了 DataRobot 如何简化不同数据类型带来的挑战的处理。</p>
+
+			<p>话虽如此，重要的是要注意 DataRobot 在自由文本处理方面似乎有一些限制。虽然该平台极大地简化了文本处理过程，但在本出版物发布时，我们还不确定特定领域的停用词可以在多大程度上包含在 DataRobot 过程中。看起来通用的停用词被丢弃了，但是有时需要考虑特定领域的停用词。在其他地方，在多模态建模的背景下，我们不确定模型的文本方面是否可以调整以包括和改变词干提取和旅鼠提取的方法。因此，建议您在将文本输入 DataRobot 之前执行自己的文本处理和特征工程，以获得更好的结果。</p>
+
+			<p>在本章以及之前的章节中，我们已经使用该平台与 DataRobot 进行了交互。尽管该平台提供了许多功能，但这些功能也有一些限制。这些限制，以及如何通过编程访问平台来缓解这些限制，在<a href="B17159_12_Final_NM_ePub.xhtml#_idTextAnchor176"> <em class="italic">第 12 章</em> </a> <em class="italic">、DataRobot Python API </em>中有详细介绍。</p>
+
+		</div>
+
+	</div>
+
+</body></html>

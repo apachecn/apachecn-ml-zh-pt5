@@ -1,0 +1,1569 @@
+<html><head/><body><html xmlns:epub="http://www.idpf.org/2007/ops">
+
+    <head>
+
+        <title>Reinforcement Learning</title>
+
+        
+
+        <meta charset="utf-8"/>
+
+<meta content="urn:uuid:c0dc9385-c68c-47e3-9ef8-4abf6976fdcb" name="Adept.expected.resource"/>
+
+    </head>
+
+
+
+    <body>
+
+        
+
+
+
+                            
+
+                    <h1 class="header-title">强化学习</h1>
+
+                
+
+            
+
+            
+
+                
+
+<p>如今，大多数计算机都是基于一个符号化的阐述。问题首先被编码成一组变量，然后使用显式算法进行处理，对于问题的每个可能的输入，该算法提供适当的输出。然而，存在这样的问题，其中通过显式算法的解析是低效的或者甚至是不自然的，例如语音识别器；用传统的方法处理这种问题是低效的。这个问题和其他类似的问题，如机器人的自主导航或执行操作时的语音辅助，是可以通过基于强化学习的解决方案直接解决的一组非常多样化的问题的一部分。</p>
+
+<p>强化学习是基于一种心理学理论，是在对动物进行了一系列实验后形成的。定义一个要实现的目标，强化学习试图最大化执行一个或一组行动所获得的回报，使我们能够达到指定的目标。强化学习是机器学习中一个非常令人兴奋的领域，被用于从自动驾驶汽车到视频游戏的方方面面。它旨在创建能够学习和适应环境变化的算法。</p>
+
+<p>本章涵盖的主题有:</p>
+
+<ul>
+
+<li>强化学习</li>
+
+<li><strong>马氏决策过程</strong> ( <strong> MDP </strong>)</li>
+
+<li>q 学习</li>
+
+<li><strong>时差</strong> ( <strong> TD </strong>)学习</li>
+
+<li>深度 Q 学习网络</li>
+
+</ul>
+
+<p>在这一章的最后，你将会完全了解强化学习的力量，并且会学到这种技术的不同方法。几个强化学习方法将被涵盖。</p>
+
+
+
+
+
+            
+
+
+
+            
+
+        
+
+    </body>
+
+
+
+</html>
+<html xmlns:epub="http://www.idpf.org/2007/ops">
+
+    <head>
+
+        <title>Reinforcement learning introduction</title>
+
+        
+
+        <meta charset="utf-8"/>
+
+<meta content="urn:uuid:c0dc9385-c68c-47e3-9ef8-4abf6976fdcb" name="Adept.expected.resource"/>
+
+    </head>
+
+
+
+    <body>
+
+        
+
+
+
+                            
+
+                    <h1 class="header-title">强化学习简介</h1>
+
+                
+
+            
+
+            
+
+                
+
+<p>强化学习旨在创造能够学习和适应环境变化的算法。这种编程技术基于根据算法选择接收外部刺激的概念。正确的选择会带来奖励，而错误的选择会导致惩罚。当然，这个系统的目标是达到最好的结果。</p>
+
+<p>在监督学习中，有一个老师告诉系统哪个是正确的输出(跟着老师学习)。这并不总是可能的。通常我们只有定性信息(有时是二元的，对/错，或成功/失败)。可用的信息被称为<strong>强化信号</strong>。但是系统并没有给出任何关于如何更新代理行为的信息(也就是权重)。您不能定义成本函数或梯度。该系统的目标是创建能够从经验中学习的智能代理。</p>
+
+<p>以下是显示强化学习与环境交互的流程图:</p>
+
+<div><img src="img/2b492b5e-a4d9-4cf9-b7e5-719a5f97220b.png" style=""/></div>
+
+<p>科学文献对强化学习的分类采取了不确定的立场。事实上，在最初阶段，它被认为是监督学习的一个特例，然后它被完全推广为机器学习算法的第三范式。它适用于监督学习效率低下的不同环境；与环境相互作用的问题就是明显的例子。</p>
+
+<p>以下流程显示了正确应用强化学习算法应遵循的步骤:</p>
+
+<ol>
+
+<li>制剂的制备</li>
+
+<li>观察环境</li>
+
+<li>最佳策略的选择</li>
+
+<li>行动的执行</li>
+
+<li>相应奖励(或惩罚)的计算</li>
+
+<li>制定更新策略(如有必要)</li>
+
+<li>重复步骤 2-5，直到代理学习到最佳策略</li>
+
+</ol>
+
+<p>强化学习是基于一些心理学理论，在动物身上进行了一系列实验后详细阐述的。特别是，美国心理学家爱德华·桑戴克指出，如果一只猫在执行了被认为正确的行为后立即得到奖励，这种行为重复发生的可能性就会增加。而面对不想要的行为，惩罚的应用降低了重复错误的可能性。</p>
+
+<p>在这一理论的基础上，通过定义要实现的目标，强化学习试图最大化执行一个或一组行动所获得的回报，从而让我们达到指定的目标。</p>
+
+
+
+
+
+            
+
+
+
+            
+
+        
+
+    </body>
+
+
+
+</html>
+<html xmlns:epub="http://www.idpf.org/2007/ops">
+
+    <head>
+
+        <title>Agent-Environment interface</title>
+
+        
+
+        <meta charset="utf-8"/>
+
+<meta content="urn:uuid:c0dc9385-c68c-47e3-9ef8-4abf6976fdcb" name="Adept.expected.resource"/>
+
+    </head>
+
+
+
+    <body>
+
+        
+
+
+
+                            
+
+                    <h1 class="header-title">代理-环境界面</h1>
+
+                
+
+            
+
+            
+
+                
+
+<p>强化学习可以被看作是实现目标的交互问题的一个特例。必须达到目标的实体称为<strong>代理</strong>。代理必须与之交互的实体被称为<strong>环境</strong>，它对应于代理外部的一切。</p>
+
+<p>到目前为止，我们更多地关注代理这个术语，但是它代表什么呢？代理是一个软件实体，它代表另一个程序执行服务，通常是自动和不可见的。这些软件也被称为<strong>智能代理</strong>。</p>
+
+<p>以下是代理最重要的特征:</p>
+
+<ul>
+
+<li>它可以在连续集和离散集之间选择对环境的动作</li>
+
+<li>行动视情况而定。系统状态中总结了这种情况</li>
+
+<li>代理持续监控环境(输入)并持续改变状态</li>
+
+<li>行动的选择并不简单，需要一定程度的智慧</li>
+
+<li>这个代理人有聪明的记忆力</li>
+
+</ul>
+
+<p>主体具有目标导向的行为，但是在事先不知道或部分知道的不确定环境中行动。智能体通过与环境互动来学习。可以在通过代理自身进行的测量了解环境的同时制定计划。这个策略接近于试错理论。</p>
+
+<div><p>试错法是解决问题的基本方法。它的特点是不断重复不同的尝试，直到成功，或者直到代理停止尝试。</p>
+
+</div>
+
+<p>媒介与环境的相互作用是连续的；主体选择要采取的行动，作为响应，环境改变状态，呈现要面对的新情况。</p>
+
+<p>在强化学习的特殊情况下，环境为代理人提供奖励；至关重要的是，奖励的来源是环境，以避免在代理人内部形成会损害学习的个人强化机制。</p>
+
+<p>奖励的价值与行动对实现目标的影响成正比；因此，在正确动作的情况下，它是正的或高的，或者在不正确动作的情况下，它是负的或低的。</p>
+
+<p>以下是现实生活中的一些例子，在这些例子中，代理人和环境之间存在相互作用来解决问题:</p>
+
+<ul>
+
+<li>一个国际象棋选手，每走一步，都有关于能创造的棋子配置和对手可能的反棋的信息</li>
+
+<li>一只小长颈鹿在几个小时内学会了以 50 公里/小时的速度站立和奔跑</li>
+
+<li>一个真正自主的机器人学会在房间里移动并离开它</li>
+
+<li>炼油厂的参数(油压、流量等)是实时设置的，以便获得最高产量或最高质量</li>
+
+</ul>
+
+<p>我们分析的所有示例都有以下共同特征:</p>
+
+<ul>
+
+<li>与环境的相互作用</li>
+
+<li>代理的目标</li>
+
+<li>不确定性或对环境的片面了解</li>
+
+</ul>
+
+<p>通过对这些例子的分析，可以得出以下结论:</p>
+
+<ul>
+
+<li>代理从自己的经验中学习。</li>
+
+<li>当行动改变了状态(情况)，未来选择的可能性也改变了(延迟奖励)。</li>
+
+<li>一个行动的效果是无法完全预测的。</li>
+
+<li>代理对它的行为有一个全局的评估。</li>
+
+<li>它必须利用这些信息来改进他的选择。选择随着经验而改进。</li>
+
+<li>问题可以有一个有限或无限的时间范围。</li>
+
+</ul>
+
+
+
+
+
+            
+
+
+
+            
+
+        
+
+    </body>
+
+
+
+</html>
+<html xmlns:epub="http://www.idpf.org/2007/ops">
+
+    <head>
+
+        <title>Markov Decision Process</title>
+
+        
+
+        <meta charset="utf-8"/>
+
+<meta content="urn:uuid:c0dc9385-c68c-47e3-9ef8-4abf6976fdcb" name="Adept.expected.resource"/>
+
+    </head>
+
+
+
+    <body>
+
+        
+
+
+
+                            
+
+                    <h1 class="header-title">马尔可夫决策过程</h1>
+
+                
+
+            
+
+            
+
+                
+
+<p>为了避免负载问题和计算困难，代理-环境的相互作用被认为是一个 MDP。MDP 是一个离散时间随机控制过程。在每个时间步，流程处于状态<em> s </em>，决策者可以选择状态<em> s </em>中可用的任何动作<em> a </em>。该流程在下一个时间步通过随机进入新状态<em>s’</em>做出响应，并给予决策者相应的奖励<em> r(s，s’)</em>。</p>
+
+<p>在这些假设下，主体与环境的相互作用可以概括如下:</p>
+
+<ul>
+
+<li>代理和环境在时间上以离散的间隔相互作用，<em> t = 0，1，2，… n </em>。</li>
+
+<li>在每个间隔，代理接收环境的状态<em> st </em>的表示。</li>
+
+<li><em xmlns:epub="http://www.idpf.org/2007/ops"> S </em>的每个元素<em xmlns:epub="http://www.idpf.org/2007/ops">S<sub>t</sub>T3】，其中<em xmlns:epub="http://www.idpf.org/2007/ops"> S </em>是可能状态的集合。</em></li>
+
+<li>一旦状态被识别，代理必须采取<em> A(s <sub> t </sub> ) </em>的动作 a <sub> t </sub>，其中<em> A(s <sub> t </sub> ) </em>是状态<em> s <sub> t </sub> </em>中可能的动作集合。</li>
+
+<li>要采取的行动的选择取决于要实现的目标，并通过符号<em> π </em>(折扣累积奖励)指示的策略进行映射，该策略将行动与每个状态<em> s </em>的<em> A(s) </em>的<sub> t </sub>相关联。术语<em> π <sub> t </sub> (s，a) </em>表示在状态<em> s </em>下执行动作<em> a </em>的概率。</li>
+
+<li>在下一个时间间隔<em xmlns:epub="http://www.idpf.org/2007/ops"> t + 1 </em>期间，作为 at 处的动作的结果的一部分，代理接收与先前在<sub xmlns:epub="http://www.idpf.org/2007/ops"> t </sub>采取的动作相对应的数字奖励<em xmlns:epub="http://www.idpf.org/2007/ops">R<sub>t</sub>+1</em>T6】R。</li>
+
+<li>相反，动作的结果代表新的状态<em xmlns:epub="http://www.idpf.org/2007/ops">s<sub>t</sub>T3】。此时，代理必须再次对状态进行编码，并做出动作选择。</em></li>
+
+<li>这种迭代不断重复，直到代理实现目标。</li>
+
+</ul>
+
+<p>状态<em> s <sub> t </sub> + 1 </em>的定义取决于之前的状态和 MDP 采取的行动，即:</p>
+
+<div><em>s<sub>t</sub> + 1 = δ (s<sub>t</sub>,a<sub>t</sub>)</em></div>
+
+<p>这里<em> δ </em>代表状态函数。</p>
+
+<p>总而言之:</p>
+
+<ul>
+
+<li>在 MDP 中，代理可以感知他所处的状态，并有一套动作供他支配</li>
+
+<li>在每个离散的时间间隔<em> t </em>，代理检测当前状态<em> st </em>并决定在<em> A </em>执行一个动作</li>
+
+<li>环境的反应是提供一个奖励(一个强化)<em> r <sub> t </sub> = r (s <sub> t </sub>，a <sub> t </sub> ) </em>并进入状态<em> s <sub> t </sub> + 1 = δ (s <sub> t </sub>，a <sub> t </sub> ) </em></li>
+
+<li><em> r </em>和<em> δ </em>函数是环境的一部分；它们只取决于当前的状态和动作(而不是先前的状态和动作),并且不一定为代理所知</li>
+
+<li>强化学习的目标是学习一个策略，对于系统所处的每个状态<em> s </em>,该策略向代理指示一个动作，以最大化在整个动作序列期间接收的总强化</li>
+
+</ul>
+
+<p>让我们更深入地了解一些使用的术语:</p>
+
+<ul>
+
+<li>一个<strong>奖励函数</strong>定义了强化学习问题中的目标。它将检测到的环境状态映射成一个数字，从而定义一个奖励。如前所述，唯一的目标是最大化长期的总回报。奖励函数定义了代理的好的和坏的事件。奖励函数有正确的需要，可以作为改变政策的依据。例如，如果策略选择的一个动作之后是低奖励，则可以在下一步中改变策略以选择该情况下的其他动作。</li>
+
+<li>一个<strong xmlns:epub="http://www.idpf.org/2007/ops">策略</strong>定义了学习代理在给定时间的行为。它映射了检测到的环境状态以及当它们处于这些状态时要采取的操作。对应于心理学上所谓的一套规则或刺激反应的关联<strong xmlns:epub="http://www.idpf.org/2007/ops">。政策是强化学习代理的基本部分，从这个意义上说，它本身就足以决定行为。</strong></li>
+
+<li>一个<strong>值函数</strong>代表一个状态对于一个代理来说有多好。它等于状态为<em> s </em>的代理期望的总报酬。值函数取决于代理选择要执行的操作的策略。</li>
+
+</ul>
+
+
+
+
+
+            
+
+
+
+            
+
+        
+
+    </body>
+
+
+
+</html>
+<html xmlns:epub="http://www.idpf.org/2007/ops">
+
+    <head>
+
+        <title>Discounted cumulative reward</title>
+
+        
+
+        <meta charset="utf-8"/>
+
+<meta content="urn:uuid:c0dc9385-c68c-47e3-9ef8-4abf6976fdcb" name="Adept.expected.resource"/>
+
+    </head>
+
+
+
+    <body>
+
+        
+
+
+
+                            
+
+                    <h1 class="header-title">折扣累积奖励</h1>
+
+                
+
+            
+
+            
+
+                
+
+<p>在上一节中，我们说过:强化学习的目标是学习一个策略，对于系统所处的每个状态<em> s </em>，该策略向代理指示一个动作，以最大化在整个动作序列期间接收的总强化。但是，我们怎样才能在整个行动过程中最大限度地获得总的强化呢？</p>
+
+<p>从保单中获得的总加固量计算如下:</p>
+
+<div><img class="fm-editor-equation" src="img/2bce7ad4-a3fe-4ee6-92e6-560dff764b36.png" style="width:23.83em;height:4.83em;"/></div>
+
+<p class="NormalPACKT">这里，<em> r <sub> T </sub> </em>代表在终端状态<em> s <sub> T </sub> </em>下驱动环境的动作的奖励。</p>
+
+<p class="NormalPACKT">这个问题的一个可能的解决方案是把提供最高奖赏的行动与每个单独的州联系起来；也就是说，我们必须确定一个最优策略，使以前的数量最大化。</p>
+
+<p class="NormalPACKT">对于在有限步数(持续任务)内没有达到目标或最终状态的问题，R<em xmlns:epub="http://www.idpf.org/2007/ops">t<sub>t</sub>T3 趋于无穷大。</em></p>
+
+<p class="NormalPACKT">在这些情况下，一个人想要最大化的回报之和在无穷远处发散，所以这种方法不适用。因此，有必要开发一种替代的加固技术。</p>
+
+<p class="NormalPACKT">最适合强化学习范式的技术是贴现累积奖励，它试图最大化以下数量:</p>
+
+<div><img class="fm-editor-equation" src="img/94c8312c-b46e-461c-9180-85f557269910.png" style="width:24.58em;height:3.75em;"/></div>
+
+<p>这里，<em> γ </em>被称为<strong>贴现因子</strong>，它代表未来报酬的重要性。该参数可以取值<em> 0 ≤ γ ≤ 1 </em>，含义如下:</p>
+
+<ul>
+
+<li>如果<em xmlns:epub="http://www.idpf.org/2007/ops"> γ &lt; 1 </em>，序列<em xmlns:epub="http://www.idpf.org/2007/ops">r<sub>t</sub>T5】将收敛到一个有限值</em></li>
+
+<li>如果<em> γ = 0 </em>，代理人将对未来的奖励不感兴趣，但将只对当前状态尝试最大化奖励</li>
+
+<li>如果<em> γ = 1 </em>，代理人将试图增加未来的回报，即使是以眼前的回报为代价</li>
+
+</ul>
+
+<p>折扣因子可以在学习过程中修改，以突出或不突出特定的动作或状态。一个最优的策略可以使执行一个动作所获得的强化甚至更低(甚至是负的)，只要总体上这导致了更大的强化。</p>
+
+
+
+
+
+            
+
+
+
+            
+
+        
+
+    </body>
+
+
+
+</html>
+<html xmlns:epub="http://www.idpf.org/2007/ops">
+
+    <head>
+
+        <title>Exploration versus exploitation</title>
+
+        
+
+        <meta charset="utf-8"/>
+
+<meta content="urn:uuid:c0dc9385-c68c-47e3-9ef8-4abf6976fdcb" name="Adept.expected.resource"/>
+
+    </head>
+
+
+
+    <body>
+
+        
+
+
+
+                            
+
+                    <h1 class="header-title">探索与开发</h1>
+
+                
+
+            
+
+            
+
+                
+
+<p>理想情况下，代理人必须在各自的奖励<em> r </em>下与每个行为相关联，以便为实现目标选择奖励最多的行为。因此，这种方法对于复杂的问题是不切实际的，在这些问题中，状态的数量特别多，因此可能的关联呈指数增长。</p>
+
+<p>这个问题被称为<strong>勘探开发困境</strong>。理想情况下，代理人必须探索每个状态的所有可能的行动，找到一个在实现其目标时实际上最有回报的行动。</p>
+
+<p>因此，决策涉及一个基本的选择:</p>
+
+<ul>
+
+<li><strong>开发</strong>:根据当前信息做出最佳决策</li>
+
+<li><strong>探索</strong>:收集更多信息</li>
+
+</ul>
+
+<p>在这个过程中，最好的长期战略可能会导致短期内的巨大牺牲。因此，有必要收集足够的信息来做出最佳决策。</p>
+
+<p>下面是一些在现实生活中采用这种技术的例子:</p>
+
+<p><strong>选择店铺</strong>:</p>
+
+<ul>
+
+<li><strong>剥削</strong>:去你最喜欢的商店</li>
+
+<li>探索:尝试一家新店</li>
+
+</ul>
+
+<p><strong>路线的选择</strong>:</p>
+
+<ul>
+
+<li><strong>开拓</strong>:选择目前为止最好的路线</li>
+
+<li>探索:尝试一条新路线</li>
+
+</ul>
+
+<p>实际上，在非常复杂的问题中，收敛到一个非常好的策略会太慢。</p>
+
+<p>解决这个问题的好办法是在探索和利用之间找到一个平衡点:</p>
+
+<ul>
+
+<li>一个局限于探索的代理人在每个状态下总是以一种随意的方式行动，很明显，收敛到一个最优策略是不可能的</li>
+
+<li>如果代理很少探索，它将总是使用通常的动作，这可能不是最佳的</li>
+
+</ul>
+
+
+
+
+
+            
+
+
+
+            
+
+        
+
+    </body>
+
+
+
+</html>
+<html xmlns:epub="http://www.idpf.org/2007/ops">
+
+    <head>
+
+        <title>Reinforcement learning techniques</title>
+
+        
+
+        <meta charset="utf-8"/>
+
+<meta content="urn:uuid:c0dc9385-c68c-47e3-9ef8-4abf6976fdcb" name="Adept.expected.resource"/>
+
+    </head>
+
+
+
+    <body>
+
+        
+
+
+
+                            
+
+                    <h1 class="header-title">强化学习技术</h1>
+
+                
+
+            
+
+            
+
+                
+
+<p>正如我们在前面几节中看到的，强化学习是一种编程哲学，旨在开发能够学习和适应环境变化的算法。这种编程技术基于这样的假设，即能够根据算法的选择从外部接收刺激。因此，一个正确的选择将导致奖励，而一个错误的选择将导致系统的惩罚。该系统的目标是获得尽可能高的奖金，从而获得尽可能好的结果。与强化学习相关的技术分为两类:</p>
+
+<ul>
+
+<li><strong>连续学习算法</strong>:这些技术的出发点是假设有一个简单的机制能够评估算法的选择，然后根据结果奖励或惩罚算法。这些技术也可以适应环境的重大变化。一个例子是语音识别程序或 OCR 程序，它们随着使用而提高性能。</li>
+
+<li><strong>预防性训练算法</strong>:这些算法从观察开始，即不断评估算法的动作可能是一个不能自动化或非常昂贵的过程。在这种情况下，应用第一阶段，其中教授算法；当系统被认为是可靠的时，它就被具体化，不再可编辑。许多电子元件在其内部使用神经网络，并且这些网络的突触权重是不可变的，因为它们在电路的构建期间是固定的。</li>
+
+</ul>
+
+<p>应该注意，前面提到的类别是实现选择，而不是算法中的概念差异。因此，一个算法通常可以属于第一类或第二类，这取决于设计者如何实现它。</p>
+
+
+
+
+
+            
+
+
+
+            
+
+        
+
+    </body>
+
+
+
+</html>
+<html xmlns:epub="http://www.idpf.org/2007/ops">
+
+    <head>
+
+        <title>Q-learning</title>
+
+        
+
+        <meta charset="utf-8"/>
+
+<meta content="urn:uuid:c0dc9385-c68c-47e3-9ef8-4abf6976fdcb" name="Adept.expected.resource"/>
+
+    </head>
+
+
+
+    <body>
+
+        
+
+
+
+                            
+
+                    <h1 class="header-title">q 学习</h1>
+
+                
+
+            
+
+            
+
+                
+
+<p>q 学习是最常用的强化学习算法之一。这是因为它能够在不需要环境模型的情况下比较可用操作的预期效用。</p>
+
+<p>由于这种技术，有可能在完成的 MDP 中为每个给定的状态找到最优的动作。</p>
+
+<p>由于学习过程，强化学习问题的一般解决方案是估计评估函数。该功能必须能够通过奖励的总和来评估特定政策的便利性或其他方面。事实上，Q-learning 试图最大化<em> Q </em>函数的值(行动值函数)，它代表当我们在状态<em> s </em>执行行动<em> a </em>时的最大贴现未来回报，如下所示:</p>
+
+<p class="CDPAlignCenter CDPAlign"><em> Q(S <sub> t </sub>，a<sub>t</sub>)= max(R<sub>t+1</sub>)</em></p>
+
+<p class="NormalPACKT">已知<em> Q </em>函数，处于状态<em> s </em>的最优动作<em> a </em>就是具有最高<em> Q </em>值的那个。此时，我们可以定义一个策略<em> π(s) </em>，它为我们提供了任何状态下的最佳操作。回想一下策略<em> π </em>关联对<em>(s；a) </em>以概率<em>(s；a) </em>即动作是在状态<em> s </em>下进行的，我们可以编写如下:</p>
+
+<div><img class="fm-editor-equation" src="img/0bf8dd3d-0c65-4b9a-809a-75214b472d33.png" style="width:17.08em;height:1.83em;"/></div>
+
+<p class="NormalPACKT">问题简化为对<em> Q </em>函数的求值。然后，我们可以通过递归过程，根据下一个点的<em> Q </em>函数来估计过渡点的<em> Q </em>函数。以下是在该过程的一个步骤中使用的等式。这个方程被称为<strong>贝尔曼方程</strong>，代表了 Q-learning 的转换规则:</p>
+
+<div><img class="fm-editor-equation" src="img/4e95528e-5650-490d-8dce-f82aeb359907.png" style="width:26.17em;height:2.75em;"/></div>
+
+<p>这些术语定义如下:</p>
+
+<ul>
+
+<li><em> Q(s <sub> t </sub>，a <sub> t </sub> ) </em>是当前的行动方针<em> a </em>从状态<em> s. </em></li>
+
+<li>r 是行动的回报。</li>
+
+<li><em xmlns:epub="http://www.idpf.org/2007/ops">max<sub>t+1</sub>(Q(s<sub>t+1</sub>，a<sub>t+1</sub>)</em>定义了未来的最大奖励。我们执行<em xmlns:epub="http://www.idpf.org/2007/ops"> a <sub> t </sub> </em>动作以状态<em xmlns:epub="http://www.idpf.org/2007/ops">s<sub>t</sub>T15】到达<em xmlns:epub="http://www.idpf.org/2007/ops">s<sub>t+1</sub>T19】状态。从这里开始，我们可能有多个动作，每个动作对应一些奖励。计算奖励的最大值。</em></em></li>
+
+<li><em> γ </em>是贴现因子。<em> γ </em>值从 0 到 1 不等；如果该值接近 0，则优先考虑立即奖励。如果它接近 1，未来奖励的重要性增加到 1，在这里它被认为等同于即时奖励。</li>
+
+</ul>
+
+<p class="mce-root">基于前面的等式，评估函数<em> Q </em>由直接奖励和从下一个状态开始可获得的最大奖励之和给出。</p>
+
+<p class="mce-root">应用前面的公式，我们正试图将延迟的奖励公式化为即时的奖励。我们之前已经说过,<em> Q </em>函数的求值代表了一个递归过程。然后，我们可以将在这个过程中获得的值输入到一个表中，当然，我们将称之为 table <em> Q </em>。在该表中，行是状态，列是动作。作为起始表<em> Q </em>，我们可以使用一个包含全零的矩阵(我们已经初始化了表<em> Q </em>，如下图所示:</p>
+
+<div><img src="img/31e9ee64-1d2c-48d9-a410-2db4756872d1.png" style=""/></div>
+
+<p>该表的元素<em> Q </em>(单元格)是当一个人处于该行给出的状态并且执行该列给出的动作时获得的奖励。在任何状态下采取的最佳行动都是奖励最高的行动。我们现在的任务是用新值更新这个表。为此，我们可以采用以下算法:</p>
+
+<ol>
+
+<li>状态<em xmlns:epub="http://www.idpf.org/2007/ops">s<sub>t</sub>T3】被解码</em></li>
+
+<li>选择一个动作<em xmlns:epub="http://www.idpf.org/2007/ops">一个<sub>t</sub>T3</em></li>
+
+<li>执行动作<em xmlns:epub="http://www.idpf.org/2007/ops">a<sub>t</sub>T3】并接收奖励<em xmlns:epub="http://www.idpf.org/2007/ops"> r </em></em></li>
+
+<li>表中的元素<em>Q(s<sub>t</sub>；用贝尔曼方程提供的训练规则更新 a <sub> t </sub> ) </em></li>
+
+<li>动作 a 的执行在状态<em xmlns:epub="http://www.idpf.org/2007/ops">s<sub>t+1</sub>T3】中移动环境</em></li>
+
+<li>将下一个状态设置为当前状态(<em> s <sub> t </sub> = s <sub> t+1 </sub> </em>)</li>
+
+<li>再次从第 1 点开始，重复该过程，直到达到终端状态</li>
+
+</ol>
+
+<p>在更复杂和有效的公式中，有可能用神经网络来代替表，该表的迭代对于复杂问题仍然是低效的，在该神经网络中，学习过程将改变突触连接的权重。</p>
+
+
+
+
+
+            
+
+
+
+            
+
+        
+
+    </body>
+
+
+
+</html>
+<html xmlns:epub="http://www.idpf.org/2007/ops">
+
+    <head>
+
+        <title>Temporal difference learning</title>
+
+        
+
+        <meta charset="utf-8"/>
+
+<meta content="urn:uuid:c0dc9385-c68c-47e3-9ef8-4abf6976fdcb" name="Adept.expected.resource"/>
+
+    </head>
+
+
+
+    <body>
+
+        
+
+
+
+                            
+
+                    <h1 class="header-title">时间差异学习</h1>
+
+                
+
+            
+
+            
+
+                
+
+<p>TD 学习算法基于减少代理在不同时间做出的估计之间的差异。前面提到的 Q-learning 是一种 TD 算法，但它是基于紧邻时刻状态之间的差异。TD 更通用，可以考虑更远的时刻和状态。</p>
+
+<p>它结合了<strong>蒙特卡罗</strong> ( <strong> MC </strong>)方法和<strong>动态规划</strong> ( <strong> DP </strong>)的思想。</p>
+
+<div><p>MC 方法允许基于所获得结果的平均值来解决强化学习问题。</p>
+
+<p>DP 代表一组算法，在给定 MDP 形式的完美环境模型的情况下，这些算法可用于计算最佳策略。</p>
+
+</div>
+
+<p>TD 算法可以直接从原始数据中学习，而不需要环境的动态模型(如 MC)。该算法部分基于先前学习的估计来更新估计，而不等待最终结果(自举，例如 DP)。它适用于没有动态环境模型的学习。如果时间步长足够小，或者时间步长随着时间的推移而减小，则使用固定策略进行收敛。</p>
+
+<p>正如我们在上一节中看到的，Q-learning 根据以下公式计算其值:</p>
+
+<div><img class="fm-editor-equation" src="img/23d2a832-5cd5-4ef2-b9d9-de942401f24b.png" style="width:26.17em;height:2.75em;"/></div>
+
+<p>通过采用单步前瞻。</p>
+
+<div><p>前瞻是一个过程的通称，该过程试图预见选择一个分支变量来评估它的一个值的影响。前瞻的两个主要目的是选择下一个要评估的变量和赋给它的值的顺序。</p>
+
+</div>
+
+<p>很明显，也可以使用两步公式，如下行所示:</p>
+
+<div><img class="fm-editor-equation" src="img/dcdee0c9-9322-4a98-89ad-1cadf49d66e6.png" style="width:30.75em;height:2.58em;"/></div>
+
+<p class="NormalPACKT">更一般地，对于 n 步前瞻，我们获得以下公式:</p>
+
+<div><img class="fm-editor-equation" src="img/ad4e7e0d-46c9-493b-b774-b8b5d7b84fe1.png" style="width:40.25em;height:2.42em;"/></div>
+
+
+
+
+
+            
+
+
+
+            
+
+        
+
+    </body>
+
+
+
+</html>
+<html xmlns:epub="http://www.idpf.org/2007/ops">
+
+    <head>
+
+        <title>Dynamic Programming</title>
+
+        
+
+        <meta charset="utf-8"/>
+
+<meta content="urn:uuid:c0dc9385-c68c-47e3-9ef8-4abf6976fdcb" name="Adept.expected.resource"/>
+
+    </head>
+
+
+
+    <body>
+
+        
+
+
+
+                            
+
+                    <h1 class="header-title">动态规划</h1>
+
+                
+
+            
+
+            
+
+                
+
+<p>DP 代表一组算法，在给定 MDP 形式的完美环境模型的情况下，这些算法可用于计算最佳策略。DP 的基本思想，以及一般的强化学习，是利用国家价值和行动来寻找好的政策。</p>
+
+<p>DP 方法通过称为<strong>策略评估</strong>和<strong>策略改进</strong>的两个过程的迭代来解决马尔可夫决策过程。</p>
+
+<ul>
+
+<li>策略评估算法在于将迭代方法应用于贝尔曼方程的求解。由于仅对<em> k → ∞ </em>保证收敛，我们必须满足于通过施加停止条件得到良好的近似。</li>
+
+<li>策略改进算法基于当前值改进策略。</li>
+
+</ul>
+
+<p>策略迭代算法的缺点是我们必须在每一步评估一个策略。这涉及一个迭代过程，其收敛时间我们事先不知道。除其他因素外，这将取决于如何选择启动政策。</p>
+
+<p class="mce-root">克服这个缺点的一个方法是在特定的步骤切断对策略的评估。该操作不会改变收敛到最优值的保证。一种特殊情况是，策略的评估被一个按状态的步骤(也称为<strong>扫描</strong>)阻止，这种情况定义了值迭代算法。在值迭代算法中，在策略改进的每个步骤之间执行值计算的单次迭代。</p>
+
+<p class="mce-root">因此，动态规划算法本质上是基于并行发生的两个过程:政策评估和政策改进。这两个过程的反复执行使得一般过程向最优解收敛。在策略迭代算法中，两个阶段交替进行，并且每个阶段在另一个阶段开始之前结束。</p>
+
+<p>DP 方法通过环境可以假设的整个状态集进行操作，在每次迭代中对每个状态执行完整的备份。由备份执行的每个更新操作基于所有可能的后续状态的值来更新状态的值，对它们发生的概率进行加权，并且由选择的策略和环境的动态性来诱导。完整备份与贝尔曼方程密切相关；它们只不过是将等式转换成赋值指令。</p>
+
+<p>当一个完整的备份迭代没有给状态值带来任何变化时，获得收敛；因此，最终状态值完全满足贝尔曼方程。只有当交流发电机有一个完美的模型时，DP 方法才适用，该模型必须相当于 MDP。</p>
+
+<p>正是由于这个原因，DP 算法在强化学习中几乎没有用，因为它们假设了完美的环境模型，并且计算量高且昂贵，但是仍然有必要提及它们，因为它们代表了强化学习的理论基础。事实上，所有的强化学习方法都试图实现与动态规划方法相同的目标，只是计算成本更低，并且不需要假设环境的完美模型。</p>
+
+<p>相对于基于直接搜索的方法所需的指数运算数量<em> m*n </em>，DP 方法通过关于状态数量<em> n </em>和动作数量<em> m </em>的多个多项式运算收敛到最优解。</p>
+
+<p>DP 方法基于后继状态的值的估计来更新状态的值的估计；或者他们在过去估计的基础上更新估计。这代表了一个特殊的属性，称为<strong>自举</strong>。强化学习的几种方法执行引导，甚至不需要如 DP 方法所要求的完美环境模型的方法。</p>
+
+
+
+
+
+            
+
+
+
+            
+
+        
+
+    </body>
+
+
+
+</html>
+<html xmlns:epub="http://www.idpf.org/2007/ops">
+
+    <head>
+
+        <title>Monte Carlo methods</title>
+
+        
+
+        <meta charset="utf-8"/>
+
+<meta content="urn:uuid:c0dc9385-c68c-47e3-9ef8-4abf6976fdcb" name="Adept.expected.resource"/>
+
+    </head>
+
+
+
+    <body>
+
+        
+
+
+
+                            
+
+                    <h1 class="header-title">蒙特卡罗方法</h1>
+
+                
+
+            
+
+            
+
+                
+
+<p>用于估计价值函数和发现优秀策略的 MC 方法不需要环境模型的存在。他们能够通过单独使用代理人的经验或从代理人和环境之间的相互作用中获得的状态序列、动作和奖励的样本来学习。该经验可以由代理根据学习过程获得，或者由先前填充的数据集模拟。在学习(在线学习)过程中获得经验的可能性是有趣的，因为它允许即使在缺乏环境动态的先验知识的情况下也能获得优秀的行为。甚至通过已经填充的经验数据集学习也可能是有趣的，因为如果与在线学习相结合，它使得由其他人的经验诱导的自动政策改进成为可能。</p>
+
+<p>为了解决强化学习问题，MC 方法基于在过去的事件中平均获得的奖励的总和来估计价值函数。这假设体验被分成几集，并且所有的集都由有限数量的过渡组成。这是因为在 MC 方法中，只有当一个事件完成时，才进行新值的估计和策略的修改。MC 方法迭代地估计策略和价值函数。然而，在这种情况下，每个迭代周期相当于完成一集——政策和价值函数的新估计一集接一集地出现。</p>
+
+<p>通常术语 MC 用于估计方法，其运算涉及随机分量；在这种情况下，MC 指的是基于总回报平均值的强化学习方法。与计算每个状态的值的 DP 方法不同，MC 方法计算每个状态-动作对的值，因为在没有模型的情况下，仅状态值不足以决定在某个状态下执行哪个动作最好。</p>
+
+
+
+
+
+            
+
+
+
+            
+
+        
+
+    </body>
+
+
+
+</html>
+<html xmlns:epub="http://www.idpf.org/2007/ops">
+
+    <head>
+
+        <title>Deep Q-Network</title>
+
+        
+
+        <meta charset="utf-8"/>
+
+<meta content="urn:uuid:c0dc9385-c68c-47e3-9ef8-4abf6976fdcb" name="Adept.expected.resource"/>
+
+    </head>
+
+
+
+    <body>
+
+        
+
+
+
+                            
+
+                    <h1 class="header-title">深度 Q 网络</h1>
+
+                
+
+            
+
+            
+
+                
+
+<p><strong>深度 Q 网络</strong> ( <strong> DQN </strong>)算法结合了强化学习方法和深度学习方法。DQN 靠自己学习，以一种经验的方式学习，没有针对特定目标的严格程序，比如赢得一盘棋。</p>
+
+<p>DQN 代表了 Q 学习的应用，其使用深度学习来近似评估函数。DQN 是由 Mnih 等人通过 2015 年 2 月 26 日发表在<em> Nature </em>上的一篇文章提出的。因此，许多研究机构加入了这一领域，因为深度神经网络可以使强化学习算法直接处理高维状态。</p>
+
+<p>深度神经网络的使用是由于研究人员注意到以下事实:在具有强化学习的算法中使用神经网络来逼近<strong> Q-evaluation </strong>函数会使系统不稳定或发散。事实上，可以注意到对<em> Q </em>的微小更新可以显著改变政策、数据分布以及<em> Q </em>和目标值之间的相关性。这些存在于观察序列中的相关性是算法不稳定的原因。</p>
+
+<p>要将普通 Q 网络转换为 DQN，必须采取以下预防措施:</p>
+
+<ul>
+
+<li>用多级卷积网络代替单级神经网络来近似 Q 函数评估</li>
+
+<li>实现体验回放</li>
+
+<li>在更新过程中，使用第二个网络来计算目标 Q 值</li>
+
+</ul>
+
+<p>术语<strong>体验回放</strong>是什么意思？这意味着，当状态/动作对在模拟或实际体验中出现时，系统存储发现的数据，通常存储在一个大表中，而不是对它们运行 Q 学习。通过这种方式，我们的网络可以使用存储的经验记忆来训练自己。</p>
+
+
+
+
+
+            
+
+
+
+            
+
+        
+
+    </body>
+
+
+
+</html>
+<html xmlns:epub="http://www.idpf.org/2007/ops">
+
+    <head>
+
+        <title>OpenAI Gym</title>
+
+        
+
+        <meta charset="utf-8"/>
+
+<meta content="urn:uuid:c0dc9385-c68c-47e3-9ef8-4abf6976fdcb" name="Adept.expected.resource"/>
+
+    </head>
+
+
+
+    <body>
+
+        
+
+
+
+                            
+
+                    <h1 class="header-title">OpenAI Gym</h1>
+
+                
+
+            
+
+            
+
+                
+
+<p><strong> OpenAI Gym </strong>是一个帮助我们实现基于强化学习的算法的库。它包括越来越多的基准问题，这些问题暴露了一个公共接口，以及一个人们可以分享他们的结果和比较算法性能的网站。</p>
+
+<p>OpenAI Gym 专注于强化学习的情景设置。换句话说，代理人的经历分为一系列的插曲。代理的初始状态是由一个分布随机抽样的，交互一直进行到环境达到一个终止状态。每集都重复这一过程，目的是最大化每集的总回报预期，并在尽可能少的剧集中实现高水平的表现。</p>
+
+<div><p>Gym 是一个开发和比较强化学习算法的工具包。它支持教会代理从走路到玩游戏(如 Pong 或 Pinball)的能力。该库可从以下 URL 获得:</p>
+
+<p><a href="https://gym.openai.com/" target="_blank">https://gym.openai.com/</a></p>
+
+</div>
+
+<p>下图是 OpenAI 健身房项目网站的主页:</p>
+
+<div><img src="img/2f87cdac-c992-470e-8e3e-1301f466cbe7.png" style=""/></div>
+
+<div><p>OpenAI 健身房是一个更加雄心勃勃的项目的一部分:OpenAI 项目。OpenAI 是一家<strong>人工智能</strong> ( <strong> AI </strong>)研究公司，由埃隆·马斯克(Elon Musk)和山姆·奥特曼(Sam Altman)创办。这是一个非营利项目，旨在以造福全人类的方式促进和发展友好的人工智能。该组织旨在通过向公众开放他们的专利和研究，与其他机构和研究人员自由合作。创始人决定承担这个项目，因为他们担心滥用人工智能带来的生存风险。</p>
+
+<p>OpenAI Gym 是一个程序库，允许您开发人工智能，测量他们的智力能力，并增强他们的学习能力。简而言之，一个以算法形式训练现在的数字大脑来打开 AI 健身房的健身房将它们投射到未来。</p>
+
+<p>但还有另一个目标。OpenAI 希望通过资助那些即使在没有经济回报的领域也能让人类进步的项目，来刺激人工智能领域的研究。另一方面，通过 Gym，它打算将人工智能的测量标准化，以便研究人员可以在平等的条件下竞争，并知道他们的同事取得了什么成就，但最重要的是，专注于对每个人真正有用的结果。</p>
+
+<p>可用的工具有很多。从玩像 Pong 这样的老式视频游戏的能力，到在 GO 中控制机器人的战斗能力，我们只需在这个数字地方输入我们的算法，看看它是如何工作的。第二步是将获得的基准与其他基准进行比较，看看我们与其他基准相比处于什么位置，也许我们可以与他们合作以获得互惠互利。</p>
+
+<p>OpenAI Gym 对我们的代理的结构没有任何假设，并且兼容任何数值计算库，如 TensorFlow 或 Theano。健身房图书馆是一个测试问题——环境——的集合，我们可以用它来制定我们的强化学习算法。这些环境有一个共享的接口，允许你编写通用算法。</p>
+
+<p>要安装 OpenAI Gym，请确保您之前已经安装了 Python 3.5+版本；然后只需键入以下命令:</p>
+
+<pre><strong>pip install gym</strong></pre>
+
+<p>一旦完成，我们将能够以一种简单而直接的方式插入该库提供的工具。</p>
+
+</div>
+
+
+
+
+
+            
+
+
+
+            
+
+        
+
+    </body>
+
+
+
+</html>
+<html xmlns:epub="http://www.idpf.org/2007/ops">
+
+    <head>
+
+        <title>Cart-Pole system</title>
+
+        
+
+        <meta charset="utf-8"/>
+
+<meta content="urn:uuid:c0dc9385-c68c-47e3-9ef8-4abf6976fdcb" name="Adept.expected.resource"/>
+
+    </head>
+
+
+
+    <body>
+
+        
+
+
+
+                            
+
+                    <h1 class="header-title">车杆系统</h1>
+
+                
+
+            
+
+            
+
+                
+
+<p>车杆系统是强化学习的经典问题。该系统由一根通过接头连接到推车上的杆(其作用类似倒立摆)组成，如下图所示:</p>
+
+<div><img src="img/7f3ae859-2e08-4728-813d-8d0e2b489e6c.png" style=""/></div>
+
+<p>通过对推车施加+1 或-1 的力来控制该系统。施加在推车上的力是可以控制的，目的是向上摆动杆子并使其稳定。这必须在手推车不落地的情况下完成。在每一步，代理人可以选择向左或向右移动手推车，并且它会在杆子平衡的每一个时间步获得 1 的奖励。如果杆偏离竖直方向超过 15 度，则程序结束。</p>
+
+<p>要使用 OpenAI Gym 库运行 Cart-Pole 示例，只需键入以下代码:</p>
+
+<pre>import gym<br/>env = gym.make('CartPole-v0')<br/>env.reset()<br/>for i in range(1000):<br/>    env.render()<br/>    env.step(env.action_space.sample())</pre>
+
+<p>像往常一样，我们将详细解释每一行代码的含义。第一行用于导入<kbd>gym</kbd>库:</p>
+
+<pre>import gym</pre>
+
+<p>然后我们继续通过调用<kbd>make</kbd>方法来创建环境:</p>
+
+<pre>env = gym.make('CartPole-v0')</pre>
+
+<p>这个方法创建了我们的代理将在其中运行的环境。环境是指代理可以与之交互的最小界面的问题。OpenAI 健身房的环境设计是为了允许对代理人的能力进行客观测试和基准测试。健身房图书馆有一套不同的环境，从容易到困难，涉及许多不同种类的数据。</p>
+
+<div><p>有关可用环境的列表，请参阅以下链接:</p>
+
+<p><a href="https://gym.openai.com/envs" target="_blank">https://gym.openai.com/envs</a></p>
+
+</div>
+
+<p>这里列出了最常用的环境:</p>
+
+<ul>
+
+<li><strong>经典控制和玩具正文</strong>:完成小规模任务，多来自强化学习文献。他们是来帮你开始的。</li>
+
+<li><strong>算法</strong>:进行多位数相加、逆序等运算。</li>
+
+<li><strong>雅达利</strong>:玩经典的雅达利游戏。</li>
+
+<li><strong> 2D 和 3D 机器人</strong>:模拟控制机器人。</li>
+
+</ul>
+
+<p>在我们的例子中，我们称之为 CartPole-v0 环境。<kbd>make</kbd>方法返回一个<kbd>env</kbd>对象，我们将使用它与游戏进行交互。但是让我们回到分析代码。现在我们必须使用<kbd>reset()</kbd>方法初始化系统:</p>
+
+<pre>env.reset()</pre>
+
+<p>该方法将环境置于其初始状态，返回描述它的数组。此时，我们将使用一个<kbd>for</kbd>循环运行 CartPole-v0 环境的一个实例，持续<kbd>1000</kbd>个时间步长，在每一步呈现环境:</p>
+
+<pre>for i in range(1000):<br/>    env.render()<br/>    env.step(env.action_space.sample())</pre>
+
+<p>调用<kbd>render()</kbd>方法将直观地显示当前状态，而对<kbd>env.step()</kbd>的后续调用将允许我们与环境交互，返回新的状态以响应我们调用它的动作。</p>
+
+<p>这样，我们在每一步都采取了随机行动。在这一点上，知道我们正在对环境采取什么行动来决定未来的行动肯定是有用的。<kbd>step()</kbd>方法返回的正是这个。实际上，此方法返回以下四个值:</p>
+
+<ul>
+
+<li><kbd>observation (object)</kbd>:一个特定环境的物体，代表你对环境的观察。</li>
+
+<li><kbd>reward (float)</kbd>:上一次行动获得的奖励金额。规模因环境而异，但目标始终是增加你的总回报。</li>
+
+<li><kbd>done (boolean)</kbd>:是否又到了重置环境的时候了。大多数(但不是全部)任务被划分成定义明确的片段，而<kbd>done</kbd>为<kbd>True</kbd>则表示该片段已经终止。</li>
+
+<li><kbd>info (dict)</kbd>:对调试有用的诊断信息。它有时对学习很有用。</li>
+
+</ul>
+
+<p>要运行这个简单的示例，将代码保存在名为<kbd>cart.py</kbd>的文件中，并在 bash 窗口中键入以下命令:</p>
+
+<pre><strong>python cart.py</strong></pre>
+
+<p>这样，将显示一个包含我们的系统的窗口，该系统不稳定，很快就会退出屏幕。这是因为推车的推力是随机产生的，没有考虑杆子的位置。</p>
+
+<p>为了解决这个问题，也就是说，为了平衡杆子，因此有必要将推力设置为与杆子的倾斜方向相反。所以，我们只需要设置两个动作，-1 或+1，向左或向右推购物车。但是为了做到这一点，我们需要随时了解从环境观察中获得的数据。正如我们已经说过的，这些数据是由<kbd>step()</kbd>方法返回的，特别是它们包含在观察对象中。</p>
+
+<p>该对象包含以下参数:</p>
+
+<ul>
+
+<li>推车位置</li>
+
+<li>推车速度</li>
+
+<li>磁极角度</li>
+
+<li>尖端的极点速度</li>
+
+</ul>
+
+<p>这四个值成为我们问题的输入。正如我们所预料的那样，系统是通过推手推车来保持平衡的。有两种可能的选择:</p>
+
+<ul>
+
+<li>将购物车推至左侧(0)</li>
+
+<li>向右推它(1)</li>
+
+</ul>
+
+<p>很明显，这是一个二进制分类问题:四个输入和一个二进制输出。</p>
+
+<p>让我们首先考虑如何提取要用作输入的值。要提取这些参数，我们只需更改前面建议的代码:</p>
+
+<pre>import gym<br/>env = gym.make('CartPole-v0')<br/>observation = env.reset()<br/>for i in range(1000):<br/>    env.render()<br/>    print(observation)<br/>    observation, reward, done, info = env.step(env.action_space.sample())</pre>
+
+<p>通过运行代码，我们可以看到包含在观察对象中的值现在被打印在屏幕上。这些很快就会有用的。</p>
+
+<p>使用从环境观察返回的值，代理必须决定两个可能的动作之一:向左或向右移动购物车。</p>
+
+
+
+
+
+            
+
+
+
+            
+
+        
+
+    </body>
+
+
+
+</html>
+<html xmlns:epub="http://www.idpf.org/2007/ops">
+
+    <head>
+
+        <title>Learning phase</title>
+
+        
+
+        <meta charset="utf-8"/>
+
+<meta content="urn:uuid:c0dc9385-c68c-47e3-9ef8-4abf6976fdcb" name="Adept.expected.resource"/>
+
+    </head>
+
+
+
+    <body>
+
+        
+
+
+
+                            
+
+                    <h1 class="header-title">学习阶段</h1>
+
+                
+
+            
+
+            
+
+                
+
+<p>现在我们要面对最苛刻的阶段，即我们系统的训练。在上一节中，我们说过健身房图书馆专注于强化学习的情景设置。经纪人的经历分为一系列的插曲。代理的初始状态是由一个分布随机抽样的，交互作用一直进行到环境达到一个终止状态。每集都重复这一过程，目的是最大化每集的总回报预期，并在尽可能少的剧集中实现高水平的表现。</p>
+
+<p>在学习阶段，我们必须估计一个评价函数。该功能必须能够通过奖励的总和来评估特定政策的便利性或其他方面。换句话说，我们必须逼近评价函数。我们能做什么？一种解决方案是使用人工神经网络作为函数逼近器。</p>
+
+<p>回想一下，神经网络的训练旨在识别神经元之间连接的权重。在这种情况下，我们将为每集选择带权重的随机值。最后，我们将选择能获得最大回报的重量组合。</p>
+
+<p>系统在给定时刻的状态是由观察对象返回给我们的。为了从实际状态中选择一个动作，我们可以使用权重和观察值的线性组合。这是函数逼近最重要的特例之一，其中逼近函数是权向量<em> w </em>的线性函数。对于每个状态<em> s </em>，都有一个实值向量<em> x(s) </em>，其分量数与<em> w </em>相同。线性方法通过<em> w </em>和<em> x(s) </em>之间的内积来近似状态值函数。</p>
+
+<p>这样，我们就确定了解决问题的方法。现在，为了使整个训练阶段易于理解，我们报告整个代码块，然后逐行对其进行详细注释:</p>
+
+<pre>import gym<br/>import numpy as np<br/>env = gym.make('CartPole-v0')<br/>HighReward = 0<br/>BestWeights = None<br/>for i in range(200):<br/>  observation = env.reset()<br/>  Weights = np.random.uniform(-1,1,4)<br/>  SumReward = 0<br/>  for j in range(1000):<br/>    env.render()<br/>    action = 0 if np.matmul(Weights,observation) &lt; 0 else 1<br/>    observation, reward, done, info = env.step(action)<br/>    SumReward += reward<br/>    print( i, j, Weights, observation, action, SumReward, BestWeights)<br/>   <br/>  if SumReward &gt; HighReward:<br/>    HighReward = SumReward<br/>    BestWeights = Weights</pre>
+
+<p>代码的第一部分处理库的导入:</p>
+
+<pre>import gym<br/>import numpy as np</pre>
+
+<p>然后我们继续通过调用<kbd>make</kbd>方法来创建环境:</p>
+
+<pre>env = gym.make('CartPole-v0')</pre>
+
+<p>这个方法创建了我们的代理将在其中运行的环境。现在让我们初始化将要使用的参数:</p>
+
+<pre>HighReward = 0<br/>BestWeights = None</pre>
+
+<p><kbd>HighReward</kbd>将包含到当前剧集为止获得的最大奖励；该值将用作比较值。<kbd>BestWeights</kbd>将包含记录最大奖励的重量序列。现在，我们可以通过针对情节的迭代过程来实现最佳权重序列搜索:</p>
+
+<pre>for i in range(200):</pre>
+
+<p>我们决定执行过程<kbd>200</kbd>次，所以我们使用<kbd>reset()</kbd>方法初始化系统:</p>
+
+<pre>  observation = env.reset() </pre>
+
+<p>在每集中，我们使用一系列重量，其数量等于对环境的观察，如前所述为四个(小车位置、小车速度、杆角度和尖端的杆速度):</p>
+
+<pre>Weights = np.random.uniform(-1,1,4)</pre>
+
+<p class="mce-root">为了确定权重，我们使用了<kbd>np.random.uniform()</kbd>函数。该函数从均匀分布中抽取样本。样本均匀分布在半开区间(低和高)。它包括低，但不包括高。</p>
+
+<p>换句话说，给定区间内的任何值都同样可能由均匀分布得出。已经传递了三个参数:输出间隔的下边界、上边界和输出形状。在我们的例子中，我们请求在区间<kbd>(-1,1)</kbd>中的四个随机值。完成后，我们初始化奖励的总和:</p>
+
+<pre>SumReward = 0</pre>
+
+<p>此时，我们实施另一个迭代周期来确定我们可以用这些权重获得的最大回报:</p>
+
+<pre>for j in range(1000):</pre>
+
+<p>调用<kbd>render()</kbd>方法将直观显示当前状态:</p>
+
+<pre>env.render()</pre>
+
+<p>现在，我们必须决定<kbd>action</kbd>:</p>
+
+<pre>action = 0 if np.matmul(Weights,observation) &lt; 0 else 1</pre>
+
+<p>正如我们所说，为了决定动作，我们使用了两个向量的线性组合:<kbd>weights</kbd>和<kbd>observation</kbd>。为了执行线性组合，我们使用了<kbd>np.matmul()</kbd>功能；它实现了两个数组的矩阵乘积。所以，如果这个乘积是<kbd>&lt;0</kbd>，那么<kbd>action</kbd>就是 0(左移)；否则，<kbd>action</kbd>为 1(右移)。</p>
+
+<div><p>需要注意的是，负的乘积意味着杆子向左倾斜，所以为了平衡这种趋势，需要向左推动大车。正的乘积意味着极点向右倾斜，所以为了平衡这种趋势，有必要将推车向右推。</p>
+
+</div>
+
+<p>现在我们使用<kbd>step()</kbd>方法来返回新的状态，以响应我们调用它的动作。显然，我们传递给方法的动作就是我们刚刚决定的动作:</p>
+
+<pre>observation, reward, done, info = env.step(action)</pre>
+
+<p>正如我们所说的，该方法返回以下四个值:</p>
+
+<ul>
+
+<li><kbd>observation</kbd> ( <kbd>object</kbd>):一个特定环境的物体，代表你对环境的观察。</li>
+
+<li><kbd>reward</kbd> ( <kbd>float</kbd>):前一次行动获得的奖励金额。规模因环境而异，但目标始终是增加你的总回报。</li>
+
+<li><kbd>done</kbd> ( <kbd>boolean</kbd>):是否又到了重置环境的时候了。大多数(但不是全部)任务被划分成定义明确的剧集，而<kbd>done</kbd>为<kbd>True</kbd>则表示该剧集已经终止。</li>
+
+<li><kbd>info</kbd> ( <kbd>dict</kbd>):对调试有用的诊断信息。它有时对学习很有用。</li>
+
+</ul>
+
+<p>然后，我们可以用刚刚获得的奖励来更新奖励的总和。请记住，对于我们保持直杆的每个时间步长，我们会得到+1 <kbd>reward</kbd>:</p>
+
+<pre>SumReward += reward</pre>
+
+<p>我们只需打印在这一步中获得的值:</p>
+
+<pre>print( i, j, Weights, observation, action, SumReward, BestWeights)</pre>
+
+<p>在当前迭代结束时，我们可以进行比较，以检查获得的总奖励是否是迄今为止获得的最高奖励:</p>
+
+<pre>if SumReward &gt; HighReward:</pre>
+
+<p>如果这是到目前为止获得的最高奖励，用这个值更新<kbd>HighReward</kbd>参数:</p>
+
+<pre>HighReward = SumReward</pre>
+
+<p>完成后，将当前步骤的<kbd>Weights</kbd>顺序固定为最佳顺序:</p>
+
+<pre>BestWeights = Weights</pre>
+
+<p>根据该指令，训练阶段结束，这将为我们提供最接近评估函数的权重序列。我们现在可以测试系统了。</p>
+
+
+
+
+
+            
+
+
+
+            
+
+        
+
+    </body>
+
+
+
+</html>
+<html xmlns:epub="http://www.idpf.org/2007/ops">
+
+    <head>
+
+        <title>Testing phase</title>
+
+        
+
+        <meta charset="utf-8"/>
+
+<meta content="urn:uuid:c0dc9385-c68c-47e3-9ef8-4abf6976fdcb" name="Adept.expected.resource"/>
+
+    </head>
+
+
+
+    <body>
+
+        
+
+
+
+                            
+
+                    <h1 class="header-title">测试阶段</h1>
+
+                
+
+            
+
+            
+
+                
+
+<p>当训练阶段完成时，实际上意味着我们已经找到了最接近该函数的权重序列，也就是说，已经返回了可实现的最佳回报的权重序列。现在，我们必须用这些值来测试系统，以检查极点是否能够承受至少<kbd>100</kbd>个时间步长。</p>
+
+<p>现在，正如我们在培训阶段已经完成的那样，为了使整个测试阶段易于理解，我们报告整个代码块，然后逐行对其进行详细注释:</p>
+
+<pre>observation = env.reset()<br/>for j in range(100):<br/>  env.render()<br/>  action = 0 if np.matmul(BestWeights,observation) &lt; 0 else 1<br/>  observation, reward, done, info = env.step(action)<br/>  print( j, action)</pre>
+
+<p>首先，我们必须使用<kbd>reset()</kbd>方法再次初始化系统:</p>
+
+<pre>observation = env.reset() </pre>
+
+<p>然后，我们必须运行一个迭代周期来应用在训练阶段获得的结果:</p>
+
+<pre>for j in range(100):</pre>
+
+<p>对于每一步，我们将调用<kbd>render()</kbd>方法来直观地显示当前状态:</p>
+
+<pre>env.render()</pre>
+
+<p>现在，我们必须根据在训练阶段获得的最佳权重和对当前状态的观察来决定对系统执行的操作:</p>
+
+<pre>action = 0 if np.matmul(BestWeights,observation) &lt; 0 else 1</pre>
+
+<p>现在我们使用<kbd>step()</kbd>方法，返回新的状态来响应我们调用它的动作。传递给该方法的操作就是我们刚刚决定的操作:</p>
+
+<pre>observation, reward, done, info = env.step(action)</pre>
+
+<p>最后，我们打印步骤号和为可视化流程控制而决定的动作。</p>
+
+<p>通过运行建议的代码，我们可以验证在训练阶段之后，系统能够在 100 个时间步长内保持极点平衡。</p>
+
+
+
+
+
+            
+
+
+
+            
+
+        
+
+    </body>
+
+
+
+</html>
+<html xmlns:epub="http://www.idpf.org/2007/ops">
+
+    <head>
+
+        <title>Summary</title>
+
+        
+
+        <meta charset="utf-8"/>
+
+<meta content="urn:uuid:c0dc9385-c68c-47e3-9ef8-4abf6976fdcb" name="Adept.expected.resource"/>
+
+    </head>
+
+
+
+    <body>
+
+        
+
+
+
+                            
+
+                    <h1 class="header-title">摘要</h1>
+
+                
+
+            
+
+            
+
+                
+
+<p>强化学习旨在创造能够学习和适应环境变化的算法。这种编程技术基于根据算法选择接收外部刺激的概念。正确的选择会带来奖励，而错误的选择会导致惩罚。当然，系统的目标是达到最好的结果。在这一章中，我们讨论了强化学习的基础。</p>
+
+<p>首先，我们看到强化学习的目标是创造能够从经验中学习的智能主体。因此，我们分析了正确应用强化学习算法的步骤。稍后，我们探索了代理-环境接口。必须实现目标的实体称为<strong>代理</strong>。代理必须与之交互的实体被称为<strong>环境</strong>，它对应于代理之外的一切。</p>
+
+<p>为了避免负载问题和计算困难，代理-环境的相互作用被认为是一个 MDP。MDP 是一个随机控制过程。然后引入了贴现因子的概念。折扣因子可以在学习过程中修改，以突出或不突出特定的动作或状态。一个最优的策略可以使执行一个动作所获得的强化甚至更低(或负的)，只要总体上这导致了更大的强化。</p>
+
+<p>在本章的中心部分，我们致力于分析最常见的强化学习技术。涵盖了 Q 学习、TD 学习和深度 Q 学习网络。最后，我们探索了 OpenAI 健身房图书馆，并着手分析了一个强化学习的实例。</p>
+
+
+
+
+
+            
+
+
+
+            
+
+        
+
+    </body>
+
+
+
+</html></body></html>

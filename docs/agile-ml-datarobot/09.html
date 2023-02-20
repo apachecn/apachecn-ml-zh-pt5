@@ -1,0 +1,325 @@
+<html><head/><body>
+
+
+
+
+
+
+
+
+
+
+
+<style type="text/css">body{margin:1em;background-color:transparent!important;}#sbo-rt-content *{text-indent:0pt!important;}#sbo-rt-content .bq{margin-right:1em!important;}</style>
+
+<div><div><h1 id="_idParaDest-109"><em class="italic"> <a id="_idTextAnchor110"/>第七章</em>:模型的理解和可解释性</h1>
+
+			<p>在上一章中，我们学习了如何构建模型，现在我们将学习如何使用 DataRobot 生成的输出来理解模型，并使用这些信息来解释为什么模型会提供特定的预测。正如我们之前所讨论的，这个方面对于确保我们正确使用结果是至关重要的。DataRobot 自动化了创建图表和绘图的大部分任务，以帮助人们理解模型，但您仍然需要知道如何在您试图解决的问题的上下文中解释它所显示的内容。这是为什么我们需要人参与到过程中的另一个原因，即使大部分任务已经自动化了。可以想象，随着自动化程度的提高，解释结果的任务将变得越来越有价值。</p>
+
+			<p>在本章中，我们将讨论以下主要话题:</p>
+
+			<ul>
+
+				<li>查看和理解模型细节</li>
+
+				<li>评估模型性能和指标</li>
+
+				<li>生成模型解释</li>
+
+				<li>理解模型学习曲线和权衡</li>
+
+			</ul>
+
+			<h1 id="_idParaDest-110"><a id="_idTextAnchor111"/>查看和了解模型细节</h1>
+
+			<p>在上一章中，我们为不同的项目创建了几个模型。DataRobot 在一个<a id="_idIndexMarker333"/>项目中创建 10 到 20 个模型，查看和分析所有这些模型的细节是非常繁重的。您不必查看这些模型中的每一个，通常在做出最终选择之前只查看前几个模型。我们现在将查看<code>Automobile Example 2</code>项目中模特的排行榜，并选择最佳模特，如下图所示:</p>
+
+			<div><div><img src="img/Figure_7.1_B17159.jpg" alt="Figure 7.1 – Model information&#13;&#10;" width="1151" height="738"/>
+
+				</div>
+
+			</div>
+
+			<p class="figure-caption">图 7.1–型号信息</p>
+
+			<p>在前面的截图中，我们在<strong class="bold">描述</strong>选项卡中选择了<strong class="bold">模型信息</strong>选项卡，以查看<a id="_idIndexMarker334"/>模型有多大以及创建预测所需的预计时间。这些信息在对时间敏感的实时应用程序中非常有用，这些应用程序需要快速记录数千个事务。现在让我们转到<strong class="bold">了解</strong>选项卡中的<strong class="bold">功能影响</strong>选项卡，如下面的屏幕截图所示:</p>
+
+			<div><div><img src="img/Figure_7.2_B17159.jpg" alt="Figure 7.2 – Feature impacts &#13;&#10;" width="1055" height="607"/>
+
+				</div>
+
+			</div>
+
+			<p class="figure-caption">图 7.2–功能影响</p>
+
+			<p>这是这个模型最重要的图表之一，因为它显示了一个特性对这个 XGBoost 模型的贡献。我们可以看到贡献最大的是<code>curb_weight</code>、<code>engine_size</code>、<code>horsepower</code>、<code>highway_mpg</code>、<code>cylinder_count</code>。另一方面，<code>cylinder_size</code>和<code>engine_type</code>贡献很小。虽然<code>cylinder_size</code>不太具有预测性，但我们不能忘记预测并不总是最终目标。我们知道<code>cylinder_size</code>对<code>engine_size</code>有影响，这是一个重要的特性。目标可能是利用这些信息找出降低成本的方法。为此，我们可能想要减少<code>engine_size</code>，但是您不能直接减少<code>engine_size</code>。为此，您需要减少气缸的尺寸或数量，这将导致<code>engine_size</code>的减少。有一个这个问题的因果图来指导你，对于决定采取什么样的行动来实现我们的目标非常有帮助。</p>
+
+			<p>在我们采取行动之前，让我们<a id="_idIndexMarker335"/>检查一下<strong class="bold">广义加性模型</strong> ( <strong class="bold"> GAM </strong>)的结果是什么样的，如下图所示:</p>
+
+			<div><div><img src="img/Figure_7.3_B17159.jpg" alt="Figure 7.3 – Feature impacts for a GAM&#13;&#10;" width="1042" height="620"/>
+
+				</div>
+
+			</div>
+
+			<p class="figure-caption">图 7.3–对 GAM 的功能影响</p>
+
+			<p><em class="italic">图 7.3 </em>显示了 GAM 的重要特征。虽然许多特性看起来相似，但是我们注意到<code>engine_type</code>对于这个模型来说非常重要，而<code>engine_type</code>对于之前的模型来说非常不重要。这不是一个错误——它指出了一个事实，即许多特征是相互关联的，不同的模型可以从不同的特征中获得信号，预测能力不一定与根本原因的<a id="_idIndexMarker336"/>相同。为了采取行动，我们需要理解导致目标特性变化的根本特性。换句话说，最能预测某事的特征并不总是能够被改变以在目标中产生期望的改变的特征。</p>
+
+			<p>为了进一步了解<a id="_idIndexMarker337"/>特征如何影响目标，让我们在模型的<strong class="bold">了解</strong>选项卡中选择<strong class="bold">特征效果</strong>选项卡，如下面的屏幕截图所示:</p>
+
+			<div><div><img src="img/Figure_7.4_B17159.jpg" alt="Figure 7.4 – Feature effects &#13;&#10;" width="1016" height="634"/>
+
+				</div>
+
+			</div>
+
+			<p class="figure-caption">图 7.4–功能效果</p>
+
+			<p>前面的<a id="_idIndexMarker338"/>截图显示了各种特性的部分依赖图。所选的图用于<code>curb_weight</code>。该图显示了<code>curb_weight</code>和价格之间相当线性的关系。我们确实在一些地方看到了一些不寻常的价格下跌——例如，在<code>2700</code>的<code>curb_weight</code>值附近。在我们对此过于认真之前，我们注意到围绕它的数据量非常有限。这告诉我们，这种特殊的观察结果可能是由于缺乏数据。这确实提出了一个问题，即我们的模型可能会预测在那个小区域的较低价格，这反过来会导致较低的收入。</p>
+
+			<p>让我们看看下面截图中的另一个功能:</p>
+
+			<div><div><img src="img/Figure_7.5_B17159.jpg" alt="Figure 7.5 – Partial dependence for engine_size&#13;&#10;" width="1011" height="636"/>
+
+				</div>
+
+			</div>
+
+			<p class="figure-caption">图 7.5-发动机尺寸的部分相关性</p>
+
+			<p>前面的截图显示了<code>engine_size</code>和价格之间的高度非线性关系。我们看到价格在<code>180</code>的<code>engine_size</code>值附近大幅上涨。不与领域专家讨论，很难知道这种效果有多真实。我们可以注意到，尺寸<a id="_idIndexMarker339"/>大于<code>130</code>的可用数据量非常小，因此我们看到的影响可能只是由于数据的缺乏。照现在的情况来看，它表明价格停滞不前超过了<code>200</code>的规模，这对企业来说可能是一个重要的洞察力。</p>
+
+			<p>让我们来看看下面截图中<code>highway_mpg</code>的另一个部分依赖图:</p>
+
+			<div><div><img src="img/Figure_7.6_B17159.jpg" alt="Figure 7.6 – Partial dependence plot for highway_mpg&#13;&#10;" width="1010" height="636"/>
+
+				</div>
+
+			</div>
+
+			<p class="figure-caption">图 7.6-highway _ mpg 的部分相关图</p>
+
+			<p><em class="italic">图 7.6 </em>显示了另一个<a id="_idIndexMarker340"/>高度非线性的关系，在<code>28</code>的<code>highway_mpg</code>值附近出现了一个关键的转变点。这清楚地表明<code>28</code>周围的价格大幅下跌，因此这是一个临界点。这可能是由于法规的原因，低于<code>28</code>会将你置于不同类型的车辆或引擎中。我们还注意到，一旦超过这个阈值，从价格影响的角度来看，任何进一步的变化都不是很有意义(但是，从其他角度来看，它仍然可能非常有影响)。如果你不知道这是为什么，那么<a id="_idIndexMarker341"/>与你的<strong class="bold">主题专家</strong> ( <strong class="bold">中小企业</strong>)讨论这一点很重要。</p>
+
+			<p>我展示和讨论这些图的主要目的是告诉你花时间分析和回顾这些图是多么重要，而不是花所有的时间编写这些图。由于 DataRobot 会自动为您创建这些结果，您现在可以将时间花在分析这些结果的增值工作上，以帮助改善您的业务。</p>
+
+			<p>让我们重温一下<code>engine_size</code>的剧情，但是<a id="_idIndexMarker342"/>这次是为了游戏，如下面的截图所示:</p>
+
+			<div><div><img src="img/Figure_7.7_B17159.jpg" alt="Figure 7.7 – Partial dependence plot for the GAM&#13;&#10;" width="1105" height="647"/>
+
+				</div>
+
+			</div>
+
+			<p class="figure-caption">图 7.7-GAM 的部分相关性图</p>
+
+			<p><em class="italic">图 7.7 </em>显示了 GAM 的部分相关性。将此与<em class="italic">图 7.5 </em>进行比较，我们看到<em class="italic">图 7.7 </em>显示了值<code>95</code>和<code>180</code>周围更清晰的阈值。与领域专家讨论这一点可以帮助您确定哪个模型更好地代表现实，哪个模型可以帮助您更好地设定价格。GAMs 的一个好处是，您可以轻松地平滑这些曲线，并为部署塑造它们。请记住，准确的预测并不总是等同于更好的干预或行动。</p>
+
+			<p>游戏更容易理解和解释。让我们来看另一张图表，它有助于理解这一点:</p>
+
+			<div><div><img src="img/Figure_7.8_B17159.jpg" alt=" Figure 7.8 – Feature coefficients&#13;&#10;" width="1025" height="664"/>
+
+				</div>
+
+			</div>
+
+			<p class="figure-caption">图 7.8–特征系数</p>
+
+			<p><em class="italic">图 7.8 </em>显示了 GAM 中不同特征的系数。你会注意到 DataRobot 已经<a id="_idIndexMarker344"/>创造了一些衍生功能。你可以点击它们查看更多细节。这提供了系数的高级视图，但还有另一个视图为理解模型提供了更好的视图。为此，让我们点击游戏的<strong class="bold">描述</strong>选项卡中的<strong class="bold">评分表</strong>选项卡，如以下截图所示:</p>
+
+			<div><div><img src="img/Figure_7.9_B17159.jpg" alt="Figure 7.9 – Rating table for a GAM&#13;&#10;" width="963" height="409"/>
+
+				</div>
+
+			</div>
+
+			<p class="figure-caption">图 7.9-GAM 的评级表</p>
+
+			<p>此视图允许您下载由 DataRobot 构建的评分表；您也可以修改该表并将其上传回<a id="_idIndexMarker345"/>以使用修改后的表。因此，这种机制允许您基于对问题的理解来手动微调您的模型。这个功能非常强大，因为它允许你有很大的灵活性，但同时，你必须小心使用这个功能。让我们点击<strong class="bold">下载表格</strong>按钮，下载<strong class="bold">逗号分隔值</strong> ( <strong class="bold"> CSV </strong>)文件。下载完成后，我们可以使用<strong class="bold"> Excel </strong>打开文件，如下图所示:</p>
+
+			<div><div><img src="img/Figure_7.10_B17159.jpg" alt="Figure 7.10 – Rating table for a GAM&#13;&#10;" width="866" height="580"/>
+
+				</div>
+
+			</div>
+
+			<p class="figure-caption">图 7.10-GAM 的评级表</p>
+
+			<p>您现在可以看到评级表的样子。在这里，你可以看到 DataRobot 已经为<a id="_idIndexMarker347"/>各种功能创建了 bin。对于每个箱，它分配了系数和相关性，以确定特征的变化如何影响目标变量。为了更好地理解这一点，我们可以在 Excel 中为各个要素创建图，如下面的屏幕截图所示:</p>
+
+			<div><div><img src="img/Figure_7.11_B17159.jpg" alt="Figure 7.11 – Feature relativities&#13;&#10;" width="1499" height="937"/>
+
+				</div>
+
+			</div>
+
+			<p class="figure-caption">图 7.11-特征相关性</p>
+
+			<p>在<em class="italic">图 7.11 </em>中，你可以看到一个给定的特性，比如<code>body_style</code>是如何影响价格的。GAM 模型本质上是来自所选特征的所有贡献的总和。给定<a id="_idIndexMarker348"/>等级表，任何人都可以容易地计算价格，并且这也可以以非常简单的方式实现。考虑到单个特征的影响是非线性的(并且仍然非常容易理解)，这使得这些模型表现得非常好，同时仍然非常容易理解。难怪游戏越来越受欢迎。</p>
+
+			<p>我们还想看一个图表，它通常有助于理解特性的贡献。为此，我们将点击页面顶部的<strong class="bold"> Insights </strong>菜单项，这将显示如下图表:</p>
+
+			<div><div><img src="img/Figure_7.12_B17159.jpg" alt="Figure 7.12 – Model insights&#13;&#10;" width="1093" height="775"/>
+
+				</div>
+
+			</div>
+
+			<p class="figure-caption">图 7.12–模型洞察</p>
+
+			<p><em class="italic">图 7.12 </em>显示了使用 DataRobot 选定模型的变量效果，该模型使用常数样条(在这种情况下，如果值落在特定区间内，则为<code>one</code>；否则就是<code>zero</code>。您可以参考所选模型的特征效果来查看此图表，以查看这些图表之间是否有任何不一致之处。</p>
+
+			<p>既然我们从哪些特性是重要的以及它们如何对目标值做出贡献的角度理解了模型，我们就可以关注模型做得有多好了。</p>
+
+			<h1 id="_idParaDest-111"><a id="_idTextAnchor112"/>评估模型性能和指标</h1>
+
+			<p>在本节中，我们将重点关注模型在尝试预测目标值方面的表现。让我们从<a id="_idIndexMarker350"/>开始，看看不同型号的整体性能比较，如下图所示:</p>
+
+			<div><div><img src="img/Figure_7.13_B17159.jpg" alt="Figure 7.13 – Performance across models&#13;&#10;" width="1059" height="810"/>
+
+				</div>
+
+			</div>
+
+			<p class="figure-caption">图 7.13–不同型号的性能</p>
+
+			<p>前面的截图显示了总排行榜，我们以前见过。在这里，我们可以看到基于<strong class="bold">伽马偏差</strong>指标的不同模型的整体性能。我们还可以通过单击指标附近的下拉箭头来查看基于其他指标的性能，这将向我们显示可供选择的指标列表，如下面的屏幕截图所示:</p>
+
+			<div><div><img src="img/Figure_7.14_B17159.jpg" alt="Figure 7.14 – Performance metrics&#13;&#10;" width="674" height="463"/>
+
+				</div>
+
+			</div>
+
+			<p class="figure-caption">图 7.14–性能指标</p>
+
+			<p><em class="italic">图 7.14 </em>显示了我们可以从中选择的各种指标。你通常会在<a id="_idIndexMarker351"/>不同的衡量标准中看到相似的趋势，即哪些模型会出现在榜首。一般来说，DataRobot 选择的指标是一个非常好的选择，如果不是最佳选择的话。现在，让我们通过点击模型并选择<strong class="bold">评估</strong>选项卡中的<strong class="bold">提升图</strong>选项卡来检查特定模型的性能详情，如以下截图所示:</p>
+
+			<div><div><img src="img/Figure_7.15_B17159.jpg" alt="Figure 7.15 – Lift chart&#13;&#10;" width="1061" height="669"/>
+
+				</div>
+
+			</div>
+
+			<p class="figure-caption">图 7.15-提升图</p>
+
+			<p>前面截图中的提升图显示了预测值与实际值的对比情况。您可以<a id="_idIndexMarker352"/>选择收集结果的箱数。最大值是<code>60</code>，这通常是一个很好的起点。这意味着预测首先按升序排序，然后分组到<code>60</code>个容器中。您看到的结果是该容器内的平均值。宁滨的原因是，如果你查看整个数据集，将会有如此多的数据，你将无法从中理解任何意义。您可以看到，该模型在整个值范围内表现非常好，只有一些小区域的差异似乎高于其他区域。我们通常希望看到多个模型的提升图，看看是否有一个模型比另一个模型做得更好的地方。现在让我们来看看 GAM 的提升图，如下面的截图所示:</p>
+
+			<div><div><img src="img/Figure_7.16_B17159.jpg" alt="Figure 7.16 – Lift chart for the GAM&#13;&#10;" width="1061" height="689"/>
+
+				</div>
+
+			</div>
+
+			<p class="figure-caption">图 7.16-GAM 的提升图</p>
+
+			<p><em class="italic">图 7.16 </em>中的结果看起来与<em class="italic">图 7.15 </em>中的结果非常相似，但我们可以看到 GAM 在更高的值时表现不佳。我们现在知道了 GAM <a id="_idIndexMarker353"/>与 XGBoost 模型相比具体在哪里比较弱。让我们通过点击<strong class="bold">评估</strong>选项卡中的<strong class="bold">残差</strong>选项卡来进一步查看，如以下截图所示:</p>
+
+			<div><div><img src="img/Figure_7.17_B17159.jpg" alt="Figure 7.17 – Model residuals&#13;&#10;" width="1055" height="719"/>
+
+				</div>
+
+			</div>
+
+			<p class="figure-caption">图 7.17–模型残差</p>
+
+			<p>残差看起来很好地分布在平均值周围，但是有一点偏向-ve 值。让我们也检查一下游戏的残差是如何分布的。我们可以在下面的截图中看到输出:</p>
+
+			<div><div><img src="img/Figure_7.18_B17159.jpg" alt="Figure 7.18 – Residuals for the GAM&#13;&#10;" width="1064" height="735"/>
+
+				</div>
+
+			</div>
+
+			<p class="figure-caption">图 7.18-GAM 的残差</p>
+
+			<p>GAM 的残差也分布良好，但与<a id="_idIndexMarker355"/> XGBoost 模型相比，偏差稍大。总的来说，模型的性能看起来非常好。我们现在可以研究理解单个的预测和它们的解释。</p>
+
+			<h1 id="_idParaDest-112"><a id="_idTextAnchor113"/>生成模型解释</h1>
+
+			<p>DataRobot 的另一个关键功能是，它会自动为<a id="_idIndexMarker356"/>每个预测生成实例级解释。这对于理解为什么一个特定的预测会变成这样是很重要的。这不仅对理解模型很重要；很多时候，这也是法规遵从性的需要。我敢肯定，如果你被拒绝信用，你已经看到了产生或提供的解释。生成这些解释的能力并不简单<a id="_idIndexMarker357"/>，而且可能非常耗时。让我们首先来看看为 XGBoost 模型生成的解释，如下面的截图所示:</p>
+
+			<div><div><img src="img/Figure_7.19_B17159.jpg" alt="Figure 7.19 – Model explanations&#13;&#10;" width="1019" height="590"/>
+
+				</div>
+
+			</div>
+
+			<p class="figure-caption">图 7.19–模型解释</p>
+
+			<p>因为我们选择了<code>0</code>到<code>10000</code>。您可以选择一些特定的点，并查看构成该预测的组件。在<em class="italic">图 7.19 </em>中，我们选择了<code>27788.86</code>的预测点。我们可以在右侧看到起作用的顶部元素，其中<code>engine_size</code>的作用最大，在这种情况下，<code>engine_size</code>的值为<code>183</code>。请注意，特性的相对贡献可能会因具体情况而异，这里的特性顺序不会与我们在上一节中看到的特性影响顺序完全匹配。让我们将其与 GAM 生成的解释进行比较，如下面的屏幕截图所示:</p>
+
+			<div><div><img src="img/Figure_7.20_B17159.jpg" alt="Figure 7.20 – Model explanations for GAM&#13;&#10;" width="1028" height="617"/>
+
+				</div>
+
+			</div>
+
+			<p class="figure-caption">图 7.20-GAM 的模型解释</p>
+
+			<p>在前面的<a id="_idIndexMarker359"/>截图中，选择的点用于<code>31465.18</code>的预测。在这一点上，我们可以看到对价格起主要作用的特性，我们也注意到由于<code>183</code>的<code>engine_size</code>对游戏来说要大得多，所以价格有所下降。</p>
+
+			<p>可以下载并分析整个数据集的解释，以获得更多见解。点击<strong class="bold">上传新数据集</strong>按钮，您还可以上传一个全新的数据集来对其评分，并轻松生成这些解释。</p>
+
+			<p>正如您在本章中所看到的，不同的型号有不同的性能，使用的功能也有所不同，并且具有不同的可理解性。在最终选择要使用的模型之前，还有几个其他方面需要考虑。现在让我们看看模型学习曲线和一些模型权衡。</p>
+
+			<h1 id="_idParaDest-113"><a id="_idTextAnchor114"/>了解模型学习曲线和权衡</h1>
+
+			<p>在<strong class="bold">机器学习</strong> ( <strong class="bold"> ML </strong>)问题中，我们总是试图找到更多的数据来改进我们的模型，但正如你所想象的，总有一天我们会达到收益递减的点。很难知道你什么时候达到了那个点，但是你可以通过观察学习曲线得到提示。幸运的是，DataRobot 通过自动构建这些学习曲线使这项任务变得简单。当 DataRobot s <a id="_idIndexMarker361"/>开始建立模型时，它首先在小样本数据上尝试广泛的算法。然后用更大的样本量建立有希望的模型，等等。</p>
+
+			<p>在此过程中，我们会发现随着数据的增加，性能会提高多少。要查看学习曲线，您可以点击屏幕顶部的<strong class="bold">学习曲线</strong>菜单项，如下图所示:</p>
+
+			<div><div><img src="img/Figure_7.21_B17159.jpg" alt="Figure 7.21 – Model learning curves&#13;&#10;" width="1209" height="871"/>
+
+				</div>
+
+			</div>
+
+			<p class="figure-caption">图 7.21–模型学习曲线</p>
+
+			<p>您可以在页面右侧看到不同的<a id="_idIndexMarker362"/>型号。在这里，您可以点击想要检查和比较的模型。选择模型后，点击<strong class="bold"> +计算学习曲线</strong>按钮。这将打开一个对话框，显示所选的模型和相应的样本大小，如下面的屏幕截图所示:</p>
+
+			<div><div><img src="img/Figure_7.22_B17159.jpg" alt="Figure 7.22 – Models selected for comparison&#13;&#10;" width="669" height="367"/>
+
+				</div>
+
+			</div>
+
+			<p class="figure-caption">图 7.22–选择用于比较的模型</p>
+
+			<p>如果<em class="italic">图 7.22 </em>中的选择看起来<a id="_idIndexMarker363"/>正确，可以点击<strong class="bold">计算</strong>按钮。现在，您将看到所选模型的学习曲线，如以下屏幕截图所示:</p>
+
+			<div><div><img src="img/Figure_7.23_B17159.jpg" alt="Figure 7.23 – Comparison of learning curves&#13;&#10;" width="1157" height="838"/>
+
+				</div>
+
+			</div>
+
+			<p class="figure-caption">图 7.23-学习曲线对比</p>
+
+			<p>现在，随着样本量的增加，您可以看到性能的提高。我们可以看到，GAM <a id="_idIndexMarker364"/>学习得非常快，但是随着样本量的增加，XGBoost 模型会取而代之。我们可以看到，这两个模型都将受益于额外的数据。我们还可以看到，如果我们只有现有数据的一半，那么 GAM 将是明显的赢家。</p>
+
+			<p>我们现在可以看看<a id="_idIndexMarker365"/>模型的另一个权衡——即速度和准确性之间的<a id="_idIndexMarker366"/>权衡。如果您点击页面顶部的<strong class="bold">速度与准确度</strong>菜单项，您将看到一个图表，如以下截图所示:</p>
+
+			<div><div><img src="img/Figure_7.24_B17159.jpg" alt="Figure 7.24 – Speed versus accuracy trade-off&#13;&#10;" width="1187" height="856"/>
+
+				</div>
+
+			</div>
+
+			<p class="figure-caption">图 7.24-速度与精度的权衡</p>
+
+			<p>你会注意到<a id="_idIndexMarker367"/> DataRobot 已经建造了一个 AVG 搅拌机模型，它似乎是最好的模型，但差不了多少。混合<a id="_idIndexMarker368"/>模型有时可以产生比单个模型大得多的升力，因此值得探索这个选项。我们可以选择该型号，并点击<strong class="bold">描述</strong>菜单项中的<strong class="bold">蓝图</strong>选项卡。</p>
+
+			<h1 id="_idParaDest-114"><a id="_idTextAnchor115"/>总结</h1>
+
+			<p>在本章中，我们介绍了如何利用 DataRobot 的功能来构建和比较模型。正如你所看到的，DataRobot 使快速建立许多模型变得非常容易，并帮助我们比较它们。正如你所经历的，我们尝试了很多东西，建立了几十个模型。这是 DataRobot 的关键功能，它对数据科学团队的重要性怎么强调都不为过。如果您自己用 Python 构建这些模型，将会花费更多的时间和精力。相反，我们用这些时间和思考来试验不同的想法，并把更多的精力放在理解问题上。我们还学习了编码最佳实践的蓝图。这些蓝图对于新的和有经验的数据科学家来说都是有用的学习工具。我们还学习了 DataRobot 如何为我们构建集合或混合模型。</p>
+
+			<p>向前一步并开始部署这些模型中的一个可能很诱人，但重要的是不要在没有做一些分析的情况下直接跳到这一步。在下一章，我们将更深入地挖掘模型来理解它们，看看我们是否能从中获得更多的见解。</p>
+
+		</div>
+
+	</div>
+
+</body></html>

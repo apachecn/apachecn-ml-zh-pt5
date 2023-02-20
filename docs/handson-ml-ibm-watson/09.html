@@ -1,0 +1,1576 @@
+<html><head/><body><html xmlns:epub="http://www.idpf.org/2007/ops">
+
+    <head>
+
+        <title>Deep Learning Using TensorFlow on the IBM Cloud</title>
+
+        
+
+        <meta charset="utf-8"/>
+
+<meta content="urn:uuid:ea72de30-ad32-4a04-8901-3b266c7f12e9" name="Adept.expected.resource"/>
+
+    </head>
+
+
+
+    <body>
+
+        
+
+
+
+                            
+
+                    <h1 class="header-title">在 IBM 云上使用 TensorFlow 进行深度学习</h1>
+
+                
+
+            
+
+            
+
+                
+
+<p>在本章中，我们将介绍 IBM Cloud 上的深度学习和神经网络的概念。还将概述如何使用 TensorFlow 框架在云上实现深度学习模型。本章旨在平衡理论和实际实施。</p>
+
+<p>我们将在本章中讨论以下主题:</p>
+
+<ul>
+
+<li>深度学习简介</li>
+
+<li>TensorFlow basics</li>
+
+<li>使用张量流的神经网络</li>
+
+<li>一个例子</li>
+
+<li>张量流和图像分类</li>
+
+<li>额外准备</li>
+
+</ul>
+
+
+
+
+
+            
+
+
+
+            
+
+        
+
+    </body>
+
+
+
+</html>
+<html xmlns:epub="http://www.idpf.org/2007/ops">
+
+    <head>
+
+        <title>Introduction to deep learning </title>
+
+        
+
+        <meta charset="utf-8"/>
+
+<meta content="urn:uuid:ea72de30-ad32-4a04-8901-3b266c7f12e9" name="Adept.expected.resource"/>
+
+    </head>
+
+
+
+    <body>
+
+        
+
+
+
+                            
+
+                    <h1 class="header-title">深度学习简介</h1>
+
+                
+
+            
+
+            
+
+                
+
+<p>深度学习(也称为<strong>深度结构化学习</strong>或<strong>分层学习</strong>)是基于学习数据表示的更大一组机器学习方法的一部分，与特定任务算法相反。</p>
+
+<p>学习可以是监督的(我们在<a href="b2822c69-13f0-4943-9e66-f9ef04898b60.xhtml">第 3 章</a>、<em>监督的机器学习模型和你的数据</em>中讨论过)、半监督的或无监督的(在<a href="f131f753-1d77-478c-9c0d-1e799330eed8.xhtml">第 4 章</a>、<em>实现无监督算法</em>中讨论过)。</p>
+
+<p>深度学习算法在令人兴奋的领域中发挥作用，例如图像分类(将数字图像中的每个像素分类到几个土地覆盖类别或主题中的一个)，对象检测(在图像或视频中找到现实世界对象(如人脸、汽车和建筑物)的实例的过程)，图像恢复(补偿或消除由运动模糊、噪声和相机失焦引起的缺陷， 这降低了图像的质量)和图像分割(将数字图像分割成多个像素段的过程，也称为<strong>超像素</strong>，以将图像的表示简化和/或改变成更有意义和更容易分析的东西)。</p>
+
+<p>使用巨大神经网络的深度学习正在教会机器自动执行人类视觉系统执行的任务。</p>
+
+<p>深度学习模型模糊地受到生物神经系统中信息处理和通信模式的启发，但它们确实不同于生物大脑的结构和功能属性，这使它们与神经科学证据不兼容。</p>
+
+<p>理论够了。虽然前面对机器/深度学习的解释可能是高层次的，但这足以让我们继续下一部分，在那里我们开始思考深度学习的实现方式，特别是使用谷歌大脑团队开发的供谷歌内部使用的工具集，在 2015 年 11 月 9 日的 Apache 2.0 开源许可证下:TensorFlow。</p>
+
+
+
+
+
+            
+
+
+
+            
+
+        
+
+    </body>
+
+
+
+</html>
+<html xmlns:epub="http://www.idpf.org/2007/ops">
+
+    <head>
+
+        <title>TensorFlow basics </title>
+
+        
+
+        <meta charset="utf-8"/>
+
+<meta content="urn:uuid:ea72de30-ad32-4a04-8901-3b266c7f12e9" name="Adept.expected.resource"/>
+
+    </head>
+
+
+
+    <body>
+
+        
+
+
+
+                            
+
+                    <h1 class="header-title">TensorFlow basics</h1>
+
+                
+
+            
+
+            
+
+                
+
+<p>张量可以被认为是广义矩阵，或者更具体地说，是生活在结构中并与其他数学实体相互作用的数学实体。如果结构中的其他实体以任何方式进行变换，那么张量也必须按照那个变换规则进行变换。</p>
+
+<p>前面的定义是什么意思？也许把一个<strong>张量</strong>想成多维数组更容易理解，或者考虑下面，比较<strong>标量</strong>、<strong>向量</strong>、<strong>矩阵</strong>和<strong>张量</strong>:</p>
+
+<div><img src="img/6aa4e189-4fb1-4e5d-84b3-2ad53319d2b2.png" style=""/></div>
+
+<p class="mce-root"/>
+
+<p>以 TensorFlow 为主题，TensorFlow 是一个开源软件库(也称为<strong>框架</strong>)，最初由 Google 创建，用于创建深度学习模型。</p>
+
+<p>您可以访问<a href="https://www.tensorflow.org/">https://www.tensorflow.org/</a>了解更多关于 TensorFlow 的详情。</p>
+
+<p>在下一节中，我们将讨论深度学习、神经网络和张量流之间的联系。</p>
+
+
+
+
+
+            
+
+
+
+            
+
+        
+
+    </body>
+
+
+
+</html>
+<html xmlns:epub="http://www.idpf.org/2007/ops">
+
+    <head>
+
+        <title>Neural networks and TensorFlow </title>
+
+        
+
+        <meta charset="utf-8"/>
+
+<meta content="urn:uuid:ea72de30-ad32-4a04-8901-3b266c7f12e9" name="Adept.expected.resource"/>
+
+    </head>
+
+
+
+    <body>
+
+        
+
+
+
+                            
+
+                    <h1 class="header-title">神经网络和张量流</h1>
+
+                
+
+            
+
+            
+
+                
+
+<p>深度学习模型通常采用被称为<strong>神经网络</strong>的算法，据说这是受实际生物神经系统(如大脑)处理信息的方式的启发。它使计算机能够识别所有数据点，每个数据点代表什么，并学习模式。</p>
+
+<p>今天，深度学习模型的主要软件工具是 TensorFlow，因为它允许开发人员创建具有许多层的大规模神经网络。</p>
+
+<p>张量流主要用于以下目的:</p>
+
+<ul>
+
+<li>分类</li>
+
+<li>感觉</li>
+
+<li>谅解</li>
+
+<li>发现</li>
+
+<li>预言；预测；预告</li>
+
+<li>创造</li>
+
+</ul>
+
+<p>正如 Watson 文档中所述，部署复杂的机器学习模型(如 TensorFlow 模型)的挑战在于，这些模型的计算成本非常高，训练起来非常耗时。一些解决方案(针对这一挑战)包括 GPU 加速、分布式计算或两者的结合。IBM 云平台和 Watson Studio 提供了这两者。</p>
+
+<p>它还指出:IBM Watson Studio 允许人们利用云上可用的计算能力来加快更复杂的机器学习模型的训练时间，从而将时间从几小时或几天减少到几分钟。</p>
+
+<p>在接下来的部分中，我们将探索几个练习，演示在 IBM Watson Studio 中使用 TensorFlow 的各种方法。</p>
+
+
+
+
+
+            
+
+
+
+            
+
+        
+
+    </body>
+
+
+
+</html>
+<html xmlns:epub="http://www.idpf.org/2007/ops">
+
+    <head>
+
+        <title>An example </title>
+
+        
+
+        <meta charset="utf-8"/>
+
+<meta content="urn:uuid:ea72de30-ad32-4a04-8901-3b266c7f12e9" name="Adept.expected.resource"/>
+
+    </head>
+
+
+
+    <body>
+
+        
+
+
+
+                            
+
+                    <h1 class="header-title">一个例子</h1>
+
+                
+
+            
+
+            
+
+                
+
+<p>在本节中，我们将从逐步浏览沃森社区(<a href="https://dataplatform.cloud.ibm.com/community">https://dataplatform.cloud.ibm.com/community</a>)教程开始，该教程旨在展示使用 IBM Watson Studio 上的 TensorFlow 库部署深度神经网络是多么容易。</p>
+
+<p>该教程可以在 GitHub 上下载，但是我们不会在这里提供 URL，因为我们将演示直接从 IBM Watson Studio 项目中导入来自外部来源(比如 GitHub)的内容是多么容易。</p>
+
+<p>这个练习的关键点是复杂的机器学习模型可能需要大量计算，但是 IBM Watson Studio 让您有机会轻松高效地(按需付费)使用云上可用的计算能力来加快处理时间，并将学习时间从几小时或几天减少到几分钟。</p>
+
+<p>此外，IBM Watson Studio 提供了在云中开发以数据为中心的解决方案所必需的所有工具。它利用 Apache Spark 集群(用于计算能力)，并允许您用 Python、Scala 和 R 创建资产，并利用开源框架(如 TensorFlow)，所有这些都已经安装在 Watson Studio 上。</p>
+
+<p>如果你花点时间通读教程的细节，你会看到它解释了如何创建一个新的 IBM Cloud 帐户并注册 IBM Watson Studio(我们已经在第<a href="07c92a06-635f-41ef-b2be-3654ba90b790.xhtml">章第</a>、<em>IBM Cloud 简介</em>中介绍过)。</p>
+
+<p>然后，教程继续展示如何导航到 IBM 的 Watson Studio(一旦在 IBM 云平台上)，创建一个新项目，然后将一个笔记本导入到项目中。</p>
+
+<p>尽管在前面的章节中，我们展示了如何在 Watson Studio 中创建新项目和创建新笔记本，但这将是我们第一次执行笔记本导入(直接从外部 URL ),因此接下来的章节将重点介绍该过程是如何工作的。</p>
+
+<p>要导入的笔记本已经包含了 TensorFlow 库和示例代码，所以这个练习对我们来说应该既快又超级简单，所以不要再浪费时间了！</p>
+
+
+
+
+
+            
+
+
+
+            
+
+        
+
+    </body>
+
+
+
+</html>
+<html xmlns:epub="http://www.idpf.org/2007/ops">
+
+    <head>
+
+        <title>Creating the new project</title>
+
+        
+
+        <meta charset="utf-8"/>
+
+<meta content="urn:uuid:ea72de30-ad32-4a04-8901-3b266c7f12e9" name="Adept.expected.resource"/>
+
+    </head>
+
+
+
+    <body>
+
+        
+
+
+
+                            
+
+                    <h1 class="header-title">创建新项目</h1>
+
+                
+
+            
+
+            
+
+                
+
+<p>采取我们在前面章节中遵循的相同步骤，我们可以创建一个新的深度学习 IBM Watson Studio 项目(参见下面的截图)并为其命名:</p>
+
+<div><img src="img/ab396f17-1f49-4b85-aa27-166db71fb636.png" style=""/></div>
+
+
+
+
+
+            
+
+
+
+            
+
+        
+
+    </body>
+
+
+
+</html>
+<html xmlns:epub="http://www.idpf.org/2007/ops">
+
+    <head>
+
+        <title>Notebook asset type</title>
+
+        
+
+        <meta charset="utf-8"/>
+
+<meta content="urn:uuid:ea72de30-ad32-4a04-8901-3b266c7f12e9" name="Adept.expected.resource"/>
+
+    </head>
+
+
+
+    <body>
+
+        
+
+
+
+                            
+
+                    <h1 class="header-title">笔记本资产类型</h1>
+
+                
+
+            
+
+            
+
+                
+
+<p>创建新项目后，从项目仪表板中，您可以单击 Add to project 选项并选择 Notebook，如下面的屏幕截图所示:</p>
+
+<div><img src="img/e4ae4435-6b3f-47e4-a4f5-ef618a9f6793.png"/></div>
+
+<p>正如我们在前面章节中所做的，我们可以创建一个新的空笔记本。但是在本练习中，我们想要导入一个现有的笔记本。</p>
+
+<p>IBM Watson Studio 允许您从一个文件或直接从一个已知的可访问的 URL 导入笔记本。</p>
+
+<p>在这种情况下，我们将选择从 URL 导入。为此，您可以选择“来自 URL”选项，然后在下面一行中键入或粘贴:</p>
+
+<p><a href="https://github.com/aounlutfi/building-first-dl-model/blob/master/first-dl-model.ipynb">https://github . com/aounlutfi/building-first-dl-model/blob/master/first-dl-model . ipynb</a></p>
+
+<p>前面的链接将是要导入到 Watson Studio 项目中的笔记本的(外部)URL。</p>
+
+<p>接下来，单击“Create Notebook”开始导入(如果您可以访问 URL，应该只需要几秒钟)，如下面的屏幕截图所示:</p>
+
+<div><img src="img/0793073b-1eea-4389-b611-fe74e691b61f.png" style=""/></div>
+
+<p>几秒钟后，笔记本打开，准备好进行检查和执行:</p>
+
+<div><img src="img/01d88983-414f-4ffd-9100-de56f3c23d4d.png" style=""/></div>
+
+
+
+
+
+            
+
+
+
+            
+
+        
+
+    </body>
+
+
+
+</html>
+<html xmlns:epub="http://www.idpf.org/2007/ops">
+
+    <head>
+
+        <title>Running the imported notebook</title>
+
+        
+
+        <meta charset="utf-8"/>
+
+<meta content="urn:uuid:ea72de30-ad32-4a04-8901-3b266c7f12e9" name="Adept.expected.resource"/>
+
+    </head>
+
+
+
+    <body>
+
+        
+
+
+
+                            
+
+                    <h1 class="header-title">运行导入的笔记本</h1>
+
+                
+
+            
+
+            
+
+                
+
+<p>要运行导入的笔记本，请在命令功能区中单击单元格，然后单击全部运行:</p>
+
+<div><img class="aligncenter size-full wp-image-434 image-border" src="img/4e080b2d-d4f3-44a1-b2b7-e0c7c1e3cec4.png" style=""/></div>
+
+<p>单击 Run All 后，IBM Watson Studio 将运行笔记本中的所有单元格，这大约需要 15 分钟左右的时间才能完成，因为数据集由 20，000 幅图像组成。</p>
+
+<p>如果您想更好地了解发生了什么，您也可以单独运行每个单元。</p>
+
+
+
+
+
+            
+
+
+
+            
+
+        
+
+    </body>
+
+
+
+</html>
+<html xmlns:epub="http://www.idpf.org/2007/ops">
+
+    <head>
+
+        <title>Reviewing the notebook</title>
+
+        
+
+        <meta charset="utf-8"/>
+
+<meta content="urn:uuid:ea72de30-ad32-4a04-8901-3b266c7f12e9" name="Adept.expected.resource"/>
+
+    </head>
+
+
+
+    <body>
+
+        
+
+
+
+                            
+
+                    <h1 class="header-title">查看笔记本</h1>
+
+                
+
+            
+
+            
+
+                
+
+<p>如果你花时间(你应该)浏览笔记本中包含的单元格，你会注意到有大量的降价单元格明确描述了笔记本中的步骤。</p>
+
+<p>例如，您应该注意标记为 Imports 的 markdown 单元格(如下面的屏幕截图所示),其中明确指出，为了能够在 TensorFlow 中构建、测试和运行 NN，必须使用以下导入。这还会导入 MNIST 数据集(数据集中的每个点都是数字 0-9 的 784 像素手写表示):</p>
+
+<div><img class="aligncenter size-full wp-image-435 image-border" src="img/338b3dd5-be69-473b-9969-6823826befeb.png" style=""/></div>
+
+<p>本教程还要求您尝试在本地计算机上(而不是在使用 IBM Watson Studio 的云上)设置 Python 和 TensorFlow，并运行示例，以便您可以比较结果，请注意，根据机器的性能，这可能需要几个小时，甚至几天的训练时间，而且这是在您组装了所需的环境之后！</p>
+
+<p>在下一个例子中，我们将介绍使用 IBM Watson Studio 和 Watson services 以及 TensorFlow API 来执行图像分类和对象检测。</p>
+
+
+
+
+
+            
+
+
+
+            
+
+        
+
+    </body>
+
+
+
+</html>
+<html xmlns:epub="http://www.idpf.org/2007/ops">
+
+    <head>
+
+        <title>TensorFlow and image classifications</title>
+
+        
+
+        <meta charset="utf-8"/>
+
+<meta content="urn:uuid:ea72de30-ad32-4a04-8901-3b266c7f12e9" name="Adept.expected.resource"/>
+
+    </head>
+
+
+
+    <body>
+
+        
+
+
+
+                            
+
+                    <h1 class="header-title">张量流和图像分类</h1>
+
+                
+
+            
+
+            
+
+                
+
+<p>IBM Watson 视觉识别服务使用深度学习算法来识别你上传到该服务的图像中的场景、物体和人脸等特征。您还可以使用视觉识别服务、IBM Watson Studio 和相关的 Python 模块来创建和训练自定义分类器，以识别符合您要求的主题。</p>
+
+<p>为了开始视觉识别，我们需要使用通常的过程来创建一个 Watson Studio 项目并定义一个新的 Python 3.5 笔记本，但是我们还需要将一个 IBM Watson 视觉识别服务实例与该项目关联起来(事实证明这是一件非常容易的事情)。</p>
+
+
+
+
+
+            
+
+
+
+            
+
+        
+
+    </body>
+
+
+
+</html>
+<html xmlns:epub="http://www.idpf.org/2007/ops">
+
+    <head>
+
+        <title>Adding the service</title>
+
+        
+
+        <meta charset="utf-8"/>
+
+<meta content="urn:uuid:ea72de30-ad32-4a04-8901-3b266c7f12e9" name="Adept.expected.resource"/>
+
+    </head>
+
+
+
+    <body>
+
+        
+
+
+
+                            
+
+                    <h1 class="header-title">添加服务</h1>
+
+                
+
+            
+
+            
+
+                
+
+<p>要添加 Watson 视觉识别服务，您需要转到 IBM Cloud Dashboard，选择 Watson Services，然后浏览 Services，在这里您可以找到并选择视觉识别服务:</p>
+
+<div><img class="aligncenter size-full wp-image-436 image-border" src="img/2f3c736d-6d73-4ee5-9dd4-925f4fa61f6c.png" style=""/></div>
+
+<p>接下来，从 Visual Recognition 页面(如下面的屏幕截图所示)，您可以为服务实例选择一个位置和资源组，然后单击 Create 来实际创建您可以在项目中使用的服务实例:</p>
+
+<div><img class="aligncenter size-full wp-image-437 image-border" src="img/7fac7444-0a3b-4002-acee-a22511d01131.png" style=""/></div>
+
+<p>视觉识别服务实例一次只能与一个项目关联。</p>
+
+<p>创建视觉识别服务实例后，它将在您的云控制面板上列出:</p>
+
+<div><img class="aligncenter size-full wp-image-438 image-border" src="img/76a53786-2282-468a-8ca4-61171883a0a6.png" style=""/></div>
+
+<p>在创建服务实例之后，您应该能够通过在 Service Credentials 部分中单击 New Credentials 或 View Credentials 来创建所谓的服务凭证(或 API 密钥)。</p>
+
+<p>您将需要这个 API 键来引用和使用项目中的实例。</p>
+
+<p class="mce-root"/>
+
+<p>以下屏幕截图显示了“服务凭据”页面:</p>
+
+<div><img class="aligncenter size-full wp-image-439 image-border" src="img/e779fd2e-0867-413b-8977-8719feab630c.png" style=""/></div>
+
+<p>在本章接下来的几节中，我们将需要引用这个 API 密匙，所以把它放在手边吧！</p>
+
+<p>现在我们已经准备好开始实际的视觉识别项目了。在本例中(GitHub 上提供了一个版本)，Watson 视觉识别服务通过 TensorFlow 对象检测 API 执行对象检测。</p>
+
+
+
+
+
+            
+
+
+
+            
+
+        
+
+    </body>
+
+
+
+</html>
+<html xmlns:epub="http://www.idpf.org/2007/ops">
+
+    <head>
+
+        <title>Required modules</title>
+
+        
+
+        <meta charset="utf-8"/>
+
+<meta content="urn:uuid:ea72de30-ad32-4a04-8901-3b266c7f12e9" name="Adept.expected.resource"/>
+
+    </head>
+
+
+
+    <body>
+
+        
+
+
+
+                            
+
+                    <h1 class="header-title">必需的模块</h1>
+
+                
+
+            
+
+            
+
+                
+
+<p>尽管许多预安装的库和模块已经作为 IBM Watson 笔记本环境的一部分(取决于所选笔记本的类型)，但是可能仍然需要安装各种其他模块和框架来使特定项目正常工作，因此我们在笔记本中应该做的第一件事是键入以下命令来查看预安装库的列表:</p>
+
+<pre><strong>!pip list –isolated</strong></pre>
+
+<p>通过使用此命令来了解您的笔记本环境，总是开始一个新项目是一个非常好的主意；以后可能会节省时间。</p>
+
+<p class="mce-root"/>
+
+<p class="mce-root"/>
+
+<p>然后，您可以使用 Python <kbd>!pip install</kbd>命令逐行安装这个项目所需的每个模块，如下所示:</p>
+
+<pre><strong>!pip install asn1crypto==0.23.0<br/>!pip install bleach==1.5.0<br/>!pip install certifi==2017.11.5<br/>!pip install cffi==1.11.2<br/>!pip install chardet==3.0.4<br/>!pip install cryptography==2.1.3<br/>!pip install cycler==0.10.0<br/>!pip install enum34==1.1.6<br/>!pip install html5lib==0.9999999<br/>!pip install idna==2.6<br/>!pip install Markdown==2.6.9<br/>!pip install matplotlib==2.1.0<br/>!pip install numpy==1.13.3<br/>!pip install olefile==0.44<br/>!pip install Pillow==4.3.0<br/>!pip install protobuf==3.5.0.post1<br/>!pip install pycparser==2.18<br/>!pip install pyOpenSSL==17.4.0<br/>!pip install pyparsing==2.2.0<br/>!pip install pysolr==3.6.0<br/>!pip install python-dateutil==2.6.1<br/>!pip install pytz==2017.3<br/>!pip install requests==2.18.4<br/>!pip install six==1.11.0<br/>!pip install tensorflow==1.4.0<br/>!pip install tensorflow-tensorboard==0.4.0rc3<br/>!pip install urllib3==1.22<br/>!pip install watson-developer-cloud==1.0.0<br/>!pip install Werkzeug==0.12.2</strong></pre>
+
+<p>用一个命令安装所需模块的另一种更有效的方法是参考提供的<kbd>requirements.txt</kbd>文件:</p>
+
+<pre><strong>pip3 install -r requirements.txt</strong></pre>
+
+
+
+
+
+            
+
+
+
+            
+
+        
+
+    </body>
+
+
+
+</html>
+<html xmlns:epub="http://www.idpf.org/2007/ops">
+
+    <head>
+
+        <title>Using the API key in code</title>
+
+        
+
+        <meta charset="utf-8"/>
+
+<meta content="urn:uuid:ea72de30-ad32-4a04-8901-3b266c7f12e9" name="Adept.expected.resource"/>
+
+    </head>
+
+
+
+    <body>
+
+        
+
+
+
+                            
+
+                    <h1 class="header-title">在代码中使用 API 键</h1>
+
+                
+
+            
+
+            
+
+                
+
+<p>IBM Watson 视觉识别服务带有内置模型，您可以使用这些模型来分析场景、对象、人脸和许多其他类别的图像，而无需任何培训。我们已经创建了视觉识别服务的一个实例，因此它可用于我们的项目。为此，您需要拥有有效的密钥(我们实际的 API 密钥)。</p>
+
+<p class="mce-root"/>
+
+<p>即使您在 Watson 笔记本中有工作的 Python 代码，您现在也需要使用您已建立的 API 密钥，这样它将通过 Watson 服务进行验证(并且实际工作)。</p>
+
+<p>如果您浏览 Python 项目代码(我们将在下一节中加载)，您会发现下面的代码语句:</p>
+
+<pre>Visual_recognition = VisualRecognitionV3('2016-05-20', api_key='API_KEY')</pre>
+
+<p>这一行代码是 Watson 视觉识别服务被初始化为我们可以在代码中使用的对象的地方。您将用实际的 API 密匙(您在上一节中创建的密匙)替换<kbd>API_KEY</kbd>短语。</p>
+
+
+
+
+
+            
+
+
+
+            
+
+        
+
+    </body>
+
+
+
+</html>
+<html xmlns:epub="http://www.idpf.org/2007/ops">
+
+    <head>
+
+        <title>Additional preparation</title>
+
+        
+
+        <meta charset="utf-8"/>
+
+<meta content="urn:uuid:ea72de30-ad32-4a04-8901-3b266c7f12e9" name="Adept.expected.resource"/>
+
+    </head>
+
+
+
+    <body>
+
+        
+
+
+
+                            
+
+                    <h1 class="header-title">额外准备</h1>
+
+                
+
+            
+
+            
+
+                
+
+<p>在这一节中，我们将在成功运行项目之前，做一些额外的工作。</p>
+
+<p>Pillow 是一个<strong> Python 图像库</strong> ( <strong> PIL </strong>)，它提供了打开、操作和保存图像的支持。当前版本可以识别和读取大量格式。</p>
+
+<p>该项目使用了<kbd>pillow</kbd>，并且要求至少安装 5.3.0 版本。为了确保笔记本使用该版本，我们需要运行以下命令:</p>
+
+<pre># --- we need pillow version of 5.3.0 to run this project<br/># --- this code will uninstall the current version:<br/>!pip uninstall -y Pillow<br/># --- install the 5.3.0 version<br/>!pip install Pillow==5.3.0<br/># --- import the new one<br/>import PIL<br/># --- Should print 5.3.0. If it doesn't, then restart the kernel <br/>print(PIL.PILLOW_VERSION)</pre>
+
+<p>该代码卸载当前安装的 Pillow 版本，安装版本 5.3.0，将其导入到项目中，然后打印(现在)当前安装的版本。</p>
+
+<p class="mce-root"/>
+
+<p>如最后一行代码所示，如果<kbd>print</kbd>命令的输出没有显示安装的<kbd>pillow</kbd>版本是 5.3.0，您将需要停止并重启您的内核(点击 kernel，然后在您的笔记本中重启)，然后再次执行<kbd>print</kbd>命令，您应该准备好了:</p>
+
+<div><img src="img/a1874dbc-70a5-4042-b240-6dfb3913ccf3.png"/></div>
+
+
+
+
+
+            
+
+
+
+            
+
+        
+
+    </body>
+
+
+
+</html>
+<html xmlns:epub="http://www.idpf.org/2007/ops">
+
+    <head>
+
+        <title>Upgrading Watson</title>
+
+        
+
+        <meta charset="utf-8"/>
+
+<meta content="urn:uuid:ea72de30-ad32-4a04-8901-3b266c7f12e9" name="Adept.expected.resource"/>
+
+    </head>
+
+
+
+    <body>
+
+        
+
+
+
+                            
+
+                    <h1 class="header-title">升级 Watson</h1>
+
+                
+
+            
+
+            
+
+                
+
+<p>当我第一次尝试这个项目时，我在使用视觉识别服务时遇到了一些困难。经过大量的调试和 IBM Cloud support 的帮助，我确定我使用的项目代码使用的是旧版本的 cloud API。</p>
+
+<p>要解决我看到的问题，有必要使用以下命令将 Watson 服务升级到最新版本:</p>
+
+<pre># --- Upgrade Watson Developer<br/>!pip install --upgrade "watson-developer-cloud&gt;-2.8.0"</pre>
+
+<p>上述命令会生成以下输出:</p>
+
+<div><img src="img/9cbeb948-5a03-4c36-a9b0-8d8f44a23ecb.png"/></div>
+
+<p class="mce-root"/>
+
+<p>要验证服务是否已升级，您应该会看到以下消息:</p>
+
+<pre>Successfully installed watson-developer-cloud-2.8.0 websocket-client-0.48.0</pre>
+
+<p>服务升级后，我之前遇到的所有问题都解决了。</p>
+
+<p>在撰写本文时，2.8.0 是最新的版本。建议始终检查并使用最新的可用版本。</p>
+
+
+
+
+
+            
+
+
+
+            
+
+        
+
+    </body>
+
+
+
+</html>
+<html xmlns:epub="http://www.idpf.org/2007/ops">
+
+    <head>
+
+        <title>Images</title>
+
+        
+
+        <meta charset="utf-8"/>
+
+<meta content="urn:uuid:ea72de30-ad32-4a04-8901-3b266c7f12e9" name="Adept.expected.resource"/>
+
+    </head>
+
+
+
+    <body>
+
+        
+
+
+
+                            
+
+                    <h1 class="header-title">形象</h1>
+
+                
+
+            
+
+            
+
+                
+
+<p>要执行的最后一个设置任务是为我们的解决方案提供一个图像文件，以检测其中的对象。</p>
+
+<p>示例项目代码提供了一张您可以使用的四只狗的图片，但是提供一只或多只您自己的狗会更有趣。该项目的自述文件指出，代码将期望文件位于<kbd>test_image/image1.jpg</kbd>中，但是您可以简单地使用我们在前面章节中所做的相同步骤将它作为数据资产上传，然后更新代码，这样它就会找到文件(您也可以更改文件名)。</p>
+
+<p>我选择使用以下三种不同的图像:</p>
+
+<div><img class="aligncenter size-full wp-image-442 image-border" src="img/f2450e5f-fefe-4018-991d-603cdc52aad6.png" style=""/></div>
+
+<p class="mce-root"/>
+
+<p class="mce-root"/>
+
+
+
+
+
+            
+
+
+
+            
+
+        
+
+    </body>
+
+
+
+</html>
+<html xmlns:epub="http://www.idpf.org/2007/ops">
+
+    <head>
+
+        <title>Code examination</title>
+
+        
+
+        <meta charset="utf-8"/>
+
+<meta content="urn:uuid:ea72de30-ad32-4a04-8901-3b266c7f12e9" name="Adept.expected.resource"/>
+
+    </head>
+
+
+
+    <body>
+
+        
+
+
+
+                            
+
+                    <h1 class="header-title">代码检查</h1>
+
+                
+
+            
+
+            
+
+                
+
+<p>此时，我们的环境应该已经为主要代码部分做好了准备。现在让我们看看代码的每一部分，以理解它的用途。</p>
+
+<p>第一部分执行各种附加导入。请特别注意从(现在已升级的)<kbd>watson_developer_cloud</kbd>导入视觉识别服务(<kbd>VisualRecognitionV3</kbd>)的代码行:</p>
+
+<pre>from watson_developer_cloud import VisualRecognitionV3</pre>
+
+<p>以下是命令:</p>
+
+<pre>import numpy as np<br/>import os<br/>import six.moves.urllib as urllib<br/>import sys<br/>import tarfile<br/>import tensorflow as tf<br/>import zipfile<br/>import json<br/>from io import StringIO<br/>from PIL import Image<br/>from watson_developer_cloud import VisualRecognitionV3<br/>import matplotlib.pyplot as plt<br/>import matplotlib.patches as patches</pre>
+
+<p>下一行代码使用我们之前提到的 API 键(您将使用自己的键):</p>
+
+<pre># --- Replace with your api key<br/>visual_recognition = VisualRecognitionV3('2016-05-20', api_key='r-1m0OdmBy9khRHJvujylJoLRJIqjwS6Bqwb6VMBfeCE')</pre>
+
+<p>下一节包含了运行笔记本时可以试验的变量。查看结果并调整变量以查看效果:</p>
+
+<pre>MAX_NUMBER_OF_BOXES = 9<br/>MINIMUM_CONFIDENCE = .9<br/>COLORS = ['b', 'g', 'r', 'c', 'm', 'y', 'b', 'w']</pre>
+
+<p>根据前面的命令，让我们来研究定义的三个变量:</p>
+
+<ul>
+
+<li><kbd>MAX_NUMBER_OF_BOXES</kbd>:该变量代表测试图像中可定位的最大对象数量；我用了<kbd>9</kbd>，因为如果有很多的话会很难看。</li>
+
+<li><kbd>MINIMUM_CONFIDENCE</kbd>:这个变量代表一个盒子可以拥有的最小置信度。如果这个值太低，您可能最终会看到周围什么都没有的框。</li>
+
+<li><kbd>COLORS</kbd>:该变量设置结果识别框的属性。</li>
+
+</ul>
+
+
+
+
+
+            
+
+
+
+            
+
+        
+
+    </body>
+
+
+
+</html>
+<html xmlns:epub="http://www.idpf.org/2007/ops">
+
+    <head>
+
+        <title>Accessing the model</title>
+
+        
+
+        <meta charset="utf-8"/>
+
+<meta content="urn:uuid:ea72de30-ad32-4a04-8901-3b266c7f12e9" name="Adept.expected.resource"/>
+
+    </head>
+
+
+
+    <body>
+
+        
+
+
+
+                            
+
+                    <h1 class="header-title">访问模型</h1>
+
+                
+
+            
+
+            
+
+                
+
+<p>代码的下一部分将下载要使用的视觉识别模型，然后将其加载到内存中。第一次下载模型可能需要几分钟，但只需在第一次运行时下载:</p>
+
+<pre># --- define What model to download.<br/>MODEL_NAME = 'ssd_mobilenet_v1_coco_11_06_2017'<br/>MODEL_FILE = MODEL_NAME + '.tar.gz'<br/>DOWNLOAD_BASE = 'http://download.tensorflow.org/models/object_detection/'<br/># --- Path to frozen detection graph. This is the actual model that  # --- is used for the object detection.<br/>PATH_TO_CKPT = MODEL_NAME + '/frozen_inference_graph.pb'<br/>print('Downloading model... (This may take over 5 minutes)')<br/># --- Download model if not already downloaded<br/>if not os.path.exists(PATH_TO_CKPT):<br/>   opener = urllib.request.URLopener()<br/>opener.retrieve(DOWNLOAD_BASE + MODEL_FILE, MODEL_FILE)<br/> print('Extracting...')<br/>tar_file = tarfile.open(MODEL_FILE)<br/>for file in tar_file.getmembers():<br/>    file_name = os.path.basename(file.name)<br/>if 'frozen_inference_graph.pb' in file_name:<br/>tar_file.extract(file, os.getcwd())<br/>else:<br/>   print('Model already downloaded............')<br/># --- Load model into memory<br/>print('Loading da model...')<br/>detection_graph = tf.Graph()<br/>with detection_graph.as_default():<br/>    od_graph_def = tf.GraphDef()<br/>    with tf.gfile.GFile(PATH_TO_CKPT, 'rb') as fid:<br/>      serialized_graph = fid.read()<br/>        od_graph_def.ParseFromString(serialized_graph)<br/>       tf.import_graph_def(od_graph_def, name='')</pre>
+
+<p class="mce-root"/>
+
+
+
+
+
+            
+
+
+
+            
+
+        
+
+    </body>
+
+
+
+</html>
+<html xmlns:epub="http://www.idpf.org/2007/ops">
+
+    <head>
+
+        <title>Detection</title>
+
+        
+
+        <meta charset="utf-8"/>
+
+<meta content="urn:uuid:ea72de30-ad32-4a04-8901-3b266c7f12e9" name="Adept.expected.resource"/>
+
+    </head>
+
+
+
+    <body>
+
+        
+
+
+
+                            
+
+                    <h1 class="header-title">侦查</h1>
+
+                
+
+            
+
+            
+
+                
+
+<p>代码的下一部分使用 TensorFlow 对象检测 API 运行图像。它将提供盒子的坐标作为边缘位置的数组(上、左、下、右)。然后，它将裁剪和保存基于框的图像。为了裁剪出正确的区域，我们需要将百分比坐标转换为像素坐标，方法是将这些值乘以宽度和高度:</p>
+
+<pre>def load_image_into_numpy_array(image):<br/>   (im_width, im_height) = image.size<br/>    return np.array(image.getdata()).reshape(<br/>   (im_height, im_width, 3)).astype(np.uint8)<br/># --- Path to image to test, was: "test_image/image1.jpg"<br/>TEST_IMAGE_PATH = 'image1.jpg'</pre>
+
+<p>在我们保存了图像部分之后，我们可以将它们中的每一个传递给 Watson 进行分类。</p>
+
+<p>注意我们之前在下面的代码中设置的变量(<kbd>MAX_NUMBER_OF_BOXES</kbd>和<kbd>MINIMUM_CONFIDENCE</kbd>)的使用:</p>
+
+<pre>print('detecting...')<br/>with detection_graph.as_default():<br/>   with tf.Session(graph=detection_graph) as sess: <br/>        image = Image.open(TEST_IMAGE_PATH)<br/>        image_np = load_image_into_numpy_array(image)<br/>        image_np_expanded = np.expand_dims(image_np, axis=0)<br/>        image_tensor = detection_graph.<br/>        get_tensor_by_name('image_tensor:0')<br/>        boxes = detection_graph.get_tensor_by_name('detection_boxes:0')<br/>        scores = detection_graph.<br/>        get_tensor_by_name('detection_scores:0')<br/>        num_detections = detection_graph.<br/>        get_tensor_by_name('num_detections:0')<br/>        # --- Actual detection.<br/>    (boxes, scores, num_detections) = sess.run([boxes, scores, num_detections], feed_dict={image_tensor: image_np_expanded})<br/>  # --- Create figure and axes and display the image<br/>        fig, ax = plt.subplots(1)<br/>        ax.imshow(image_np)<br/>        (height, width, x) = image_np.shape<br/>for i in range(0, int(min(num_detections,          MAX_NUMBER_OF_BOXES))):<br/>           score = np.squeeze(scores)[i]<br/>           # --- if the score is not greater than<br/>           # --- what we set the minimun score to be then<br/>           # --- exit the loop<br/>           if score &lt; MINIMUM_CONFIDENCE:<br/>             break<br/>            box = np.squeeze(boxes)[i]<br/>            box_x = box[1] * width<br/>            box_y = box[0] * height<br/>            box_width = (box[3] - box[1]) * width<br/>            box_height = (box[2] - box[0]) * height<br/>            box_x2 = box[3] * width<br/>            box_y2 = box[2] * height<br/>            img2 = image.crop((box_x, box_y, box_x2, box_y2))<br/>            path = 'cropped/image1'<br/>            os.makedirs(path, exist_ok=True)<br/>            full_path = os.path.join(path, 'img{}.jpg'.format(i))<br/>            img2.save(full_path)        </pre>
+
+
+
+
+
+            
+
+
+
+            
+
+        
+
+    </body>
+
+
+
+</html>
+<html xmlns:epub="http://www.idpf.org/2007/ops">
+
+    <head>
+
+        <title>Classification and output</title>
+
+        
+
+        <meta charset="utf-8"/>
+
+<meta content="urn:uuid:ea72de30-ad32-4a04-8901-3b266c7f12e9" name="Adept.expected.resource"/>
+
+    </head>
+
+
+
+    <body>
+
+        
+
+
+
+                            
+
+                    <h1 class="header-title">分类和输出</h1>
+
+                
+
+            
+
+            
+
+                
+
+<p>假设您执行了前面概述的环境检查和本章前面概述的设置，那么到目前为止，所有代码都应该可以完美地运行，不会产生任何错误。由于 IBM 对 API 的新版本进行了更改，下一部分代码从 GitHub 上提供的项目的原始版本进行了更新。</p>
+
+<p>如果您使用本书提供的笔记本代码，更新已经为您完成。</p>
+
+<p>最后，下一个代码段将从 Watson 视觉识别服务返回的结果或分类接收到一个名为<kbd>results</kbd>的对象中。</p>
+
+<p>然后根据这些信息构建一个标签，并在源图像文件中检测到的每个对象周围绘制一个矩形:</p>
+
+<pre># --- Classify images with Watson visual recognition<br/>         with open(full_path, 'rb') as images_file:<br/>             parameters = json.dumps({'threshold': 0.7,          'classifier_ids': ['default']})<br/>               results = visual_recognition.classify(images_file=images_file, parameters=parameters).get_result() <br/>                label = results['images'][0]['classifiers'][0]['classes'][0]['class']<br/>                ax.text(box_x + 5, box_y - 5, label, fontsize=10, color='white', bbox={'facecolor':COLORS[i % 8], 'edgecolor':'none'})<br/>            # --- Create a Rectangle patch<br/>            rect = patches.Rectangle((box_x, box_y), box_width, box_height, linewidth=2, edgecolor=COLORS[i % 8], facecolor='none')<br/>            ax.add_patch(rect)</pre>
+
+<p>如果您更仔细地检查<kbd>results</kbd>对象(尝试对其使用 Python <kbd>type</kbd>命令)，您将看到结果对象是一个 Python 字典对象。</p>
+
+<p>Python 字典对象类似于列表，因为它是对象的集合。</p>
+
+<p>现在尝试将<kbd>print(results)</kbd>添加到笔记本代码中，您将看到结果中返回的原始输出。</p>
+
+<p>使用<kbd>print(results)</kbd>命令，实际输出如下面的屏幕截图所示:</p>
+
+<div><img class="aligncenter size-full wp-image-443 image-border" src="img/b7b06b27-feff-47a6-82bc-e7ae5082476b.png" style=""/></div>
+
+
+
+
+
+            
+
+
+
+            
+
+        
+
+    </body>
+
+
+
+</html>
+<html xmlns:epub="http://www.idpf.org/2007/ops">
+
+    <head>
+
+        <title>Objects detected</title>
+
+        
+
+        <meta charset="utf-8"/>
+
+<meta content="urn:uuid:ea72de30-ad32-4a04-8901-3b266c7f12e9" name="Adept.expected.resource"/>
+
+    </head>
+
+
+
+    <body>
+
+        
+
+
+
+                            
+
+                    <h1 class="header-title">检测到的对象</h1>
+
+                
+
+            
+
+            
+
+                
+
+<p>最后，我们准备使用<kbd>matplotlib</kbd>、<kbd>plt.show()</kbd>来显示我们正在处理的当前图像:</p>
+
+<pre> # --- use matplotlib to show the result!<br/> plt.show()</pre>
+
+<p>我们现在终于可以看到项目的输出了。在本例中，我们的图像是一匹马，我们可以看到 Watson 视觉识别服务正确地检测到了该对象，并将其标记为一匹平托马:</p>
+
+<div><img class="aligncenter size-full wp-image-444 image-border" src="img/71d2361b-c83c-4c62-add9-cee100a4e2ac.png" style=""/></div>
+
+
+
+
+
+            
+
+
+
+            
+
+        
+
+    </body>
+
+
+
+</html>
+<html xmlns:epub="http://www.idpf.org/2007/ops">
+
+    <head>
+
+        <title>Now the fun part</title>
+
+        
+
+        <meta charset="utf-8"/>
+
+<meta content="urn:uuid:ea72de30-ad32-4a04-8901-3b266c7f12e9" name="Adept.expected.resource"/>
+
+    </head>
+
+
+
+    <body>
+
+        
+
+
+
+                            
+
+                    <h1 class="header-title">现在是有趣的部分</h1>
+
+                
+
+            
+
+            
+
+                
+
+<p>现在有趣的部分来了。您可以从几乎任何地方下载任意数量的文件来测试应用程序(或者创建自己的应用程序)。我用了几张图片，发现 Watson 相当准确。</p>
+
+<p>使用的第一幅图像被正确地检测为摩托车，第二幅(显示两辆老爷车的图像)非常接近，因为 Watson 检测到其中一辆车是轿车，而另一辆被检测为轻型卡车。</p>
+
+<p>我们已经提到的最终图像的结果:沃森不仅正确地检测到了一匹马，还标记了它的品种:平托。</p>
+
+<p>下面的屏幕截图显示了三个不同的图像及其各自的结果:</p>
+
+<div><img class="aligncenter size-full wp-image-445 image-border" src="img/11d3605d-8eed-4e7f-af0e-79b35559d38c.png" style=""/></div>
+
+
+
+
+
+            
+
+
+
+            
+
+        
+
+    </body>
+
+
+
+</html>
+<html xmlns:epub="http://www.idpf.org/2007/ops">
+
+    <head>
+
+        <title>Save and share your work</title>
+
+        
+
+        <meta charset="utf-8"/>
+
+<meta content="urn:uuid:ea72de30-ad32-4a04-8901-3b266c7f12e9" name="Adept.expected.resource"/>
+
+    </head>
+
+
+
+    <body>
+
+        
+
+
+
+                            
+
+                    <h1 class="header-title">保存并共享您的工作</h1>
+
+                
+
+            
+
+            
+
+                
+
+<p>像往常一样，一旦你有一个工作项目笔记本，你可以点击文件，然后保存保存你的工作。下一步是通过单击共享图标来共享您的笔记本，如以下截图所示):</p>
+
+<div><img class="aligncenter size-full wp-image-446 image-border" src="img/175a785c-318a-4faa-9a0a-8f43d52c38ca.png" style=""/></div>
+
+<p>在那里，您可以选择想要共享笔记本的方式:</p>
+
+<div><img class="aligncenter size-full wp-image-447 image-border" src="img/426faef0-dc94-41ef-90b1-1cde9e209233.png" style=""/></div>
+
+<p>您应该养成在分享之前用 Markdown 单元格内容记录您的笔记本的习惯。你会惊讶地发现，如果你给每个单元格添加评论和观点，你的作品会得到更好的评价。</p>
+
+<p class="mce-root"/>
+
+<p class="mce-root"/>
+
+<p>最后，当您查看项目笔记本时(参见下面的屏幕截图)，请注意共享图标和状态图标。您可以将笔记本发布到各种目标环境，例如 GitHub:</p>
+
+<div><img class="aligncenter size-full wp-image-448 image-border" src="img/d53062b6-b401-4d3e-ba45-7f0b8e9f37d8.png" style=""/></div>
+
+
+
+
+
+            
+
+
+
+            
+
+        
+
+    </body>
+
+
+
+</html>
+<html xmlns:epub="http://www.idpf.org/2007/ops">
+
+    <head>
+
+        <title>Summary</title>
+
+        
+
+        <meta charset="utf-8"/>
+
+<meta content="urn:uuid:ea72de30-ad32-4a04-8901-3b266c7f12e9" name="Adept.expected.resource"/>
+
+    </head>
+
+
+
+    <body>
+
+        
+
+
+
+                            
+
+                    <h1 class="header-title">摘要</h1>
+
+                
+
+            
+
+            
+
+                
+
+<p>在本章中，我们首先介绍了深度学习的概念，并查看了使用 TensorFlow 库和神经网络的基础知识。</p>
+
+<p>然后，我们通过两个 IBM Watson Studio 项目演示了如何使用 IBM Cloud 上提供的工具和服务来构建神经网络和对象检测项目。</p>
+
+<p>下一章，我们将在 IBM Cloud 上创建一个面部表情平台。</p>
+
+
+
+
+
+            
+
+
+
+            
+
+        
+
+    </body>
+
+
+
+</html></body></html>

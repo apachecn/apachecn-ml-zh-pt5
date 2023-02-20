@@ -1,0 +1,1035 @@
+<html><head/><body><html xmlns:epub="http://www.idpf.org/2007/ops">
+
+    <head>
+
+        <title>Time Series and Causality</title>
+
+        
+
+        <meta charset="utf-8"/>
+
+<meta content="urn:uuid:edef0689-6ba8-4dfc-93a3-190fd7a9b9a4" name="Adept.expected.resource"/>
+
+    </head>
+
+
+
+    <body>
+
+        
+
+
+
+                            
+
+                    <h1 class="header-title">时间序列和因果关系</h1>
+
+                
+
+            
+
+            
+
+                
+
+<p>“经济学家是明天就会知道为什么他昨天预测的事情今天没有发生的专家。”</p>
+
+<p>劳伦斯·J·彼得</p>
+
+<p>单变量时间序列是指在标准时间尺度上收集的测量值，可以是分钟、小时、天、周、月等等。与其他数据相比，时间序列的问题在于观察的顺序很重要。这种顺序依赖性会导致标准分析方法产生不必要的高偏差或方差。</p>
+
+<p>看起来关于机器学习和时间序列数据的文献很少，或者是不合标准的。举个例子，我在 2018 年春天的一个数据科学会议上，一位备受推崇的机器学习专家提到，向量自回归要求数据是平稳的。我们以后再讨论这个。听到这里，我差点摔倒。假数据新闻！我告诉我的受过计量经济学训练的同事，让他们感到恐惧和沮丧。这是不幸的，因为如此多的真实世界数据都包含时间成分。此外，时间序列分析可能相当复杂和棘手。我会说，如果你没有看到一个时间序列分析做错了，你没有看得足够近。</p>
+
+<p>涉及时间序列的另一个经常被忽视的方面是因果关系。是的，我们不想混淆相关性和因果关系，但是，在时间序列分析中，我们可以应用格兰杰因果关系的技术来确定因果关系，从统计上来说，是否存在。</p>
+
+<p>在这一章中，我们将应用时间序列/计量经济学技术来识别单变量预测模型(包括总体)，向量自回归模型，最后是格兰杰因果关系。完成本章后，您可能不是时间序列分析的完全大师，但您将了解足够的知识来执行有效的分析，并理解在构建时间序列模型和创建预测模型(预测)时要考虑的基本问题。</p>
+
+<p>以下是本章将涉及的主题:</p>
+
+<ul>
+
+<li>单变量时间序列分析</li>
+
+<li>时序数据</li>
+
+<li>建模和评估</li>
+
+</ul>
+
+
+
+
+
+            
+
+
+
+            
+
+        
+
+    </body>
+
+
+
+</html>
+<html xmlns:epub="http://www.idpf.org/2007/ops">
+
+    <head>
+
+        <title>Univariate time series analysis</title>
+
+        
+
+        <meta charset="utf-8"/>
+
+<meta content="urn:uuid:edef0689-6ba8-4dfc-93a3-190fd7a9b9a4" name="Adept.expected.resource"/>
+
+    </head>
+
+
+
+    <body>
+
+        
+
+
+
+                            
+
+                    <h1 class="header-title">单变量时间序列分析</h1>
+
+                
+
+            
+
+            
+
+                
+
+<p>我们将重点介绍两种分析和预测单个时间序列的方法:<strong>指数平滑</strong>和<strong>自回归综合移动平均</strong> ( <strong> ARIMA </strong>)模型。我们先来看看指数平滑模型。</p>
+
+<p>与移动平均模型一样，指数平滑模型使用过去观察值的权重。但与移动平均线模型不同的是，观察值越新，相对于后来的观察值，它的权重就越大。有三种可能的平滑参数需要估计:总体平滑参数、趋势参数和季节平滑参数。如果不存在趋势或季节性，则这些参数变得无效。</p>
+
+<p>平滑参数通过以下等式生成预测:</p>
+
+<p class="CDPAlignCenter CDPAlign"><img class="fm-editor-equation" src="img/722db33f-b1aa-4383-a3ad-9a907416c96e.png" style="width:37.58em;height:1.42em;"/></p>
+
+<p>在这个方程中，<em xmlns:epub="http://www.idpf.org/2007/ops">Y<sub>T</sub>T3】是当时的值，<em xmlns:epub="http://www.idpf.org/2007/ops"> T </em>，alpha ( <em xmlns:epub="http://www.idpf.org/2007/ops"> α </em>)是平滑参数。算法通过最小化误差、<strong xmlns:epub="http://www.idpf.org/2007/ops">误差平方和</strong> ( <strong xmlns:epub="http://www.idpf.org/2007/ops"> SSE </strong>)或最大似然来优化 alpha(和其他参数)。</em></p>
+
+<p>预测方程以及趋势和季节性方程(如果适用)如下:</p>
+
+<ul>
+
+<li>预测，其中<em> A </em>是前面的平滑方程，<em> h </em>是预测周期数:<img class="fm-editor-equation" src="img/2915b68b-6c7f-4bd1-9bf5-db4ea53df218.png" style="width:9.67em;height:0.92em;"/></li>
+
+<li>趋势方程式:<img class="fm-editor-equation" src="img/387d852c-2908-4f0e-b287-39a3eec0e678.png" style="width:14.83em;height:1.17em;"/></li>
+
+<li>季节性，其中<em> m </em>是季节周期数:<img class="fm-editor-equation" src="img/e2df70ce-69cd-4ff0-a910-4335c0f75334.png" style="width:19.25em;height:1.17em;"/></li>
+
+</ul>
+
+<p>这个方程被称为<strong>霍尔特-温特斯法</strong>。预测方程本质上是相加的，趋势是线性的。该方法还允许包含衰减趋势和倍增季节性，其中季节性随时间成比例地增加或减少。有了这些模型，你不必像在 ARIMA 模型中那样担心平稳性的假设。平稳性是指时间序列在所有时间段之间具有恒定的均值、方差和相关性。话虽如此，理解 ARIMA 模型仍然很重要，因为在某些情况下它们会有最佳的表现。</p>
+
+<p>从自回归模型开始，在时间<em> T </em>的<em> Y </em>的值是<em> Y </em>的先验值的线性函数。自回归 lag-1 模型<em> AR(1) </em>的公式为<img class="fm-editor-equation" src="img/d5f9ee29-b6c4-4cab-abbd-3653612a2789.png" style="width:13.50em;height:0.92em;"/>。该模型的关键假设如下:</p>
+
+<ul>
+
+<li><em> Et </em>表示误差同分布且独立分布，均值为零，方差恒定</li>
+
+<li>误差与<em> Yt </em>无关</li>
+
+<li>Yt，Yt-1，Yt-n...是静止的，这意味着<em xmlns:epub="http://www.idpf.org/2007/ops">φ</em>的绝对值小于 1</li>
+
+</ul>
+
+<p>有了平稳的时间序列，就可以考察<strong>自相关函数</strong> ( <strong> ACF </strong>)。平稳序列的 ACF 给出了<em> h = 1，2 时<em> Yt </em>和<em> Yt-h </em>之间的相关性...n </em>。让我们使用 R 来创建一个<em> AR(1) </em>序列并绘制它:</p>
+
+<pre>&gt; install.packages("forecast")<br/><br/>&gt; set.seed(1966)<br/><br/>&gt; ar1 &lt;- arima.sim(list(order = c(1, 0, 0), ar = 0.5), n = 200)<br/><br/>&gt; forecast::autoplot(ar1, main = "AR1")</pre>
+
+<p>以下是前面命令的输出:</p>
+
+<p class="CDPAlignCenter CDPAlign"><img class="alignnone size-full wp-image-801 image-border" src="img/2a1b6a0e-0c00-4663-b360-aaa26001ae6f.png" style="width:49.33em;height:27.83em;"/></p>
+
+<p>现在，让我们来检查一下<kbd>ACF</kbd>:</p>
+
+<pre>&gt; forecast::autoplot(acf(ar1, plot = F), main = "ACF of simulated AR1")</pre>
+
+<p>上述命令的输出如下:</p>
+
+<p class="CDPAlignCenter CDPAlign"><img class="alignnone size-full wp-image-802 image-border" src="img/c3663c56-4121-4a46-82b4-3b290bf6cdf5.png" style="width:50.42em;height:28.42em;"/></p>
+
+<p><strong> ACF </strong>图显示，随着<strong>滞后</strong>的增加，相关性呈指数下降。蓝色虚线表示显著相关的置信带。任何高于高波段或低于低波段的线都被认为是重要的。除了 ACF，我们还要考察<strong>偏自相关函数</strong> ( <strong> PACF </strong>)。PACF 是一种条件相关性，这意味着<em> Yt </em>和<em> Yt-h </em>之间的相关性取决于两者之间的观测值。直观理解这一点的一个方法是考虑线性回归模型及其系数。我们假设你有<em> Y = B0 + B1X1 </em>对<em> Y = B0 + B1X1 + B2X2 </em>。第一个模型中的<em> X </em>到<em> Y </em>的关系与一个系数成线性关系，但是在第二个模型中，该系数将会不同，因为现在也考虑了<em> Y </em>和<em> X2 </em>之间的关系。注意，在下面的<kbd>PACF</kbd>图中，lag-1 处的部分自相关值与 lag-1 处的自相关值相同，因为这不是条件相关:</p>
+
+<pre> &gt; forecast::autoplot(pacf(ar1, plot = F), main = "PACF of simulated AR1")</pre>
+
+<p>以下是前面命令的输出:</p>
+
+<p class="CDPAlignCenter CDPAlign"><img class="alignnone size-full wp-image-803 image-border" src="img/47014995-a397-46e5-8e0e-7be792627aad.png" style="width:48.83em;height:27.58em;"/></p>
+
+<p>根据前面的时间序列图，我们可以有把握地假设该序列是平稳的。我们将在实际练习中查看几个统计测试，以确保数据是稳定的，但有时，眼球测试就足够了。如果数据不是静态的，那么可以通过取其差值来还原数据。这是 ARIMA 的综合(I)。差分后，新数列变成<em>δYt = Yt-Yt-1</em>。人们应该期望一阶差分实现平稳性，但在某些情况下，二阶差分可能是必要的。具有<em> AR(1) </em>和<em> I(1) </em>的 ARIMA 模型将被标注为(1，1，0)。</p>
+
+<p><strong> MA </strong>代表<strong>移动平均线</strong>。这不是股票价格的 50 天移动平均线那样简单的移动平均线，而是一个应用于误差的系数。当然，误差是同分布和独立分布的，均值为零，方差不变。<em> MA(1) </em>模型的公式为<em> Yt =常数+Et+θEt-1</em>。正如我们对<em> AR(1) </em>模型所做的那样，我们可以在 R 中构建一个<em> MA(1) </em>，如下所示:</p>
+
+<pre>    &gt; set.seed(123)<br/>    <br/>    &gt; ma1 &lt;- arima.sim(list(order = c(0, 0, 1), ma = -0.5), n = 200)<br/>    <br/>    &gt; forecast::autoplot(ma1, main = "MA1")</pre>
+
+<p>以下是前面命令的输出:</p>
+
+<p class="CDPAlignCenter CDPAlign"><img class="alignnone size-full wp-image-804 image-border" src="img/ddc22208-f310-4c53-b39f-001e1276d203.png" style="width:49.33em;height:27.83em;"/></p>
+
+<p><kbd>ACF</kbd>和<kbd>PACF</kbd>图与<em> AR(1) </em>模型略有不同。请注意，在查看图表时，有一些经验法则可以用来确定模型是否有 AR 和/或 MA 项。它们可能有点主观，所以我将把学习这些启发法的任务留给您，但是请相信 R 能够识别正确的模型。在下面的图中，我们将看到滞后-1 处的显著相关性以及滞后-1 和滞后-2 处的两个显著偏相关:</p>
+
+<pre>&gt; forecast::autoplot(acf(ma1, plot = F), main = "ACF of simulated MA1")</pre>
+
+<p>上述命令的输出如下:</p>
+
+<div><img class="alignnone size-full wp-image-805 image-border" src="img/febdc28c-6e91-452d-8229-7338411c1d50.png" style="width:48.42em;height:27.33em;"/></div>
+
+<p>前面的图是<kbd>ACF</kbd>图，现在，我们将看到<kbd>PACF</kbd>图:</p>
+
+<pre>&gt; forecast::autoplot(pacf(ma1, plot = F), main = "PACF of simulated MA1")</pre>
+
+<div><p>上述命令的输出如下:</p>
+
+<p class="CDPAlignCenter CDPAlign"><img class="alignnone size-full wp-image-806 image-border" src="img/152df65b-50a3-4ec3-b452-9a455d9e7541.png" style="width:45.83em;height:25.83em;"/></p>
+
+</div>
+
+<p>在 ARIMA 模型中，可以加入季节性因素，包括自回归、积分和移动平均项。非季节性 ARIMA 模型符号一般为<em> (p，d，q) </em>。对于季节性 ARIMA，假设数据是每月的，那么符号将是<em> (p，D，q) x (P，D，Q)12 </em>，符号中的 12 考虑了每月的季节性。在我们将要使用的包中，R 可以自动识别是否应该包括季节性；如果是这样，也将包括最佳术语。</p>
+
+
+
+
+
+            
+
+
+
+            
+
+        
+
+    </body>
+
+
+
+</html>
+<html xmlns:epub="http://www.idpf.org/2007/ops">
+
+    <head>
+
+        <title>Understanding Granger causality</title>
+
+        
+
+        <meta charset="utf-8"/>
+
+<meta content="urn:uuid:edef0689-6ba8-4dfc-93a3-190fd7a9b9a4" name="Adept.expected.resource"/>
+
+    </head>
+
+
+
+    <body>
+
+        
+
+
+
+                            
+
+                    <h1 class="header-title">理解格兰杰因果关系</h1>
+
+                
+
+            
+
+            
+
+                
+
+<p>想象你被问到一个问题，比如，<em>新处方的数量和药物 X 的总处方数量之间有什么关系？</em>您知道这些是按月衡量的，那么考虑到人们认为新脚本会推高总脚本，您能做些什么来理解这种关系呢？或者，检验大宗商品价格——尤其是铜——是美国股市价格的领先指标这一假设如何？嗯，对于两组时间序列数据，<em> x </em>和<em> y </em>，格兰杰因果关系是一种试图确定一个序列是否可能影响另一个序列的变化的方法。这是通过获取一个序列的不同滞后并使用它来模拟第二个序列的变化来实现的。为了实现这一点，我们将创建两个预测<em> y </em>的模型，一个模型只有<em> y </em> ( <kbd>Ω</kbd>)的过去值，另一个模型有<em> y </em>和<em> x </em> ( <kbd>π</kbd>)的过去值。模型如下，其中<em> k </em>为时间序列中的滞后数:</p>
+
+<p style="padding-left: 90px"><img class="alignnone size-full wp-image-843 image-border" src="img/dd495f73-0053-47b3-8a96-09d1984cc166.png" style="width:33.92em;height:4.25em;"/></p>
+
+<p>然后比较 RSS，并使用<kbd>F-test</kbd>来确定嵌套模型(<kbd>Ω</kbd>)是否足以解释<em> y </em>的未来值，或者完整模型(<kbd>π</kbd>)是否更好。<kbd>F-test</kbd>用于测试以下无效假设和替代假设:</p>
+
+<ul>
+
+<li><em/>:<kbd>αi = 0</kbd>对于每一个<em> i </em> <kbd>∊[1,k]</kbd>，没有格兰杰因果关系</li>
+
+<li><em/>:<kbd>αi ≠ 0</kbd>至少有一个<em> i </em> <kbd>∊[1,k]</kbd>，格兰杰因果关系</li>
+
+</ul>
+
+<p>本质上，我们试图确定我们是否可以说，从统计上来说，<em> x </em>比单独的<em> y </em>的过去值提供了更多关于<em> y </em>的未来值的信息。在这个定义中，很明显，我们并没有试图证明实际的因果关系，只是这两个值通过某种现象联系在一起。按照这些思路，我们还必须反向运行这个模型，以便验证<em> y </em>没有提供关于<em> x </em>的未来值的信息。如果我们发现是这种情况，很可能有一些外生变量，比如说<em> Z </em>，需要加以控制，或者可能是格兰杰因果关系的更好候选。最初，您必须将该方法应用于平稳时间序列，以避免虚假结果。这不再是我将要证明的情况。</p>
+
+<p>请注意，讨论非线性模型使用的技术的研究论文是可用的，但这超出了本书的范围。我推荐阅读一篇优秀的关于格兰杰因果关系的介绍性论文，它围绕着古老的先有鸡还是先有蛋的难题(瑟曼，1988)。</p>
+
+<p class="mce-root"/>
+
+<p>有几种不同的方法来识别适当的滞后结构。自然，我们可以使用蛮力和无知来测试所有合理的滞后，一次一个。我们可能有一个基于领域专业知识的理性直觉，或者可能有一个先前的研究来指导滞后选择。如果没有，那么可以应用<strong>向量自回归</strong> ( <strong> VAR </strong>)来识别信息准则最低的滞后结构，比如<strong>艾卡克的信息准则</strong> ( <strong> AIC </strong>)或者<strong>最终预测误差</strong> ( <strong> FPE </strong>)。为简单起见，这里是两个变量的 VAR 模型的符号，每个变量只有一个滞后。这种符号可以扩展到任意多的变量和滞后:</p>
+
+<ul>
+
+<li><em> Y =常数<sub>1</sub>+B<sub>11</sub>Y<sub>t-1</sub>+B<sub>12</sub>Y<sub>t-1</sub>+e<sub>1</sub></em></li>
+
+<li><em> X =常数<sub>1</sub>+B2<sub>1</sub>Y<sub>t-1</sub>+B2<sub>2</sub>Y<sub>t-1</sub>+E2</em></li>
+
+</ul>
+
+<p>在 R 中，这个过程很容易实现，我们将在下面的实际问题中看到。</p>
+
+
+
+
+
+            
+
+
+
+            
+
+        
+
+    </body>
+
+
+
+</html>
+<html xmlns:epub="http://www.idpf.org/2007/ops">
+
+    <head>
+
+        <title>Time series data</title>
+
+        
+
+        <meta charset="utf-8"/>
+
+<meta content="urn:uuid:edef0689-6ba8-4dfc-93a3-190fd7a9b9a4" name="Adept.expected.resource"/>
+
+    </head>
+
+
+
+    <body>
+
+        
+
+
+
+                            
+
+                    <h1 class="header-title">时序数据</h1>
+
+                
+
+            
+
+            
+
+                
+
+<p>这个星球不会去任何地方。我们是！我们要走了。</p>
+
+<p>——哲学家和喜剧演员，乔治·卡林</p>
+
+<p>气候变化正在发生。它一直都是，也将会是，但最大的问题是，至少从政治和经济的角度来看，气候变化是人为的吗？我将利用这一章来测试计量经济学时间序列模型，试图了解从统计学角度来说，碳排放是否会导致气候变化，尤其是气温上升。就我个人而言，我想在这个问题上采取中立的立场，永远记住卡林先生在他关于这个问题的教导中留给我们的明智原则。</p>
+
+<p>首要任务是找到并收集数据。对于温度，我选择了<strong xmlns:epub="http://www.idpf.org/2007/ops"> HadCRUT4 </strong>年中值温度时间序列，这大概是黄金标准。这些数据是由东安格利亚大学气候研究中心和英国气象局哈德利中心合作汇编的。在 http://www.metoffice.gov.uk/hadobs/index.html 的<a xmlns:epub="http://www.idpf.org/2007/ops" href="http://www.metoffice.gov.uk/hadobs/index.html">可以获得关于数据如何编译和建模的全面讨论。</a></p>
+
+<p class="mce-root"/>
+
+<p class="mce-root"/>
+
+<p>我们将使用的数据是以年度异常值的形式提供的，它是通过给定时间段的年平均地表温度与参考年份(1961-1990 年)的平均值之间的差异来计算的。年度表面温度是全球收集的温度集合，由<strong> CRUTEM4 </strong>表面空气温度和<strong> HadSST3 </strong>海面数据集混合而成。怀疑论者抨击有偏见和不可靠:<a href="http://www.telegraph.co.uk/comment/11561629/Top-scientists-start-to-examine-fiddled-global-warming-figures.html">http://www . telegraph . co . uk/comment/11561629/Top-scientists-start-to-examinate-fiddled-global-warming-figures . html</a>。这已经超出了我们的工作范围，所以我们必须接受和利用这些数据，但是我仍然觉得很有趣。我提取了 1919 年到 2013 年的数据来匹配我们的二氧化碳数据。</p>
+
+<p>全球二氧化碳排放量估计可在美国能源部<strong xmlns:epub="http://www.idpf.org/2007/ops">二氧化碳信息分析中心</strong> ( <strong xmlns:epub="http://www.idpf.org/2007/ops"> CDIAC </strong>)的以下网站找到:【http://cdiac.ornl.gov/】T4。</p>
+
+<p>我已经将数据放在一个<kbd>.csv</kbd>文件(<kbd>climate.csv</kbd>)中，供您下载并存储在您的工作目录:<a href="https://github.com/PacktPublishing/Advanced-Machine-Learning-with-R/blob/master/Data/climate.csv">https://github . com/packt publishing/Advanced-Machine-Learning-with-R/blob/master/Data/climate . CSV</a>。</p>
+
+<p>让我们根据需要安装库，加载数据，并检查结构:</p>
+
+<pre>&gt; library(magrittr)<br/><br/>&gt; install.packages("tidyverse")<br/><br/>&gt; install.packages("ggplot2")<br/><br/>&gt; install.packages("ggthemes")<br/><br/>&gt; install.packages("tseries")<br/><br/>&gt; climate &lt;- readr::read_csv("climate.csv")<br/><br/>&gt; str(climate)<br/>Classes ‘tbl_df’, ‘tbl’ and 'data.frame': 95 obs. of 3 variables:<br/> $ Year: int 1919 1920 1921 1922 1923 1924 1925 1926 1927 1928 ...<br/> $ CO2 : int 806 932 803 845 970 963 975 983 1062 1065 ...<br/> $ Temp: num -0.272 -0.241 -0.187 -0.301 -0.272 -0.292 -0.214 -0.105 -0.208 -0.206 ...</pre>
+
+<p>我们将把它放在一个时间序列结构中，指定开始和结束年份:</p>
+
+<pre>&gt; climate_ts &lt;- ts(climate[, 2:3],<br/>    start = 1919,<br/>    end = 2013)<strong><br/></strong></pre>
+
+<p>随着我们的数据加载并放入时间序列结构中，我们现在可以开始理解并进一步为分析做准备。</p>
+
+
+
+
+
+            
+
+
+
+            
+
+        
+
+    </body>
+
+
+
+</html>
+<html xmlns:epub="http://www.idpf.org/2007/ops">
+
+    <head>
+
+        <title>Data exploration</title>
+
+        
+
+        <meta charset="utf-8"/>
+
+<meta content="urn:uuid:edef0689-6ba8-4dfc-93a3-190fd7a9b9a4" name="Adept.expected.resource"/>
+
+    </head>
+
+
+
+    <body>
+
+        
+
+
+
+                            
+
+                    <h1 class="header-title">数据探索</h1>
+
+                
+
+            
+
+            
+
+                
+
+<p>让我们从使用基数 R 的时间序列图开始:</p>
+
+<pre>&gt; plot(climate_ts, main = "CO2 and Temperature Deviation")</pre>
+
+<p>上述命令的输出如下:</p>
+
+<p class="CDPAlignCenter CDPAlign"><img class="alignnone size-full wp-image-807 image-border" src="img/30e53a2c-7cc9-4b38-b4d4-0c1ea04c965c.png" style="width:61.75em;height:36.50em;"/></p>
+
+<p>似乎二氧化碳水平在第二次世界大战后真正开始上升，在 20 世纪 70 年代中期气温异常迅速上升。似乎没有任何明显的异常值，并且随时间的变化似乎是恒定的。使用标准程序，我们可以看到这两个系列高度相关，如下所示:</p>
+
+<pre>    &gt; cor(climate_temp)<br/>               CO2      Temp<br/>    CO2  1.0000000 0.8404215<br/>    Temp 0.8404215 1.0000000</pre>
+
+<p>如前所述，这没有什么值得高兴的，因为它证明了什么。我们将通过绘制两个系列的<kbd>ACF</kbd>和<kbd>PACF</kbd>来寻找结构:</p>
+
+<pre>&gt; forecast::autoplot(acf(climate_ts[, 2], plot = F), main="Temperature ACF")</pre>
+
+<p>上述代码片段的输出如下:</p>
+
+<p class="CDPAlignCenter CDPAlign"><img class="alignnone size-full wp-image-808 image-border" src="img/192dc122-14dc-4fd5-821f-49ec6610b67c.png" style="width:64.50em;height:38.67em;"/></p>
+
+<p>这段代码给出了温度的<kbd>PACF</kbd>图:</p>
+
+<pre>&gt; forecast::autoplot(pacf(climate_ts[, 2], plot = F), main = "Temperature PACF")</pre>
+
+<p class="mce-root"/>
+
+<p class="mce-root"/>
+
+<p class="mce-root"/>
+
+<p class="mce-root"/>
+
+<p class="mceNonEditable"/>
+
+<p class="mceNonEditable"/>
+
+<p>上述代码片段的输出如下:</p>
+
+<p class="CDPAlignCenter CDPAlign"><img class="alignnone size-full wp-image-809 image-border" src="img/adaa77d4-87ee-4443-9f3d-7f9ea7f80f34.png" style="width:64.50em;height:31.17em;"/></p>
+
+<p>这段代码为我们提供了<kbd>CO2</kbd>的<kbd>ACF</kbd>图:</p>
+
+<pre>&gt; forecast::autoplot(acf(climate_ts[, 1], plot = F), main = "CO2 ACF")</pre>
+
+<p>上述代码片段的输出如下:</p>
+
+<p class="CDPAlignCenter CDPAlign"><img class="alignnone size-full wp-image-810 image-border" src="img/352ecc9a-3ab1-4b70-b23a-45128f4ff370.png" style="width:64.50em;height:31.17em;"/></p>
+
+<p>这段代码为我们提供了<kbd>CO2</kbd>的<kbd>PACF</kbd>图:</p>
+
+<pre>&gt; forecast::autoplot(acf(climate_ts[, 1], plot = F), main = "CO2 PACF")</pre>
+
+<p>上述代码片段的输出如下:</p>
+
+<p class="CDPAlignCenter CDPAlign"><img class="alignnone size-full wp-image-811 image-border" src="img/90b4a93b-7da0-4da9-bdc8-f8769d540027.png" style="width:64.50em;height:31.17em;"/></p>
+
+<p>对于缓慢衰减的 ACF 模式和快速衰减的 PACF 模式，我们可以假设这些序列都是自回归的，尽管<kbd>Temp</kbd>似乎有一些重要的 MA 项。接下来，我们来看看<strong>互相关函数</strong> ( <strong> CCF </strong>)。注意，在函数中，我们将<em> x </em>放在<em> y </em>之前:</p>
+
+<pre>&gt; forecast::autoplot(ccf(climate_ts[, 1], climate_ts[, 2], plot = F), main = "CCF")</pre>
+
+<div><p>上述代码的输出如下:</p>
+
+<p class="CDPAlignCenter CDPAlign"><img class="alignnone size-full wp-image-812 image-border" src="img/88d2c115-581a-44f1-9430-16fe1a2116e2.png" style="width:64.50em;height:31.17em;"/></p>
+
+</div>
+
+<p><strong> CCF </strong>向我们展示了温度和 CO2 滞后之间的关系。如果<em> x </em>变量的负滞后具有高相关性，我们可以说<em> x </em>领先<em> y </em>。如果<em> x </em>的正滞后具有高相关性，我们说<em> x </em>滞后<em> y </em>。在这里，我们可以看到二氧化碳既是领先变量，也是滞后变量。对于我们的分析，令人鼓舞的是我们看到了前者，但奇怪的是我们看到了后者。我们将在 VAR 和 Granger 因果分析中看到这是否重要。</p>
+
+<p>此外，我们需要测试数据是否是稳定的。我们可以用<kbd>tseries</kbd>包中的<strong>增强 Dickey-Fuller </strong> ( <strong> ADF </strong>)测试来证明这一点，使用<kbd>adf.test()</kbd>函数，如下所示:</p>
+
+<pre>    &gt; tseries::adf.test(climate_ts[, 1])<br/><br/>           Augmented Dickey-Fuller Test<br/><br/>    data: climate_ts[, 1]<br/>    Dickey-Fuller = -1.1519, Lag order = 4, p-value =<br/>    0.9101<br/>    alternative hypothesis: stationary<br/><br/>    &gt; tseries::adf.test(climate_ts[, 2])<br/><br/>           Augmented Dickey-Fuller Test<br/><br/>    data: climate_ts[, 2]<br/>    Dickey-Fuller = -1.8106, Lag order = 4, p-value =<br/>    0.6546<br/>    alternative hypothesis: stationary</pre>
+
+<p>对于这两个系列，我们有无关紧要的<kbd>p-values</kbd>，所以我们不能拒绝零，并得出结论，他们不是平稳的。</p>
+
+<p>研究完数据后，让我们开始建模过程，首先将单变量技术应用于温度异常。</p>
+
+
+
+
+
+            
+
+
+
+            
+
+        
+
+    </body>
+
+
+
+</html>
+<html xmlns:epub="http://www.idpf.org/2007/ops">
+
+    <head>
+
+        <title>Modeling and evaluation</title>
+
+        
+
+        <meta charset="utf-8"/>
+
+<meta content="urn:uuid:edef0689-6ba8-4dfc-93a3-190fd7a9b9a4" name="Adept.expected.resource"/>
+
+    </head>
+
+
+
+    <body>
+
+        
+
+
+
+                            
+
+                    <h1 class="header-title">建模和评估</h1>
+
+                
+
+            
+
+            
+
+                
+
+<p>对于建模和评估步骤，我们将关注三个任务。第一个是产生一个仅适用于地表温度的单变量预测模型。第二个是开发一个地表温度和 CO2 水平的向量自回归模型，用这个模型的结果来指导我们研究 CO2 水平是否是地表温度异常的格兰杰原因。</p>
+
+
+
+
+
+            
+
+
+
+            
+
+        
+
+    </body>
+
+
+
+</html>
+<html xmlns:epub="http://www.idpf.org/2007/ops">
+
+    <head>
+
+        <title>Univariate time series forecasting</title>
+
+        
+
+        <meta charset="utf-8"/>
+
+<meta content="urn:uuid:edef0689-6ba8-4dfc-93a3-190fd7a9b9a4" name="Adept.expected.resource"/>
+
+    </head>
+
+
+
+    <body>
+
+        
+
+
+
+                            
+
+                    <h1 class="header-title">单变量时间序列预测</h1>
+
+                
+
+            
+
+            
+
+                
+
+<p>这项任务的目标是对地表温度进行单变量预测，重点是选择指数平滑模型、ARIMA 模型或包括神经网络在内的综合方法。我们将训练模型，并在超时测试集上确定它们的预测准确性，就像我们在其他学习工作中所做的那样。下面的代码创建定型集和测试集:</p>
+
+<pre>&gt; temp_ts &lt;- ts(climate$Temp, start = 1919, frequency = 1)<br/><br/>&gt; train &lt;- window(temp_ts, end = 2007)<br/><br/>&gt; test &lt;- window(temp_ts, start = 2008)</pre>
+
+<p class="packt_figure">为了构建我们的指数平滑模型，我们将使用<kbd>forecast</kbd>包中的<kbd>ets()</kbd>函数。该函数将找到具有最低 AIC 的最佳模型:</p>
+
+<pre>&gt; fit.ets &lt;- forecast::ets(train)<br/><br/>&gt; fit.ets<br/>ETS(A,A,N) <br/><br/>Call:<br/> forecast::ets(y = train) <br/><br/>  Smoothing parameters:<br/>    alpha = 0.3429 <br/>    beta = 1e-04 <br/><br/>  Initial states:<br/>    l = -0.2817 <br/>    b = 0.0095 <br/><br/>  sigma: 0.1025<br/><br/>       AIC AICc BIC <br/>-0.1516906 0.5712010 12.2914912<strong> </strong></pre>
+
+<p>模型对象返回许多感兴趣的参数。首先要检查的是<kbd>(A,A,N)</kbd>是什么意思。它表示所选择的模型是带有附加误差的简单指数平滑。第一个字母表示误差类型，第二个字母表示趋势，第三个字母表示季节性。可能的字母如下:</p>
+
+<ul>
+
+<li><em> A =添加剂</em></li>
+
+<li><em> M =乘法</em></li>
+
+<li><em> N =无</em></li>
+
+</ul>
+
+<p>我们还可以看到α(平滑参数)用于误差校正(电平)，β(斜率)用于参数估计。初始状态值用于启动模型选择；sigma 是残差的变化，提供了模型标准值。您可以绘制估计值随时间的变化情况:</p>
+
+<pre>&gt; forecast::autoplot(fit.ets)</pre>
+
+<p>上述代码的输出如下:</p>
+
+<p class="CDPAlignCenter CDPAlign"><img class="alignnone size-full wp-image-874 image-border" src="img/0f940098-717a-42cb-aa82-64a8f630c02f.png" style="width:55.25em;height:31.25em;"/></p>
+
+<p>我们现在将绘制<kbd>forecast</kbd>，看看它在测试数据上的表现如何:</p>
+
+<pre>&gt; plot(forecast::forecast(fit.ets, h = 6))<br/><br/>&gt; lines(test, type = "o")</pre>
+
+<p>上述代码的输出如下:</p>
+
+<p class="CDPAlignCenter CDPAlign"><img class="alignnone size-full wp-image-814 image-border" src="img/234d3c23-c8f9-469d-a854-459892ab3c1a.png" style="width:67.50em;height:34.83em;"/></p>
+
+<p>从图上看，似乎这个预测显示了一个轻微的线性上升趋势，并且高估了实际值。我们现在来看看模型的准确性度量:<strong> <br/> </strong></p>
+
+<pre>&gt; fit.ets %&gt;% forecast::forecast(h = 6) %&gt;%<br/>    forecast::accuracy(temp_ts)<br/>                      ME       RMSE        MAE       MPE     MAPE      MASE<br/>Training set -0.00160570 0.10012357 0.08052241      -Inf      Inf 0.8752436<br/>Test set     -0.06410776 0.08303044 0.07086704 -14.90784 16.12354 0.7702939<br/>                  ACF1  Theil's U<br/>Training set 0.1058923         NA<br/>Test set    -0.1743445  0.7940449</pre>
+
+<p class="mce-root"/>
+
+<p class="mce-root"/>
+
+<p>误差有八种度量方法。我认为我们应该关注的是 Theil 的 U(实际上 U2 作为最初的 Theil 的 U 有一些缺陷)，它只在测试数据上可用。泰尔的 U 是一个有趣的统计数据，因为它不依赖于规模，所以你可以比较多个模型。例如，如果在一个模型中使用对数标度转换时间序列，则可以将统计数据与不转换数据的模型进行比较。你可以把它想成是预测相对于一个天真的预测提高可预测性的比率，或者我们可以用模型的<strong>均方根误差</strong> ( <strong> RMSE </strong>)除以天真模型的 RMSE 来描述它。因此，大于 1 的 Theil 的 U 统计比简单预测表现差，值 1 等于简单预测，小于 1 表示模型优于简单预测。进一步的讨论以及统计数据是如何得出的可点击此链接:<a href="http://www.forecastingprinciples.com/data/definitions/theil's%20u.html">http://www . forecasting principles . com/data/definitions/Theil ' s % 20u . html</a>。</p>
+
+<p class="CDPAlignLeft CDPAlign">平滑模型提供的统计值为 0.7940449。虽然低于 1，但这并不令人印象深刻。在我看来，我们应该努力达到或低于 0.5。</p>
+
+<p>我们现在将使用<kbd>auto.arima()</kbd>开发一个<kbd>ARIMA</kbd>模型，它也来自<kbd>forecast</kbd>包。您可以在函数中指定许多选项，或者您可以只包含您的时间序列数据，它会找到最合适的<kbd>ARIMA</kbd>。我建议谨慎使用该函数，因为它通常会返回一个违反残差假设的模型，如下所示:</p>
+
+<pre>&gt; fit.arima &lt;- forecast::auto.arima(train)<br/><br/>&gt; summary(fit.arima)<br/>Series: train <br/>ARIMA(1,1,1) with drift <br/><br/>Coefficients:<br/>         ar1     ma1  drift<br/>      0.2089 -0.7627 0.0087<br/>s.e.  0.1372  0.0798 0.0033<br/><br/>sigma^2 estimated as 0.01021: log likelihood=78.09<br/>AIC=-148.18 AICc=-147.7 BIC=-138.28<br/><br/>Training set error measures:<br/>                        ME       RMSE        MAE MPE MAPE      MASE<br/>Training set -8.396214e-05 0.09874311 0.07917484 Inf  Inf 0.8605961<br/>                   ACF1<br/>Training set 0.02010508</pre>
+
+<p>简略输出显示所选模型为 AR = 1，I = 1，MA = 1，I = 1，或带漂移的<kbd>ARIMA(1,1,1)</kbd>(相当于差分数据中的截距项和无差分数据中的斜率项)。我们可以用与之前相同的方式检查其在<kbd>test</kbd>数据上的性能图:</p>
+
+<pre>&gt; plot(forecast::forecast(fit.arima, h = 6))<br/><br/>&gt; lines(test, type = "o")</pre>
+
+<p class="packt_figure">上述代码的输出如下:</p>
+
+<p class="CDPAlignCenter CDPAlign"><img class="alignnone size-full wp-image-815 image-border" src="img/f5d0471e-521b-4639-85ff-ae39dd1a89a8.png" style="width:65.00em;height:36.33em;"/></p>
+
+<p>这与现有方法非常相似。让我们检查一下这些准确性统计数据，当然重点是泰尔的 U:</p>
+
+<pre>&gt; fit.arima %&gt;% forecast::forecast(h = 6) %&gt;%<br/>    forecast::accuracy(temperature)<br/>                        ME       RMSE        MAE       MPE     MAPE      MASE<br/>Training set -8.396214e-05 0.09874311 0.07917484       Inf      Inf 0.8605961<br/>Test set     -4.971043e-02 0.07242892 0.06110011 -11.84965 13.89815 0.6641316<br/>                    ACF1 Theil's U</pre>
+
+<p class="mce-root"/>
+
+<p class="mce-root"/>
+
+<pre>Training set  0.02010508        NA<br/>Test set     -0.18336583 0.6729521</pre>
+
+<p>ARIMA 模型的预测误差稍好一些。你应该经常用你的模型检查残差，尤其是 ARIMA，它依赖于在所述残差中没有序列相关性的假设:</p>
+
+<pre>&gt; forecast::checkresiduals(fit.arima)<br/><br/>  Ljung-Box test<br/><br/>data: Residuals from ARIMA(1,1,1) with drift<br/>Q* = 18.071, df = 7, p-value = 0.01165<br/><br/>Model df: 3. Total lags used: 10</pre>
+
+<p>以下代码的输出如下:</p>
+
+<p class="CDPAlignCenter CDPAlign"><img class="alignnone size-full wp-image-816 image-border" src="img/335c35a5-0198-44da-94d8-86215bfd79c1.png" style="width:66.75em;height:39.50em;"/></p>
+
+<p>首先看一下 Ljung-Box Q 测试。零假设是残差中的相关性为零，另一种假设是残差表现出序列相关性。我们看到一个显著的 p 值，因此我们可以拒绝空值。这在残差的 ACF 图中直观地得到了证实，其中在滞后 4 和滞后 10 处存在显著的相关性。由于存在序列相关性，模型系数是无偏的，但标准误差和任何依赖于它们的统计数据都是错误的。这一事实可能需要您通过反复试验来手动选择合适的 ARIMA 模型。解释如何做到这一点需要一个单独的章节，所以它不在本书的范围内。</p>
+
+<p>有了几个相对较弱的模型，我们可以尝试其他方法，但让我们看看如何创建一个类似于我们在<a href="3665909b-b545-4492-928b-843756ec6588.xhtml">第 8 章</a>、<em>中创建的系综和多类方法</em>的系综。我们将把刚刚创建的两个模型放在一起，并从<kbd>forecast</kbd>包中可用的<kbd>nnetar()</kbd>函数添加一个前馈神经网络。我们不会对模型进行叠加，只是简单的在测试数据上取三个模型的平均值进行对比。</p>
+
+<p>该流程的第一步是为每个模型开发预测。这很简单:</p>
+
+<pre>&gt; ETS &lt;- forecast::forecast(forecast::ets(train), h = 6)<br/><br/>&gt; ARIMA &lt;- forecast::forecast(forecast::auto.arima(train), h = 6)<br/><br/>&gt; NN &lt;- forecast::forecast(forecast::nnetar(train), h = 6)</pre>
+
+<p>下一步是创建总体值，这也只是一个简单的平均值:</p>
+
+<pre>&gt; ensemble.fit &lt;-<br/>    (ETS[["mean"]] + ARIMA[["mean"]] + NN[["mean"]]) / 3</pre>
+
+<p>比较步骤是一个开放的画布，可以让您生成想要的统计数据。请注意，我只提取了测试数据和泰尔指数的准确性。您可以提取必要的统计数据，如 RMSE 或 MAPE，如果您愿意的话:</p>
+
+<pre>&gt; c(ets = forecast::accuracy(ETS, temperature)["Test set", c("Theil's U")],<br/>    arima = forecast::accuracy(ARIMA, temperature)["Test set", c("Theil's U")],<br/>    nn = forecast::accuracy(NN, temperature)["Test set", c("Theil's U")],<br/>    ef = forecast::accuracy(ensemble.fit, temperature)["Test set", c("Theil's U")])<br/>      ets     arima        nn        ef <br/>0.7940449 0.6729521 0.6794704 0.7104893 </pre>
+
+<p>我认为这很有趣，因为指数平滑正在拖累整体性能，而 ARIMA 和神经网络几乎相等。只是为了直观比较，我们来绘制一下神经网络:</p>
+
+<pre>&gt; plot(NN)<br/><br/>&gt; lines(test, type = "o")</pre>
+
+<p>上述代码的输出如下:</p>
+
+<p class="CDPAlignCenter CDPAlign"><img class="alignnone size-full wp-image-817 image-border" src="img/babf3804-7155-48bd-9c72-253f26e66abf.png" style="width:69.92em;height:36.00em;"/></p>
+
+<p>我们该拿这一切怎么办？这里有一些想法。如果你观察时间序列模式，你会注意到它经历了我们称之为不同的结构变化。有许多 R 包来检查这种结构，并确定在哪个点开始时间序列进行预测更有意义。例如，在 1960 年代中期，时间序列的斜率似乎有明显的变化。当你对你的数据这样做时，你丢掉了可能是有价值的数据点，所以判断开始起作用。这意味着，如果你想完全自动化你的时间序列模型，你需要考虑这一点。</p>
+
+<p>您可以尝试用 log 值(这对于负值不太适用)或 Box-Cox 来转换整个时间序列。在<kbd>forecast</kbd>包中，您可以在您的模型函数中设置<kbd>lambda = "auto"</kbd>。我这样做了，性能没有提高。为了举例，让我们试着检测结构变化，并在选定的起点上建立一个 ARIMA 模型。我将用<kbd>strucchange</kbd>包演示结构变化，它通过计算确定线性回归关系的变化。你可以在这个链接找到完整的讨论和简介:<a href="https://cran.r-project.org/web/packages/strucchange/vignettes/strucchange-intro.pdf">https://cran . r-project . org/web/packages/struc change/vignettes/struc change-intro . pdf</a>。</p>
+
+<p>我发现这种方法在与利益相关者的讨论中很有用，因为它有助于他们理解潜在的数据生成过程何时甚至为什么会发生变化。这是:</p>
+
+<pre>&gt; temp_struc &lt;- strucchange::breakpoints(temp_ts ~ 1)<br/><br/>&gt; summary(temp_struc)<br/><br/>   Optimal (m+1)-segment partition: <br/><br/>Call:<br/>breakpoints.formula(formula = temp_ts ~ 1)<br/><br/>Breakpoints at observation number:<br/>                      <br/>m = 1 68 <br/>m = 2 60 78<br/>m = 3 18 60 78<br/>m = 4 18 45 60 78<br/>m = 5 17 31 45 60 78<br/><br/>Corresponding to breakdates:<br/>                                <br/>m = 1 1986 <br/>m = 2 1978 1996<br/>m = 3 1936 1978 1996<br/>m = 4 1936 1963 1978 1996<br/>m = 5 1935 1949 1963 1978 1996</pre>
+
+<p>该算法为我们提供了时间序列中的五个潜在断点，以观察数字和年份的形式返回信息。果不其然，1963 年预示着一场结构性变化，但它告诉我们<kbd>1978</kbd>和<kbd>1996</kbd>也符合条件。让我们以 1963 年的突破作为 ARIMA 模型时间序列的开始:</p>
+
+<pre>&gt; train_bp &lt;- window(temp_ts, start = 1963, end = 2007)<br/><br/>&gt; fit.arima2 &lt;- forecast::auto.arima(train_bp)<br/><br/>&gt; fit.arima2 %&gt;% forecast::forecast(h = 6) %&gt;%<br/>    forecast::accuracy(temperature)<br/>                       ME      RMSE        MAE       MPE     MAPE<br/>Training set -0.007696066 0.1034046 0.08505900  53.68130 99.93869<br/>Test set     -0.086625082 0.1017767 0.08676477 -19.61829 19.64341<br/>                  MASE        ACF1 Theil's U<br/>Training set 0.7951128  0.09310454        NA<br/>Test set     0.8110579 -0.08291170  1.057287</pre>
+
+<p>现在你知道了:令我惊讶的是，它甚至比一个天真的预测还要糟糕，但是至少我们已经介绍了如何实现这个方法。</p>
+
+<p>至此，我们已经完成了地表温度异常的单变量预测模型的构建，现在我们将继续下一项任务，看看二氧化碳水平是否会导致这些异常。</p>
+
+
+
+
+
+            
+
+
+
+            
+
+        
+
+    </body>
+
+
+
+</html>
+<html xmlns:epub="http://www.idpf.org/2007/ops">
+
+    <head>
+
+        <title>Examining the causality</title>
+
+        
+
+        <meta charset="utf-8"/>
+
+<meta content="urn:uuid:edef0689-6ba8-4dfc-93a3-190fd7a9b9a4" name="Adept.expected.resource"/>
+
+    </head>
+
+
+
+    <body>
+
+        
+
+
+
+                            
+
+                    <h1 class="header-title">检验因果关系</h1>
+
+                
+
+            
+
+            
+
+                
+
+<p>对于这一章，这是我认为橡胶遇到道路的地方，我们将从纯粹的相关性中分离出因果关系——好吧，从统计学上来说，无论如何。这并不是这种技术第一次被应用到这个问题上。Triacca (2005 年)没有发现任何证据表明大气 CO2 格兰杰导致了地表温度异常。另一方面，Kodra (2010 年)得出结论，存在因果关系，但提出警告，即使经过二阶差分，他们的数据也不是稳定的。虽然这一努力不会解决争论，但它有望激励你在个人努力中应用这一方法。眼下的话题无疑为论证格兰杰因果关系提供了一个有效的训练场地。</p>
+
+<p>我们的计划是首先证明虚假线性回归，其中残差遭受自相关，也称为序列相关。然后，我们将检验两种不同的格兰杰因果关系的方法。第一种是传统方法，两个系列都是平稳的。然后，我们将看看 Toda 和 Yamamoto (1995)演示的方法，该方法将该方法应用于原始数据，或有时被称为<strong>水平</strong>。</p>
+
+
+
+
+
+            
+
+
+
+            
+
+        
+
+    </body>
+
+
+
+</html>
+<html xmlns:epub="http://www.idpf.org/2007/ops">
+
+    <head>
+
+        <title>Linear regression</title>
+
+        
+
+        <meta charset="utf-8"/>
+
+<meta content="urn:uuid:edef0689-6ba8-4dfc-93a3-190fd7a9b9a4" name="Adept.expected.resource"/>
+
+    </head>
+
+
+
+    <body>
+
+        
+
+
+
+                            
+
+                    <h1 class="header-title">线性回归</h1>
+
+                
+
+            
+
+            
+
+                
+
+<p>让我们从伪回归开始吧，我已经看到它在现实世界中实现得太频繁了。在这里，我们简单地构建一个线性模型并检查结果:</p>
+
+<pre>    &gt; fit.lm &lt;- lm(Temp ~ CO2, data = climate)<br/><br/>    &gt; summary(fit.lm)<br/><br/>    Call:<br/>    lm(formula = Temp ~ CO2, data = climate)<br/><br/>    Residuals:<br/>         Min       1Q  Median      3Q     Max <br/>    -0.36411 -0.08986 0.00011 0.09475 0.28763 <br/><br/>    Coefficients:<br/>                  Estimate  Std. Error  t value     Pr(&gt;|t|) <br/>    (Intercept) -2.430e-01   2.357e-02   -10.31   &lt;2e-16 ***<br/>    CO2          7.548e-05   5.047e-06    14.96   &lt;2e-16 ***<br/>    ---<br/>    Signif. codes: <br/>    0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1<br/><br/>    Residual standard error: 0.1299 on 93 degrees of freedom<br/>    Multiple R-squared: 0.7063, Adjusted R-squared: 0.7032 <br/>    F-statistic: 223.7 on 1 and 93 DF, p-value: &lt; 2.2e-16</pre>
+
+<p>请注意，一切都很重要，调整后的 R 平方为 0.7。好吧，它们是高度相关的，但是格兰杰和纽博尔德(1974)讨论的这些都是没有意义的。同样，我在与许多拥有高学历的人的会议上看到过这样的结果，我不得不做坏人，挑战这些结果。</p>
+
+<p>我们可以绘制序列相关性，从残差的时间序列图开始，它产生一个清晰的模式:</p>
+
+<pre>&gt; forecast::checkresiduals(fit.lm)<br/><br/>  Breusch-Godfrey test for serial correlation of order up to 10<br/><br/>data: Residuals<br/>LM test = 46.193, df = 10, p-value = 1.323e-06</pre>
+
+<p class="CDPAlignLeft CDPAlign">上述代码的输出如下:</p>
+
+<div><img class="alignnone size-full wp-image-818 image-border" src="img/0a72741e-bdc1-4db1-b2d5-a5ede3839200.png" style="width:72.67em;height:38.75em;"/></div>
+
+<p>通过检查这些图和 Breusch-Godfrey 测试，我们可以安全地拒绝无自相关的零假设，这并不令人惊讶。处理自相关的简单方法是加入相关时间序列的滞后变量和/或使所有数据平稳。接下来，我们将使用向量自回归来确定适当的滞后结构，以纳入我们的因果关系研究。结构变化点之一是 1949 年，所以我们从那里开始。</p>
+
+
+
+
+
+            
+
+
+
+            
+
+        
+
+    </body>
+
+
+
+</html>
+<html xmlns:epub="http://www.idpf.org/2007/ops">
+
+    <head>
+
+        <title>Vector autoregression</title>
+
+        
+
+        <meta charset="utf-8"/>
+
+<meta content="urn:uuid:edef0689-6ba8-4dfc-93a3-190fd7a9b9a4" name="Adept.expected.resource"/>
+
+    </head>
+
+
+
+    <body>
+
+        
+
+
+
+                            
+
+                    <h1 class="header-title">向量自回归</h1>
+
+                
+
+            
+
+            
+
+                
+
+<p>我们在上一节中已经看到，温度和 CO2 需要一阶差分。展示这一点的另一个简单方法是使用<kbd>forecast</kbd>包的<kbd>ndiffs()</kbd>函数。它提供一个输出，详细说明使数据稳定所需的最小差异数。在该功能中，您可以指定您想要使用三种可用测试中的哪一种:<strong>科维亚特科夫斯基、飞利浦、施密特&amp;申</strong> ( <strong> KPSS </strong>)、<strong>增广迪基-富勒</strong> ( <strong> ADF </strong>)或<strong>飞利浦-庇隆</strong> ( <strong> PP </strong>)。我将在下面的代码中使用 ADF，它有一个空假设，即数据不是静态的:</p>
+
+<pre>&gt; climate49 &lt;- window(climate_ts, start = 1949)  <br/> <br/>&gt; forecast::ndiffs(climate49[, 1], test = "adf")<br/>    [1] 1<br/><br/>&gt; forecast::ndiffs(climate49[, 2], test = "adf")<br/>    [1] 1<strong><br/></strong></pre>
+
+<p>我们看到两者都需要一阶差分才能稳定。首先，我们将创造一种差异。然后，我们将完成传统方法，其中两个系列都是固定的:</p>
+
+<pre>&gt; climate_diff &lt;- diff(climate49)<strong><br/></strong></pre>
+
+<p>现在的问题是基于使用向量自回归的信息标准来确定最佳滞后结构。这是通过<kbd>vars</kbd>包中的<kbd>VARselect</kbd>函数完成的。您只需在函数中使用<kbd>lag.max = x</kbd>指定模型中的数据和滞后数。让我们使用最多 12 个滞后:</p>
+
+<pre>&gt; lag.select &lt;- vars::VARselect(climate_diff, lag.max = 12)<br/><br/>&gt; lag.select$selection<br/>    AIC(n) HQ(n) SC(n) FPE(n) <br/>         5     1     1      5</pre>
+
+<p>我们使用<kbd>lag$selection</kbd>调用信息标准。提供了四种不同的准则，包括<strong> AIC </strong>、<strong>汉南-奎因准则</strong> ( <strong> HQ </strong>)、<strong>施瓦兹-贝叶斯准则</strong> ( <strong> SC </strong>)和<strong> FPE </strong>。注意 AIC 和 SC 在<a href="11c0076c-a839-44dc-a3f6-2f88378c748f.xhtml">第二章</a>、<em>线性回归</em>中有所涉及，所以我在这里不再赘述判别公式或区别。如果您想查看每个延迟的实际结果，您可以使用<kbd>lag$criteria</kbd>。我们可以看到<kbd>AIC</kbd>和<kbd>FPE</kbd>选择了滞后 5 和 HQ 和 SC 滞后 1 作为<kbd>VAR</kbd>模型的最优结构。使用五年的滞后时间似乎是有道理的。我们将使用<kbd>var()</kbd>函数创建这个模型。我会让你用滞后 1:</p>
+
+<pre>&gt; fit1 &lt;- vars::VAR(climate_diff, p = 5)</pre>
+
+<p>总结结果相当冗长，因为它构建了两个独立的模型，可能会占用整整两页。我提供的是一个简短的输出，显示了以温度作为预测的结果:</p>
+
+<pre>&gt; summary(fit1)<br/>Residual standard error: 0.09877 on 48 degrees of freedom<br/>Multiple R-Squared: 0.4692, Adjusted R-squared: 0.3586 <br/>F-statistic: 4.243 on 10 and 48 DF, p-value: 0.0002996 </pre>
+
+<p>该模型具有显著性，结果调整后的 R 平方为 0.36。</p>
+
+<p>正如我们在上一节中所做的那样，我们应该检查序列相关性。这里，<kbd>VAR</kbd>包为多元自相关提供了<kbd>serial.test()</kbd>函数。它提供了几种不同的测试，但是让我们把注意力集中在<kbd>Portmanteau Test</kbd>上，请注意流行的 Durbin-Watson 测试只针对单变量序列。无效假设是自相关为零，另一种假设是自相关不为零:</p>
+
+<pre>&gt; vars::serial.test(fit1, type = "PT.asymptotic")<br/><br/>  Portmanteau Test (asymptotic)<br/><br/>data: Residuals of VAR object fit1<br/>Chi-squared = 33.332, df = 44, p-value = 0.8794</pre>
+
+<p>当<kbd>p-value</kbd>为 0.8794 时，我们没有证据拒绝零值，可以说残差不自相关。1 滞后测试说明了什么？</p>
+
+<p>要做 R 中的格兰杰因果关系测试，你可以使用<kbd>lmtest</kbd>包和<kbd>Grangertest()</kbd>函数或者<kbd>vars</kbd>包中的<kbd>causality()</kbd>函数。我将使用<kbd>causality()</kbd>来演示这项技术。这非常简单，因为您只需要创建两个对象，一个用于引起<kbd>y</kbd>的<kbd>x</kbd>，另一个用于引起<kbd>x</kbd>的<kbd>y</kbd>，利用之前创建的<kbd>fit1</kbd>对象:</p>
+
+<pre>&gt; x2y &lt;- vars::causality(fit1, cause = "CO2")<br/><br/>&gt; y2x &lt;- vars::causality(fit1, cause = "Temp")</pre>
+
+<p>现在只需要简单的调用格兰杰测试结果:</p>
+
+<pre>&gt; x2y$Granger<br/><br/>  Granger causality H0: CO2 don't Granger-cause Temp<br/><br/>data: VAR object fit1<br/>F-Test = 2.7907, df1 = 5, df2 = 96, p-value = 0.02133<br/><br/>&gt; y2x$Granger<br/><br/>  Granger causality H0: Temp don't Granger-cause CO2<br/><br/>data: VAR object fit1<br/>F-Test = 0.71623, df1 = 5, df2 = 96, p-value = 0.6128</pre>
+
+<p class="mce-root"/>
+
+<p>格兰杰原因温度 CO2 差异的<kbd>p-value</kbd>值为 0.02133，其他方向不显著。那么这一切意味着什么呢？首先我们可以说的是，Y 并不引起 X，至于 X 引起 Y，我们可以在 0.05 的显著性水平上拒绝 null，从而得出 X 确实格兰杰原因 Y 的结论，但是，这里的相关结论是这样的吗？请记住，如果零假设为真，p 值评估影响的可能性。此外，请记住，测试从来没有被设计成一些二元是或否。由于这项研究是基于观测数据，我相信我们可以说很有可能是<em>二氧化碳排放导致地表温度异常</em>。但是这个结论有很多批评的余地。我在前面提到了围绕数据质量的争议。</p>
+
+<p>然而，我们仍然需要使用替代格兰杰因果关系技术来模拟原始的二氧化碳水平。找到正确滞后数的过程与之前相同，只是我们不需要让数据保持不变:</p>
+
+<pre>&gt; level.select &lt;- vars::VARselect(climate49, lag.max = 12)<br/><br/>&gt; level.select$selection<br/>AIC(n) HQ(n) SC(n) FPE(n) <br/>    10     1     1      6</pre>
+
+<p>让我们试试 lag 6 的结构，看看我们是否能达到显著性，记住要加上一个额外的 lag 来说明综合系列。关于这项技术以及为什么需要这样做的讨论可以在 http://Dave giles . blogspot . de/2011/04/testing-for-Granger-causality . html 上找到:</p>
+
+<pre>&gt; fit2 &lt;- vars::VAR(climate49, p = 7)<br/><br/>&gt; vars::serial.test(fit2, type = "PT.asymptotic")<br/><br/>  Portmanteau Test (asymptotic)<br/><br/>data: Residuals of VAR object fit2<br/>Chi-squared = 32.693, df = 36, p-value = 0.6267</pre>
+
+<p>现在，为了确定 X 导致 Y 的格兰杰因果关系，您进行了一个 Wald 测试，其中 X 的系数和方程中只有 X 的系数是 0，以预测 Y，记住不要在测试中包括额外的系数来说明积分。</p>
+
+<p>R 中的 Wald 测试可以在我们已经加载的<kbd>aod</kbd>包中找到。我们需要指定完整模型的系数，它的方差-协方差矩阵，以及原因变量的系数。</p>
+
+<p>我们需要在 VAR 对象中测试的<kbd>Temp</kbd>的系数由从 2 到 12 的偶数组成，而 CO2 的系数是从 1 到 11 的奇数。让我们用 base R 的 seq()函数创建一个对象，而不是在我们的函数中使用 c(2、4、6 等等)。</p>
+
+<p>首先，让我们看看 CO2 是如何引起温度升高的:</p>
+
+<pre>&gt; CO2terms &lt;- seq(1, 11, 2)<br/><br/>&gt; Tempterms &lt;- seq(2, 12, 2)</pre>
+
+<p>我们现在准备运行<kbd>wald</kbd>测试，在下面的代码和简短的输出中描述:</p>
+
+<pre>&gt; aod::wald.test(<br/>    b = coef(fit2$varresult$Temp),<br/>    Sigma = vcov(fit2$varresult$Temp),<br/>    Terms = c(CO2terms)<br/> )<br/><br/>$result$`chi2`<br/>       chi2         df          P <br/>13.48661591 6.00000000 0.03592734 </pre>
+
+<p>怎么样？我们有一个显著的 p 值，所以让我们用下面的代码测试另一个方向的因果关系:</p>
+
+<pre>&gt; aod::wald.test(<br/>    b = coef(fit2$varresult$CO2),<br/>    Sigma = vcov(fit2$varresult$CO2),<br/>    Terms = c(Tempterms)<br/> )<br/><br/>$result$`chi2`<br/>     chi2        df         P <br/>4.7709016 6.0000000 0.5735146</pre>
+
+<p>相反，我们可以说温度不是二氧化碳的格兰杰原因。这里最后要展示的是如何使用向量自回归来生成预测。有一个<kbd>predict</kbd>函数可用，我们将绘制 24 年的预测图:</p>
+
+<pre>&gt; plot(predict(fit2, n.ahead = 24, ci = 0.95))</pre>
+
+<p class="CDPAlignLeft CDPAlign">上述代码的输出如下:</p>
+
+<div><img class="alignnone size-full wp-image-819 image-border" src="img/ff5d5ae7-6e9d-4488-8c8b-bd3058bb2ed5.png" style="width:75.08em;height:36.92em;"/></div>
+
+<p>展望未来几十年，我们看到温度异常接近 1 度。如果没有别的，我希望这已经激发了你的思考，如何将这种技术应用到你自己的现实世界问题中，或者甚至更详细地检查气候变化数据。证明因果关系应该有一个很高的门槛，格兰杰因果关系是一个很好的工具。</p>
+
+<p class="mce-root"/>
+
+<p class="mce-root"/>
+
+
+
+
+
+            
+
+
+
+            
+
+        
+
+    </body>
+
+
+
+</html>
+<html xmlns:epub="http://www.idpf.org/2007/ops">
+
+    <head>
+
+        <title>Summary</title>
+
+        
+
+        <meta charset="utf-8"/>
+
+<meta content="urn:uuid:edef0689-6ba8-4dfc-93a3-190fd7a9b9a4" name="Adept.expected.resource"/>
+
+    </head>
+
+
+
+    <body>
+
+        
+
+
+
+                            
+
+                    <h1 class="header-title">摘要</h1>
+
+                
+
+            
+
+            
+
+                
+
+<p>在本章中，我们的目标是讨论时间元素在机器学习和分析领域的重要性，识别分析时间序列时的常见陷阱，并展示解决这些陷阱的技术和方法。我们探索了全球气温异常和人类二氧化碳排放的单变量和双变量时间序列分析。此外，我们研究了格兰杰因果关系，以确定我们是否可以说，从统计上来说，大气二氧化碳水平导致了地表温度异常。我们发现 CO2 与温度的格兰杰因果关系的 p 值大于 0.05 但小于 0.10。这表明格兰杰因果关系是研究机器学习问题中因果关系的有效工具。在下一章，我们将改变思路，看看如何将学习方法应用于文本数据。</p>
+
+<p>此外，请记住，在时间序列分析中，我们只是浏览了表面。我鼓励您探索围绕变化点检测、时间序列分解、非线性预测等其他技术。虽然通常不被认为是机器学习工具箱的一部分，但我相信你会发现它是你的一个无价之宝。</p>
+
+
+
+
+
+            
+
+
+
+            
+
+        
+
+    </body>
+
+
+
+</html></body></html>

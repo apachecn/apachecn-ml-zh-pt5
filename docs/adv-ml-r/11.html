@@ -1,0 +1,545 @@
+<html><head/><body><html xmlns:epub="http://www.idpf.org/2007/ops">
+
+    <head>
+
+        <title>Association Analysis</title>
+
+        
+
+        <meta charset="utf-8"/>
+
+<meta content="urn:uuid:edef0689-6ba8-4dfc-93a3-190fd7a9b9a4" name="Adept.expected.resource"/>
+
+    </head>
+
+
+
+    <body>
+
+        
+
+
+
+                            
+
+                    <h1 class="header-title">联想分析</h1>
+
+                
+
+            
+
+            
+
+                
+
+<p>如果我们有数据，我们就来看数据。如果我们只有意见，那就用我的吧。</p>
+
+<p>——吉姆·巴克斯代尔，前网景公司首席执行官</p>
+
+<p>你必须生活在月球的黑暗面，才能看不到我们每天都要讨论的技术的结果。如果你访问<a href="http://www.amazon.com">www.amazon.com</a>，在<a href="http://www.netflix.com">www.netflix.com</a>上看电影，或者访问任何零售网站，你都会接触到诸如<em>相关产品</em>、<em>之类的术语，因为你看过...</em>，<em>买了 x 的客户也买了 y，</em>和<em>为你推荐</em>，在每一个转折处。利用大量的实时或接近实时的历史信息，零售商利用各种算法试图增加购买者的购买量和这些购买的价值。</p>
+
+<p>实现这一点的技术可以分为两类:关联规则和推荐引擎。关联规则分析通常被称为购物篮分析，因为它与了解一起购买的商品有关。推荐引擎的目标是根据顾客对他们以前浏览或购买的商品的评价，为他们提供他们喜欢的其他商品。</p>
+
+<p>在这一章中，我们将集中讨论关联分析。它不仅适用于推荐、产品放置和促销定价，还可用于制造业、网络使用、医疗保健等。如果你对物品如何一起出现感兴趣，应用你将要学习的东西。</p>
+
+
+
+
+
+            
+
+
+
+            
+
+        
+
+    </body>
+
+
+
+</html>
+<html xmlns:epub="http://www.idpf.org/2007/ops">
+
+    <head>
+
+        <title>An overview of association analysis</title>
+
+        
+
+        <meta charset="utf-8"/>
+
+<meta content="urn:uuid:edef0689-6ba8-4dfc-93a3-190fd7a9b9a4" name="Adept.expected.resource"/>
+
+    </head>
+
+
+
+    <body>
+
+        
+
+
+
+                            
+
+                    <h1 class="header-title">关联分析综述</h1>
+
+                
+
+            
+
+            
+
+                
+
+<p>关联分析是一种数据挖掘技术，其目的是找到产品或服务的最佳组合，并允许营销人员利用这一知识来提供建议、优化产品放置或开发利用交叉销售的营销计划。简而言之，我们的想法是确定哪些物品搭配得好，并从中获利。</p>
+
+<p>你可以把分析的结果想象成一个<kbd>if...then</kbd>语句。如果客户购买了机票，那么他们有 46 %的可能性会购买酒店房间，如果他们继续购买酒店房间，那么有 33 %的可能性会租车。</p>
+
+<p>然而，这不仅仅是为了销售和营销。它还用于欺诈检测和医疗保健；例如，如果患者接受治疗 A，那么他们有 26 %的可能性表现出症状 x。在进入细节之前，我们应该看看一些术语，如下所示:</p>
+
+<ul>
+
+<li><strong> Itemset </strong>:这是数据集中一个或多个项目的集合。</li>
+
+<li><strong> Support </strong>:这是数据中包含感兴趣的项集的事务的比例。</li>
+
+<li><strong>信心</strong>:这是一个人购买或做<em> x </em>，他们将购买或做<em> y </em>的条件概率；做<em> x </em>的行为被称为<em>前因</em>或<strong>左侧</strong> ( <strong> LHS </strong>)，而<em> y </em>是<em>结果</em>或<strong>右侧</strong> ( <strong> RHS </strong>)。</li>
+
+<li><strong>升力</strong>:这是<em> x </em>与 y 同时出现的支撑除以<em> x </em>和<em> y </em>独立出现的概率的比值。就是<strong>置信度</strong>除以概率<em> x </em>乘以概率<em>y</em>；例如，假设我们将<em> x </em>和<em> y </em>同时发生的概率设为 10 %，而<em> x </em>的概率为 20 %，y 为 30 %，那么升力将为 10 % (20 %乘以 30 %)或 16.67 %。</li>
+
+</ul>
+
+<p>R 中可以用来执行购物篮分析的包是<strong>arules:Mining Association Rules and frequency with items sets</strong>。这个包提供了两种不同的方法来寻找规则<strong>先验</strong>和<strong> ECLAT </strong>。我们还可以使用其他算法来进行购物篮分析，但 apriori 是使用最频繁的算法，因此也是我们的重点。</p>
+
+<p>apriori 的原则是，如果一个项目集是频繁的，那么它的所有子集也必须是频繁的。最小频率(支持)由分析师在执行算法之前确定，一旦确定，算法将如下运行:</p>
+
+<ul>
+
+<li>设<em> k=1 </em>(项目数)</li>
+
+<li>生成长度等于或大于指定支持的项集</li>
+
+<li>迭代<em> k + (1...n) </em>，修剪那些不常出现的(少于支持的)</li>
+
+<li>当没有识别出新的频繁项目集时，停止迭代</li>
+
+</ul>
+
+<p>一旦有了最频繁项目集的有序摘要，就可以通过检查置信度和提升来提供感兴趣的关联，从而继续分析过程。</p>
+
+<p>在我们深入分析之前，有必要了解如何将原始数据放入适当的结构中，称为 R 类事务。这可能是一个令人困惑的任务，所以在继续完整演示关联分析之前，我将在这方面花一些时间。</p>
+
+
+
+
+
+            
+
+
+
+            
+
+        
+
+    </body>
+
+
+
+</html>
+<html xmlns:epub="http://www.idpf.org/2007/ops">
+
+    <head>
+
+        <title>Creating transactional data</title>
+
+        
+
+        <meta charset="utf-8"/>
+
+<meta content="urn:uuid:edef0689-6ba8-4dfc-93a3-190fd7a9b9a4" name="Adept.expected.resource"/>
+
+    </head>
+
+
+
+    <body>
+
+        
+
+
+
+                            
+
+                    <h1 class="header-title">创建交易数据</h1>
+
+                
+
+            
+
+            
+
+                
+
+<p class="mce-root">在物联网的世界里，你会收到大量的数据。当您监控设备的异常或故障时，假设您得到一些故障代码。在 R 语言中，你如何将原始数据转化为有意义的分析数据？这里有一个案例研究。我们将把一个随机数据集放在一起，并把它转换成与 R 的<kbd>arules</kbd>包一起使用的适当形式。这是数据框架:</p>
+
+<pre>&gt; set.seed(270)<br/><br/>&gt; faults &lt;- data.frame(<br/>    serialNumber = sample(1:20, 100, replace = T),<br/>    faultCode = paste("fc", sample(1:12, 100, replace = T), sep = "")<br/> )</pre>
+
+<p class="mce-root">这给了我们<kbd>20</kbd>不同的序列号，告诉我们哪些被监控的设备出现了故障。每个设备都有可能出现<kbd>12</kbd>不同的故障代码。我们正在进行的关联分析的局限性在于，它不包括交易顺序。让我们假设在这个例子中这不是一个问题，然后继续。首先，考虑到这些数据是随机生成的，我们将删除重复的数据:</p>
+
+<pre>&gt; faults &lt;- unique(faults)</pre>
+
+<p>在将数据帧转换成事务之前，数据帧的结构非常关键。标识符列必须是整数。所以，如果你有一个客户或者设备标识符比如<kbd>123abc</kbd>，你必须把它变成一个整数。那么，感兴趣的项目必须是一个因素。在这里，我们确认我们有正确的数据帧结构:</p>
+
+<pre>&gt; str(faults)<br/>'data.frame': 80 obs. of 2 variables:<br/> $ serialNumber: int 9 8 1 18 11 20 2 16 10 20 ...<br/> $ faultCode : Factor w/ 12 levels "fc1","fc10","fc11",..: 2 5 1 12 1 3 6 10 11 1 ...</pre>
+
+<p>请注意，这些数据是长格式的，通常就是这样产生的。因此，创建一个所有值都是<kbd>TRUE</kbd>的列，并使用 tidyverse 将数据重新调整为宽格式:</p>
+
+<pre>&gt; faults$indicator &lt;- TRUE<br/><br/>&gt; faults_wide &lt;- tidyr::spread(faults, key = faultCode, value = indicator)</pre>
+
+<p>我们现在有了一个数据帧，其中每个相关项目的相关故障都标为<kbd>TRUE</kbd>。接下来，将数据转换成矩阵，同时删除 ID:</p>
+
+<pre>&gt; faults_matrix &lt;- as.matrix(faults_wide[,-1])</pre>
+
+<p>你必须把缺失的<kbd>na</kbd>变成可以理解的东西，所以让我们把它们变成<kbd>FALSE</kbd>:</p>
+
+<pre>&gt; faults_matrix[is.na(faults_matrix)] &lt;- FALSE</pre>
+
+<p>最后，我们可以将这些数据转换成<kbd>transactions</kbd>类:</p>
+
+<pre>&gt; faults_transactions &lt;- as(faults_matrix, "transactions")</pre>
+
+<p>为了确认这一切都起作用，创建一个前 10 项频率的图表:</p>
+
+<pre>&gt; arules::itemFrequencyPlot(faults_transactions, topN = 10)</pre>
+
+<p>上述代码的输出如下:</p>
+
+<p class="CDPAlignCenter CDPAlign"><img class="alignnone size-full wp-image-450 image-border" src="img/57dd5b3c-8512-4816-b2e9-9979f455186e.png" style="width:37.42em;height:19.00em;"/></p>
+
+<p>成功！遵循前面的过程将使你从原始数据到适当的结构。我们将使用来自<kbd>arules</kbd>包本身的数据转换成一个例子，您可以将它应用于任何您想要的分析。</p>
+
+
+
+
+
+            
+
+
+
+            
+
+        
+
+    </body>
+
+
+
+</html>
+<html xmlns:epub="http://www.idpf.org/2007/ops">
+
+    <head>
+
+        <title>Data understanding</title>
+
+        
+
+        <meta charset="utf-8"/>
+
+<meta content="urn:uuid:edef0689-6ba8-4dfc-93a3-190fd7a9b9a4" name="Adept.expected.resource"/>
+
+    </head>
+
+
+
+    <body>
+
+        
+
+
+
+                            
+
+                    <h1 class="header-title">数据理解</h1>
+
+                
+
+            
+
+            
+
+                
+
+<p>对于我们的业务案例，我们将重点关注确定杂货店的关联规则。数据集将来自<kbd>arules</kbd>包，名为<kbd>Groceries</kbd>。该数据集由现实世界中一家杂货店 30 天内的实际交易组成，包括 9，835 次不同的购买。所有购买的商品都归入 169 个类别中的一个，例如面包、酒、肉等等。</p>
+
+<p>比方说，我们希望了解潜在客户会购买什么样的啤酒，以确定商店内合适的产品位置或支持交叉销售活动。</p>
+
+
+
+
+
+            
+
+
+
+            
+
+        
+
+    </body>
+
+
+
+</html>
+<html xmlns:epub="http://www.idpf.org/2007/ops">
+
+    <head>
+
+        <title>Data preparation</title>
+
+        
+
+        <meta charset="utf-8"/>
+
+<meta content="urn:uuid:edef0689-6ba8-4dfc-93a3-190fd7a9b9a4" name="Adept.expected.resource"/>
+
+    </head>
+
+
+
+    <body>
+
+        
+
+
+
+                            
+
+                    <h1 class="header-title">数据准备</h1>
+
+                
+
+            
+
+            
+
+                
+
+<p>对于这个分析，我们只需要加载两个包，以及<kbd>Groceries</kbd>数据集:</p>
+
+<pre>&gt; install.packages("arules")<br/><br/>&gt; install.packages("arulesViz")<br/><br/>&gt; library(arules)<br/><br/>&gt; data(Groceries)<br/><br/>&gt; str(Groceries)<strong><br/>    </strong>Formal class 'transactions' [package "arules"] with 3 slots<br/>      ..@ data :Formal class 'ngCMatrix' [package "Matrix"] with 5 <br/>        slots<br/>      .. .. ..@ i : int [1:43367] 13 60 69 78 14 29 98 24 15 29 ...<br/>      .. .. ..@ p : int [1:9836] 0 4 7 8 12 16 21 22 27 28 ...<br/>      .. .. ..@ Dim : int [1:2] 169 9835<br/>      .. .. ..@ Dimnames:List of 2<br/>      .. .. .. ..$ : NULL<br/>      .. .. .. ..$ : NULL<br/>      .. .. ..@ factors : list()<br/>      ..@ itemInfo :'data.frame': 169 obs. of 3 variables:<br/>      .. ..$ labels: chr [1:169] "frankfurter" "sausage" "liver loaf" <br/>        "ham" ...<br/>      .. ..$ level2: Factor w/ 55 levels "baby food","bags",..: 44 44 <br/>      44 44 44 44<br/>      44 42 42 41 ...<br/>      .. ..$ level1: Factor w/ 10 levels "canned food",..: 6 6 6 6 6 6 <br/>      6 6 6 6 <br/>      ...<br/>      ..@ itemsetInfo:'data.frame': 0 obs. of 0 variables</pre>
+
+<p>这个数据集被结构化为一个稀疏矩阵对象，称为我们之前创建的<kbd>transaction</kbd>类。</p>
+
+<p>因此，一旦结构是类事务的结构，我们的标准探索技术就不起作用了，但是<kbd>arules</kbd>包为我们提供了探索数据的其他方法。探索这些数据的最佳方式是使用<kbd>arules</kbd>包中的<kbd>itemFrequencyPlot()</kbd>函数绘制一个项目频率图。您需要指定事务数据集、绘制频率最高的项目数，以及是否需要项目的相对或绝对频率。让我们先来看一下绝对频率和排名前几位的<kbd>10</kbd>项:</p>
+
+<pre>&gt; arules::itemFrequencyPlot(Groceries, topN = 10, type = "absolute")</pre>
+
+<p>上述命令的输出如下:</p>
+
+<p class="CDPAlignCenter CDPAlign"><img class="alignnone size-full wp-image-451 image-border" src="img/6d055c18-77eb-4dda-826e-0bfdb4284fcc.png" style="width:40.83em;height:26.17em;"/></p>
+
+<p>购买最多的商品是<strong>全脂牛奶</strong>，篮子里 9836 笔交易中大约有<strong> 2 笔</strong>、<strong> 500 笔</strong>。对于前<kbd>15</kbd>项的相对分布，让我们运行以下代码:</p>
+
+<pre>&gt; arules::itemFrequencyPlot(Groceries, topN = 15)</pre>
+
+<p>以下是前面命令的输出:</p>
+
+<p class="CDPAlignCenter CDPAlign"><img class="alignnone size-full wp-image-452 image-border" src="img/a96e947b-3027-4eb3-9808-bef931444607.png" style="width:41.08em;height:25.50em;"/></p>
+
+<p>唉，在这里我们看到啤酒是这家商店第 13 位<sup xmlns:epub="http://www.idpf.org/2007/ops">和第 15 位<sup xmlns:epub="http://www.idpf.org/2007/ops">最常购买的商品。不到 10 %的交易与<strong xmlns:epub="http://www.idpf.org/2007/ops">瓶装啤酒</strong>和/或<strong xmlns:epub="http://www.idpf.org/2007/ops">罐装啤酒</strong>有关。</sup></sup></p>
+
+<p>对于这个练习，这就是我们需要做的；因此，我们可以直接进入建模和评估。</p>
+
+
+
+
+
+            
+
+
+
+            
+
+        
+
+    </body>
+
+
+
+</html>
+<html xmlns:epub="http://www.idpf.org/2007/ops">
+
+    <head>
+
+        <title>Modeling and evaluation</title>
+
+        
+
+        <meta charset="utf-8"/>
+
+<meta content="urn:uuid:edef0689-6ba8-4dfc-93a3-190fd7a9b9a4" name="Adept.expected.resource"/>
+
+    </head>
+
+
+
+    <body>
+
+        
+
+
+
+                            
+
+                    <h1 class="header-title">建模和评估</h1>
+
+                
+
+            
+
+            
+
+                
+
+<p>我们将从挖掘总体关联规则的数据开始，然后具体讨论啤酒的规则。在整个建模过程中，我们将使用 apriori 算法，它是<kbd>arules</kbd>包中名副其实的<kbd>apriori()</kbd>函数。我们需要在函数中指定的两个主要内容是数据集和参数。至于参数，您需要在确定最小支持度、置信度以及项目集中篮子项目的最小和/或最大长度时进行判断。使用项目频率图以及试错法，让我们将最小支持度设置为 1/1，000 个交易，最小置信度为 90 %。</p>
+
+<p>此外，让我们将关联项目的最大数量设定为 4。下面的代码创建了我们称之为<kbd>rules</kbd>的对象:</p>
+
+<pre> rules &lt;-<br/>  arules::apriori(Groceries, parameter = list(<br/>    supp = 0.001,<br/>    conf = 0.9,<br/>    maxlen = 4<br/>  ))</pre>
+
+<p>调用对象显示算法产生了多少规则:</p>
+
+<pre>&gt; rules<br/>set of 67 rules </pre>
+
+<p>检查规则的方法有很多。我建议的第一件事是使用基数 r 中的<kbd>options()</kbd>函数将显示的位数设置为两位。然后，根据它们提供的提升对前五条规则进行排序和检查，如下所示:</p>
+
+<pre>&gt; options(digits = 2)<br/>    <br/>&gt; rules &lt;- arules::sort(rules, by = "lift", decreasing = TRUE)<br/>    <br/>&gt; arules::inspect(rules[1:5])<br/>  lhs                 rhs                support confidence lift<br/>1 {liquor, red/blush wine}     =&gt; {bottled beer}      0.0019       <br/>   0.90 11.2<br/>2 {root vegetables, butter, cream cheese }      =&gt; {yogurt}            <br/>   0.0010       0.91  6.5<br/>3 {citrus fruit, root vegetables, soft cheese}=&gt; {other vegetables}  <br/>   0.0010       1.00  5.2<br/>4 {pip fruit, whipped/sour cream, brown bread}=&gt; {other vegetables}  <br/>   0.0011       1.00  5.2<br/>5 {butter,whipped/sour cream, soda}    =&gt; {other vegetables}  <br/>    0.0013       0.93  4.8</pre>
+
+<p>瞧啊！提供最佳整体提升的规则是根据购买<kbd>bottled beer</kbd>的概率购买<kbd>liquor</kbd>和<kbd>red wine</kbd>。我不得不承认这纯粹是偶然的，不是我的本意。就像我常说的，运气好不如运气好。尽管如此，它仍然不是一个非常常见的事务，只支持 1.9/1000。</p>
+
+<p>您还可以根据支持度和信心度进行排序，所以让我们按降序来看一下前五条规则<kbd>by="confidence"</kbd>，如下所示:</p>
+
+<pre> &gt; rules &lt;- arules::sort(rules, by = "confidence", decreasing = TRUE)<br/><br/> &gt; arules::inspect(rules[1:5])<br/>      lhs             rhs                support confidence lift<br/>    1 {citrus fruit, root vegetables, soft cheese}=&gt; {other vegetables}  <br/>      0.0010          1  5.2<br/>    2 {pip fruit, whipped/sour cream, brown bread}=&gt; {other vegetables}  <br/>      0.0011          1  5.2<br/>    3 {rice, sugar}  =&gt; {whole milk}        0.0012          1  3.9<br/>    4 {canned fish, hygiene articles} =&gt; {whole milk} 0.0011   1  3.9<br/>    5 {root vegetables, butter, rice} =&gt; {whole milk} 0.0010   1  3.9</pre>
+
+<p>您可以在表格中看到，这些事务的<kbd>confidence</kbd>是 100 %。继续我们对啤酒的具体研究，我们可以利用<kbd>arules</kbd>中的函数来开发交叉列表——<kbd>crossTable()</kbd>函数——然后检查任何适合我们需要的东西。第一步是用我们的数据集创建一个表:</p>
+
+<pre> &gt; tab &lt;- arules::crossTable(Groceries)</pre>
+
+<p>随着<kbd>tab</kbd>的创建，我们现在可以调查项目之间的联合事件。这里，我们只看前三行和前三列:</p>
+
+<pre> &gt; tab[1:3, 1:3]<br/>                frankfurter sausage liver loaf<br/>    frankfurter         580      99          7<br/>    sausage              99     924         10<br/>    liver loaf            7      10         50</pre>
+
+<p>正如你所想象的，在 9835 次交易中，购物者只选择了肝面包<kbd>50</kbd>次。此外，在第<kbd>924</kbd>次，人们倾向于<kbd>sausage</kbd>，<kbd>ten</kbd>次，他们觉得不得不抓住<kbd>liver loaf</kbd>。(非常时期需要非常手段！)如果您想查看一个特定的示例，您可以指定行号和列号，或者拼出该项:</p>
+
+<pre>&gt; tab["bottled beer","bottled beer"]<br/>[1] 792</pre>
+
+<p>这告诉我们有<kbd>bottled beer</kbd>的<kbd>792</kbd>个事务。让我们看看<kbd>bottled beer</kbd>和<kbd>canned beer</kbd>之间的联合发生是什么:</p>
+
+<pre>&gt; tab["bottled beer","canned beer"]<br/>[1] 26</pre>
+
+<p>我预计这个数字会很低，因为它支持了我的观点，即人们倾向于喝瓶装或罐装啤酒。我非常喜欢一瓶。它也是一种方便的武器，可以保护你免受诸如占领华尔街之类的流氓抗议者的伤害。</p>
+
+<p class="mce-root"/>
+
+<p class="mce-root"/>
+
+<p>我们现在可以继续并推导出<kbd>bottled beer</kbd>的具体规则。我们将再次使用<kbd>apriori()</kbd>函数，但是这一次，我们将在<kbd>appearance</kbd>周围添加一个语法。这意味着我们将在语法中指定，我们希望左侧是增加购买概率的项目<kbd>bottled beer</kbd>，它将在右侧。在下面的代码中，注意我已经调整了<kbd>support</kbd>和<kbd>confidence</kbd>的数字。请随意尝试您的设置:</p>
+
+<pre>&gt; beer.rules &lt;- arules::apriori(<br/>    data = Groceries,<br/>    parameter = list(support<br/>    = 0.0015, confidence = 0.3),<br/>    appearance = list(default = "lhs",<br/>    rhs = "bottled beer"))<br/><br/>&gt; beer.rules<br/>set of 4 rules </pre>
+
+<p>我们发现自己只有<kbd>4</kbd>条关联规则。我们已经见过其中一个了。现在让我们按电梯降序介绍其他三条规则:</p>
+
+<pre> &gt; beer.rules &lt;- arules::sort(beer.rules, decreasing = TRUE, by = "lift")<br/>  &gt; arules::inspect(beer.rules)<br/> lhs rhs support confidence lift<br/> 1 {liquor, red/blush wine} =&gt; {bottled beer} 0.0019 0.90 11.2<br/> 2 {liquor} =&gt; {bottled beer} 0.0047 0.42 5.2<br/> 3 {soda, red/blush wine} =&gt; {bottled beer} 0.0016 0.36 4.4<br/> 4 {other vegetables, red/blush wine} =&gt; {bottled beer}0.0015 0.31 <br/> 3.8</pre>
+
+<p>在所有的例子中，购买<kbd>bottled beer</kbd>都与酒有关，或者是<kbd>liquor</kbd>和/或红酒，这对任何人来说都不奇怪。有趣的是<kbd>white wine</kbd>不在这里。让我们仔细看看这个，比较一下<kbd>bottled beer</kbd>和酒的种类的联合出现:</p>
+
+<pre>    &gt; tab["bottled beer", "red/blush wine"]<br/>    [1] 48<br/>    <br/>    &gt; tab["red/blush wine", "red/blush wine"]<br/>    [1] 189<br/>    <br/>    &gt; 48/189<br/>    [1] 0.25<br/>    <br/>    &gt; tab["white wine", "white wine"]<br/>    [1] 187<br/>    <br/>    &gt; tab["bottled beer", "white wine"]<br/>    [1] 22<br/>    &gt; 22/187<br/>    [1] 0.12</pre>
+
+<p>有意思的是，25 %的时候有人购买了<kbd>red wine</kbd>，他们也购买了<kbd>bottled beer</kbd>；但是对于<kbd>white wine</kbd>，联合购买只发生在 12 %的情况下。我们当然不知道为什么在这个分析中，但这可能有助于我们确定我们应该如何定位我们的产品在这家杂货店。在我们继续之前，另一件事是看看规则的情节。这是通过<kbd>arulesViz</kbd>包中的<kbd>plot()</kbd>功能完成的。</p>
+
+<p>有许多图形选项可用。对于这个例子，让我们指定我们希望<kbd>graph</kbd>显示<kbd>lift</kbd>和由<kbd>confidence</kbd>提供和遮蔽的规则。下面的语法将相应地提供这一点:</p>
+
+<pre>&gt; library(arulesViz)<br/>Loading required package: grid<br/><br/>&gt; plot(beer.rules,<br/>+ method = "graph",<br/>+ measure = "lift",<br/>+ shading = "confidence")</pre>
+
+<p>以下是前面命令的输出:</p>
+
+<p class="CDPAlignCenter CDPAlign"><img class="alignnone size-full wp-image-846 image-border" src="img/3f06f81d-8dc5-4eab-a900-5aa0b6769057.png" style="width:36.75em;height:27.75em;"/></p>
+
+<p>该图显示了<strong>酒</strong> / <strong>红酒</strong>提供了最好的<strong>升力</strong>和最高水平的<strong>信心</strong>与圆圈的<strong>大小</strong>及其阴影。</p>
+
+<p>我们刚刚在这个简单的练习中所做的是展示用 R 进行市场篮分析是多么容易。不需要太多的想象力就能想出我们可以用这种技术进行分析的可能性，例如，整合客户细分、纵向购买历史等等，以及如何在广告展示、联合促销等等中使用它。</p>
+
+
+
+
+
+            
+
+
+
+            
+
+        
+
+    </body>
+
+
+
+</html>
+<html xmlns:epub="http://www.idpf.org/2007/ops">
+
+    <head>
+
+        <title>Summary</title>
+
+        
+
+        <meta charset="utf-8"/>
+
+<meta content="urn:uuid:edef0689-6ba8-4dfc-93a3-190fd7a9b9a4" name="Adept.expected.resource"/>
+
+    </head>
+
+
+
+    <body>
+
+        
+
+
+
+                            
+
+                    <h1 class="header-title">摘要</h1>
+
+                
+
+            
+
+            
+
+                
+
+<p>在这一章中，我们的目标是介绍如何使用 R 来构建和测试关联规则挖掘(市场篮分析)。购物篮分析试图了解哪些商品是一起购买的，哪些商品是一起出现的，因此您可以将该分析应用于医疗保健、欺诈检测，甚至探索机械问题。因此，我们学习了如何将原始数据转换成事务结构，以便在<kbd>arules</kbd>包中使用。</p>
+
+<p>我们现在要回到监督学习。在下一章中，我们将介绍一些鲜为人知但却是实用机器学习中必不可少的方法，即分析时间序列数据和确定因果关系。</p>
+
+
+
+
+
+            
+
+
+
+            
+
+        
+
+    </body>
+
+
+
+</html></body></html>

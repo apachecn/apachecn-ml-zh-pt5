@@ -1,0 +1,456 @@
+<html><head/><body>
+
+
+    
+        <title>Assessment</title>
+        
+        <meta charset="utf-8"/>
+    
+
+    
+        
+
+                            
+                    <h1 class="header-title">评价</h1>
+                
+            
+            
+                
+
+
+            
+
+            
+        
+    
+
+
+
+
+
+
+    
+        <title>Chapter 1, Implementing Machine Learning Algorithms</title>
+        
+        <meta charset="utf-8"/>
+    
+
+    
+        
+
+                            
+                    <h1 class="header-title">第 1 章，实现机器学习算法</h1>
+                
+            
+            
+                
+<ol>
+<li>在经典编程中，在计算机中开发和运行的代码是一组逐步的指令，告诉计算机做什么以及如何处理不同的选项。机器学习是向计算机展示数据的例子，或者通过例子教它做什么，或者让它学习隐藏在数据中的信息。</li>
+<li>机器学习模型可以是回归(如果目标变量是数值的和连续的)或分类(如果目标变量是分类的或离散的)。</li>
+<li>通过示例学习的模型，对标记的数据进行训练，被称为监督机器学习模型。相比之下，那些在未标记数据中找到信息的模型被称为无监督机器学习模型。</li>
+<li>以下是创建和使用机器学习模型时需要的主要步骤:<ol>
+<li>获取数据并合并不同的数据源</li>
+<li>清理数据</li>
+<li>初步分析和特征工程</li>
+<li>为它们中的每一个尝试不同的模型和参数，通过使用完整数据集的一部分来训练它们，并使用其余部分进行测试</li>
+<li>部署模型，以便它可以在连续的分析流程中使用，而不仅仅是在小的、孤立的测试中使用</li>
+<li>预测新输入数据的值</li>
+</ol>
+</li>
+</ol>
+<ol start="4">
+<li>R <sub> j </sub>残差是<em> j </em>数据点的<em> y </em>值与适合该点的回归线值之间的差值:</li>
+</ol>
+<p style="padding-left: 30px" class="CDPAlignCenter CDPAlign"><img class="fm-editor-equation" src="img/a8ba961f-dfe0-4f86-9475-d304ea4e8a6e.png" style="width:6.83em;height:1.42em;"/></p>
+<p style="padding-left: 60px"><strong>平均绝对误差</strong> ( <strong> MAE </strong>)定义如下:</p>
+<p style="padding-left: 30px" class="CDPAlignCenter CDPAlign"><img class="fm-editor-equation" src="img/632b4cc9-0f9c-4f12-94b7-d3d0b7b41053.png" style="width:10.50em;height:4.00em;"/></p>
+<p style="padding-left: 60px"><strong>均方误差</strong> ( <strong> MSE </strong>)定义如下:</p>
+<p style="padding-left: 30px" class="CDPAlignCenter CDPAlign"><img class="fm-editor-equation" src="img/e1d7afd5-8ffa-4002-9d3c-2deaad245e32.png" style="width:11.08em;height:4.00em;"/></p>
+<ol start="4">
+<li>欠拟合是指模型不能代表数据集的特征。即使这看起来是正确的，但它完全缺乏普遍性。过度拟合指的是模型与训练数据拟合得如此之好，以至于它缺乏泛化能力，用不同的数据集测试它是错误的。</li>
+<li>首先需要将它们编码为二进制变量。</li>
+</ol>
+
+
+            
+
+            
+        
+    
+
+
+
+
+
+
+    
+        <title>Chapter 2, Hands-On Examples of Machine Learning Models</title>
+        
+        <meta charset="utf-8"/>
+    
+
+    
+        
+
+                            
+                    <h1 class="header-title">第 2 章，机器学习模型的实践例子</h1>
+                
+            
+            
+                
+<ol>
+<li>编码准备分类特征，以便将它们馈送到机器学习模型中，并且不假设编码值之间的任何先验相关性。</li>
+<li>通过对树的长度设置限制或者通过定义最小熵值。</li>
+<li><kbd>Temperature_hot</kbd>均分；两个值以<kbd>Train_outside</kbd> = yes 结尾，两个值以<kbd>Train_outside</kbd> = no 结尾，这代表最大熵值，这里没有明确的信息说明如果温度很热该怎么办。</li>
+</ol>
+<ol start="4">
+<li>在决定是否进行户外训练时，将考虑以下<kbd>IF</kbd>陈述:<ul>
+<li>如果天气晴朗，没有风，那就在户外训练。</li>
+<li>如果天气晴朗，有风，那就不要在户外训练。</li>
+<li>如果天气阴沉，那就在室外训练。</li>
+<li>如果天气潮湿多雨，就不要在室外训练。</li>
+<li>如果天气多雨，湿度正常，那么就在室外训练。</li>
+</ul>
+</li>
+</ol>
+<p style="padding-left: 60px">应该清楚的是，这个图只是一个例子，并没有涵盖从数据表中可以推导出的所有可能性。</p>
+<ol start="5">
+<li>群集分布将取决于质心的初始选择。有更高级的构建集群的方法来避免这个问题。</li>
+<li>可视化聚类是基于二维图的，二维图只显示两个变量之间的关系。数值分析考虑了数据中的所有维度。</li>
+</ol>
+
+
+            
+
+            
+        
+    
+
+
+
+
+
+
+    
+        <title>Chapter 3, Importing Data into Excel from
+Different Data Sources</title>
+        
+        <meta charset="utf-8"/>
+    
+
+    
+        
+
+                            
+                    <h1 class="header-title">第 3 章，将不同数据源的数据导入 Excel</h1>
+                
+            
+            
+                
+<ol>
+<li>不与文件内容混淆的任何字符。</li>
+<li>机器学习模型的结果会受到缺失或不正确的数据条目的影响，并且还应该使用正确的格式。</li>
+<li>导入 Excel 文件将打开电量查询界面，以便对数据进行预处理。</li>
+<li>表格形式的数据。</li>
+<li>详尽的列表可以在<a href="https://gist.github.com/gelisam/13d04ac5a54b577b2492785c1084281f">https://gist . github . com/Geli Sam/13d 04 AC 5a 54 b 577 b 2492785 c 1084281 f</a>找到。</li>
+<li>一个例子可以在<a href="https://stackoverflow.com/questions/38120895/database-vs-file-system-storage">https://stack overflow . com/questions/38120895/database-vs-file-system-storage</a>找到。</li>
+</ol>
+
+
+            
+
+            
+        
+    
+
+
+
+
+
+
+    
+        <title>Chapter 4, Data Cleansing and Preliminary
+Data Analysis</title>
+        
+        <meta charset="utf-8"/>
+    
+
+    
+        
+
+                            
+                    <h1 class="header-title">第 4 章，数据清理和初步数据分析</h1>
+                
+            
+            
+                
+<ol>
+<li>与其手动构建决策树，不如深入研究示例内置的 Azure Machine Learning Studio，这在<a href="c4a815b7-95bc-4573-89cf-0399d293e3f6.xhtml">第十章</a>、<em> Azure 和 Excel -云中的机器学习</em>中有所展示。</li>
+<li><kbd>cabin</kbd>和<kbd>fare</kbd>、<kbd>pclass</kbd>和<kbd>fare</kbd>、<kbd>home.dest</kbd>和<kbd>fare</kbd>就是一些例子。</li>
+<li>缺失值可以用变量的平均值来代替。</li>
+<li>数据集中的任何不平衡都被称为偏差。这将影响任何机器学习模型的结果，因为该模型将找到给定类别的更多示例或特定目标值的一些趋势。</li>
+<li>例如，您可以尝试使用散点图来查看变量之间的一些相关性。</li>
+</ol>
+
+
+            
+
+            
+        
+    
+
+
+
+
+
+
+    
+        <title>Chapter 5, Correlations and the Importance of Variables</title>
+        
+        <meta charset="utf-8"/>
+    
+
+    
+        
+
+                            
+                    <h1 class="header-title">第 5 章，相关性和变量的重要性</h1>
+                
+            
+            
+                
+<ol>
+<li>例如，您可以用 x 轴上的分类值和 y 轴上的数值构建一个图表；从这张图中可以清楚地看出任何相互关系。</li>
+<li>读者应该很容易构建图表并理解变量之间的关系。</li>
+<li>不。这意味着当一个变量增加时，另一个变量减少。</li>
+<li>这种格式在第 6 章、<em>的<a href="f8d119b7-0a06-49f5-b1f6-7f0c220ff69c.xhtml">Excel 数据挖掘模型实践示例</a></em>中使用。</li>
+<li>我们将<strong>的平方误差</strong> ( <strong> SSE </strong>)计算为<em>(【@mpg]-[@prediction])^2</em>)。我们需要的另一笔款子是<em>SST =</em><em>(【@mpg]-average([@prediction]))^2】T9)。然后，我们计算<em> R <sup> 2 </sup> = 1-SSE/SST </em>。</em></li>
+<li>您可以尝试使用指数函数(<em> EXP() </em>)或其他类似形状的函数。R <sup> 2 </sup>值可能仍然远离 1，因为数据中的离差非常高。</li>
+</ol>
+
+
+            
+
+            
+        
+    
+
+
+
+
+
+
+    
+        <title>Chapter 6, Data Mining Models in Excel
+Hands-On Examples</title>
+        
+        <meta charset="utf-8"/>
+    
+
+    
+        
+
+                            
+                    <h1 class="header-title">第 6 章，Excel 中的数据挖掘模型动手示例</h1>
+                
+            
+            
+                
+<ol>
+<li>利用之前对业务的了解来丢弃这些关联。</li>
+<li>不一定。这些类型的分析通常依赖于业务领域，甚至依赖于我们执行它们的特定地点。这意味着有些结果是可以推广的，但通常不是全部。</li>
+<li>这意味着没有客户在列中指示的时间之前开始购买产品，并且在行中显示的时间段之后继续购买。</li>
+<li>没有那么老的客户(就作为客户花费的时间而言)。</li>
+<li>例如，关注那些停止购买的人，并针对他们开展广告活动。</li>
+</ol>
+
+
+            
+
+            
+        
+    
+
+
+
+
+
+
+    
+        <title>Chapter 7, Implementing Time Series</title>
+        
+        <meta charset="utf-8"/>
+    
+
+    
+        
+
+                            
+                    <h1 class="header-title">第 7 章，实施时间序列</h1>
+                
+            
+            
+                
+<ol>
+<li>通过将<kbd>increasing(TravelDate)</kbd>设置为计算中的移动平均值，并遵循相同的步骤。</li>
+<li>如果季节性与数据中的真实值相差太大，那么预测的准确性就会降低。如果我们增加置信区间，那么误差也会增加。</li>
+<li>使用 Excel 中的<kbd>COVARIANCE.P</kbd>函数。</li>
+</ol>
+<ol start="4">
+<li>时序图，应用对数后，看起来会像下面的截图:</li>
+</ol>
+<p class="CDPAlignCenter CDPAlign"><img src="img/fe2a99bd-9558-4372-9bf6-331505df4346.png" style="width:37.42em;height:22.33em;"/></p>
+<p style="padding-left: 60px">趋势仍在上升，但标准差看起来是平的，不依赖于时间。</p>
+
+
+            
+
+            
+        
+    
+
+
+
+
+
+
+    
+        <title>Chapter 8, Visualizing Data in Diagrams,
+Histograms, and Maps</title>
+        
+        <meta charset="utf-8"/>
+    
+
+    
+        
+
+                            
+                    <h1 class="header-title">第 8 章，在图表、直方图和地图中可视化数据</h1>
+                
+            
+            
+                
+<ol>
+<li>很难区分不同的饼图切片。</li>
+<li>多个折线图。</li>
+<li>您可以从<a href="https://openaddresses.io/">https://openaddresses.io/</a>获取数据，并按照本文中的说明进行操作:<a href="https://www.roguegeographer.com/create-your-own-maps-using-excel-3d-maps/">https://www . rogue geographer . com/create-your-own-maps-using-excel-3d-maps/</a>。</li>
+<li>有可能做到，得到一个结果，但是精度会很差。选举的结果主要取决于数据没有考虑的外部因素，而不是过去选举的历史结果。</li>
+</ol>
+
+
+            
+
+            
+        
+    
+
+
+
+
+
+
+    
+        <title>Chapter 9, Artificial Neural Networks</title>
+        
+        <meta charset="utf-8"/>
+    
+
+    
+        
+
+                            
+                    <h1 class="header-title">第九章，人工神经网络</h1>
+                
+            
+            
+                
+<ol>
+<li>结果将取决于人工神经网络的训练。你可以遵循<a href="b0dde0bb-32ef-4535-9e19-7999e8e9a631.xhtml">第一章</a>、<em>实现机器学习算法</em>中<em>评估模型</em>小节的分步说明。</li>
+<li>数据集不平衡，这将影响结果。</li>
+</ol>
+
+
+            
+
+            
+        
+    
+
+
+
+
+
+
+    
+        <title>Chapter 10, Azure and Excel - Machine Learning in the Cloud</title>
+        
+        <meta charset="utf-8"/>
+    
+
+    
+        
+
+                            
+                    <h1 class="header-title">第 10 章，Azure 和 Excel——云中的机器学习</h1>
+                
+            
+            
+                
+<ol>
+<li class="mce-root">成本、速度、全球规模、生产率、性能和安全性。</li>
+<li class="mce-root">云计算对许多不同的应用程序都很有用，事实上，它可以取代从数据库到可视化的内部构建的一切。</li>
+<li class="mce-root">Web 服务是托管在 internet 上的应用程序，它可以通过预定义的协议和数据格式与其他应用程序进行通信。使用 web 服务的优点是它们易于共享，并且独立于所使用的操作系统和编程语言。</li>
+<li class="mce-root">Azure Machine Learning Studio 需要输入数据格式，这是从输入数据模块获取的。</li>
+<li>训练流用于训练模型，然后保存它。然后在单独的流中使用相同的模型进行预测，而不需要在每次使用时重新训练模型。</li>
+</ol>
+
+
+            
+
+            
+        
+    
+
+
+
+
+
+
+    
+        <title>Chapter 11, The Future of Machine Learning</title>
+        
+        <meta charset="utf-8"/>
+    
+
+    
+        
+
+                            
+                    <h1 class="header-title">第 11 章，机器学习的未来</h1>
+                
+            
+            
+                
+<ol>
+<li>数据挖掘取代了模型训练和测试，它试图从数据中获取有用的信息。</li>
+<li>新数据不断地被包含到数据流中，并且在将它馈送到机器学习模型之前，必须完成整个周期。</li>
+<li>在开始学习过程之前设置超参数值，并定义模型的一些特征(例如，人工神经网络训练模型中的周期数)。</li>
+<li>AutoML 可以自动执行以下步骤:<ul>
+<li>数据预处理</li>
+<li>特征工程</li>
+<li>型号选择</li>
+<li>模型超参数的优化</li>
+<li>模型结果分析</li>
+</ul>
+</li>
+</ol>
+
+
+            
+
+            
+        
+    
+
+
+</body></html>

@@ -1,0 +1,969 @@
+<html><head/><body>
+
+
+    
+        <title>Anomaly Detection Model</title>
+        
+        <meta charset="utf-8"/>
+    
+
+    
+        
+
+                            
+                    <h1 class="header-title">异常检测模型</h1>
+                
+            
+            
+                
+<p>随着 k-means 聚类模型的出现，现在是时候深入研究异常检测模型了。异常检测是 ML.NET 新增的功能之一，特别是时间序列变换。在本章中，我们将深入探讨异常检测以及最适合利用异常检测的各种应用程序。此外，我们将构建两个新的示例应用程序:一个异常检测应用程序用于确定登录尝试是否异常，演示随机 PCA 训练器，另一个用于演示网络流量异常检测应用程序中的时间序列。最后，我们将探索如何用 model 揭示的属性来评估异常检测模型。</p>
+<p>在本章中，我们将讨论以下主题:</p>
+<ul>
+<li>分解异常检测</li>
+<li>创建时序应用程序</li>
+<li>创建异常检测应用程序</li>
+<li>评估异常检测模型</li>
+</ul>
+
+
+            
+
+            
+        
+    
+
+
+
+
+
+
+    
+        <title>Breaking down anomaly detection</title>
+        
+        <meta charset="utf-8"/>
+    
+
+    
+        
+
+                            
+                    <h1 class="header-title">分解异常检测</h1>
+                
+            
+            
+                
+<p>正如在<a href="b8d873e1-9234-4f11-ad94-76df5ffbb228.xhtml">第一章</a>、<em>机器学习入门和 ML.NET 中提到的，</em>异常检测，根据定义，是一种无监督的学习算法。这意味着该算法将对数据进行训练，并寻找不符合正常数据的数据。在这一节中，我们将深入探讨异常检测的用例，以及在 ML.NET 可用于异常检测的各种训练器。</p>
+
+
+            
+
+            
+        
+    
+
+
+
+
+
+
+    
+        <title>Use cases for anomaly detection</title>
+        
+        <meta charset="utf-8"/>
+    
+
+    
+        
+
+                            
+                    <h1 class="header-title">异常检测的用例</h1>
+                
+            
+            
+                
+<p>正如您可能已经意识到的，异常检测有许多应用，其中数据是可用的，但是不知道数据中是否有异常。无需手动抽查，异常检测算法就可以对这些数据进行训练，并确定是否存在任何异常。ML.NET 提供了各种异常检测值，供您在应用程序内部以编程方式查看。我们将在本章的后面回顾这些值，以更好地确保任何检测都不是误报。</p>
+<p>最适合异常检测的一些潜在应用包括:</p>
+<ul>
+<li>销售预测</li>
+<li>股票市场</li>
+<li>欺诈检测</li>
+<li>预测由于各种因素导致的设备故障</li>
+<li>用于远程连接和网络流量登录历史的网络安全应用程序，例如我们稍后将深入探讨的示例应用程序</li>
+</ul>
+
+
+            
+
+            
+        
+    
+
+
+
+
+
+
+    
+        <title>Diving into the randomized PCA trainer</title>
+        
+        <meta charset="utf-8"/>
+    
+
+    
+        
+
+                            
+                    <h1 class="header-title">进入随机 PCA 训练器</h1>
+                
+            
+            
+                
+<p>在撰写本文时，随机 PCA 训练器是在 ML.NET 发现的唯一用于异常检测的传统训练器。随机化的 PCA 训练器要求值的标准化；但是，缓存不是必需的，使用训练器也不需要额外的 NuGet 包。</p>
+<p>与其他算法类似，输入是一个已知大小的<kbd>Float</kbd>类型的向量。输出包含两个属性:<kbd>Score</kbd>和<kbd>PredictedLabel</kbd>。<kbd>Score</kbd>值属于<kbd>Float</kbd>类型，非负且无界。相反，<kbd>PredictedLabel</kbd>属性指示基于阈值集的有效异常；值为 true 表示异常，而值为 false 则表示异常。ML。NET 的默认阈值是 0.5，可以通过<kbd>ChangeModelThreshold</kbd>方法进行调整。实际上，高于阈值的值返回 true，低于阈值的值返回 false。</p>
+<p>在遮光罩下，该算法使用特征向量来估计包含正常类的子空间，然后计算实际特征向量和该子空间中的投影特征向量之间的归一化差异。简而言之，如果计算误差不接近 0，则该算法找到边缘情况。如果发现误差接近于 0，则认为是正常数据点(即非异常)。</p>
+<p>我们将在本章后面的第二个示例应用程序中通过检测登录异常来演示这个训练器。</p>
+<p>如果你想更深入地研究随机化 PCA，下面的论文是一个很好的资源:<a href="https://web.stanford.edu/group/mmds/slides2010/Martinsson.pdf">https://web . Stanford . edu/group/mmds/slides 2010/Martins son . pdf</a>。</p>
+
+
+            
+
+            
+        
+    
+
+
+
+
+
+
+    
+        <title>Diving into time series transforms</title>
+        
+        <meta charset="utf-8"/>
+    
+
+    
+        
+
+                            
+                    <h1 class="header-title">深入研究时间序列转换</h1>
+                
+            
+            
+                
+<p>与本书中的其他算法和 ML.NET 本身不同，时间序列支持是作为一系列转换添加到您的训练和测试数据中的。如前所述，时间序列也是 ML.NET 的新增功能之一，是在 1.2.0 中添加的。</p>
+<p>在 ML.NET，时序转换被归入<kbd>TimeSeriesCatalog</kbd>类。这个类中有六种不同的方法:</p>
+<ul>
+<li><kbd>DetectAnomalyBySrCnn</kbd>:用 SRCNN 算法检测异常</li>
+<li><kbd>DetectChangePointBySsa</kbd>:用<strong>奇异谱分析</strong> ( <strong> SSA </strong>)算法对变点进行异常检测</li>
+<li><kbd>DetectIidChangePoint</kbd>:检测变化，用<strong>独立同分布</strong>(<strong>I . I . d .</strong>)算法预测变化点</li>
+<li><kbd>DetectIidSpike</kbd>:用 i.i.d 算法检测变化，但预测尖峰而不是变化点</li>
+<li><kbd>DetectSpikeBySsa</kbd>:使用 SSA 算法检测尖峰</li>
+<li><kbd>ForecastBySsa</kbd>:使用 SSA 算法进行基于单一变量(通常称为单变量)的时间序列预测</li>
+</ul>
+<p>根据应用程序的不同，您可能希望寻找数据变化的峰值或变化点(在上升或下降螺旋上)。在本章的时间序列示例中，我们将利用<kbd>DetectSpikeBySsa</kbd>来寻找网络传输中的峰值。</p>
+<p>关于 SSA 预测的更多信息，可以在这里找到很好的资源:<a href="http://arxiv.org/pdf/1206.6910.pdf">http://arxiv.org/pdf/1206.6910.pdf</a>。</p>
+
+
+            
+
+            
+        
+    
+
+
+
+
+
+
+    
+        <title>Creating a time series application</title>
+        
+        <meta charset="utf-8"/>
+    
+
+    
+        
+
+                            
+                    <h1 class="header-title">创建时序应用程序</h1>
+                
+            
+            
+                
+<p>如前所述，我们将创建的应用程序是一个网络流量异常检测器。给定一组与网络流量(以字节为单位)相关的属性，应用程序将使用该数据来查找给定检查点的流量异常。与其他应用一样，这并不意味着支持下一个 ML 网络流量异常检测产品；然而，它将向您展示如何在 ML.NET 使用时间序列，特别是使用 SSA 来检测峰值。</p>
+<p>和前面的章节一样，完整的项目代码、样本数据集和项目文件可以在这里下载:<a href="https://github.com/PacktPublishing/Hands-On-Machine-Learning-With-ML.NET/tree/master/chapter06-time-series">https://github . com/packt publishing/Hands-On-Machine-Learning-With-ML。NET/tree/master/chapter 06-时序</a>。</p>
+
+
+            
+
+            
+        
+    
+
+
+
+
+
+
+    
+        <title>Exploring the project architecture</title>
+        
+        <meta charset="utf-8"/>
+    
+
+    
+        
+
+                            
+                    <h1 class="header-title">探索项目架构</h1>
+                
+            
+            
+                
+<p>基于我们在前面章节中创建的项目架构和代码，大部分的变化都是在模型的训练中，因为时间序列需要一个相对于我们在前面章节中所回顾的相当重要的范式转变。除此之外，当使用时序转换时，如果您正在从头开始创建一个项目，您将需要添加<kbd>Microsoft.ML.TimeSeries</kbd> NuGet 包。GitHub 存储库中可用的示例应用程序已经包含了这个包。</p>
+<p>在下面的屏幕截图中，您将找到该项目的 Visual Studio 解决方案资源管理器视图。该解决方案的新增内容是<kbd>NetworkTrafficHistory</kbd> <strong> </strong>和<kbd>NetworkTrafficPrediction</kbd> <strong> </strong>文件，我们将在本节稍后回顾这些文件:</p>
+<p class="CDPAlignCenter CDPAlign"><img class="alignnone size-full wp-image-625 image-border" src="img/7800d9bf-46b4-4f78-bcb1-582760156732.png" style="width:21.17em;height:28.42em;"/></p>
+<p><kbd>sampledata.csv</kbd>文件包含八行网络流量数据。请随意调整数据以适应您自己的观察或调整训练好的模型。以下是数据片段:</p>
+<div><pre>laptop,2019-11-14T11:13:23,1500<br/>laptop,2019-11-15T11:13:23,1000<br/>laptop,2019-11-16T11:13:23,1100<br/>laptop,2019-11-17T11:13:23,1600<br/>laptop,2019-11-18T11:13:23,1000<br/>laptop,2019-11-19T11:13:23,1100<br/>laptop,2019-11-20T11:13:23,1000<br/>laptop,2019-11-21T11:13:23,1000</pre></div>
+<p>这些行中的每一行都包含了新创建的<kbd>NetworkTrafficHistory</kbd> <strong> </strong>类中的属性值，我们将在本章后面的内容中进行回顾。</p>
+<p>除此之外，我们还添加了<kbd>testdata.csv</kbd>文件，它包含额外的数据点来测试新训练的模型并对其进行评估。下面是<kbd>testdata.csv</kbd>中的一段数据:</p>
+<pre>laptop,2019-11-22T11:13:23,1000<br/>laptop,2019-11-23T11:13:23,1100<br/>laptop,2019-11-24T11:13:23,1200<br/>laptop,2019-11-25T11:13:23,1300<br/>laptop,2019-11-26T11:13:23,1400<br/>laptop,2019-11-27T11:13:23,3000<br/>laptop,2019-11-28T11:13:23,1500<br/>laptop,2019-11-29T11:13:23,1600</pre>
+
+
+            
+
+            
+        
+    
+
+
+
+
+
+
+    
+        <title>Diving into the code</title>
+        
+        <meta charset="utf-8"/>
+    
+
+    
+        
+
+                            
+                    <h1 class="header-title">钻研代码</h1>
+                
+            
+            
+                
+<p>对于这个应用程序，如前一节所述，我们在第五章、<em>中完成的工作基础上构建集群模型</em>。在这次深入探讨中，我们将只关注针对该应用程序更改的代码。</p>
+<p>更改或添加的类如下:</p>
+<ul>
+<li><kbd>NetworkTrafficHistory</kbd></li>
+<li><kbd>NetworkTrafficPrediction</kbd></li>
+<li><kbd>Predictor</kbd></li>
+<li><kbd>Trainer</kbd></li>
+<li><kbd>Program</kbd></li>
+</ul>
+
+
+            
+
+            
+        
+    
+
+
+
+
+
+
+    
+        <title>The NetworkTrafficHistory class</title>
+        
+        <meta charset="utf-8"/>
+    
+
+    
+        
+
+                            
+                    <h1 class="header-title">NetworkTrafficHistory 类</h1>
+                
+            
+            
+                
+<p><kbd>NetworkTrafficHistory</kbd> <strong> </strong>类是容器类，包含预测和训练我们模型的数据。如前几章所述，<kbd>LoadColumn</kbd>装饰器中的数字映射到 CSV 文件中的索引。如前所述，ML.NET 的异常检测需要使用单个浮点值；在这种情况下，它是<kbd>BytesTransferred</kbd>的财产:</p>
+<pre>using System;<br/><br/>using Microsoft.ML.Data;<br/><br/>namespace chapter06.ML.Objects<br/>{<br/>    public class NetworkTrafficHistory<br/>    {<br/>        [LoadColumn(0)]<br/>        public string HostMachine { get; set; }<br/><br/>        [LoadColumn(1)]<br/>        public DateTime Timestamp { get; set; }<br/><br/>        [LoadColumn(2)] <br/>        public float BytesTransferred { get; set; }<br/>    }<br/>}</pre>
+
+
+            
+
+            
+        
+    
+
+
+
+
+
+
+    
+        <title>The NetworkTrafficPrediction class</title>
+        
+        <meta charset="utf-8"/>
+    
+
+    
+        
+
+                            
+                    <h1 class="header-title">网络流量预测类</h1>
+                
+            
+            
+                
+<p><kbd>NetworkTrafficPrediction</kbd> <strong> </strong>类包含映射到我们的预测输出的属性。<kbd>VectorType(3)</kbd>函数保存警报、分数和 p 值。我们将在本节的后面部分回顾这些值:</p>
+<div><pre>using Microsoft.ML.Data;<br/><br/>namespace chapter06.ML.Objects<br/>{<br/>    public class NetworkTrafficPrediction<br/>    {<br/>        [VectorType(3)]<br/>        public double[] Prediction { get; set; }<br/>    }<br/>}</pre></div>
+
+
+            
+
+            
+        
+    
+
+
+
+
+
+
+    
+        <title>The Predictor class</title>
+        
+        <meta charset="utf-8"/>
+    
+
+    
+        
+
+                            
+                    <h1 class="header-title">预测器类</h1>
+                
+            
+            
+                
+<p>为了处理网络流量预测场景，需要对此类进行一些更改:</p>
+<ol>
+<li>首先，我们用<kbd>NetworkTrafficHistory</kbd> <strong> </strong>和<kbd>NetworkHistoryPrediction</kbd>类型创建我们的预测引擎:</li>
+</ol>
+<div><pre style="padding-left: 60px">var predictionEngine = MlContext.Model.CreatePredictionEngine&lt;NetworkTrafficHistory, NetworkTrafficPrediction&gt;(mlModel);</pre></div>
+<ol start="2">
+<li>接下来，我们将输入文件读入一个<kbd>IDataView</kbd>变量(注意使用逗号作为<kbd>separatorChar</kbd>)中:</li>
+</ol>
+<div><pre style="padding-left: 60px">var inputData = MlContext.Data.LoadFromTextFile&lt;NetworkTrafficHistory&gt;(inputDataFile, separatorChar: ',');</pre></div>
+<ol start="3">
+<li>接下来，我们获取新创建的<kbd>IDataView</kbd>变量，并基于该数据视图获得一个可枚举变量:</li>
+</ol>
+<pre style="padding-left: 60px" class="mce-root">var rows = MlContext.Data.CreateEnumerable&lt;NetworkTrafficHistory&gt;(inputData, false);</pre>
+<ol start="3">
+<li style="list-style-type: none">
+ 
+</li>
+<li>最后，我们需要运行预测，然后输出模型运行的结果:</li>
+</ol>
+<div><pre style="padding-left: 60px">Console.WriteLine($"Based on input file ({inputDataFile}):");<br/><br/>foreach (var row in rows)<br/>{<br/>    var prediction = predictionEngine.Predict(row);<br/><br/>    Console.Write($"HOST: {row.HostMachine} TIMESTAMP: {row.Timestamp} TRANSFER: {row.BytesTransferred} ");<br/>    Console.Write($"ALERT: {prediction.Prediction[0]} SCORE: {prediction.Prediction[1]:f2} P-VALUE: {prediction.Prediction[2]:F2}{Environment.NewLine}");<br/>}</pre></div>
+<p>在<kbd>Transform</kbd>只返回三元素向量的情况下，输出原始行数据以给出上下文。</p>
+
+
+            
+
+            
+        
+    
+
+
+
+
+
+
+    
+        <title>The Trainer class</title>
+        
+        <meta charset="utf-8"/>
+    
+
+    
+        
+
+                            
+                    <h1 class="header-title">培训师课程</h1>
+                
+            
+            
+                
+<p>在<kbd>Trainer</kbd>类中，需要进行一些修改来支持时序转换。在许多方面，简化是必要的。执行评估和测试数据负载的移除:</p>
+<ol>
+<li>第一个加法是发送到转换的四个变量:</li>
+</ol>
+<div><pre style="padding-left: 60px">private const int PvalueHistoryLength = 3;<br/>private const int SeasonalityWindowSize = 3;<br/>private const int TrainingWindowSize = 7;<br/>private const int Confidence = 98;</pre></div>
+<p>由于撰写本文时 ML.NET 库中的限制，训练窗口大小必须大于 p 值历史长度的两倍。</p>
+<ol start="2">
+<li>然后，我们从 CSV 训练文件构建<kbd>DataView</kbd>对象:</li>
+</ol>
+<div><pre style="padding-left: 60px">var trainingDataView = GetDataView(trainingFileName);</pre></div>
+<ol start="3">
+<li>然后，我们可以创建 SSA 尖峰检测:</li>
+</ol>
+<div><pre style="padding-left: 60px">var trainingPipeLine = MlContext.Transforms.DetectSpikeBySsa(<br/>    nameof(NetworkTrafficPrediction.Prediction),<br/>    nameof(NetworkTrafficHistory.BytesTransferred),<br/>    confidence: Confidence,<br/>    pvalueHistoryLength: PvalueHistoryLength,<br/>    trainingWindowSize: TrainingWindowSize,<br/>    seasonalityWindowSize: SeasonalityWindowSize);</pre></div>
+<ol start="4">
+<li>现在，我们根据训练数据拟合模型并保存模型:</li>
+</ol>
+<pre style="padding-left: 60px">ITransformer trainedModel = trainingPipeLine.Fit(trainingDataView);<br/><br/>MlContext.Model.Save(trainedModel, trainingDataView.Schema, ModelPath);<br/><br/>Console.WriteLine("Model trained");</pre>
+
+
+            
+
+            
+        
+    
+
+
+
+
+
+
+    
+        <title>The Program class</title>
+        
+        <meta charset="utf-8"/>
+    
+
+    
+        
+
+                            
+                    <h1 class="header-title">程序类</h1>
+                
+            
+            
+                
+<p>鉴于训练只需要训练数据，必须对<kbd>Program</kbd>类进行一些修改:</p>
+<ol>
+<li>帮助文本需要更新以反映新的用法:</li>
+</ol>
+<div><pre style="padding-left: 60px">if (args.Length &lt; 2)<br/>{<br/>    Console.WriteLine($"Invalid arguments passed in, exiting.{Environment.NewLine}{Environment.NewLine}Usage:{Environment.NewLine}" +<br/>                      $"predict &lt;path to input file&gt;{Environment.NewLine}" +<br/>                      $"or {Environment.NewLine}" +<br/>                      $"train &lt;path to training data file&gt;{Environment.NewLine}");<br/><br/>    return;<br/>}</pre></div>
+<ol start="2">
+<li>此外，需要更新 switch case 语句，以反映为预测传递的单个参数:</li>
+</ol>
+<div><pre style="padding-left: 60px">switch (args[0])<br/>{<br/>    case "predict":<br/>        new Predictor().Predict(args[1]);<br/>        break;<br/>    case "train":<br/>        new Trainer().Train(args[1]);<br/>        break;<br/>    default:<br/>        Console.WriteLine($"{args[0]} is an invalid option");<br/>        break;<br/>}</pre></div>
+
+
+            
+
+            
+        
+    
+
+
+
+
+
+
+    
+        <title>Running the application</title>
+        
+        <meta charset="utf-8"/>
+    
+
+    
+        
+
+                            
+                    <h1 class="header-title">运行应用程序</h1>
+                
+            
+            
+                
+<p>为了运行应用程序，我们使用的过程与第三章、<em>回归模型</em>的示例应用程序几乎相同:</p>
+<ol>
+<li>准备好数据后，我们必须通过传入新创建的<kbd>sampledata.csv</kbd>文件来训练模型:</li>
+</ol>
+<div><pre style="padding-left: 60px"><strong>PS chapter06-time-series\bin\Debug\netcoreapp3.0&gt; .\chapter06-time-series.exe train ..\..\..\Data\sampledata.csv</strong><br/>Model trained</pre></div>
+<ol start="2">
+<li>要使用这个文件运行模型，只需将前面提到的<kbd>testdata.csv</kbd>文件<strong> </strong>传递到新构建的应用程序中，预测的输出将显示如下:</li>
+</ol>
+<div><pre style="padding-left: 60px"><strong>PS bin\debug\netcoreapp3.0&gt; .\chapter06-time-series.exe predict ..\..\..\Data\testdata.csv</strong><br/>Based on input file (..\..\..\Data\testdata.csv):<br/>HOST: laptop TIMESTAMP: 11/22/2019 11:13:23 AM TRANSFER: 1000 ALERT: 0 SCORE: 46.07 P-VALUE: 0.50<br/>HOST: laptop TIMESTAMP: 11/23/2019 11:13:23 AM TRANSFER: 1100 ALERT: 0 SCORE: 131.36 P-VALUE: 0.00<br/>HOST: laptop TIMESTAMP: 11/24/2019 11:13:23 AM TRANSFER: 1200 ALERT: 0 SCORE: 180.44 P-VALUE: 0.06<br/>HOST: laptop TIMESTAMP: 11/25/2019 11:13:23 AM TRANSFER: 1300 ALERT: 0 SCORE: 195.42 P-VALUE: 0.17<br/>HOST: laptop TIMESTAMP: 11/26/2019 11:13:23 AM TRANSFER: 1400 ALERT: 0 SCORE: 201.15 P-VALUE: 0.22<br/>HOST: laptop TIMESTAMP: 11/27/2019 11:13:23 AM TRANSFER: 3000 ALERT: 1 SCORE: 1365.42 P-VALUE: 0.00<br/>HOST: laptop TIMESTAMP: 11/28/2019 11:13:23 AM TRANSFER: 1500 ALERT: 0 SCORE: -324.58 P-VALUE: 0.11<br/>HOST: laptop TIMESTAMP: 11/29/2019 11:13:23 AM TRANSFER: 1600 ALERT: 0 SCORE: -312.93 P-VALUE: 0.25</pre></div>
+<p>输出包括三个数据点:<kbd>HOST</kbd>、<kbd>TIMESTAMP</kbd>和<kbd>TRANSFER</kbd>。新增加的是<kbd>ALERT</kbd>、<kbd>SCORE</kbd>和<kbd>P-VALUE</kbd>。非零值表示异常。<kbd>SCORE</kbd>是异常分数的数值表示；较高的值表示峰值。<kbd>P-VALUE</kbd>，0-1 之间的值，是当前点到平均点的距离。接近或等于 0 的值是尖峰的另一个指示。在评估您的模型和功效时，结合使用这三个数据点，您可以保证获得真实的峰值，从而有效减少潜在的假阳性计数。</p>
+<p>您可以随意修改这些值，并根据模型所基于的数据集来研究预测如何变化。从这一点来看，一些实验领域可能如下:</p>
+<ul>
+<li>添加更具体的数据点，如 IP 地址</li>
+<li>向训练和测试数据添加多样化和更多的数据点</li>
+</ul>
+
+
+            
+
+            
+        
+    
+
+
+
+
+
+
+    
+        <title>Creating an anomaly detection application</title>
+        
+        <meta charset="utf-8"/>
+    
+
+    
+        
+
+                            
+                    <h1 class="header-title">创建异常检测应用程序</h1>
+                
+            
+            
+                
+<p>如前所述，我们将创建的应用程序是一个登录异常检测器。给定一组与登录相关的属性，应用程序将使用这些数据来发现异常情况，比如异常的登录时间。与其他应用程序一样，这并不意味着支持下一个 ML 登录异常检测产品；但是，它将向您展示如何在 ML.NET 使用异常检测。</p>
+<p>和前面的章节一样，完整的项目代码、样本数据集和项目文件可以在这里下载:<a href="https://github.com/PacktPublishing/Hands-On-Machine-Learning-With-ML.NET/tree/master/chapter06">https://github . com/packt publishing/Hands-On-Machine-Learning-With-ML。网/树/主/第 06 章</a>。</p>
+
+
+            
+
+            
+        
+    
+
+
+
+
+
+
+    
+        <title>Exploring the project architecture</title>
+        
+        <meta charset="utf-8"/>
+    
+
+    
+        
+
+                            
+                    <h1 class="header-title">探索项目架构</h1>
+                
+            
+            
+                
+<p>基于我们在前几章中创建的项目架构和代码，本例中的大部分更改都是在模型的训练中。</p>
+<p>在下面的屏幕截图中，您将找到该项目的 Visual Studio 解决方案资源管理器视图。该解决方案的新增内容是<kbd>LoginHistory </kbd>和<kbd>LoginPrediction</kbd>文件，我们将在本节的后面查看:</p>
+<p class="CDPAlignCenter CDPAlign"><img class="alignnone size-full wp-image-626 image-border" src="img/2264ca20-b60c-44c8-9b34-ede53f39ca3d.png" style="width:16.42em;height:27.58em;"/></p>
+<p><kbd>sampledata.csv</kbd>文件包含 10 行登录数据。请随意调整数据以适应您自己的观察或调整训练好的模型。以下是数据片段:</p>
+<div><pre>0,1,0,1,1,0<br/>0,1,0,1,1,0<br/>0,0,1,0,1,0<br/>0,0,1,0,1,0<br/>0,0,1,1,0,1<br/>1,1,0,1,1,0<br/>1,1,0,1,1,0<br/>1,0,1,0,1,0<br/>1,0,1,0,1,1<br/>1,0,1,1,0,0</pre></div>
+<p>这些行中的每一行都包含新创建的<kbd>LoginHistory</kbd>类中的属性值，我们将在本章的后面回顾这些值。</p>
+<p>除此之外，我们还添加了<kbd>testdata.csv</kbd>文件，它包含额外的数据点来测试新训练的模型并对其进行评估。下面是<kbd>testdata.csv</kbd>中的一段数据:</p>
+<pre>0,1,0,1,1,0<br/>0,1,0,1,1,0<br/>0,0,1,0,1,0<br/>0,0,1,0,1,0<br/>0,0,1,1,0,1<br/>1,1,0,1,1,0<br/>1,1,0,1,1,0<br/>1,0,1,0,1,0<br/>1,0,1,0,1,1<br/>1,0,1,1,0,0</pre>
+
+
+            
+
+            
+        
+    
+
+
+
+
+
+
+    
+        <title>Diving into the code</title>
+        
+        <meta charset="utf-8"/>
+    
+
+    
+        
+
+                            
+                    <h1 class="header-title">钻研代码</h1>
+                
+            
+            
+                
+<p>对于这个应用程序，如前一节所述，我们在第五章、<em>中完成的工作基础上构建集群模型</em>。在这次深入探讨中，我们将只关注针对该应用程序更改的代码。</p>
+<p>更改或添加的类如下:</p>
+<ul>
+<li><kbd>Constants</kbd></li>
+<li><kbd>LoginHistory</kbd></li>
+<li><kbd>LoginPrediction</kbd></li>
+<li><kbd>Predictor</kbd></li>
+<li><kbd>Trainer</kbd></li>
+</ul>
+
+
+            
+
+            
+        
+    
+
+
+
+
+
+
+    
+        <title>The Constants class</title>
+        
+        <meta charset="utf-8"/>
+    
+
+    
+        
+
+                            
+                    <h1 class="header-title">常量类</h1>
+                
+            
+            
+                
+<p>已经更改了<kbd>Constants</kbd>类，以便将模型保存到<kbd>chapter6.mdl</kbd>。以下代码块反映了这些更改:</p>
+<pre>namespace chapter06.Common<br/>{<br/>    public class Constants<br/>    {<br/>        public const string MODEL_FILENAME = "chapter6.mdl";<br/><br/>        public const string SAMPLE_DATA = "sampledata.csv";<br/><br/>        public const string TEST_DATA = "testdata.csv";<br/>    }<br/>}</pre>
+
+
+            
+
+            
+        
+    
+
+
+
+
+
+
+    
+        <title>The LoginHistory class</title>
+        
+        <meta charset="utf-8"/>
+    
+
+    
+        
+
+                            
+                    <h1 class="header-title">LoginHistory 类</h1>
+                
+            
+            
+                
+<p><kbd>LoginHistory</kbd> <strong> </strong>类是容器类，包含预测和训练我们模型的数据。如前几章所述，<kbd>LoadColumn</kbd>装饰器中的数字映射到 CSV 文件中的索引。每个属性映射到一个值，该值将被发送到模型中进行异常检测:</p>
+<pre>using Microsoft.ML.Data;<br/><br/>namespace chapter06.ML.Objects<br/>{<br/>    public class LoginHistory<br/>    {<br/>        [LoadColumn(0)]<br/>        public float UserID { get; set; }<br/><br/>        [LoadColumn(1)]<br/>        public float CorporateNetwork { get; set; }<br/><br/>        [LoadColumn(2)] <br/>        public float HomeNetwork { get; set; }<br/><br/>        [LoadColumn(3)] <br/>        public float WithinWorkHours { get; set; }<br/><br/>        [LoadColumn(4)] <br/>        public float WorkDay { get; set; }<br/><br/>        [LoadColumn(5)] <br/>        public float Label { get; set; }<br/>    }<br/>}</pre>
+
+
+            
+
+            
+        
+    
+
+
+
+
+
+
+    
+        <title>The LoginPrediction class</title>
+        
+        <meta charset="utf-8"/>
+    
+
+    
+        
+
+                            
+                    <h1 class="header-title">LoginPrediction 类</h1>
+                
+            
+            
+                
+<p><kbd>LoginPrediction</kbd> <strong> </strong>类包含映射到我们预测输出的属性。下面的<kbd>PredictedLabel</kbd>属性将保存我们的预测，而<kbd>Label</kbd>和<kbd>Score</kbd>属性用于评估:</p>
+<div><pre>namespace chapter06.ML.Objects<br/>{<br/>    public class LoginPrediction<br/>    {<br/>        public float Label;<br/><br/>        public float Score;<br/><br/>        public bool PredictedLabel;<br/>    }<br/>}</pre></div>
+
+
+            
+
+            
+        
+    
+
+
+
+
+
+
+    
+        <title>The Predictor class</title>
+        
+        <meta charset="utf-8"/>
+    
+
+    
+        
+
+                            
+                    <h1 class="header-title">预测器类</h1>
+                
+            
+            
+                
+<p>为了处理<kbd>Login</kbd>异常检测场景，需要对此类进行一些更改:</p>
+<ol>
+<li>首先，我们用<kbd>LoginHistory</kbd> <strong> </strong>和<kbd>LoginPrediction</kbd>类型创建我们的预测引擎:</li>
+</ol>
+<div><pre style="padding-left: 60px">var predictionEngine = MlContext.Model.CreatePredictionEngine&lt;LoginHistory, LoginPrediction&gt;(mlModel);     </pre></div>
+<ol start="2">
+<li>接下来，我们将输入文件读入一个字符串变量:</li>
+</ol>
+<div><pre style="padding-left: 60px">var json = File.ReadAllText(inputDataFile);</pre></div>
+<ol start="3">
+<li>最后，我们运行预测，然后输出模型运行的结果:</li>
+</ol>
+<div><pre style="padding-left: 60px">var prediction = predictionEngine.Predict(JsonConvert.DeserializeObject&lt;LoginHistory&gt;(json));<br/><br/>Console.WriteLine(<br/>                    $"Based on input json:{System.Environment.NewLine}" +<br/>                    $"{json}{System.Environment.NewLine}" + <br/>                    $"The login history is {(prediction.PredictedLabel ? "abnormal" : "normal")}, with a {prediction.Score:F2} outlier score");</pre></div>
+
+
+            
+
+            
+        
+    
+
+
+
+
+
+
+    
+        <title>The Trainer class</title>
+        
+        <meta charset="utf-8"/>
+    
+
+    
+        
+
+                            
+                    <h1 class="header-title">培训师课程</h1>
+                
+            
+            
+                
+<p>在<kbd>Trainer</kbd>类中，需要使用随机 PCA 训练器进行一些修改以支持异常检测分类:</p>
+<ol>
+<li>第一个变化是添加了一个<kbd>GetDataView</kbd>助手方法，该方法从之前在<kbd>LoginHistory</kbd>类中定义的列构建<kbd>IDataView</kbd>数据视图:</li>
+</ol>
+<div><pre style="padding-left: 60px">private (IDataView DataView, IEstimator&lt;ITransformer&gt; Transformer) GetDataView(string fileName, bool training = true)<br/>{<br/>    var trainingDataView = MlContext.Data.LoadFromTextFile&lt;LoginHistory&gt;(fileName, ',');<br/><br/>    if (!training)<br/>    {<br/>        return (trainingDataView, null);<br/>    }<br/><br/>    IEstimator&lt;ITransformer&gt; dataProcessPipeline = MlContext.Transforms.Concatenate(<br/>        FEATURES, <br/>        typeof(LoginHistory).ToPropertyList&lt;LoginHistory&gt;(nameof(LoginHistory.Label)));<br/><br/>    return (trainingDataView, dataProcessPipeline);<br/>}</pre></div>
+<ol start="2">
+<li>然后我们构建训练数据视图和<kbd>RandomizedPcaTrainer.Options</kbd>对象:</li>
+</ol>
+<div><pre style="padding-left: 60px">var trainingDataView = GetDataView(trainingFileName);<br/><br/>var options = new RandomizedPcaTrainer.Options<br/>{<br/>    FeatureColumnName = FEATURES,<br/>    ExampleWeightColumnName = null,<br/>    Rank = 5,<br/>    Oversampling = 20,<br/>    EnsureZeroMean = true,<br/>    Seed = 1<br/>};<br/><br/></pre></div>
+<p>请注意，<kbd>Rank</kbd>属性必须等于或小于特性。</p>
+<ol start="3">
+<li>然后，我们可以创建随机 PCA 训练器，将其附加到训练数据视图，拟合我们的模型，然后保存它:</li>
+</ol>
+<div><pre style="padding-left: 60px">IEstimator&lt;ITransformer&gt; trainer = MlContext.AnomalyDetection.Trainers.RandomizedPca(options: options);<br/><br/>EstimatorChain&lt;ITransformer&gt; trainingPipeline = trainingDataView.Transformer.Append(trainer);<br/><br/>TransformerChain&lt;ITransformer&gt; trainedModel = trainingPipeline.Fit(trainingDataView.DataView);<br/><br/>MlContext.Model.Save(trainedModel, trainingDataView.DataView.Schema, ModelPath);</pre></div>
+<ol start="4">
+<li>现在，我们使用测试数据集评估刚刚训练的模型:</li>
+</ol>
+<pre style="padding-left: 60px">var testingDataView = GetDataView(testingFileName, true);<br/><br/>var testSetTransform = trainedModel.Transform(testingDataView.DataView);<br/><br/>var modelMetrics = MlContext.AnomalyDetection.Evaluate(testSetTransform);</pre>
+<ol start="5">
+<li>最后，我们输出所有的分类指标。这些都将在下一节中详细介绍:</li>
+</ol>
+<pre style="padding-left: 60px">Console.WriteLine($"Area Under Curve: {modelMetrics.AreaUnderRocCurve:P2}{Environment.NewLine}" +<br/>                  $"Detection at FP Count: {modelMetrics.DetectionRateAtFalsePositiveCount}");</pre>
+
+
+            
+
+            
+        
+    
+
+
+
+
+
+
+    
+        <title>Running the application</title>
+        
+        <meta charset="utf-8"/>
+    
+
+    
+        
+
+                            
+                    <h1 class="header-title">运行应用程序</h1>
+                
+            
+            
+                
+<p>为了运行应用程序，我们使用的过程与第三章、<em>回归模型</em>的示例应用程序几乎相同，只是在训练时传递了测试数据集:</p>
+<ol>
+<li>提取数据后，我们必须通过传入新创建的<kbd>sampledata.csv</kbd>和<kbd>testdata.csv</kbd>文件来训练模型:</li>
+</ol>
+<div><pre style="padding-left: 60px"><strong>PS chapter06\bin\Debug\netcoreapp3.0&gt; .\chapter06.exe train ..\..\..\Data\sampledata.csv </strong>..\..\..\Data\testdata.csv <br/>Area Under Curve: 78.12%<br/>Detection at FP Count: 1</pre></div>
+<ol start="2">
+<li>要使用这个文件运行模型，只需传入一个构造好的 JSON 文件(在本例中为<kbd>input.json</kbd>),预测的输出将显示:</li>
+</ol>
+<div><pre style="padding-left: 60px"><strong>PS chapter06\bin\Debug\netcoreapp3.0&gt; .\chapter06.exe predict input.json</strong> <br/>Based on input json:<br/>{<br/> "UserID": 0, "CorporateNetwork": 1, "HomeNetwork": 0, "WithinWorkHours": 1, "WorkDay": 1<br/>}<br/>The login history is normal, with a 0% score</pre></div>
+<p>请注意，模型训练的扩展输出包括两个度量数据点。我们将在本章末尾讨论每一项的含义。</p>
+<p>您可以随意修改这些值，并根据模型所基于的数据集来研究预测如何变化。从这一点来看，一些实验领域可能包括以下内容:</p>
+<ul>
+<li>添加一些附加属性以提高生产场景中的预测准确性，例如登录发生在一天中的哪个小时</li>
+<li>增加训练和测试数据的多样性</li>
+</ul>
+
+
+            
+
+            
+        
+    
+
+
+
+
+
+
+    
+        <title>Evaluating a randomized PCA model</title>
+        
+        <meta charset="utf-8"/>
+    
+
+    
+        
+
+                            
+                    <h1 class="header-title">评估随机 PCA 模型</h1>
+                
+            
+            
+                
+<p>如前几章所述，评估模型是整个模型构建过程的关键部分。训练不足的模型只会提供不准确的预测。幸运的是，ML.NET 提供了许多流行的属性来计算模型的准确性，这些属性基于训练时的测试集，让您了解您的模型在生产环境中的表现。</p>
+<p>如示例应用程序所述，在 ML.NET 中，有两个属性组成了<kbd>AnomalyDetectionMetrics</kbd> <strong> </strong>类对象。让我们深入到<kbd>AnomalyDetectionMetrics</kbd> <strong> </strong>对象中暴露的属性:</p>
+<ul>
+<li>ROC 曲线下面积</li>
+<li>假阳性计数的检测率</li>
+</ul>
+<p>在接下来的部分中，我们将分解这些值是如何计算的，以及要寻找的理想值。</p>
+
+
+            
+
+            
+        
+    
+
+
+
+
+
+
+    
+        <title>Area under the ROC curve</title>
+        
+        <meta charset="utf-8"/>
+    
+
+    
+        
+
+                            
+                    <h1 class="header-title">ROC 曲线下面积</h1>
+                
+            
+            
+                
+<p>ROC 曲线下面积<a href="8bcfc000-9adc-4eda-a91a-e09f676eac85.xhtml">第三章</a>、<em>回归模型</em>中提到的 ROC 曲线下面积，顾名思义就是<strong>受试者工作特性</strong> ( <strong> ROC </strong>)曲线下的面积。可能会想到的一个问题是:这与评估异常检测模型有什么关系？</p>
+<p>这个计算出的面积等于算法(在我们的例子中，随机化 PCA)对正例的得分高于负例的概率，两者都是随机选择的，以更好地评估数据。返回的接近 100%的数字是理想值，而如果接近 0%，您很可能会有严重的误报。您可能还记得我们之前的示例应用程序获得了 78%的收益。这意味着有 22%的机会出现假阳性；下面列出了一些改进模型的建议，应该可以减少这个数字。</p>
+<p>下图直观地反映了随机猜测线和任意数据曲线。随机猜测线之间的数据曲线下的面积是 ROC 曲线数据指标下的面积:</p>
+<p class="CDPAlignCenter CDPAlign"><img class="alignnone size-full wp-image-674 image-border" src="img/ca963c34-e882-4652-bdae-ba762ee7d9d5.png" style="width:19.75em;height:20.00em;"/></p>
+
+
+            
+
+            
+        
+    
+
+
+
+
+
+
+    
+        <title>Detection rate at false positive count</title>
+        
+        <meta charset="utf-8"/>
+    
+
+    
+        
+
+                            
+                    <h1 class="header-title">假阳性计数的检测率</h1>
+                
+            
+            
+                
+<p>误报计数属性的检测率为<em> K </em>误报的检测率。异常检测场景中的误报是将数据点视为异常，而实际上它不是。该比率的计算方法如下:</p>
+<p class="CDPAlignCenter CDPAlign"><em>K 个误报的检出率= X / Y </em></p>
+<p>这里，<em> X </em>被计算为基于先前在异常检测示例中描述的分数的顶部测试样本(以降序排序)。这些被认为是最高真阳性(也就是说，更有可能是实际异常)。</p>
+<p><em> Y </em>计算为测试数据中异常的总数，不考虑分值(不过滤到看起来可疑或不可疑的点)。理论上，如果训练数据中的误报数量很高，这个数字可能会很高。当您使用随机化 PCA 构建生产模型时，请确保您的数据尽可能接近生产，以避免过度拟合或欠拟合异常。</p>
+
+
+            
+
+            
+        
+    
+
+
+
+
+
+
+    
+        <title>Summary</title>
+        
+        <meta charset="utf-8"/>
+    
+
+    
+        
+
+                            
+                    <h1 class="header-title">摘要</h1>
+                
+            
+            
+                
+<p>在本章中，我们讨论了 ML。NET 的异常检测支持通过随机 PCA 算法。我们还使用随机 PCA 算法创建并训练了第一个异常检测应用程序，以预测异常登录。除此之外，我们还创建了一个时序应用程序，查看网络流量并发现传输数据量的峰值。最后，我们还研究了如何评估异常检测模型，以及 ML.NET 公开的各种属性，以实现对异常检测模型的正确评估。</p>
+<p>在下一章中，我们将深入研究用 ML.NET 矩阵分解来创建音乐偏好预测器。</p>
+
+
+            
+
+            
+        
+    
+
+
+</body></html>

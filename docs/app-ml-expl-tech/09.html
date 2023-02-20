@@ -1,0 +1,346 @@
+<html><head/><body>
+
+
+	
+		<title>B18216_07_ePub</title>
+		
+	
+	
+		<div><h1 id="_idParaDest-124"><em class="italic"> <a id="_idTextAnchor128"/>第 7 章</em>:在 ML 中使用 SHAP 的实际暴露</h1>
+			<p>在前一章，我们讨论了<strong class="bold"> SHapley 加法解释</strong> ( <strong class="bold"> SHAP </strong>)，这是最流行的模型可解释性框架之一。我们还介绍了一个使用 SHAP 解释回归模型的实例。然而，SHAP 可以解释在不同类型的数据集上训练的其他类型的模型。在前一章中，你确实对 SHAP 现有的不同类型的<strong class="bold">解释器</strong>有了一个简要的概念理解，这些解释器用于解释在不同类型的数据集上训练的模型。但是在这一章中，你将获得应用 SHAP 现有的各种解释器所需的实践机会。</p>
+			<p>更具体地说，您将学习如何应用<strong class="bold"> TreeExplainers </strong>来解释在结构化表格数据上训练的树集成模型。您还将学习如何将<strong class="bold"> DeepExplainer </strong>和<strong class="bold"> GradientExplainer </strong> SHAP 应用于经过图像数据训练的深度学习模型。正如您在前一章中了解到的，SHAP 的<strong class="bold"> KernelExplainer </strong>是模型不可知的，您将在本章中实际接触到 KernelExplainer。我们还将介绍在线性模型上使用<strong class="bold"> LinearExplainers </strong>的实际情况。最后，您将探索如何使用 SHAP 来解释基于文本数据训练的复杂的最先进的<strong class="bold"> Transformer </strong>模型。</p>
+			<p>在本章中，我们将讨论以下重要主题:</p>
+			<ul>
+				<li>将树解释器应用于树集合模型</li>
+				<li>使用 DeepExplainer 和 GradientExplainer 解释深度学习模型</li>
+				<li>使用 KernelExplainer 的模型不可知可解释性</li>
+				<li>探索 SHAP 的线性解释器</li>
+				<li>用 SHAP 解释变压器</li>
+			</ul>
+			<p>我们开始吧！</p>
+			<h1 id="_idParaDest-125"><a id="_idTextAnchor129"/>技术要求</h1>
+			<p>该代码教程以及必要的资源可以从本章的 GitHub 资源库下载或克隆:<a href="https://github.com/PacktPublishing/Applied-Machine-Learning-Explainability-Techniques/tree/main/Chapter07">https://GitHub . com/packt publishing/Applied-Machine-Learning-explability-Techniques/tree/main/chapter 07</a>。Python 和 Jupyter 笔记本用于实现本章所涵盖的理论概念的实际应用。但是，我建议您在阅读完本章后再运行笔记本，以便更好地理解。</p>
+			<h1 id="_idParaDest-126">将树解释器应用于树集成模型</h1>
+			<p>正如在<a id="_idIndexMarker481"/>前一章中所讨论的，树 SHAP 实现可以与树集合模型一起工作，例如<strong class="bold">随机森林</strong>、<strong class="bold"> XGBoost </strong>和<strong class="bold"> LightGBM </strong>算法。现在，决策树天生是可以解释的。但是基于树的集成学习模型，无论是实现 boosting 还是 bagging，本质上都不是可解释的，并且解释起来可能相当复杂。因此，SHAP 是用来解释这种复杂模型的算法的流行选择之一。SHAP 的内核 SHAP 实现是模型不可知的，可以解释任何模型。但是，对于包含许多要素的大型数据集，该算法可能会非常慢。这就是为什么该算法的<strong class="bold">树 SHAP</strong>(<a href="https://arxiv.org/abs/1802.03888">https://arxiv.org/abs/1802.03888</a>)实现是用于树集合模型的高速精确算法。TreeExplainer 是树 SHAP 算法的快速 C++实现，它支持 XGBoost、CatBoost、LightGBM 和 scikit-learn 的其他树集成模型等算法。在这一节中，我将介绍如何在实践中应用 TreeExplainer。</p>
+			<h2 id="_idParaDest-127"><a id="_idTextAnchor131"/>安装所需的 Python 模块</h2>
+			<p>完整的教程在 GitHub 资源库中提供，网址是<a href="https://github.com/PacktPublishing/Applied-Machine-Learning-Explainability-Techniques/blob/main/Chapter07/TreeExplainers.ipynb">https://GitHub . com/packt publishing/Applied-Machine-Learning-explability-Techniques/blob/main/chapter 07/tree explainers . ipynb</a>，我强烈建议您阅读这一部分并并排执行代码。如果您已经学习了其他章节中提供的教程，现在应该已经安装了大部分所需的 Python 包。否则，您可以使用<code>pip</code>安装程序安装必要的软件包:</p>
+			<pre class="source-code">!pip install --upgrade numpy pandas matplotlib seaborn sklearn lightgbm shap</pre>
+			<p>您可以导入这些软件包来验证它们是否成功安装:</p>
+			<pre class="source-code">import numpy as np</pre>
+			<pre class="source-code">import pandas as pd</pre>
+			<pre class="source-code">import seaborn as sns</pre>
+			<pre class="source-code">import matplotlib.pyplot as plt</pre>
+			<pre class="source-code">import sklearn</pre>
+			<pre class="source-code">import lightgbm as lgb</pre>
+			<pre class="source-code">import shap</pre>
+			<p>对于 Jupyter 笔记本中某些基于 JavaScript 的 SHAP 可视化，请确保初始化 SHAP JavaScript 模块:</p>
+			<pre class="source-code">shap.initjs()</pre>
+			<p>接下来，让我们讨论一下在本例中我们将用于<a id="_idIndexMarker484"/>的数据集<a id="_idIndexMarker483"/>。</p>
+			<h2 id="_idParaDest-128"><a id="_idTextAnchor132"/>关于数据集的讨论</h2>
+			<p>对于这个例子，我们将使用来自 ka ggle(<a href="https://www.kaggle.com/uciml/german-credit">https://www.kaggle.com/uciml/german-credit</a>)的德国信用风险数据集。该数据集用于建立分类模型，对<a id="_idIndexMarker485"/>信用风险的好坏进行分类。Kaggle 数据集实际上是 UCI 现有原始数据的简化版本(<a href="https://archive.ics.uci.edu/ml/datasets/statlog+(german+credit+data)">https://archive . ics . UCI . edu/ml/datasets/statlog+(德语+信用+数据)</a>)</p>
+			<p class="callout-heading">德国信贷数据数据集</p>
+			<p class="callout">数据集的功劳归于〔t0〕博士。Hans Hofmann，汉堡大学统计和计量研究所。</p>
+			<p>有关数据集的更多信息，请参考笔记本。本章的 GitHub 资源库中已经提供了数据集:<a href="https://github.com/PacktPublishing/Applied-Machine-Learning-Explainability-Techniques/tree/main/Chapter07/datasets">https://GitHub . com/packt publishing/Applied-Machine-Learning-explability-Techniques/tree/main/chapter 07/datasets</a>。我们可以使用 pandas Python 模块加载数据集并将其显示为数据帧:</p>
+			<pre class="source-code">data  = pd.read_csv('datasets/german_credit_data.csv', index_col=0)</pre>
+			<pre class="source-code">data.head()</pre>
+			<p>下图说明了该数据的熊猫数据框架:</p>
+			<div><div><img src="img/B18216_07_001.jpg" alt="Figure 7.1 – pandas DataFrame snapshot of the German Credit Risk dataset&#13;&#10;"/>
+				</div>
+			</div>
+			<p class="figure-caption">图 7.1-德国信用风险数据集的 pandas 数据框架快照</p>
+			<p>我强烈建议你<a id="_idIndexMarker486"/>进行一次彻底的<strong class="bold">探索性数据分析</strong> ( <strong class="bold"> EDA </strong>)。你也可以使用如<a href="B18216_02_ePub.xhtml#_idTextAnchor033"> <em class="italic">第 2 章</em> </a>、<em class="italic">模型可解释方法</em>所示的熊猫剖析(<a href="https://github.com/ydataai/pandas-profiling">https://github.com/ydataai/pandas-profiling</a>)，用于自动化 EDA。由于我们已经讨论过这个<a id="_idIndexMarker487"/>，我将跳过这个例子中的 EDA 部分。</p>
+			<p>但是，数据集确实有一些缺失值，这需要在构建模型之前进行处理。我们可以使用以下代码行来检查这一点:</p>
+			<pre class="source-code">sns.displot(</pre>
+			<pre class="source-code">    data=data.isna().melt(value_name="missing"),</pre>
+			<pre class="source-code">    y="variable",</pre>
+			<pre class="source-code">    hue="missing",</pre>
+			<pre class="source-code">    multiple="fill",</pre>
+			<pre class="source-code">    aspect=1.5,</pre>
+			<pre class="source-code">    palette='seismic'</pre>
+			<pre class="source-code">)</pre>
+			<pre class="source-code">plt.show()</pre>
+			<p>以下可视化结果作为输出生成:</p>
+			<div><div><img src="img/B18216_07_002.jpg" alt="Figure 7.2 – Missing value visualization for the German Credit Risk dataset&#13;&#10;"/>
+				</div>
+			</div>
+			<p class="figure-caption">图 7.2–德国信用风险数据集的缺失值可视化</p>
+			<p>数据集的<code>Saving accounts</code>特征约有 18%的缺失值，而<code>Checking account</code>特征约有 40%的缺失值。由于丢失数据的百分比很高，而且这些特性可能很重要，所以我们不能完全忽略或放弃这些特性。请<a id="_idIndexMarker488"/>记住，本教程的重点是使用树解释器的模型可解释性。因此，我们不会花太多时间做数据插补，因为我们并不关心为这个例子建立一个有效的模型。由于这两个特征都是分类特征，我们将简单地为缺失值创建一个<code>Unknown</code>类别。这可以通过下面一行代码来实现:</p>
+			<pre class="source-code">data.fillna('Unknown', inplace=True)</pre>
+			<p>我们将需要为<a id="_idIndexMarker489"/>分类特征执行<strong class="bold">标签编码</strong>，因为我们需要将类似字符串的特征值转换为整数格式:</p>
+			<pre class="source-code">from sklearn.preprocessing import LabelEncoder</pre>
+			<pre class="source-code">le = LabelEncoder()</pre>
+			<pre class="source-code">for feat in ['Sex', 'Housing', 'Saving accounts', 'Checking account', 'Purpose', 'Risk']:</pre>
+			<pre class="source-code">    le.fit(data[feat])</pre>
+			<pre class="source-code">    data[feat] = le.transform(data[feat])</pre>
+			<p>现在，对于这个例子，我们将使用<strong class="bold"> LightGBM 算法</strong>(【https://lightgbm.readthedocs.io/en/latest/】)，它可以直接作用于分类变量，因此<a id="_idIndexMarker490"/>我们不需要执行<strong class="bold">一键编码</strong>。但是对于其他的<a id="_idIndexMarker491"/>算法，我们可能需要执行一键编码。此外，我们不会执行其他复杂的数据预处理或特征工程步骤。我强烈建议您<a id="_idIndexMarker492"/>执行健壮的<em class="italic">特征工程</em>、<em class="italic">异常检测</em>和<em class="italic">数据标准化</em>来构建高效的 ML 模型。然而，对于这个例子，即使模型不是非常准确，我们也可以使用 SHAP 来生成解释。让我们进入模型训练部分。</p>
+			<h2 id="_idParaDest-129"><a id="_idTextAnchor133"/>训练模型</h2>
+			<p>在训练<a id="_idIndexMarker493"/>模型之前，我们需要创建训练和测试集:</p>
+			<pre class="source-code">from sklearn.model_selection import train_test_split</pre>
+			<pre class="source-code">features = data.drop(columns=['Risk'])</pre>
+			<pre class="source-code">labels = data['Risk']</pre>
+			<pre class="source-code"># Dividing the data into training-test set with 80:20 split ratio</pre>
+			<pre class="source-code">x_train,x_test,y_train,y_test = \</pre>
+			<pre class="source-code">train_test_split(features,labels,test_size=0.2, </pre>
+			<pre class="source-code">                 random_state=123)</pre>
+			<p>由于我们将使用 LightGBM 算法，因此需要创建 LightGBM 数据集对象，这些对象将在培训过程中使用:</p>
+			<pre class="source-code">data_train = lgb.Dataset(x_train, label=y_train, </pre>
+			<pre class="source-code">                         categorical_feature=cat_features)</pre>
+			<pre class="source-code">data_test = lgb.Dataset(x_test, label=y_test, </pre>
+			<pre class="source-code">                        categorical_feature=cat_features)</pre>
+			<p>我们还需要将<a id="_idIndexMarker494"/>模型参数定义为一个字典:</p>
+			<pre class="source-code">params = {</pre>
+			<pre class="source-code">    'boosting_type': 'gbdt',</pre>
+			<pre class="source-code">    'objective': 'binary',</pre>
+			<pre class="source-code">    'metric': 'auc',</pre>
+			<pre class="source-code">    'num_leaves': 20,</pre>
+			<pre class="source-code">    'learning_rate': 0.05,</pre>
+			<pre class="source-code">    'feature_fraction': 0.9,</pre>
+			<pre class="source-code">    'bagging_fraction': 0.8,</pre>
+			<pre class="source-code">    'bagging_freq': 5,</pre>
+			<pre class="source-code">    'verbose': -1,</pre>
+			<pre class="source-code">    'lambda_l1': 1,</pre>
+			<pre class="source-code">    'lambda_l2': 1,</pre>
+			<pre class="source-code">    'seed': 123</pre>
+			<pre class="source-code">}</pre>
+			<p>最后，我们可以使用创建的参数和数据集对象来训练模型:</p>
+			<pre class="source-code">model = lgb.train(params,</pre>
+			<pre class="source-code">                  data_train,</pre>
+			<pre class="source-code">                  num_boost_round=100,</pre>
+			<pre class="source-code">                  verbose_eval=100,</pre>
+			<pre class="source-code">                  valid_sets=[data_test, data_train])</pre>
+			<p>我们再次跳过超参数调整过程，以获得更有效的模型，但我肯定会建议花一些时间在超参数调整上，以获得精度更高的模型。现在，让我们继续使用 SHAP 的模型可解释性部分。</p>
+			<h2 id="_idParaDest-130"><a id="_idTextAnchor134"/>树木解说器在 SHAP 的应用</h2>
+			<p>在 SHAP 应用<a id="_idIndexMarker496"/> TreeExplainer 非常容易，因为这个框架已经很好的模块化了:</p>
+			<pre class="source-code">explainer = shap.TreeExplainer(model)</pre>
+			<pre class="source-code">shap_values = explainer.shap_values(features)</pre>
+			<p>一旦我们获得了 SHAP 值的近似值，我们就可以应用 SHAP 提供的可视化方法来获得模型的可解释性。我<a id="_idTextAnchor135"/>建议您参考第六章<em class="italic">使用 SHAP </em>的<em class="italic">可视化在 SHAP </em>部分，以刷新您的记忆，了解我们可以使用 SHAP 进行模型解释的各种可视化方法。我们将从概要图的全局可解释性开始。</p>
+			<p><em class="italic">图 7.3 </em>显示了使用 TreeExplainer 在该数据集上生成的 SHAP 值的 SHAP 汇总图:</p>
+			<div><div><img src="img/B18216_07_003.jpg" alt="Figure 7.3 – SHAP summary plot on SHAP values generated by TreeExplainer&#13;&#10;"/>
+				</div>
+			</div>
+			<p class="figure-caption">图 7.3-tree explainer 生成的 SHAP 值的 SHAP 汇总图</p>
+			<p>正如我们从上图中看到的，摘要图突出显示了基于 SHAP 值的重要特性，从最重要到最不重要排序。该模型认为<code>Checking account</code>和<code>Duration</code>是最有影响力的特征之一，与<code>Sex</code>或<code>Job</code>特征相比，<a id="_idIndexMarker498"/>。</p>
+			<p>对于局部<a id="_idIndexMarker499"/>的可解释性，我们可以采用<strong class="bold">力图</strong>和<strong class="bold">决策图</strong>可视化<a id="_idIndexMarker500"/>的方法:</p>
+			<pre class="source-code"># Local explainability with force plots</pre>
+			<pre class="source-code">shap.force_plot(explainer.expected_value[1], shap_values[1][0,:], features.iloc[0,:])</pre>
+			<pre class="source-code"># Local explainability with force plots</pre>
+			<pre class="source-code">shap.decision_plot(explainer.expected_value[1], shap_values[1][0,:], features.iloc[0,:])</pre>
+			<p>我经常发现决策图比力图更容易解释，因为决策图显示了每个特性与平均期望值的偏差<a id="_idIndexMarker501"/>。偏离的方向还表明该特征是对模型的决策产生积极影响，还是产生消极影响。但你们中的一些人可能也更喜欢力图，因为这可以根据其特征值指示积极或消极影响的特征，以及它们如何影响实现更高的预测值或更低的预测值。</p>
+			<p><em class="italic">图 7.4 </em>展示了我们获得的力图和决策图:</p>
+			<div><div><img src="img/B18216_07_004.jpg" alt="Figure 7.4 – Force and decision plots for local interpretability &#13;&#10;"/>
+				</div>
+			</div>
+			<p class="figure-caption">图 7.4-局部可解释性的力和决策图</p>
+			<p>在某些情况下，理解特征间的相关性变得很重要，因为 SHAP 不会孤立地考虑<a id="_idIndexMarker502"/>特征来获得最有<a id="_idIndexMarker503"/>影响力的特征。相反，基于 SHAP 的特征重要性是基于多个特征一起的集体影响来估计的。因此，为了分析特性的重要性，我们可以尝试 SHAP 特性依赖图:</p>
+			<pre class="source-code"># For feature wise global interpretability</pre>
+			<pre class="source-code">for col in ['Purpose', 'Age']:</pre>
+			<pre class="source-code">    print(f"Feature Dependence plot for: {col}")</pre>
+			<pre class="source-code">    shap.dependence_plot(col, shap_values[1], features, display_features=features)</pre>
+			<p>下图显示了<code>Purpose</code>和<code>Age</code>功能的功能依赖图:</p>
+			<div><div><img src="img/B18216_07_005.jpg" alt="Figure 7.5 – SHAP feature dependence plot for the Purpose and Age features&#13;&#10;"/>
+				</div>
+			</div>
+			<p class="figure-caption">图 7.5-目的和年龄特征的 SHAP 特征依赖图</p>
+			<p>从<em class="italic">图 7.3 </em>中的 SHAP 中，我略微惊讶地发现<code>Purpose</code>和<code>Age</code>的特性没有<code>Duration</code>或<code>Credit amount</code>重要。在这种情况下，特征相关性<a id="_idIndexMarker504"/>图自动计算所选特征的最相关特征。因此，从<em class="italic">图 7.5 </em>中，我们可以看到对于<code>Purpose</code>和<code>Age</code>，<code>Credit Amount</code>都是从属特征，我们<a id="_idIndexMarker505"/>也可以看到这些特征如何随从属特征而变化。这证明了总的来说，<code>Credit amount</code>比<code>Purpose</code>和<code>Age</code>更有影响力。</p>
+			<p>您还可以尝试其他可视化方法，这些方法在第六章 、<em class="italic">使用 SHAP 的模型可解释性</em>中有所涉及，并明确推荐您尝试使用 TreeExplainer 生成的 SHAP 值，以便您可以提出自己的自定义可视化方法！在下一部分中，我们将把 SHAP 解释器应用于在图像数据上训练的深度学习模型。</p>
+			<h1 id="_idParaDest-131"><a id="_idTextAnchor137"/>使用 DeepExplainer 和 GradientExplainer 解释深度学习模型</h1>
+			<p>在<a id="_idIndexMarker506"/>的前一节中，我们<a id="_idIndexMarker507"/>介绍了在<a id="_idIndexMarker508"/> SHAP 中使用 TreeExplainer，这是一个特定于模型的可解释方法，仅<a id="_idIndexMarker509"/>适用于树集合模型。我们现在将讨论 GradientExplainer 和 DeepExplainer，这是 SHAP 的另外两个特定于模型的解释器，主要用于深度学习模型。</p>
+			<h2 id="_idParaDest-132"><a id="_idTextAnchor138"/> GradientExplainer</h2>
+			<p>正如在<a href="B18216_02_ePub.xhtml#_idTextAnchor033"> <em class="italic">第二章</em> </a>、<em class="italic">模型可解释性方法</em>中所讨论的，解释<a id="_idIndexMarker510"/>在图像等非结构化数据<a id="_idIndexMarker511"/>上训练的深度学习模型最广泛采用的方式之一是<strong class="bold">逐层相关性传播</strong> ( <strong class="bold"> LRP </strong>)。LRP 是关于分析深度神经网络中间<a id="_idIndexMarker512"/>层的梯度流。SHAP 梯度解释器也以类似的方式工作。正如在第 6 章<em class="italic">中所讨论的那样，使用 SHAP </em>的模型可解释性，GradientExplainer 将<em class="italic"> SHAP </em>、<em class="italic">综合梯度</em>和<em class="italic">平滑梯度</em>的思想组合成一个单一的期望值方程。GradientExplainer 最后使用了一种基于灵敏度图的梯度可视化方法。可视化地图中的红色像素表示具有正 SHAP 值的像素，这增加了输出类的概率。蓝色像素表示具有负 SHAP 值的像素，这降低了输出类别的可能性。现在，让我带你浏览一下代码库中提供的教程:<a href="https://github.com/PacktPublishing/Applied-Machine-Learning-Explainability-Techniques/blob/main/Chapter07/Explaining%20Deep%20Learning%20models.ipynb">https://github . com/packt publishing/Applied-Machine-Learning-explability-Techniques/blob/main/chapter 07/Explaining % 20 deep % 20 Learning % 20 models . ipynb</a>。请加载必要的模块，并遵循笔记本教程中提供的详细步骤，因为我将在本节中只介绍重要的编码步骤，以帮助您理解代码教程的流程。</p>
+			<h2 id="_idParaDest-133"><a id="_idTextAnchor139"/>讨论用于训练模型的数据集</h2>
+			<p>对于本例，我们将<a id="_idIndexMarker513"/>使用 SHAP ImageNet 数据集，该数据集将用于生成 GradientExplainer 算法所需的背景参考。我们还将从同一个数据集中选取推断图像。但是，您始终可以自由选择任何其他图像数据集或推理图像:</p>
+			<pre class="source-code">X,y = shap.datasets.imagenet50(resolution=224)</pre>
+			<pre class="source-code">inference_image = X[[46]] </pre>
+			<p>对于此示例，我们选择了以下图像作为我们的推理图像:</p>
+			<div><div><img src="img/B18216_07_006.jpg" alt="Figure 7.6 – Inference image from SHAP ImageNet50&#13;&#10;"/>
+				</div>
+			</div>
+			<p class="figure-caption">图 7.6-来自 SHAP 图像网 50 的推理图像</p>
+			<p>从推断图中我们可以看到，它包含了很多可能的物体，包括一个人，一把椅子，还有<a id="_idIndexMarker514"/>电脑。所有这些都可能是潜在的模型结果，而实际结果取决于模型进行预测的确切区域。因此，在这种情况下，可解释性非常重要。接下来，让我们讨论一下这个例子使用的模型。</p>
+			<h2 id="_idParaDest-134"><a id="_idTextAnchor140"/>对于这个例子，使用预先训练的 CNN 模型</h2>
+			<p>我使用了一个预先训练好的 CNN 模型，<code>tensorflow</code> Python 模块:</p>
+			<pre class="source-code">from tensorflow.keras.applications.vgg19 import VGG19</pre>
+			<pre class="source-code">model = VGG19(weights='imagenet')</pre>
+			<p>接下来，让我们将 GradientExplainer 应用于 SHAP。</p>
+			<h2 id="_idParaDest-135">GradientExplainer 在 SHAP 的应用</h2>
+			<p>GradientExplainer 帮助<a id="_idIndexMarker516"/>绘制一个<a id="_idIndexMarker517"/>深度学习<a id="_idIndexMarker518"/>模型的中间层的梯度流，如<strong class="bold">卷积神经网络</strong> ( <strong class="bold"> CNN </strong>)来解释模型的工作原理。因此，我们将尝试探索模型的第 10 层，并基于 SHAP 值可视化梯度。第 10 层的选择完全是任意的；你也可以<a id="_idIndexMarker519"/>选择其他<a id="_idIndexMarker520"/>图层:</p>
+			<pre class="source-code">layer_num = 10</pre>
+			<pre class="source-code"># explain how the input to the 10th layer of the model explains the top two classes</pre>
+			<pre class="source-code">def map2layer(x, layer):</pre>
+			<pre class="source-code">    '''</pre>
+			<pre class="source-code">    Source : https://github.com/slundberg/shap</pre>
+			<pre class="source-code">    '''</pre>
+			<pre class="source-code">    feed_dict = dict(zip([model.layers[0].input],</pre>
+			<pre class="source-code">                         [preprocess_input(x.copy())]))</pre>
+			<pre class="source-code">    return K.get_session().run(model.layers[layer].input, feed_dict)</pre>
+			<pre class="source-code">model_input = (model.layers[layer_num].input, </pre>
+			<pre class="source-code">               model.layers[-1].output)</pre>
+			<pre class="source-code">explainer = shap.GradientExplainer(model_input,</pre>
+			<pre class="source-code">                                   map2layer(X, layer_num),</pre>
+			<pre class="source-code">                                   local_smoothing=0)</pre>
+			<pre class="source-code">shap_values, ind = explainer.shap_values(</pre>
+			<pre class="source-code">    map2layer(inference_image, layer_num), </pre>
+			<pre class="source-code">    ranked_outputs=4)</pre>
+			<pre class="source-code"># plot the explanations</pre>
+			<pre class="source-code">shap.image_plot(shap_values, inference_image, class_names)</pre>
+			<p>在此示例中，我们尝试为预训练模型的第 10 层估计基于 GradientExplainer 的 SHAP 值。使用 SHAP 图像绘图法，我们可以可视化模型的前 4 个可能结果的灵敏度图，如图 7.7 所示:</p>
+			<div><div><img src="img/B18216_07_007.jpg" alt="Figure 7.7 – SHAP image plot visualization based on applying GradientExplainer to the inference image&#13;&#10;"/>
+				</div>
+			</div>
+			<p class="figure-caption">图 7.7–基于将 GradientExplainer 应用于推理图像的 SHAP 图像绘图可视化</p>
+			<p>来自模型的前四个预测是<strong class="bold">桌面 _ 电脑</strong>、<strong class="bold">桌面</strong>、<strong class="bold">显示器</strong>和<strong class="bold">屏幕</strong>。根据模型关注的区域，所有这些都是有效的结果。使用<em class="italic">图 7.7 </em>中所示的 SHAP 图像图，我们可以确定对<a id="_idIndexMarker521"/>特定模型预测有贡献的确切区域。用红色标记的像素区域<a id="_idIndexMarker522"/>对特定的模型预测做出正贡献，而蓝色像素区域对模型预测做出负贡献。您还可以尝试可视化模型的其他层，并分析模型预测在这些层中是如何变化的！</p>
+			<h2 id="_idParaDest-136"><a id="_idTextAnchor142"/>探索深层解释者</h2>
+			<p>在上一节中，我们<a id="_idIndexMarker523"/>介绍了 SHAP 的 GradientExplainers。然而，深度学习模型也可以使用 SHAP 基于深度 SHAP 算法的 DeepExplainers 来解释。深度 SHAP 是为深度学习模型估计 SHAP 值的高速实现。它使用背景样本的分布和 Shapley 方程来线性化深度学习模型中使用的主要非线性操作，如 max、products 和 softmax。</p>
+			<p>在<a href="https://github.com/PacktPublishing/Applied-Machine-Learning-Explainability-Techniques/blob/main/Chapter07/Explaining%20Deep%20Learning%20models.ipynb">https://github . com/packt publishing/Applied-Machine-Learning-explability-Techniques/blob/main/chapter 07/Explaining % 20 deep % 20 Learning % 20 models . ipynb</a>中提供的教程笔记本涵盖了一个在 CIFAR-10 数据集(【https://www.cs.toronto.edu/~kriz/cifar.html】)上从零开始训练的深度学习模型的例子，用于多类分类。数据集包含大小为 32x32 的高度压缩图像，属于 10 个不同的类别。在本节中，我将跳过模型训练过程，因为它已经在笔记本教程中有足够的详细介绍。相反，我将使用<a id="_idIndexMarker524"/> DeepExplainers 讨论模型可解释性部分，这是我们的主要焦点。你也可以用一个预先训练好的 CNN 模型来尝试同样的教程，而不是从头开始训练一个模型。现在，让我们讨论模型可解释性部分。</p>
+			<h2 id="_idParaDest-137">DeepExplainer 在 SHAP 的应用</h2>
+			<p>为了应用<a id="_idIndexMarker525"/> DeepExplainer，我们需要首先形成背景样本。可解释性的健壮性实际上很大程度上取决于背景样本的选择。对于本例，我们将从训练数据中随机选择 1，000 个样本。您也可以增加样本量，但请通过确保数据收集过程的一致性来确保背景样本在训练数据或推断数据之间没有数据漂移:</p>
+			<pre class="source-code">background = x_train[np.random.choice(len(x_train), 1000, replace=False)]</pre>
+			<p>一旦选择了背景样本，我们可以使用 DeepExplainer 方法在训练模型和背景样本上创建 SHAP explainer 对象，并估计推断数据的 SHAP 值:</p>
+			<pre class="source-code">explainer = shap.DeepExplainer(model, background)</pre>
+			<pre class="source-code">shap_values = explainer.shap_values(sample_x_test)</pre>
+			<p>计算出 SHAP 值后，我们可以使用 SHAP 图像图，使用与 GradientExplainer 相似的灵敏度图，以正面和负面方式显示影响模型的像素:</p>
+			<pre class="source-code">shap.image_plot(shap_values, sample_x_test, labels, labelpad= 1)</pre>
+			<p>下图显示了一些样本推断数据的 SHAP 图像图:</p>
+			<div><div><img src="img/B18216_07_008.jpg" alt="Figure 7.8 – SHAP image plot visualization after applying DeepExplainers in SHAP&#13;&#10;"/>
+				</div>
+			</div>
+			<p class="figure-caption">图 7.8–在 SHAP 应用 DeepExplainers 后的 SHAP 图像绘图可视化</p>
+			<p>正如我们从<em class="italic">图 7.8 </em>中看到的，即使该模型是在一个非常压缩的数据集上训练的，DeepExplainer 也能够计算出 SHAP 值，这些值可以帮助我们识别出<a id="_idIndexMarker527"/>图像中对模型预测做出积极贡献的区域(以粉红色像素突出显示)。该模型确实正确预测了作为<em class="italic">马</em>的<a id="_idIndexMarker528"/>结果，这是来自压缩图像的正确分类。然而，应用 DeepExplainer 非常简单，并且与传统方法相比，该方法非常快速，可以为在图像等非结构化数据上训练的深度学习模型近似 SHAP 值。接下来，我们将学习 KernelExplainer 的模型不可知解释能力。</p>
+			<h1 id="_idParaDest-138">使用 KernelExplainer 的模型不可知解释能力</h1>
+			<p>在前面的章节中，我们已经讨论了 SHAP 提供的三个特定于模型的解释器——tree explainer、GradientExplainer 和 DeepExplainer。SHAP 的 KernelExplainer 实际上使 SHAP 成为一种模型不可知的可解释方法。然而，与之前的方法不同，基于核 SHAP 算法的 KernelExplainer 要慢得多，尤其是对于大型和高维度的数据集。内核 SHAP 试图将 Shapley values 和<strong class="bold">局部可解释模型不可知解释(LIME) </strong>的思想结合起来，用于黑盒模型的全局和局部可解释性。与 LIME 中遵循的方法类似，核 SHAP 算法也创建局部线性扰动样本，并计算其 Shapley 值，以识别有助于或不利于模型预测的特征。</p>
+			<p>KernelExplainer 是内核 SHAP 算法的<a id="_idIndexMarker531"/>实际实现。演示 SHAP KernelExplainer 应用的完整教程在以下笔记本中提供:<a href="https://github.com/PacktPublishing/Applied-Machine-Learning-Explainability-Techniques/blob/main/Chapter07/KernelExplainers.ipynb">https://github . com/packt publishing/Applied-Machine-Learning-explability-Techniques/blob/main/chapter 07/kernel explainers . ipynb</a>。我使用了与<em class="italic"> TreeExplainer 教程</em>相同的<em class="italic">德国信用风险数据集</em>。如果您直接从本节开始，请参考<em class="italic">将 TreeExplainers 应用于树集合模型</em>一节，了解数据集和模型的详细讨论。在这个<a id="_idIndexMarker532"/>部分，我们将讨论 KernelExplainers 的应用程序，解决 TreeExplainer 教程中讨论的相同问题。</p>
+			<h2 id="_idParaDest-139">KernelExplainer 在 SHAP 的应用</h2>
+			<p>SHAP 的 KernelExplainer <a id="_idIndexMarker533"/>方法将模型和背景数据作为输入来计算 SHAP 值。对于较大的数据集或具有许多特征的高维度<a id="_idIndexMarker534"/>数据集，建议仅使用训练数据的子集作为背景样本。否则，核 SHAP 可能是一个非常慢的算法，并且会花费大量时间来生成 SHAP 值。像前面介绍的 explainer 方法一样，应用 KernelExplainer 非常简单，可以使用下面几行代码来完成:</p>
+			<pre class="source-code">explainer = shap.KernelExplainer(model.predict, x_train)</pre>
+			<pre class="source-code">shap_values = explainer.shap_values(x_test, nsamples=100)</pre>
+			<p>如果我们记录计算 SHAP 值的时间(使用 Jupyter 笔记本中的<code>%%time</code>),并在同一数据集上比较 KernelExplainer 和 TreeExplainer，我们会发现 KernelExplainer 的执行时间要长得多(在我们的例子中几乎长了 1000 倍！).这表明，尽管 KernelExplainer 是模型不可知的，但算法的缓慢是一个主要缺点。</p>
+			<p>为了解释黑盒模型，适用于 TreeExplainer 的相同可视化方法，这些方法可以由以下代码生成:</p>
+			<pre class="source-code">shap.summary_plot(shap_values, x_test, plot_type='violin', show=False)</pre>
+			<pre class="source-code">shap.force_plot(explainer.expected_value, shap_values[1], x_test.iloc[0,:])</pre>
+			<pre class="source-code">shap.decision_plot(explainer.expected_value, shap_values[1], x_test.iloc[0,:])</pre>
+			<p><em class="italic">图 7.9 </em>显示了用于解释黑盒模型的汇总图、决策图和作用力图:</p>
+			<div><div><img src="img/B18216_07_009.jpg" alt="Figure 7.9 – Summary plot, decision plot, and force plots obtained after using SHAP KernelExplainer&#13;&#10;"/>
+				</div>
+			</div>
+			<p class="figure-caption">图 7.9-使用 SHAP 内核解释器后获得的汇总图、决策图和力图</p>
+			<p>使用与 TreeExplainer 相同的方法可以获得图 7.9 所示的图。在下一节的<a id="_idIndexMarker535"/>中，我们将介绍 SHAP 的 LinearExplainer，它是另一种特定于模型的解释方法。</p>
+			<h1 id="_idParaDest-140">在 SHAP 探索线性解释器</h1>
+			<p>SHAP 的 linear explainer<a id="_idIndexMarker537"/>是专门为线性机器学习模型开发的。在前一节中，我们已经看到，尽管 KernelExplainer 是模型不可知的，但它可能非常慢。因此，我认为这是使用 LinearExplainer 来解释具有独立特征的线性模型，甚至考虑特征相关性的主要动机之一。在这一节中，我们将讨论在实践中应用 LinearExplainer 方法。详细的笔记本教程可以在<a href="https://github.com/PacktPublishing/Applied-Machine-Learning-Explainability-Techniques/blob/main/Chapter07/LinearExplainers.ipynb">https://github . com/packt publishing/Applied-Machine-Learning-explability-Techniques/blob/main/chapter 07/linear explainers . ipynb</a>获得。我们使用了与第 6 章 、<em class="italic">使用 SHAP </em>的模型可解释性<a href="B18216_06_ePub.xhtml#_idTextAnchor107"> <em class="italic">中讨论的教程相同的<em class="italic">红酒质量数据集</em>。您可以参考同一教程来了解更多关于数据集的信息，因为<a id="_idIndexMarker538"/>我们在本节中将只关注 LinearExplainer 应用程序部分。</em></a></p>
+			<h2 id="_idParaDest-141">线性解释器在 SHAP 的应用</h2>
+			<p>对于这个例子，我们<a id="_idIndexMarker539"/>实际上已经在数据集上训练了一个线性回归模型。与其他解释器类似，我们<a id="_idIndexMarker540"/>可以使用几行代码来应用 LinearExplainer:</p>
+			<pre class="source-code">explainer = shap.LinearExplainer(model, x_train, feature_dependence="independent")</pre>
+			<pre class="source-code">shap_values = explainer.shap_values(x_test)</pre>
+			<p>为了解释训练好的线性模型，适用于 TreeExplainer 和 KernelExplainer 的相同可视化方法。<em class="italic">图 7.10 </em>显示了用于解释已训练线性模型的概要图、特征相关性图和力图:</p>
+			<div><div><img src="img/B18216_07_010.jpg" alt="Figure 7.10 – Summary plot, feature dependence plot, and force plots obtained after using SHAP LinearExplainer&#13;&#10;"/>
+				</div>
+			</div>
+			<p class="figure-caption">图 7.10-使用 SHAP 线性解释器后获得的概要图、特征依赖图和力图</p>
+			<p>我们可以使用以下代码行获得图 7.10 所示的可视化图:</p>
+			<pre class="source-code">shap.summary_plot(shap_values, x_test, plot_type='violin', show=False)</pre>
+			<pre class="source-code">shap.force_plot(explainer.expected_value, shap_values[1], x_test.iloc[0,:])</pre>
+			<pre class="source-code">shap.dependence_plot("alcohol", shap_values, x_test, show=False)</pre>
+			<p>我将推荐你<a id="_idIndexMarker541"/>探索其他可视化方法，甚至使用 LinearExplainer 生成的 SHAP 值创建你自己的可视化。接下来，我们将讨论将 SHAP 应用于在文本数据上训练的变压器模型。</p>
+			<h1 id="_idParaDest-142"><a id="_idTextAnchor148"/>用 SHAP 解释变压器</h1>
+			<p>在这一章中，到目前为止，我们已经看到了各种 SHAP 解释器的例子，这些解释器用于解释在结构化和图像数据集上训练的不同类型的模型。现在，我们将介绍解释基于文本数据训练的复杂模型的方法。对于文本数据，用传统的<strong class="bold">【自然语言处理(NLP)】</strong>方法训练的模型获得高精度总是具有挑战性的。这是因为使用传统方法在连续文本数据中提取上下文信息总是困难的。</p>
+			<p>然而，随着基于<strong class="bold">注意力机制</strong>的<strong class="bold"> Transformer </strong>深度学习架构(<a href="https://blogs.nvidia.com/blog/2022/03/25/what-is-a-transformer-model/">https://blogs . NVIDIA . com/blog/2022/03/25/what-is-a-Transformer-model/</a>)的发明，获得在文本数据上训练的更高精度的模型变得更加容易。然而，transformer <a id="_idIndexMarker544"/>模型极其复杂，解释这种模型的工作原理可能真的很困难。幸运的是，由于是模型不可知的，SHAP 也可以应用于 transformer 模型。</p>
+			<p>因此，在这一节中，我们将介绍如何将来自拥抱脸(【https://github.com/huggingface/transformers】)的<em class="italic">基于文本的预训练变压器模型应用于不同的应用。完整教程可从<a href="https://github.com/PacktPublishing/Applied-Machine-Learning-Explainability-Techniques/blob/main/Chapter07/Explaining_Transformers.ipynb">https://github . com/packt publishing/Applied-Machine-Learning-explability-Techniques/blob/main/chapter 07/Explaining _ transformers . ipynb</a>获取。现在，让我们看第一个使用 SHAP 解释基于转换器的情感分析模型的例子。</em></p>
+			<h2 id="_idParaDest-143"><a id="_idTextAnchor149"/>解释基于变压器的情感分析模型</h2>
+			<p>使用<code>pip</code>安装程序的<code>transformers</code> Python 模块:</p>
+			<pre class="source-code">!pip install --upgrade transformers</pre>
+			<p>您可以通过导入模块来确认 transformers 框架的成功安装:</p>
+			<pre class="source-code">import transformers</pre>
+			<p>现在，让我们加载一个情绪分析预训练模型:</p>
+			<pre class="source-code">model = transformers.pipeline('sentiment-analysis', return_all_scores=True)</pre>
+			<p>我们可以把任何一句话作为输入，我们将应用这个模型来检查它是否有积极或消极的情绪。所以，我们将使用句子<code>"Hugging Face transformers are absolutely brilliant!"</code>作为我们的推断数据:</p>
+			<pre class="source-code">text_data = "Hugging Face transformers are absolutely brilliant!"</pre>
+			<pre class="source-code">model(text_data)[0]</pre>
+			<p>该模型将预测推断数据为正和负的概率:</p>
+			<pre class="source-code">[{'label': 'NEGATIVE', 'score': 0.00013269631017465144},</pre>
+			<pre class="source-code"> {'label': 'POSITIVE', 'score': 0.99986732006073}]</pre>
+			<p>该模型以非常高的概率(99.99%)预测该句子是肯定的，这是正确的预测。现在，让我们应用 SHAP 来解释模型预测:</p>
+			<pre class="source-code">explainer = shap.Explainer(model) </pre>
+			<pre class="source-code">shap_values = explainer([text_data])</pre>
+			<p>一旦成功计算出 SHAP 值，我们可以应用 SHAP 文本图可视化和条形图可视化来突出显示对模型预测有正面和负面影响的单词<a id="_idIndexMarker548"/>:</p>
+			<pre class="source-code">shap.plots.text(shap_values[0,:,'POSITIVE'])</pre>
+			<pre class="source-code">shap.plots.bar(shap_values[0,:,'POSITIVE'])</pre>
+			<p><em class="italic">图 7.11 </em>向我们展示了 SHAP 文本图，它看起来类似于力图:</p>
+			<div><div><img src="img/B18216_07_011.jpg" alt="Figure 7.11 – Explaining transformer models trained on text data using SHAP text plots&#13;&#10;"/>
+				</div>
+			</div>
+			<p class="figure-caption">图 7.11–解释使用 SHAP 文本图在文本数据上训练的变压器模型</p>
+			<p>从<em class="italic">图 7.11 </em>中可以看出，用红色突出显示的词语，如<em class="italic">辉煌</em>、<em class="italic">绝对</em>、<em class="italic">拥抱</em>，做出了积极的贡献，增加了模型预测得分，而其他词语则降低了模型预测，从而对模型预测做出了消极的贡献。</p>
+			<p>从下图所示的 SHAP 条形图中也可以得出同样的结论:</p>
+			<div><div><img src="img/B18216_07_012.jpg" alt="Figure 7.12 – SHAP bar plot used to explain a transformer model trained on text data&#13;&#10;"/>
+				</div>
+			</div>
+			<p class="figure-caption">图 7.12–用于解释基于文本数据训练的变压器模型的 SHAP 条形图</p>
+			<p>我发现解读<a id="_idIndexMarker549"/>条形图更容易，它清楚地显示了句子中出现的每个单词的正面或负面影响，如图<em class="italic">图 7.12 </em>所示。</p>
+			<p>接下来，让我们探索另一个<a id="_idIndexMarker550"/>示例，其中基于 transformer 的多类分类模型在文本数据上进行训练。</p>
+			<h2 id="_idParaDest-144"><a id="_idTextAnchor150"/>解释使用 SHAP 的多级预测变压器模型</h2>
+			<p>在前面的例子中，我们<a id="_idIndexMarker551"/>应用 SHAP 来解释一个基于文本的二元分类模型。现在，让我们应用 SHAP 来解释一个用于检测以下六种情绪之一的<a id="_idIndexMarker552"/>预训练变压器模型:<em class="italic">悲伤</em>、<em class="italic">欢乐</em>、<em class="italic">爱</em>、<em class="italic">愤怒</em>、<em class="italic">恐惧</em>和<em class="italic">惊喜</em>。</p>
+			<p>让我们加载预训练的变压器模型进行情绪检测:</p>
+			<pre class="source-code">tokenizer = transformers.AutoTokenizer.from_pretrained("nateraw/bert-base-uncased-emotion", use_fast=True)</pre>
+			<pre class="source-code">model = transformers.AutoModelForSequenceClassification.from_pretrained("nateraw/bert-base-uncased-emotion").cuda()</pre>
+			<pre class="source-code"># build a pipeline object to do predictions</pre>
+			<pre class="source-code">pipeline = transformers.pipeline("text-classification", model=model, tokenizer=tokenizer, device=0, return_all_scores=True)</pre>
+			<p>现在，让我们使用与上一个示例相同的推断数据<a id="_idIndexMarker553"/>并使用 SHAP 计算 SHAP 值:</p>
+			<pre class="source-code">explainer = shap.Explainer(pipeline)</pre>
+			<pre class="source-code">shap_values = explainer([text_data])</pre>
+			<p>然后，我们可以使用 SHAP 文本图来突出显示对六种可能结果中的每一种做出积极或消极贡献的单词:</p>
+			<pre class="source-code">shap.plots.text(shap_values[0])</pre>
+			<p><em class="italic">图 7.13 </em>显示了从上一行代码中获得的 SHAP 文本图的输出:</p>
+			<div><div><img src="img/B18216_07_013.jpg" alt="Figure 7.13 – Interactive SHAP text plot highlighting the words that make a positive and negative contribution&#13;&#10;"/>
+				</div>
+			</div>
+			<p class="figure-caption">图 7.13–交互式 SHAP 文本图，突出显示做出积极和消极贡献的词语</p>
+			<p>SHAP 文本情节是互动的。正如我们从<em class="italic">图 7.13 </em>中看到的，这用红色突出显示了模型的预测结果，以及对模型决策做出积极和消极贡献的词语。我们还可以点击其他可能的结果，并可视化每个单词对模型预测的影响。例如，如果我们点击<em class="italic">惊喜</em>而不是<em class="italic">喜悦</em>，我们会看到除了单词<em class="italic">面对</em>之外的所有单词都以<a id="_idIndexMarker555"/>蓝色突出显示，因为这些单词对特定结果有负面影响。就我个人而言，我发现这种使用 SHAP 解释基于文本数据训练的变压器模型的方法非常有趣和高效！接下来，让我们介绍另一个有趣的应用 SHAP 来解释 NLP 零镜头学习模型的用例。</p>
+			<h2 id="_idParaDest-145"><a id="_idTextAnchor151"/>用 SHAP 解释零起点学习模型</h2>
+			<p><strong class="bold">零距离学习</strong>是 NLP 中最吸引人的概念之一，它涉及将模型应用于推理数据，以预测任何在训练过程中没有使用的自定义类别<a id="_idIndexMarker557"/>，而无需进行微调。你可以在<a id="_idIndexMarker558"/>本参考链接:<a href="https://aixplain.com/2021/09/23/zero-shot-learning-in-natural-language-processing/">https://AIX plain . com/2021/09/23/zero-shot-learning-in-natural-language-processing/</a>找到更多关于零拍学习的信息。将 SHAP 应用于零射击学习模型也非常简单。</p>
+			<p>首先，我们需要加载预先训练好的 transformer 模型:</p>
+			<pre class="source-code">model = AutoModelForSequenceClassification.from_pretrained("valhalla/distilbart-mnli-12-3")</pre>
+			<pre class="source-code">tokenizer = AutoTokenizer.from_pretrained("valhalla/distilbart-mnli-12-3")</pre>
+			<p>为了让 SHAP 发挥作用，我们需要创建一个定制的零起点学习渠道:</p>
+			<pre class="source-code">class ZSLPipeline(ZeroShotClassificationPipeline):</pre>
+			<pre class="source-code">    # Overwrite the __call__ method</pre>
+			<pre class="source-code">    def __call__(self, *args):</pre>
+			<pre class="source-code">        out = super().__call__(args[0], self.set_labels)[0]</pre>
+			<pre class="source-code">        return [[{"label":x[0], "score": x[1]}  for x in zip(out["labels"], out["scores"])]]</pre>
+			<pre class="source-code">    def set_labels(self, labels: Union[str,List[str]]):</pre>
+			<pre class="source-code">        self.set_labels = labels</pre>
+			<p>然后，我们需要定义<a id="_idIndexMarker559"/>定制标签和推理文本数据，并为<a id="_idIndexMarker560"/>零触发学习模型配置新标签。对于这个例子，我们已经选择了文本<code>"I love playing cricket!"</code>作为我们的推理数据，并且我们希望我们的零触发学习模型预测推理文本数据是属于<code>insect</code>、<code>sports</code>还是<code>animal</code>类:</p>
+			<pre class="source-code">text = ["I love playing cricket!"]</pre>
+			<pre class="source-code">labels = ["insect", "sports", "animal"]</pre>
+			<pre class="source-code">model.config.label2id.update({v:k for k,v in enumerate(labels)})</pre>
+			<pre class="source-code">model.config.id2label.update({k:v for k,v in enumerate(labels)})</pre>
+			<pre class="source-code">pipe = ZSLPipeline(model=model, tokenizer=tokenizer, return_all_scores=True)</pre>
+			<pre class="source-code">pipe.set_labels(labels)</pre>
+			<p>一旦建立零射击学习模型的过程准备好了，我们可以很容易地应用 SHAP 来解释模型:</p>
+			<pre class="source-code">explainer = shap.Explainer(pipe)</pre>
+			<pre class="source-code">shap_values = explainer(text)</pre>
+			<p>成功计算 SHAP 值后，我们可以使用文本图或条形图来解释模型:</p>
+			<pre class="source-code">shap.plots.text(shap_values)</pre>
+			<pre class="source-code">shap.plots.bar(shap_values[0,:,'sports'])</pre>
+			<p><em class="italic">图 7.14 </em>显示了作为输出获得的柱状图<a id="_idIndexMarker561"/>可视化:</p>
+			<div><div><img src="img/B18216_07_014.jpg" alt="Figure 7.14 – Bar plot visualization for the outcome of the predicted sport for the zero-shot learning model&#13;&#10;"/>
+				</div>
+			</div>
+			<p class="figure-caption">图 7.14-零杆学习模型预测运动结果的柱状图可视化</p>
+			<p>本例中使用的推理文本句子–<code>"I love playing cricket!"</code>确实与<code>Sports</code>类相关，这是由模型正确预测的。然而，板球不仅是一项运动，也是一种昆虫。当短语<code>playing cricket</code>被使用时，总的来说它表示我们在谈论一项运动。所以，这些话应该对模型的预测做出积极的贡献。不幸的是，从<em class="italic">图 7.14 </em>中，我们可以看到词语<code>playing</code>和<code>cricket</code>都是负 SHAP 值的负贡献。这给了我们一个指示，即使模型预测是正确的，这也不是一个非常好的模型，因为模型严重依赖于单词<code>love</code>而不是单词<code>cricket</code>或<code>playing</code>。这是一个经典的例子，它强调了<a id="_idIndexMarker563"/>需要使<strong class="bold">可解释的 AI </strong> ( <strong class="bold"> XAI </strong>)成为 AI 过程循环的一个强制性部分，即使模型预测是正确的，我们也不应该盲目地相信模型。</p>
+			<p>我们现在已经到了本章的末尾，我将总结一下我们在本章中讨论过的重要话题。</p>
+			<h1 id="_idParaDest-146"><a id="_idTextAnchor152"/>总结</h1>
+			<p>阅读完本章后，您已经实际接触了将 SHAP 用于表格结构数据以及图像和文本等非结构数据。我们已经讨论了在 SHAP 可以得到的不同的解释器，用于模型特定的和模型不可知的解释。在本章中，我们已经应用 SHAP 来解释线性模型、树集成模型、卷积神经网络模型，甚至变压器模型。使用 SHAP，我们可以解释基于不同类型数据的不同类型的模型。我强烈推荐尝试 GitHub 代码库中提供的端到端教程，并更深入地探索事物，以获得更深入的实用知识。</p>
+			<p>在下一章，我们将讨论概念激活向量的另一个有趣话题，并探索应用谷歌人工智能的概念激活向量(<strong class="bold"/>)框架的<strong class="bold">测试的实际部分，以解释具有人类友好概念的模型。</strong></p>
+			<h1 id="_idParaDest-147"><a id="_idTextAnchor153"/>参考文献</h1>
+			<p>请参考以下资源以获取更多信息:</p>
+			<ul>
+				<li>劳埃德·沙普利，《n 人游戏的价值》对博弈论的贡献 2.28(1953):【https://doi.org/10.1515/9781400881970-018】T2</li>
+				<li><em class="italic">红酒质量数据集–ka ggle</em>:<a href="https://www.kaggle.com/uciml/red-wine-quality-cortez-et-al-2009">https://www . ka ggle . com/UC IML/Red-Wine-Quality-cortez-et-al-2009</a></li>
+				<li><em class="italic">https://github.com/slundberg/shap SHAP GitHub 项目</em>:<a href="https://github.com/slundberg/shap"/></li>
+				<li><em class="italic">https://shap.readthedocs.io/en/latest/index.html SHAP 文献:</em>T2</li>
+				<li><em class="italic">拥抱脸模特</em>:【https://huggingface.co/】T2</li>
+				<li><em class="italic">零距离学习</em>:【https://en.wikipedia.org/wiki/Zero-shot_learning T2】</li>
+			</ul>
+		</div>
+	
+
+</body></html>
