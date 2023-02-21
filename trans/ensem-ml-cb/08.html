@@ -1,0 +1,672 @@
+<html><head/><body>
+
+  
+    <title>Blend It with Stacking</title>
+    <meta content="urn:uuid:64b74aae-7be0-4e73-89f3-687dd4470606" name="Adept.expected.resource"/>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+  
+
+
+  
+        
+
+                            
+                    <h1 class="header-title">将它与堆叠混合</h1>
+                
+            
+            
+                
+<p class="calibre2">在本章中，我们将介绍以下配方:</p>
+<ul class="calibre10">
+<li class="calibre11">了解堆叠概括</li>
+<li class="calibre11">通过组合预测来实现堆叠式概化</li>
+<li class="calibre11">使用 H2O 实现市场营销活动结果预测的堆叠概化</li>
+</ul>
+
+
+            
+
+            
+        
+    
+
+
+
+
+
+  
+    <title>Technical requirements</title>
+    <meta content="urn:uuid:64b74aae-7be0-4e73-89f3-687dd4470606" name="Adept.expected.resource"/>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+  
+
+
+  
+        
+
+                            
+                    <h1 class="header-title">技术要求</h1>
+                
+            
+            
+                
+<p class="calibre2">本章的技术要求与我们在前面章节中详述的保持一致。</p>
+<p class="calibre2">访问 GitHub 存储库，找到数据集和代码。数据集和代码文件是根据章节号和主题名排列的。</p>
+
+
+            
+
+            
+        
+    
+
+
+
+
+
+  
+    <title>Understanding stacked generalization</title>
+    <meta content="urn:uuid:64b74aae-7be0-4e73-89f3-687dd4470606" name="Adept.expected.resource"/>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+  
+
+
+  
+        
+
+                            
+                    <h1 class="header-title">了解堆叠概括</h1>
+                
+            
+            
+                
+<p class="calibre2">堆叠概括是一组不同模型的集合，它引入了元学习者的概念。元学习器是第二级机器学习算法，它从基础学习器的最佳组合中学习:</p>
+<p>“堆叠概括是一种非线性组合概括器以形成新概括器的方法，试图以最佳方式整合每个原始概括器对学习集的看法。每个概化器要说的越多(不会重复其他概化器要说的)，得到的堆叠概化就越好。”</p><div>- Wolpert (1992)<em class="calibre23">,</em> Stacked Generalization
+</div>
+<p class="calibre2"/>
+<p class="calibre2">堆叠的步骤如下:</p>
+<ol class="calibre14">
+<li class="calibre11">将数据集分为定型集和测试集。</li>
+<li class="calibre11">在训练集中训练几个基础学员。</li>
+<li class="calibre11">在测试集上应用基础学习者进行预测。</li>
+<li class="calibre11">使用预测作为输入，使用实际响应作为输出来训练更高水平的学习者。</li>
+</ol>
+<p class="calibre2">因为来自基础学习者的预测被混合在一起，所以堆叠也被称为混合。</p>
+<p class="calibre2">下图给出了堆叠的概念表示:</p>
+<p class="CDPAlignCenter"><img class="aligncenter81" src="img/addebcb4-b1e7-44d6-ad30-af0d0ddefebf.png"/></p>
+<p class="calibre2"/>
+<p class="calibre2">来自基础学习器的预测彼此不相关，这对于栈泛化具有重要意义。为了从基础学习器获得不相关的预测，可以使用内部使用不同方法的算法来训练基础学习器。堆叠概括主要用于最小化基础学习者的概括错误，并且可以被视为交叉验证的精炼版本。它使用一种比交叉验证的<strong class="calibre4">赢家通吃</strong>方法更复杂的策略来组合来自基础学习者的预测。</p>
+
+
+            
+
+            
+        
+    
+
+
+
+
+
+  
+    <title>Implementing stacked generalization by combining predictions</title>
+    <meta content="urn:uuid:64b74aae-7be0-4e73-89f3-687dd4470606" name="Adept.expected.resource"/>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+  
+
+
+  
+        
+
+                            
+                    <h1 class="header-title">通过组合预测实现堆叠式概化</h1>
+                
+            
+            
+                
+<p class="calibre2">在本节中，我们将了解如何从头开始实现堆叠综合。</p>
+<p class="calibre2">我们将执行以下步骤开始:</p>
+<ol class="calibre14">
+<li class="calibre11">为堆叠构建三个基础学习者。</li>
+<li class="calibre11">结合每个基础学习者的预测。</li>
+<li class="calibre11">使用另一种算法构建元学习器。</li>
+</ol>
+
+
+            
+
+            
+        
+    
+
+
+
+
+
+  
+    <title>Getting ready...</title>
+    <meta content="urn:uuid:64b74aae-7be0-4e73-89f3-687dd4470606" name="Adept.expected.resource"/>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+  
+
+
+  
+        
+
+                            
+                    <h1 class="header-title">做好准备...</h1>
+                
+            
+            
+                
+<p class="calibre2">在这个例子中，我们使用了一个来自 UCI ML 数据库的关于信用卡违约的数据集。该数据集包含信用卡客户的违约付款、人口统计因素、信用数据、付款历史和账单等信息。GitHub 中提供了数据和数据描述。</p>
+<p class="calibre2">我们将从加载所需的库和读取数据集开始:</p>
+<pre class="calibre15">import os<br class="title-page-name"/>import numpy as np<br class="title-page-name"/>import pandas as pd<br class="title-page-name"/>from sklearn.metrics import accuracy_score</pre>
+<p class="calibre2">我们将工作文件夹设置如下:</p>
+<pre class="calibre15"># Set your working directory according to your requirement<br class="title-page-name"/>os.chdir(".../Chapter 8/")<br class="title-page-name"/>os.getcwd()</pre>
+<p class="calibre2"/>
+<p class="calibre2"/>
+<p class="calibre2">现在让我们来读取数据。我们将以<kbd class="calibre12">df_</kbd>作为数据帧名称的前缀，以便于理解:</p>
+<pre class="calibre15">df_creditcarddata = pd.read_csv("UCI_Credit_Card.csv")</pre>
+<p class="calibre2">我们删除了<kbd class="calibre12">ID</kbd>列，因为这不是必需的:</p>
+<pre class="calibre15">df_creditcarddata = df_creditcarddata.drop("ID", axis= 1) </pre>
+<p class="calibre2">我们检查数据集的形状:</p>
+<pre class="calibre15">df_creditcarddata.shape</pre>
+<p class="calibre2">我们注意到数据集现在有 30，000 个观察值和 24 列。现在让我们继续训练我们的模型。</p>
+
+
+            
+
+            
+        
+    
+
+
+
+
+
+  
+    <title>How to do it... </title>
+    <meta content="urn:uuid:64b74aae-7be0-4e73-89f3-687dd4470606" name="Adept.expected.resource"/>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+  
+
+
+  
+        
+
+                            
+                    <h1 class="header-title">怎么做...</h1>
+                
+            
+            
+                
+<ol class="calibre14">
+<li class="calibre11">我们将目标变量和特征变量分开:</li>
+</ol>
+<pre class="calibre18">from sklearn.model_selection import train_test_split<br class="title-page-name"/><br class="title-page-name"/>X = df_creditdata.iloc[:,0:23]<br class="title-page-name"/>Y = df_creditdata['default.payment.next.month']</pre>
+<ol start="2" class="calibre14">
+<li class="calibre11">将数据分成训练、验证和测试子集:</li>
+</ol>
+<pre class="calibre18"># We first split the dataset into train and test subset<br class="title-page-name"/>X_train, X_test, Y_train, Y_test = train_test_split(X, Y, test_size=0.1, random_state=1)<br class="title-page-name"/><br class="title-page-name"/># Then we take the train subset and carve out a validation set from the same<br class="title-page-name"/>X_train, X_val, Y_train, Y_val = train_test_split(X_train, Y_train, test_size=0.2, random_state=1)</pre>
+<ol start="2" class="calibre14"/>
+<ol start="3" class="calibre14">
+<li class="calibre11">检查每个子集的尺寸，以确保我们的分割是正确的:</li>
+</ol>
+<pre class="calibre18"># Dimensions for train subsets<br class="title-page-name"/>print(X_train.shape)<br class="title-page-name"/>print(Y_train.shape)<br class="title-page-name"/><br class="title-page-name"/># Dimensions for validation subsets<br class="title-page-name"/>print(X_val.shape)<br class="title-page-name"/>print(Y_val.shape)<br class="title-page-name"/><br class="title-page-name"/># Dimensions for test subsets<br class="title-page-name"/>print(X_test.shape)<br class="title-page-name"/>print(Y_test.shape)</pre>
+<ol start="4" class="calibre14">
+<li class="calibre11">导入基础学习者和元学习者所需的库:</li>
+</ol>
+<pre class="calibre18"># for the base learners<br class="title-page-name"/>from sklearn.naive_bayes import GaussianNB<br class="title-page-name"/>from sklearn.neighbors import KNeighborsClassifier<br class="title-page-name"/>from sklearn.tree import DecisionTreeClassifier<br class="title-page-name"/><br class="title-page-name"/><br class="title-page-name"/># for the meta learner<br class="title-page-name"/>from sklearn.linear_model import LogisticRegression</pre>
+<ol start="5" class="calibre14">
+<li class="calibre11">创建基础学习者的实例，并根据我们的训练数据拟合模型:</li>
+</ol>
+<pre class="calibre18"># The base learners<br class="title-page-name"/>model_1 = GaussianNB()<br class="title-page-name"/>model_2 = KNeighborsClassifier(n_neighbors=1)<br class="title-page-name"/>model_3 = DecisionTreeClassifier()<br class="title-page-name"/><br class="title-page-name"/># Now we train a list of models<br class="title-page-name"/>base_learner_1 = model_1.fit(X_train, Y_train)<br class="title-page-name"/>base_learner_2 = model_2.fit(X_train, Y_train)<br class="title-page-name"/>base_learner_3 = model_3.fit(X_train, Y_train)</pre>
+<ol start="6" class="calibre14">
+<li class="calibre11">使用我们验证子集中的基础学习者进行预测:</li>
+</ol>
+<pre class="calibre18"># We then use the models to make predictions on validation data<br class="title-page-name"/>val_prediction_base_learner_1 = base_learner_1.predict(X_val)<br class="title-page-name"/>val_prediction_base_learner_2 = base_learner_2.predict(X_val)<br class="title-page-name"/>val_prediction_base_learner_3 = base_learner_3.predict(X_val)</pre>
+<ol start="7" class="calibre14">
+<li class="calibre11">我们有来自三个基础学习者的三组预测结果。我们用它们来创建一个堆叠阵列:</li>
+</ol>
+<pre class="calibre18"># And then use the predictions to create a new stacked dataset<br class="title-page-name"/>import numpy as np<br class="title-page-name"/>prediction_test_stack = np.dstack([val_prediction_base_learner_1, val_prediction_base_learner_2, val_prediction_base_learner_3])<br class="title-page-name"/><br class="title-page-name"/># Now we stack the actual outcomes i.e. Y_Test with the prediction_stack<br class="title-page-name"/>final_train_stack = np.dstack([prediction_test_stack, Y_val])</pre>
+<ol start="8" class="calibre14">
+<li class="calibre11">我们将<kbd class="calibre12">final_train_stack</kbd>堆叠数组转换为数据帧，并为每一列添加列名。验证尺寸并查看前几行:</li>
+</ol>
+<pre class="calibre18">stacked_train_dataframe = pd.DataFrame(final_train_stack[0,0:5400], columns='NB_VAL KNN_VAL DT_VAL Y_VAL'.split())<br class="title-page-name"/><br class="title-page-name"/>print(stacked_train_dataframe.shape)<br class="title-page-name"/>print(stacked_train_dataframe.head(5))</pre>
+<p class="calibre20">在下图中，我们看到堆叠阵列现在有 5，400 个观察值和 4 列:</p>
+<p class="CDPAlignCenter"><img class="aligncenter82" src="img/56917bad-d1a0-46f2-9aef-12025ce62841.png"/></p>
+<ol start="9" class="calibre14">
+<li class="calibre11">使用我们在<em class="calibre23">步骤 8 </em>中创建的堆叠数组来训练元学习者:</li>
+</ol>
+<pre class="calibre18"># Build the Mata-learner<br class="title-page-name"/>meta_learner = LogisticRegression()<br class="title-page-name"/>meta_learner_model = meta_learner.fit(stacked_train_dataframe.iloc[:,0:3], stacked_train_dataframe['Y_VAL'])</pre>
+<ol start="10" class="calibre14">
+<li class="calibre11">使用测试子集创建堆叠测试集:</li>
+</ol>
+<pre class="calibre18"># Take the test data (new data)<br class="title-page-name"/># Apply the base learners on this new data to make predictions<br class="title-page-name"/><br class="title-page-name"/># We now use the models to make predictions on the test data and create a new stacked dataset<br class="title-page-name"/>test_prediction_base_learner_1 = base_learner_1.predict(X_test)<br class="title-page-name"/>test_prediction_base_learner_2 = base_learner_2.predict(X_test)<br class="title-page-name"/>test_prediction_base_learner_3 = base_learner_3.predict(X_test)<br class="title-page-name"/><br class="title-page-name"/># Create the stacked data<br class="title-page-name"/>final_test_stack = np.dstack([test_prediction_base_learner_1, test_prediction_base_learner_2, test_prediction_base_learner_3])</pre>
+<p class="calibre2"/>
+<ol start="11" class="calibre14">
+<li class="calibre11">将<kbd class="calibre12">final_test_stack</kbd>堆叠数组转换为数据帧，并为每列添加列名。验证尺寸并查看前几行:</li>
+</ol>
+<pre class="calibre18">stacked_test_dataframe = pd.DataFrame(final_test_stack[0,0:3000], columns='NB_TEST KNN_TEST DT_TEST'.split())<br class="title-page-name"/>print(stacked_test_dataframe.shape)<br class="title-page-name"/>print(stacked_test_dataframe.head(5))</pre>
+<p class="calibre20">我们看到堆叠阵列现在有 3000 个观察值，在<kbd class="calibre12">stacked_test_dataframe</kbd>有 3 列:</p>
+<p class="CDPAlignCenter"><img class="aligncenter83" src="img/26e39687-b793-40a5-85a8-4b9d6989a2a0.png"/></p>
+<ol start="12" class="calibre14">
+<li class="calibre11">在我们的原始测试数据上检查<kbd class="calibre12">base_learner</kbd>的准确性:</li>
+</ol>
+<pre class="calibre18">test_prediction_base_learner_1 = base_learner_1.predict(X_test)<br class="title-page-name"/>test_prediction_base_learner_2 = base_learner_2.predict(X_test)<br class="title-page-name"/>test_prediction_base_learner_3 = base_learner_3.predict(X_test)<br class="title-page-name"/><br class="title-page-name"/>print("Accuracy from GaussianNB:", accuracy_score(Y_test, test_prediction_base_learner_1))<br class="title-page-name"/>print("Accuracy from KNN:", accuracy_score(Y_test, test_prediction_base_learner_2))<br class="title-page-name"/>print("Accuracy from Decision Tree:", accuracy_score(Y_test, test_prediction_base_learner_3))</pre>
+<p class="calibre20">我们注意到精度如下。请注意，基于采样策略和超参数，结果可能会有所不同:</p>
+<p class="CDPAlignCenter"><img class="aligncenter84" src="img/587145bc-00ad-429b-a493-115eb20bacc3.png"/></p>
+<ol start="13" class="calibre14">
+<li class="calibre11">对堆叠的测试数据使用元学习器并检查准确性:</li>
+</ol>
+<pre class="calibre15">test_predictions_meta_learner = meta_learner_model.predict(stacked_test_dataframe)<br class="title-page-name"/>print("Accuracy from Meta Learner:", accuracy_score(Y_test, test_predictions_meta_learner))</pre>
+<p class="calibre20">我们看到元学习者在堆叠的测试数据上返回了下面的输出。这种准确性高于单个基础学习者:</p>
+<p class="CDPAlignCenter"><img class="aligncenter85" src="img/23f76ead-80a5-407b-a4cd-ccf09120bfc5.png"/></p>
+
+
+            
+
+            
+        
+    
+
+
+
+
+
+  
+    <title>How it works...</title>
+    <meta content="urn:uuid:64b74aae-7be0-4e73-89f3-687dd4470606" name="Adept.expected.resource"/>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+  
+
+
+  
+        
+
+                            
+                    <h1 class="header-title">它是如何工作的...</h1>
+                
+            
+            
+                
+<p class="calibre2">在第一步中，我们将数据集分成目标和特征集。在<em class="calibre13">步骤 2 </em>中，我们创建了我们的训练、验证和测试子集。我们在<em class="calibre13">步骤 3 </em>中查看了每个子集的尺寸，以验证分割是否正确。</p>
+<p class="calibre2">然后，我们继续构建我们的基础学习者和元学习者。在<em class="calibre13">步骤 4 </em>中，我们为基础学习者和元学习者导入了所需的库。对于基础学习者，我们使用高斯朴素贝叶斯、KNN 和决策树，而对于元学习者，我们使用逻辑回归。</p>
+<p class="calibre2">在<em class="calibre13">步骤 5 </em>中，我们将基础学习者与我们的训练数据集相匹配。单个模型，包括高斯朴素贝叶斯、KNN 和决策树，在 0 级空间中建立。然后我们有了三个基本模型。</p>
+<p class="calibre2">在<em class="calibre13">步骤 6 </em>中，我们在验证子集上使用这三个基础模型来预测目标变量。然后我们有三组由各自的基础学习者给出的预测。</p>
+<p class="calibre2">现在，基础学习者将通过层叠概括在 1 级空间中通过逻辑回归被整合。在<em class="calibre13">步骤 7 </em>中，我们堆叠了三组预测值来创建一个数组。我们还将训练数据集的实际目标变量堆叠到数组中。然后，我们的数组中有四列:三列来自基础学习者的三组预测值，第四列来自我们的训练数据集的目标变量。我们称之为<kbd class="calibre12">final_train_stack</kbd>，即<kbd class="calibre12">stacked_train_dataframe</kbd>，我们根据基础学习者使用的算法来命名这些列。在我们的例子中，我们使用了名称<kbd class="calibre12">NB_VAL</kbd>、<kbd class="calibre12">KNN_VAL</kbd>和<kbd class="calibre12">DT_VAL</kbd>，因为我们分别使用了高斯朴素贝叶斯、KNN 和决策树分类器。因为基础学习者符合我们的验证子集，所以我们在列名后面加上了<kbd class="calibre12">_VAL</kbd>以使它们更容易理解。</p>
+<p class="calibre2">在<em class="calibre13">步骤 9 </em>中，我们用逻辑回归构建了元学习器，并将其拟合到我们的堆叠数据集<kbd class="calibre12">stacked_train_dataframe</kbd>。请注意，我们从原始数据集转移到了堆叠数据集，其中包含来自基础学习者的预测值。</p>
+<p class="calibre2"/>
+<p class="calibre2">在<em class="calibre13">步骤 10 </em>中，我们使用测试子集上的基础模型来获得预测结果。我们称之为<kbd class="calibre12">final_test_stack</kbd>。在<em class="calibre13">步骤 11 </em>中，我们将<kbd class="calibre12">final_test_stack</kbd>数组转换为一个名为<kbd class="calibre12">stacked_test_dataframe</kbd>的数据帧。注意，在我们的<kbd class="calibre12">stacked_test_dataframe</kbd>中，我们只有三列，它们保存了应用于我们的测试子集的基础学习者返回的预测值。这三列以所使用的算法命名，后缀为<kbd class="calibre12">_TEST</kbd>，因此我们将<kbd class="calibre12">NB_TEST</kbd>、<kbd class="calibre12">KNN_TEST</kbd>和<kbd class="calibre12">DT_TEST</kbd>作为<kbd class="calibre12">stacked_test_dataframe</kbd>中的三列。</p>
+<p class="calibre2">在<em class="calibre13">步骤 12 </em>中，我们在原始测试子集上检查了基础模型的准确性。高斯朴素贝叶斯、KNN 和决策树分类器模型分别给了我们 0.39、0.69 和 0.73 的准确率。</p>
+<p class="calibre2">在<em class="calibre13">步骤 13 </em>中，我们检查了通过对我们的堆叠测试数据应用元学习者模型而获得的准确性。这给了我们 0.77 的准确率，我们可以看到，这比单个基础学习者要高。然而，请记住，简单地将更多的基础学习者添加到您的堆叠算法中并不能保证您会获得更好的准确性。</p>
+
+
+            
+
+            
+        
+    
+
+
+
+
+
+  
+    <title>There's more...</title>
+    <meta content="urn:uuid:64b74aae-7be0-4e73-89f3-687dd4470606" name="Adept.expected.resource"/>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+  
+
+
+  
+        
+
+                            
+                    <h1 class="header-title">还有更多...</h1>
+                
+            
+            
+                
+<p class="calibre2">创建堆叠模型可能很繁琐。<kbd class="calibre12">mlxtend</kbd>库提供了简化构建堆叠模型的工具。它提供 StackingClassifier，这是用于堆叠的集成学习元分类器，它还提供 StackingCVClassifier，它使用交叉验证为第二级元学习器准备输入，以防止过拟合。</p>
+<p class="calibre2">你可以从<a href="https://pypi.org/project/mlxtend/" class="calibre9">https://pypi.org/project/mlxtend/</a>下载这个库或者使用<kbd class="calibre12">pip install mlxtend</kbd>命令来安装它。你可以在<a href="http://rasbt.github.io/mlxtend/user_guide/classifier/StackingClassifier/" class="calibre9">http://rasbt . github . io/mlx tend/user _ guide/classifier/stacking classifier/</a>找到一些很棒的简单堆叠分类和带网格搜索的堆叠分类的例子。</p>
+
+
+            
+
+            
+        
+    
+
+
+
+
+
+  
+    <title>See also</title>
+    <meta content="urn:uuid:64b74aae-7be0-4e73-89f3-687dd4470606" name="Adept.expected.resource"/>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+  
+
+
+  
+        
+
+                            
+                    <h1 class="header-title">请参见</h1>
+                
+            
+            
+                
+<p class="calibre2">也可以看一下<kbd class="calibre12">ML-Ensemble</kbd>库。要了解更多关于 T2 的信息，请访问 http://ml-ensemble.com/。https://bit.ly/2GFsxJN 有<kbd class="calibre12">ML-Ensemble</kbd>的使用指南。</p>
+
+
+            
+
+            
+        
+    
+
+
+
+
+
+  
+    <title>Implementing stacked generalization for campaign outcome prediction using H2O</title>
+    <meta content="urn:uuid:64b74aae-7be0-4e73-89f3-687dd4470606" name="Adept.expected.resource"/>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+  
+
+
+  
+        
+
+                            
+                    <h1 class="header-title">使用 H2O 实现活动结果预测的堆叠综合</h1>
+                
+            
+            
+                
+<p class="calibre2">H2O 是一个用于构建机器学习和预测分析模型的开源平台。算法是在 H2O 的分布式 map-reduce 框架上编写的。借助 H2O，数据可以跨节点分布，并行读取，并以压缩方式存储在内存中。这使得 H2O 速度极快。</p>
+<p class="calibre2">H2O 的堆叠集成方法是一种用于监督问题的集成机器学习算法，该算法使用堆叠来寻找一组预测算法的最佳组合。H2O 的堆叠集成支持回归、二元分类和多类分类。</p>
+<p class="calibre2">在这个例子中，我们将看看如何使用 H2O 的堆叠系综来建立一个堆叠模型。我们将使用 Github 中提供的银行营销数据集。</p>
+
+
+            
+
+            
+        
+    
+
+
+
+
+
+  
+    <title>Getting ready...</title>
+    <meta content="urn:uuid:64b74aae-7be0-4e73-89f3-687dd4470606" name="Adept.expected.resource"/>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+  
+
+
+  
+        
+
+                            
+                    <h1 class="header-title">做好准备...</h1>
+                
+            
+            
+                
+<p class="calibre2">首先，从 H2O 导入<kbd class="calibre12">h2o</kbd>库和其他模块:</p>
+<pre class="calibre18">import h2o<br class="title-page-name"/>from h2o.estimators.random_forest import H2ORandomForestEstimator<br class="title-page-name"/>from h2o.estimators.gbm import H2OGradientBoostingEstimator<br class="title-page-name"/>from h2o.estimators.glm import H2OGeneralizedLinearEstimator<br class="title-page-name"/>from h2o.estimators.stackedensemble import H2OStackedEnsembleEstimator<br class="title-page-name"/>from h2o.grid.grid_search import H2OGridSearch</pre>
+<p class="calibre2">使用<kbd class="calibre12">init()</kbd>函数初始化<kbd class="calibre12">h2o</kbd>实例:</p>
+<pre class="calibre18">h2o.init()</pre>
+<p class="calibre2">一旦我们运行了前面的代码，<kbd class="calibre12">h2o</kbd>实例被初始化，我们将看到下面的输出:</p>
+<p class="CDPAlignCenter"><img class="aligncenter86" src="img/ecafcf23-ff57-404b-8924-0eb395f3964f.png"/></p>
+<p class="calibre2">现在我们已经实例化了一个<kbd class="calibre12">H2O</kbd>实例，我们继续读取数据集并构建堆叠模型。</p>
+
+
+            
+
+            
+        
+    
+
+
+
+
+
+  
+    <title>How to do it...</title>
+    <meta content="urn:uuid:64b74aae-7be0-4e73-89f3-687dd4470606" name="Adept.expected.resource"/>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+  
+
+
+  
+        
+
+                            
+                    <h1 class="header-title">怎么做...</h1>
+                
+            
+            
+                
+<ol start="1" class="calibre14">
+<li class="calibre11">我们使用<kbd class="calibre12">h2o.import_file()</kbd>函数读取数据。我们将文件名作为参数传递给函数:</li>
+</ol>
+<pre class="calibre18">df_bankdata = h2o.import_file("bank-full.csv")</pre>
+<ol start="2" class="calibre14">
+<li class="calibre11">我们将数据分成训练和测试子集:</li>
+</ol>
+<pre class="calibre18"># split into train and validation sets<br class="title-page-name"/>train, test = df_bankdata.split_frame(ratios = [.8], seed = 1234)</pre>
+<p class="calibre2"/>
+<ol start="3" class="calibre14">
+<li class="calibre11">我们检查训练和测试子集的维度，以验证拆分是正确的:</li>
+</ol>
+<pre class="calibre18">train.shape, test.shape</pre>
+<ol start="4" class="calibre14">
+<li class="calibre11">我们看一下前几行，以确保数据加载正确:</li>
+</ol>
+<pre class="calibre18">df_bankdata.head()</pre>
+<ol start="5" class="calibre14">
+<li class="calibre11">我们将目标列名和预测列名分开，它们分别是<kbd class="calibre12">response</kbd>和<kbd class="calibre12">predictors</kbd>:</li>
+</ol>
+<pre class="calibre18"># Set the predictor names <br class="title-page-name"/>predictors = train.columns<br class="title-page-name"/><br class="title-page-name"/># Set the response column name<br class="title-page-name"/>response = "y"<br class="title-page-name"/><br class="title-page-name"/># Remove the 'y' variable from the predictors<br class="title-page-name"/>predictors.remove(response)<br class="title-page-name"/><br class="title-page-name"/>print(predictors)</pre>
+<ol start="6" class="calibre14">
+<li class="calibre11">我们用<kbd class="calibre12">asfactor()</kbd>函数将<kbd class="calibre12">response</kbd>变量转换成分类类型:</li>
+</ol>
+<pre class="calibre18">train[response] = train[response].asfactor()<br class="title-page-name"/>test[response] = test[response].asfactor()</pre>
+<ol start="7" class="calibre14">
+<li class="calibre11">我们将使用交叉验证来培训我们的基础学习者。我们将<kbd class="calibre12">nfolds</kbd>值设置为<kbd class="calibre12">5</kbd>。我们还将变量“encoding”设置为“OneHotExplicit”。我们将使用这个变量来编码我们的分类变量。</li>
+</ol>
+<pre class="calibre18"># Number of CV folds<br class="title-page-name"/>nfolds = 5<br class="title-page-name"/><br class="title-page-name"/># Using the `categorical_encoding` parameter<br class="title-page-name"/>encoding = "OneHotExplicit"</pre>
+<ol start="8" class="calibre14">
+<li class="calibre11">我们开始训练我们的基础学习者。我们选择梯度推进机器算法来构建我们的第一个基础学习器:</li>
+</ol>
+<pre class="calibre18"># Train and cross-validate a GBM<br class="title-page-name"/>base_learner_gbm = H2OGradientBoostingEstimator(distribution="bernoulli",\<br class="title-page-name"/>                                                ntrees=100,\<br class="title-page-name"/>                                                max_depth=5,\<br class="title-page-name"/>                                                min_rows=2,\<br class="title-page-name"/>                                                learn_rate=0.01,\<br class="title-page-name"/>                                                nfolds=nfolds,\<br class="title-page-name"/>                                                fold_assignment="Modulo",\<br class="title-page-name"/>                                                categorical_encoding = encoding,\<br class="title-page-name"/>                                                keep_cross_validation_predictions=True)<br class="title-page-name"/><br class="title-page-name"/>base_learner_gbm.train(x=predictors, y=response, training_frame=train)</pre>
+<ol start="9" class="calibre14">
+<li class="calibre11">对于我们的第二个基础学习者，我们使用随机森林:</li>
+</ol>
+<pre class="calibre18"># Train and cross-validate a RF<br class="title-page-name"/>base_learner_rf = H2ORandomForestEstimator(ntrees=250,\<br class="title-page-name"/>                                           nfolds=nfolds,\<br class="title-page-name"/>                                           fold_assignment="Modulo",\<br class="title-page-name"/>                                           categorical_encoding = encoding,\<br class="title-page-name"/>                                           keep_cross_validation_predictions=True)<br class="title-page-name"/>base_learner_rf.train(x=predictors, y=response, training_frame=train)</pre>
+<ol start="10" class="calibre14">
+<li class="calibre11">对于我们的第三基础学习者，我们实现了一个<strong class="calibre1">广义线性模型</strong> ( <strong class="calibre1"> GLM </strong>):</li>
+</ol>
+<pre class="calibre18"># Train and cross-validate a GLM<br class="title-page-name"/>base_learner_glm = H2OGeneralizedLinearEstimator(family="binomial",\<br class="title-page-name"/>                                                 model_id="GLM",\<br class="title-page-name"/>                                                 lambda_search=True,\<br class="title-page-name"/>                                                 nfolds = nfolds,\<br class="title-page-name"/>                                                 fold_assignment = "Modulo",\<br class="title-page-name"/>                                                 keep_cross_validation_predictions = True)<br class="title-page-name"/>                                                <br class="title-page-name"/><br class="title-page-name"/>base_learner_glm.train(x = predictors, y = response,training_frame = train)</pre>
+<ol start="11" class="calibre14">
+<li class="calibre11">根据<kbd class="calibre12">test AUC</kbd>获取测试集中表现最好的基础学习者。将其与堆叠系综模型的<kbd class="calibre12">test AUC</kbd>进行比较:</li>
+</ol>
+<pre class="calibre18"># Compare to base learner performance on the test set<br class="title-page-name"/>gbm_test_performance = base_learner_gbm.model_performance(test)<br class="title-page-name"/>rf_test_performance = base_learner_rf.model_performance(test)<br class="title-page-name"/>glm_test_performance = base_learner_glm.model_performance(test)<br class="title-page-name"/><br class="title-page-name"/>print("Best AUC from the GBM", gbm_test_performance.auc())<br class="title-page-name"/>print("Best AUC from the Random Forest", rf_test_performance.auc())<br class="title-page-name"/>print("Best AUC from the GLM", glm_test_performance.auc())<br class="title-page-name"/><br class="title-page-name"/>baselearner_best_auc_test = max(gbm_test_performance.auc(), rf_test_performance.auc(), glm_test_performance.auc())<br class="title-page-name"/>print("Best AUC from the base learners", baselearner_best_auc_test)<br class="title-page-name"/><br class="title-page-name"/><br class="title-page-name"/>stack_auc_test = perf_stack_test.auc()<br class="title-page-name"/>print("Best Base-learner Test AUC: ", baselearner_best_auc_test)<br class="title-page-name"/>print("Ensemble Test AUC: ", stack_auc_test)</pre>
+<ol start="12" class="calibre14">
+<li class="calibre11">我们使用我们在前面的步骤中构建的基础学习器来训练堆叠集合:</li>
+</ol>
+<pre class="calibre18">all_models = [base_learner_glm, base_learner_gbm, base_learner_rf]<br class="title-page-name"/><br class="title-page-name"/># Set up Stacked Ensemble. Using Deep Learning as the meta learner<br class="title-page-name"/>ensemble_deep = H2OStackedEnsembleEstimator(model_id ="stack_model_d", base_models = all_models, metalearner_algorithm = 'deeplearning')<br class="title-page-name"/><br class="title-page-name"/>ensemble_deep.train(y = response, training_frame = train)<br class="title-page-name"/><br class="title-page-name"/># Eval ensemble performance on the test data<br class="title-page-name"/>perf_stack_test = ensemble_deep.model_performance(test)<br class="title-page-name"/>stack_auc_test = perf_stack_test.auc()<br class="title-page-name"/>print("Ensemble_deep Test AUC: {0}".format(stack_auc_test))</pre>
+
+
+            
+
+            
+        
+    
+
+
+
+
+
+  
+    <title>How it works...</title>
+    <meta content="urn:uuid:64b74aae-7be0-4e73-89f3-687dd4470606" name="Adept.expected.resource"/>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+  
+
+
+  
+        
+
+                            
+                    <h1 class="header-title">它是如何工作的...</h1>
+                
+            
+            
+                
+<p class="calibre2">在<em class="calibre13">步骤 1 </em>中，我们使用了<kbd class="calibre12">h2o.import_file()</kbd>函数来读取我们的数据集。</p>
+<p><kbd class="calibre19">h2o.import_file()</kbd>函数返回一个<kbd class="calibre19">H2OFrame</kbd>实例。</p>
+<p class="calibre2">在<em class="calibre13">步骤 2 </em>中，我们将<kbd class="calibre12">H2OFrame</kbd>分成训练和测试子集。在<em class="calibre13">步骤 3 </em>中，我们检查了这些子集的尺寸，以验证我们的分割是否足以满足我们的要求。</p>
+<p class="calibre2">在<em class="calibre13">步骤 4 </em>中，我们查看了前几行，以检查数据是否被正确加载。在<em class="calibre13">步骤</em> <em class="calibre13"> 5 </em>中，我们分离出响应变量和预测变量的列名，在<em class="calibre13">步骤 6 </em>中，我们用<kbd class="calibre12">asfactor()</kbd>函数将响应变量转换成分类类型。</p>
+<p class="calibre2">我们在<em class="calibre13">步骤 7 </em>中定义了一个名为<kbd class="calibre12">nfolds</kbd>的变量，用于交叉验证。我们还定义了一个变量<kbd class="calibre12">encoding</kbd>，我们在接下来的步骤中使用它来指示 H2O 对分类变量使用一键编码。在<em class="calibre13">步骤 8 </em>到<em class="calibre13">步骤 10 </em>中，我们构建了我们的基础学习者。</p>
+<p class="calibre2">在<em class="calibre13">步骤 11 </em>中，我们训练了一个梯度推进机器模型。我们将一些值传递给几个超参数，如下所示:</p>
+<p class="calibre2"><kbd class="calibre12">nfolds</kbd>:K 折交叉验证的折叠数。</p>
+<ul class="calibre10">
+<li class="calibre11"><kbd class="calibre12">fold_assignment</kbd>:该选项指定交叉验证文件夹分配使用的方案。仅当指定了<kbd class="calibre12">nfolds</kbd>的值而未指定<kbd class="calibre12">fold_column</kbd>时，此选项才适用。</li>
+<li class="calibre11"><kbd class="calibre12">distribution</kbd>:指定分布。在我们的例子中，由于响应变量有两个类，我们将<kbd class="calibre12">distribution</kbd>设置为<kbd class="calibre12">"bernoulli"</kbd>。</li>
+<li class="calibre11"><kbd class="calibre12">ntrees</kbd>:树木数量。</li>
+<li class="calibre11"><kbd class="calibre12">max_depth</kbd>:表示最大树深。</li>
+<li class="calibre11"><kbd class="calibre12">min_rows</kbd>:一片叶子中允许的最少观察值。</li>
+<li class="calibre11"><kbd class="calibre12">learn_rate</kbd>:学习率从<kbd class="calibre12">0.0</kbd>到<kbd class="calibre12">1.0</kbd>取值。</li>
+<li class="calibre11">请注意，对于所有基础学员，交叉验证折叠必须相同，并且<kbd class="calibre19">keep_cross_validation_predictions</kbd>必须设置为<kbd class="calibre19">True</kbd>。</li>
+</ul>
+<p>在<em class="calibre13">步骤 9 </em>中，我们使用以下超参数训练了一个随机森林基学习者:<kbd class="calibre12">ntrees</kbd>、<kbd class="calibre12">nfolds</kbd>、<kbd class="calibre12">fold_assignment</kbd>。</p>
+<p class="calibre2">在<em class="calibre13">步骤 10 </em>中，我们用 GLM 训练了我们的算法。注意，我们没有对 GLM 中的分类变量进行编码。</p>
+<p class="calibre2">H2O 建议用户允许 GLM 处理分类列，因为它可以利用分类列获得更好的性能和有效的内存利用。<br class="title-page-name"/>来自 H2o.ai:“我们强烈建议避免将任何级别的分类列一次性编码成许多二进制列，因为这是非常低效的。对于那些习惯于为其他框架手动扩展分类变量的 Python 用户来说尤其如此”。</p>
+<p>在<em class="calibre13">步骤 11 </em>中，我们为每个基础学习者生成了测试 AUC 值，并打印了最佳 AUC。</p>
+<p class="calibre2">在<em class="calibre13">步骤 12 </em>中，我们通过使用<kbd class="calibre12">H2OStackedEnsembleEstimator</kbd>组合基础学习器的输出来训练堆叠集成模型。我们在测试子集上使用了经过训练的集成模型。注意，默认情况下，GLM 被用作<kbd class="calibre12">H2OStackedEnsembleEstimator</kbd>的元学习者。然而，在我们的例子中，我们使用深度学习作为元学习者。</p>
+<p class="calibre2">注意，我们已经为元学习者使用了默认的超参数值。我们可以用<kbd class="calibre19">metalearner_params</kbd>指定超参数值。<kbd class="calibre19">metalearner_params</kbd>选项允许您传入一个字典/超参数列表，用于作为元学习器的算法。</p>
+<p>微调超参数可以提供更好的结果。</p>
+<p class="calibre2">还有更多...</p>
+
+
+            
+
+            
+        
+    
+
+
+
+
+
+  
+    <title>There's more...</title>
+    <meta content="urn:uuid:64b74aae-7be0-4e73-89f3-687dd4470606" name="Adept.expected.resource"/>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+  
+
+
+  
+        
+
+                            
+                    <h1 class="header-title">您也可以组合一个模型列表，以不同方式堆叠在一起。在前面的例子中，我们训练了单个模型，并把它们放在一个列表中进行集成。我们也可以训练模型网格:</h1>
+                
+            
+            
+                
+<p class="calibre2">我们为网格指定随机森林超参数:</p>
+<ol class="calibre14">
+<li class="calibre11">我们使用前面代码中定义的超参数来训练网格:</li>
+</ol>
+<pre class="calibre18">hyper_params = {"max_depth": [3, 4, 5, 8, 10],<br class="title-page-name"/>                "min_rows": [3,4,5,6,7,8,9,10],<br class="title-page-name"/>                "mtries": [10,15, 20],<br class="title-page-name"/>                "ntrees": [100,250,500, 750],<br class="title-page-name"/>                "sample_rate": [0.7, 0.8, 0.9, 1.0],<br class="title-page-name"/>                "col_sample_rate_per_tree": [0.5, 0.6, 0.7, 0.8, 0.9, 1.0]}<br class="title-page-name"/><br class="title-page-name"/>search_criteria = {"strategy": "RandomDiscrete", "max_models": 3, "seed": 1}</pre>
+<ol start="2" class="calibre14">
+<li class="calibre11">We train the grid using the hyperparameters defined in the preceding code:</li>
+</ol>
+<pre class="calibre18"># Train the grid<br class="title-page-name"/>grid = H2OGridSearch(model=H2ORandomForestEstimator(nfolds=nfolds,\<br class="title-page-name"/>                                                    fold_assignment="Modulo",\<br class="title-page-name"/>                                                    keep_cross_validation_predictions=True),\<br class="title-page-name"/>                     hyper_params=hyper_params,\<br class="title-page-name"/>                     search_criteria=search_criteria,\<br class="title-page-name"/>                     grid_id="rf_grid_binomial")<br class="title-page-name"/><br class="title-page-name"/>grid.train(x=predictors, y=response, training_frame=train)</pre>
+<p class="calibre2">我们使用随机森林网格来训练集合:</p>
+<ol start="3" class="calibre14">
+<li class="calibre11">前面的代码将给出最好的基础学习者测试 AUC，并测试来自集合模型的 AUC。如果响应变量高度不平衡，可考虑微调以下超参数来控制过采样和欠采样:</li>
+</ol>
+<pre class="calibre18"># Train a stacked ensemble using the RF grid<br class="title-page-name"/>ensemble = H2OStackedEnsembleEstimator(model_id="ensemble_rf_grid_binomial_9", base_models=grid.model_ids)<br class="title-page-name"/><br class="title-page-name"/>ensemble.train(x=predictors, y=response, training_frame=train)<br class="title-page-name"/><br class="title-page-name"/># Evaluate ensemble performance on the test data<br class="title-page-name"/>perf_stack_test = ensemble.model_performance(test)<br class="title-page-name"/><br class="title-page-name"/># Compare to base learner performance on the test set<br class="title-page-name"/>baselearner_best_auc_test = max([h2o.get_model(model).model_performance(test_data=test).auc() for model in grid.model_ids])<br class="title-page-name"/><br class="title-page-name"/>stack_auc_test = perf_stack_test.auc()<br class="title-page-name"/><br class="title-page-name"/>print("Best Base-learner Test AUC: ", baselearner_best_auc_test)<br class="title-page-name"/>print("Ensemble Test AUC: ", stack_auc_test)</pre>
+<p class="calibre2"><kbd class="calibre12">balance_classes</kbd>:该选项可用于平衡等级分布。启用后，H2O 将对多数类进行欠采样或对少数类进行过采样。如果启用该选项，您也可以为<kbd class="calibre12">class_sampling_factors</kbd>和<kbd class="calibre12">max_after_balance_size</kbd>选项指定一个值。</p>
+<ul class="calibre10">
+<li class="calibre11"><kbd class="calibre12">class_sampling_factors</kbd>:默认情况下，训练时会自动计算采样因子以获得类别平衡。使用<kbd class="calibre12">class_sampling_factors</kbd>参数可以改变这种行为。该选项为每个类别设置过采样或欠采样比率，并需要<kbd class="calibre12">balance_classes=true</kbd>。<br class="title-page-name"/></li>
+<li class="calibre11"><kbd class="calibre12">max_after_balance_size</kbd>:在大多数情况下，将<kbd class="calibre12">balance_classes</kbd>设置为 true 会增加数据帧的大小。要减小数据帧的大小，可以使用<kbd class="calibre12">max_after_balance_size</kbd>参数。这指定了平衡类计数后训练数据的最大相对大小，默认为<kbd class="calibre12">5.0</kbd>。</li>
+<li class="calibre11">请参见</li>
+</ul>
+
+
+            
+
+            
+        
+    
+
+
+
+
+
+  
+    <title>See also</title>
+    <meta content="urn:uuid:64b74aae-7be0-4e73-89f3-687dd4470606" name="Adept.expected.resource"/>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+  
+
+
+  
+        
+
+                            
+                    <h1 class="header-title">看看<kbd class="calibre12">StackNet</kbd>，它是由 Marios Michailidis 开发的，作为他博士学位的一部分。<kbd class="calibre12">StackNet</kbd>在麻省理工学院许可下可用。这是一个可扩展的分析框架，类似于前馈神经网络，并使用 Wolpert 的堆叠泛化概念来提高机器学习预测任务的准确性。它使用元学习者的概念，因为它使用一些算法的预测作为其他算法的特征。StackNet 还可以在多个级别上推广堆叠。然而，这是计算密集型的。它最初是用 Java 开发的，但是一个名为<kbd class="calibre12">pystacknet</kbd>的更轻便的 Python 版本<kbd class="calibre12">StackNet</kbd>现在也可以使用了。</h1>
+                
+            
+            
+                
+<p class="calibre2">让我们想想 StackNet 是如何工作的。在神经网络的情况下，将一层的输出作为输入插入到下一层，并应用激活函数，如 sigmoid、tanh 或 relu。类似地，在 StackNet 的情况下，激活函数可以用任何受监督的机器学习算法来代替。</p>
+<p class="calibre2">堆叠元件可以在两种模式下运行:正常堆叠模式和重新堆叠模式。在正常堆叠模式下，每一层都使用前一层的预测。在重新堆叠模式的情况下，每一层使用前一层的神经元和激活。</p>
+<p class="calibre2">使用 StackNet 的示例代码由以下步骤组成:</p>
+<p class="calibre2">导入所需的库(注意，我们已经从<kbd class="calibre12">pystacknet</kbd>库导入了<kbd class="calibre12">StackNetClassifier</kbd>和<kbd class="calibre12">StackNetRegressor</kbd>):</p>
+<ol class="calibre14">
+<li class="calibre11">Import the required libraries (note that we have imported <kbd class="calibre12">StackNetClassifier</kbd> and <kbd class="calibre12">StackNetRegressor</kbd> from the <kbd class="calibre12">pystacknet</kbd> library):</li>
+</ol>
+<pre class="calibre18">import numpy as np<br class="title-page-name"/><br class="title-page-name"/># import required libraries from sklearn<br class="title-page-name"/>from sklearn.tree import DecisionTreeClassifier<br class="title-page-name"/>from sklearn.ensemble import RandomForestClassifier, GradientBoostingClassifier<br class="title-page-name"/>from sklearn.linear_model import LogisticRegression<br class="title-page-name"/><br class="title-page-name"/>from sklearn.metrics import roc_auc_score, log_loss<br class="title-page-name"/>from sklearn.model_selection import StratifiedKFold<br class="title-page-name"/><br class="title-page-name"/># import StackNetClassifier and StackNetRegressor from pystacknet<br class="title-page-name"/>from pystacknet.pystacknet import StackNetClassifier,StackNetRegressor<br class="title-page-name"/>from pystacknet.metrics import rmse,mae</pre>
+<p class="calibre2">我们读取数据，删除<kbd class="calibre12">ID</kbd>列，并检查数据集的维度:</p>
+<ol start="2" class="calibre14">
+<li class="calibre11">我们将目标变量和预测变量分开。我们还将数据分成训练和测试子集:</li>
+</ol>
+<pre class="calibre18">df_creditcarddata = pd.read_csv("UCI_Credit_Card.csv")<br class="title-page-name"/><br class="title-page-name"/>#dropping the ID column, as it would not be required<br class="title-page-name"/>df_creditcarddata.drop(["ID"],axis=1,inplace=True)<br class="title-page-name"/><br class="title-page-name"/># Check the shape of the data<br class="title-page-name"/>df_creditcarddata.shape</pre>
+<ol start="3" class="calibre14">
+<li class="calibre11">我们为基础学习者和元学习者定义了模型:</li>
+</ol>
+<pre class="calibre18">#create the predictor &amp; target set<br class="title-page-name"/>X = df_creditcarddata.iloc[:,0:23]<br class="title-page-name"/>Y = df_creditcarddata['default.payment.next.month']<br class="title-page-name"/><br class="title-page-name"/># Create train &amp; test sets<br class="title-page-name"/>X_train, X_test, Y_train, Y_test = \<br class="title-page-name"/>train_test_split(X, Y, test_size=0.20, random_state=1)</pre>
+<ol start="4" class="calibre14">
+<li class="calibre11">我们现在使用<kbd class="calibre12">StackNetClassifier</kbd>来构建堆叠系综。但是，请注意，我们使用<kbd class="calibre12">restacking=False</kbd>，这意味着它使用正常堆叠模式:</li>
+</ol>
+<pre class="calibre18">models=[[DecisionTreeClassifier(criterion="entropy", max_depth=5, max_features=0.5, random_state=1),<br class="title-page-name"/>GradientBoostingClassifier(n_estimators=100, learning_rate=0.1, max_depth=5, max_features=0.5, random_state=1),<br class="title-page-name"/>LogisticRegression(random_state=1)],<br class="title-page-name"/>[RandomForestClassifier (n_estimators=500, criterion="entropy", max_depth=5, max_features=0.5, random_state=1)]]</pre>
+<ol start="5" class="calibre14">
+<li class="calibre11">We now use <kbd class="calibre12">StackNetClassifier</kbd> to build the stacking ensemble. However, note that we use <kbd class="calibre12">restacking=False</kbd>, which means that it uses the normal stacking mode:</li>
+</ol>
+<pre class="calibre18">model=StackNetClassifier(models, metric="accuracy", folds=4, restacking=False, use_retraining=True, use_proba=True, random_state=12345, n_jobs=1, verbose=1)<br class="title-page-name"/> <br class="title-page-name"/>model.fit(X_train,Y_train )<br class="title-page-name"/><br class="title-page-name"/># Uses the meta-learner model to predict the outcome<br class="title-page-name"/>preds=model.predict_proba(X_test)[:,1]<br class="title-page-name"/>print ("TEST ACCURACY without RESTACKING, auc %f " % (roc_auc_score(Y_test,preds)))</pre>
+<p class="calibre2"/>
+<p class="calibre2">对于<kbd class="calibre12">restacking=True</kbd>，<kbd class="calibre12">StackNetClassifier</kbd>将使用重新堆叠模式来构建模型。</p>
+<p class="calibre2">在 Kaggle，有各种 StackNet 用于赢得比赛的案例研究。如何使用<kbd class="calibre12">StackNet</kbd>的示例可在<a href="https://bit.ly/2T7339y" class="calibre9">https://bit.ly/2T7339y</a>获得。</p>
+<p class="calibre2">There are various case studies of StackNet being used in winning competitions in Kaggle. An example of how <kbd class="calibre12">StackNet</kbd> can be used is available at <a href="https://bit.ly/2T7339y" class="calibre9">https://bit.ly/2T7339y</a>.</p>
+
+
+            
+
+            
+        
+    
+
+
+</body></html>

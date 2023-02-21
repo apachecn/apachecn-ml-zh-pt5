@@ -1,0 +1,312 @@
+<html><head/><body>
+
+
+	
+		<title>B16572_03_Final_JM_ePub</title>
+		
+	
+	
+		<div><h1 id="_idParaDest-49"><a id="_idTextAnchor053"/>第三章:代码符合数据</h1>
+			<p>在本章中，我们将通过使用上一章中讨论的 MLOps 工作流来解决业务问题，从动手<strong class="bold"> MLOps </strong>实施开始。我们还将讨论用于<strong class="bold">机器学习</strong> ( <strong class="bold"> ML </strong>)的源代码管理的有效方法，探索数据质量特征，并为 ML 解决方案分析和形成数据。</p>
+			<p>本章开始时，我们对业务问题进行分类，以便为 it 策划最合适的 MLOps 解决方案。接下来，我们将设置实施解决方案所需的资源和工具。讨论了 ML 源代码管理的 10 个指导原则，以应用干净的代码实践。我们将讨论什么构成了 ML 的高质量数据等等，然后处理与业务问题相关的数据集，并将其接收和版本化到 ML 工作空间。本章的大部分内容都是实践操作，旨在让您对 MLOps 有一个很好的理解和体验。为此，我们将在本章中讨论以下主要话题:</p>
+			<ul>
+				<li>业务问题分析和问题分类</li>
+				<li>设置资源和工具</li>
+				<li>机器学习的 10 个源代码管理原则</li>
+				<li>机器学习的好数据</li>
+				<li>数据预处理</li>
+				<li>数据注册和版本控制</li>
+				<li>走向 ML 管道</li>
+			</ul>
+			<p>事不宜迟，让我们开始揭开业务问题的神秘面纱，并使用 MLOps 方法实现解决方案。</p>
+			<h1 id="_idParaDest-50"><a id="_idTextAnchor054"/>业务问题分析和问题分类</h1>
+			<p>在前一章中，我们研究了下面的业务问题陈述。在本节中，我们将<a id="_idIndexMarker154"/>通过对问题陈述进行分类来揭开问题陈述的神秘面纱<a id="_idIndexMarker155"/>使用原则来策划实施路线图。我们将浏览为解决业务问题而提供给我们的数据集，并决定哪种类型的 ML 模型将有效地解决业务问题。最后，我们将对实现健壮和可扩展的 ML 操作的 MLOps 方法进行分类，并决定实现的工具。</p>
+			<p class="callout-heading">以下是问题陈述:</p>
+			<p class="callout">您是一名数据科学家，带领一个小型数据科学家团队为一家总部位于芬兰的货运公司工作。90%的货物通过货运进口到芬兰。你的任务是在芬兰的图尔库港节省 20%的货运成本。这可以通过开发提前 4 小时预测港口天气状况的 ML 解决方案来实现。您需要监控可能的降雨条件，这可能会扭曲港口人力资源和运输的运营，进而影响港口的供应链运营。您的 ML 解决方案将帮助港务局提前 4 小时预测可能的降雨；这将节省 20%的成本，并使港口的供应链运作顺畅。</p>
+			<p>解决问题的第一步是使用适当的方法对其进行简化和分类。在前一章中，我们讨论了如何对业务问题进行分类，以使用 ML 来解决它。让我们应用这些原则来绘制一个清晰的实施路线图。</p>
+			<p>首先，我们将看看我们将训练什么类型的模型来产生最大的商业价值。其次，我们将确定实施 MLOps 的正确方法。</p>
+			<p>为了决定训练模型的类型，我们可以从 GitHub 上的数据集开始:<a href="https://github.com/PacktPublishing/EngineeringMLOps">https://github.com/PacktPublishing/EngineeringMLOps</a>。</p>
+			<p>这是<code>weather_dataset_raw.csv</code>的快照，在<em class="italic">图 3.1 </em>中。文件大小为 10.7 MB，行数为 96，453，文件为 CSV 格式:</p>
+			<div><div><img src="img/B16572_03_01.jpg" alt="Figure 3.1 – Dataset snapshot&#13;&#10;"/>
+				</div>
+			</div>
+			<p class="figure-caption">图 3.1–数据集快照</p>
+			<p>通过评估数据，我们可以将业务问题分类如下:</p>
+			<ul>
+				<li><code>Weather condition</code>列描述了一个事件是否记录了雨、雪或晴朗的条件。这可以被框定或重新标记为<code>rain</code>或<code>no rain</code>，并用于执行二元分类。因此，用有监督的学习方法来解决业务问题是很简单的。</li>
+				<li><strong class="bold">MLOps approach</strong>: By observing the <a id="_idIndexMarker157"/>problem statement and data, here are the facts:<p>(a)数据:训练数据是 10.7 MB。数据大小相当小(不能视为大数据)。</p><p>(b)业务:我们需要训练、测试、部署和监测一个 ML 模型，以便在记录新数据时每小时(提前 4 小时)预报图尔库港的天气。</p><p>(c)团队规模:一个中小型数据科学家团队，没有 DevOps 工程师。</p></li>
+			</ul>
+			<p>基于上述事实，我们可以将操作分为<strong class="bold">小团队操作</strong>；没有<a id="_idIndexMarker158"/>需要大数据处理，团队小而敏捷。现在，我们将研究一些合适的工具来实现解决当前业务问题所需的操作。</p>
+			<p>为了全面了解 MLOps 实施，我们将同时使用两种不同的工具<a id="_idTextAnchor055"/>来<a id="_idIndexMarker159"/>实施业务<a id="_idIndexMarker160"/>问题:</p>
+			<ul>
+				<li><strong class="bold"> Azure 机器学习</strong>(微软 Azure)</li>
+				<li><strong class="bold"> MLflow ( </strong>一个开源云和平台无关的工具<strong class="bold"> ) </strong></li>
+			</ul>
+			<p>我们使用<a id="_idIndexMarker161"/>这两个工具来<a id="_idIndexMarker162"/>了解纯基于云的方法和开源/云不可知方法的工作原理。所有代码和 CI/CD 操作都将使用 Azure DevOps 进行管理和编排，如图 3.2 所示:</p>
+			<div><div><img src="img/B16572_03_02.jpg" alt="Figure 3.2 – MLOps tools for the solution &#13;&#10;"/>
+				</div>
+			</div>
+			<p class="figure-caption">图 3.2–解决方案的 MLOps 工具</p>
+			<p>现在，我们<a id="_idIndexMarker163"/>将设置实施业务问题解决方案<a id="_idIndexMarker164"/>所需的工具和资源。因为我们将使用 Python 作为主要编程语言，所以在您的 Mac、Linux 或 Windows 操作系统中安装<strong class="bold"> Python 3 </strong>是一个先决条件。</p>
+			<h1 id="_idParaDest-51"><a id="_idTextAnchor056"/>设置资源和工具</h1>
+			<p>如果你已经在你的电脑上安装并设置了这些工具，请随意跳过这一部分；否则，请按照详细说明启动并运行它们。</p>
+			<h2 id="_idParaDest-52"><a id="_idTextAnchor057"/>安装 MLflow</h2>
+			<p>我们从<a id="_idIndexMarker167"/>安装 MLflow 开始，这是一个用于管理 ML 生命周期的开源平台，包括实验、可复制性、部署和中央模型注册。</p>
+			<p>要安装 MLflow，请转到您的终端并执行以下命令:</p>
+			<pre>pip3 install mlflow</pre>
+			<p>成功安装后，通过执行以下命令启动<code>mlflow</code>跟踪 UI 来测试安装:</p>
+			<pre>mlflow ui</pre>
+			<p>在运行<code>mlflow</code>跟踪 UI 时，您将在您的机器上运行一个监听端口<code>5000</code>的服务器，它输出如下消息:</p>
+			<pre>[2021-03-11 14:34:23 +0200] [43819] [INFO] Starting gunicorn 20.0.4
+[2021-03-11 14:34:23 +0200] [43819] [INFO] Listening at: http://127.0.0.1:5000 (43819)
+[2021-03-11 14:34:23 +0200] [43819] [INFO] Using worker: sync
+[2021-03-11 14:34:23 +0200] [43821] [INFO] Booting worker with pid: 43821</pre>
+			<p>您可以在<code>http://localhost:5000</code>访问并查看<code>mlflow</code>界面。当您成功安装<code>mlflow</code>并运行跟踪 UI 后，您就可以安装下一个工具了。</p>
+			<h2 id="_idParaDest-53"><a id="_idTextAnchor058"/> Azure 机器学习</h2>
+			<p>Azure 机器学习为训练、部署和管理 ML <a id="_idIndexMarker168"/>模型提供了一个基于云的 ML 平台。这项服务在微软 Azure 上提供，所以<a id="_idIndexMarker169"/>的先决条件是免费订阅微软 Azure。请创建一个大约 170 美元的信用免费帐户，这足以实施解决方案，这里:<a href="https://azure.microsoft.com/">https://azure.microsoft.com/</a>。</p>
+			<p>当你拥有 Azure 的访问/订阅权限时，继续下一部分，让 Azure 机器学习开始运行。</p>
+			<h3>创建资源组</h3>
+			<p>一个<strong class="bold">资源组</strong>是一个 Azure <a id="_idIndexMarker171"/>解决方案的相关<a id="_idIndexMarker170"/>资源集合。它是一个容器，绑定了与服务或解决方案相关的所有资源。创建资源组可以轻松访问和管理解决方案。让我们从创建您自己的资源组开始:</p>
+			<ol>
+				<li>打开 Azure 门户。</li>
+				<li>Access the portal menu (go to the portal's home page if you are not there by default) and hover over the resource group icon in the navigation section. A <strong class="bold">Create</strong> button will appear; click on it to create a new resource group:<div><img src="img/B16572_03_03.jpg" alt="Figure 3.3 – Creating a resource group&#13;&#10;"/></div><p class="figure-caption">图 3.3–创建资源组</p></li>
+				<li>使用您选择的名称创建一个资源组(建议使用<code>Learn_MLOps</code>)，如图<em class="italic">图 3.3 </em>所示。</li>
+				<li>选择一个离你近的地区<a id="_idIndexMarker172"/>，以获得最佳的<a id="_idIndexMarker173"/>性能和价格。例如，在<em class="italic">图 3.3 </em>中，名为<code>Learn MLOps</code>且区域为<strong class="bold">(欧洲)北欧</strong>的资源组已经准备好创建。在你点击<strong class="bold"> Review + Create </strong>按钮并且 Azure 验证了请求之后，最终的<strong class="bold"> Create </strong>按钮将会出现。应该按下最后一个<strong class="bold">创建</strong>按钮来创建新的资源组。</li>
+			</ol>
+			<p>当检查和创建资源组时，您可以设置和管理该资源组中与 ML 解决方案相关的所有服务。新创建的资源组将在资源组列表中列出。</p>
+			<h3>创建 Azure 机器学习工作区</h3>
+			<p>ML 工作空间是一个<a id="_idIndexMarker174"/>中心枢纽，用于跟踪和管理您的 ML 培训、部署和监控实验。要创建 Azure 机器学习工作区，进入 Azure 门户菜单，点击<code>Machine Learning</code>并选择它。您将看到以下屏幕:</p>
+			<div><div><img src="img/B16572_03_04.jpg" alt="Figure 3.4 – Creating an Azure Machine Learning workspace&#13;&#10;"/>
+				</div>
+			</div>
+			<p class="figure-caption">图 3.4–创建 Azure 机器学习工作区</p>
+			<p>用您选择的<a id="_idIndexMarker175"/>名称命名工作区(例如，我们在<em class="italic">图 3.4 </em>中将其命名为<strong class="bold"> MLOps_WS </strong>)。选择您之前创建的资源组，将这个 ML 服务绑定到它(在<em class="italic">图 3.4 </em>中选择<strong class="bold"> Learn_MLOps </strong>)。最后，点击<strong class="bold">查看+创建</strong>按钮，您将被带到最后一个<strong class="bold">创建</strong>按钮的新屏幕。按下最后的<strong class="bold">创建</strong>按钮来创建你的 Azure 机器学习工作空间。</p>
+			<p>在创建了 Azure 机器学习工作空间(<code>Learn_MLOps</code>)之后，Azure 平台将部署这个服务需要的所有资源。使用 Azure 机器学习实例(<code>Learn_MLOps</code>)部署的资源，如 Blob 存储、密钥库和应用洞察，被提供并绑定到工作区。这些资源将通过工作区和 SDK 来消耗或使用。</p>
+			<p>你可以在这里找到关于创建 Azure 机器学习实例的详细说明:<a href="https://docs.microsoft.com/en-us/azure/machine-learning/how-to-manage-workspace">https://docs . Microsoft . com/en-us/Azure/Machine-Learning/how-to-management-workspace</a>。</p>
+			<h3>正在安装 Azure 机器学习 SDK</h3>
+			<p>在你的电脑上打开终端或<a id="_idIndexMarker176"/>命令行，安装 Azure Machine Learning SDK，它将在代码中被广泛用于编排实验。要安装它，请运行以下命令:</p>
+			<pre>pip3 install --upgrade azureml-sdk</pre>
+			<p>可以在这里找到详细说明:<a href="https://docs.microsoft.com/en-us/python/api/overview/azure/ml/install?view=azure-ml-py">https://docs . Microsoft . com/en-us/python/API/overview/azure/ml/install？view=azure-ml-py </a>。</p>
+			<h2 id="_idParaDest-54">天蓝色的 DevOps</h2>
+			<p>所有的<a id="_idIndexMarker177"/>源代码和 CI/CD 相关的操作都将使用 Azure DevOps 进行管理和编排。我们在 Azure DevOps 的存储库中管理的<a id="_idIndexMarker178"/>代码将用于训练、部署和监控由 CI/CD 管道支持的 ML 模型。让我们从创建 Azure DevOps 订阅开始:</p>
+			<ol>
+				<li value="1">在 dev.azure.com 创建一个免费账户。可以使用现有的 Microsoft 或 GitHub 帐户创建免费帐户。</li>
+				<li>创建一个名为<code>Learn_MLOps</code>的项目(根据您的喜好将其设为公共或私有)。</li>
+				<li>转到<strong class="bold">回购</strong>部分。在<strong class="bold">导入库</strong>部分，按下<strong class="bold">导入</strong>按钮。</li>
+				<li>从这个库导入一个公共 GitHub 项目的库:<a href="https://github.com/PacktPublishing/EngineeringMLOps ">https://github.com/PacktPublishing/EngineeringMLOps</a>(如图<em class="italic">图 3.5 </em>):</li>
+			</ol>
+			<div><div><img src="img/B16572_03_05.jpg" alt="Figure 3.5 – Import the GitHub repository into the Azure DevOps project&#13;&#10;"/>
+				</div>
+			</div>
+			<p class="figure-caption">图 3.5–将 GitHub 存储库导入 Azure DevOps 项目</p>
+			<p>导入 GitHub 存储库后，将显示导入的存储库中的文件。</p>
+			<h2 id="_idParaDest-55">木星枢纽</h2>
+			<p>最后，我们将<a id="_idIndexMarker179"/>需要一个交互式数据分析和可视化工具来使用我们的代码处理<a id="_idIndexMarker180"/>数据。为此，我们使用<strong class="bold"> JupyterHub </strong>。这是一种常见的数据科学工具，被数据科学家广泛用于处理数据、可视化数据和训练 ML 模型。要安装它，请遵循两个简单的步骤:</p>
+			<ol>
+				<li value="1">Install JupyterHub via the command line on your PC:<pre>python3 -m pip install jupyterhub</pre><p>你可以在这里找到详细的说明:<a href="https://jupyterhub.readthedocs.io/en/stable/quickstart.html">https://jupyterhub.readthedocs.io/en/stable/quickstart.html</a>。</p></li>
+				<li>Install Anaconda.<p>Anaconda 是必需的，因为它安装依赖项、设置环境和服务来支持 JupyterHub。下载 Anaconda，按照这里的详细说明安装:<a href="https://docs.anaconda.com/anaconda/install/">https://docs.anaconda.com/anaconda/install/</a>。</p><p>既然我们已经为实际操作的实现做好了准备，那么让我们看看如何管理好的代码和数据。</p></li>
+			</ol>
+			<h1 id="_idParaDest-56"><a id="_idTextAnchor061"/>ML 源代码管理的 10 个原则</h1>
+			<p>这里有 10 条<a id="_idIndexMarker181"/>原则可以应用到你的代码中，以确保代码的质量、健壮性和可伸缩性:</p>
+			<ul>
+				<li><strong class="bold">Modularity:</strong> It is better to have modular code than to have one big chunk. Modularity encourages reusability <a id="_idIndexMarker182"/>and facilitates upgrading by replacing the required components. To avoid needless complexity and repetition, follow this golden rule:<p class="author-quote">只有当其中一个组件使用另一个组件时，两个或多个 ML 组件才应该配对。如果它们都不互相使用，那么就应该避免配对。</p><p>与其环境不紧密配对的 ML 组件比紧密配对的组件更容易修改或替换。</p></li>
+				<li><strong class="bold">单任务专用函数:</strong>函数是管道和系统的重要构建模块，<a id="_idIndexMarker183"/>是用于执行特定任务的小段代码。函数的目的是避免命令的重复，并支持可重用的代码。它们很容易变成一组复杂的命令来简化任务。对于可读和可重用的代码，将单个函数专用于单个任务比多个任务更有效。拥有多个函数比拥有一个又长又复杂的函数要好。</li>
+				<li><code>Error 300</code>。结构化代码块并尝试限制函数和类的最大缩进量可以增强代码的可读性。</li>
+				<li><strong class="bold">Clean code:</strong> If you have to explain the code, it's not that good. Clean code is self-explanatory. It <a id="_idIndexMarker185"/>focuses on high readability, optimal modularity, reusability, non-repeatability, and optimal performance. Clean code reduces the cost of maintaining and upgrading your ML pipelines. It enables a team to perform efficiently and can be extended to other developers.<p>要深入理解这一点，请阅读罗伯特·C·马丁<strong class="bold">的<em class="italic">干净代码:敏捷软件工艺手册</em>。</strong></p></li>
+				<li><strong class="bold">测试:</strong>确保系统的健壮性至关重要，测试在其中扮演着重要的角色。一般来说，测试<a id="_idIndexMarker186"/>延伸到单元测试和验收测试。单元测试是一种使用强制数据和使用方法测试源代码组件健壮性的方法，以确定组件是否适合生产系统。验收测试是对整个系统进行测试，以确保系统实现用户需求；端到端业务流在实时场景中得到验证。测试对于确保代码的有效运行是至关重要的:“如果它没有被测试，它就是坏的。”</li>
+			</ul>
+			<p>要了解更多关于单元测试的实现，请阅读这个文档:<a href="https://docs.python.org/3/library/unittest.html">https://docs.python.org/3/library/unittest.html</a>。</p>
+			<ul>
+				<li><strong class="bold">Version control (code, data and models):</strong> Git is used for version control of code in ML systems. The <a id="_idIndexMarker187"/>purpose of version control is to ensure that all the team members working on the system have access to up-to-date code and that code is not lost when there is a hardware failure. One rule of working with Git should be to not break the master (branch). This means when you have working code in the repository and you add new features or make improvements, you do this in a feature branch, which is merged to the master branch when the code is working and reviewed. Branches should be given a short descriptive name, such as feature/label-encoder. Branch naming and approval guidelines should be properly communicated and agreed upon with the team to avoid any complexity and unnecessary conflicts. Code review is done with pull requests to the repository of the code. Usually, it is best to review code in small sets, less than 400 lines. In practice, it often means one module or a submodule at a time.<p>数据的版本化对于 ML 系统是必不可少的，因为它帮助我们跟踪哪些数据被用于特定版本的代码来生成模型。对数据进行版本控制可以复制模型，并符合业务需求和法律。我们总是可以回溯<a id="_idIndexMarker188"/>并看到 ML 系统采取某些行动的原因。类似地，模型(工件)的版本化对于跟踪哪个版本的模型已经为 ML 系统产生了某些结果或者动作是很重要的。我们还可以跟踪或记录用于训练模型的某个版本的参数。这样，我们可以为模型工件、数据和代码启用端到端的可追溯性。对代码、数据和模型的版本控制可以增强 ML 系统，对于开发和维护它的人来说具有很大的透明度和效率。</p></li>
+				<li><code>print</code>语句适合测试和调试，但不适合生产。记录器包含的信息，尤其是系统信息、警告和错误，在监视生产系统时非常有用。</li>
+				<li><strong class="bold">错误处理:</strong>错误处理对于处理边缘情况至关重要，尤其是那些难以预料的情况。建议<a id="_idIndexMarker190"/>即使您认为不需要，也要捕捉并处理异常，因为预防胜于治疗。日志记录结合异常处理是处理边缘情况的有效方法。</li>
+				<li><strong class="bold">Readability:</strong> Code readability <a id="_idIndexMarker191"/>enables information transfer, code efficiency, and code maintainability. It can be achieved by following principles such as following industry-standard coding practices such as PEP-8 (<a href="https://www.python.org/dev/peps/pep-0008/">https://www.python.org/dev/peps/pep-0008/</a>) or the JavaScript standard style (depending on the language you are using). Readability is also increased by using docstrings. A docstring is a text that is written at the beginning of, for example, a function, describing what it does and possibly what it takes as input. In some cases, it is enough to have a one-liner explanation, such as this:<pre>def swap(a,b):
+"""Swaps the variables a and b. Returns the swapped variables""" 
+return b, a</pre><p>更复杂的功能需要更长的 docstring<a id="_idIndexMarker192"/>。解释参数和回报是一个好主意:</p><pre>def function_with_types_in_docstring(param1, param2): """Example function with types documented in the docstring.
+`PEP 484`_ type annotations are supported. If attribute, parameter, and
+return types are annotated according to `PEP 484`_, they do not need to be
+included in the docstring:
+Args:
+    param1 (int): The first parameter. 
+    param2 (str): The second parameter.
+Returns:
+     bool: The return value. True for success, False otherwise.
+                              """</pre></li>
+			</ul>
+			<p><strong class="bold">注释和文档化:</strong>注释和文档化对于维护可持续的代码至关重要。T21 并不总是能够解释清楚代码。在这种情况下，注释有助于防止混淆和解释代码。注释可以传达诸如版权信息、意图、代码说明、可能的警告和代码详细说明等信息。系统和模块的详细文档可以使团队高效地执行，并且代码和资产可以扩展到其他开发人员。对于文档，可以使用开源工具来记录 API，如 Swagger(<a href="https://swagger.io">https://Swagger . io</a>)和 Read<a id="_idIndexMarker195"/>Docs(<a href="https://readthedocs.org">https://readthedocs.org</a>)。使用正确的文档工具可以提高效率，并使开发人员的知识标准化。</p>
+			<h1 id="_idParaDest-57"><a id="_idTextAnchor062"/>什么是 ML 的好数据？</h1>
+			<p>好的 ML 模型是对高质量数据进行训练的结果。在进行 ML 培训之前，一个先决条件是要有高质量的数据。因此，我们需要处理数据以提高其质量。因此，确定数据的质量至关重要。以下五个特征将使我们能够辨别数据的质量:</p>
+			<ul>
+				<li><strong class="bold">准确性</strong>:准确性是数据质量的一个至关重要的<a id="_idIndexMarker197"/>特征，因为不准确的数据会导致较差的 ML 模型性能以及现实生活中的后果。要检查数据的准确性，请确认该信息是否代表真实情况。</li>
+				<li><strong class="bold">完整性</strong>:在大多数情况下，不完整的<a id="_idIndexMarker198"/>信息是不可用的，如果对一个 ML 模型进行训练，可能会导致不正确的结果。检查数据的全面性至关重要。</li>
+				<li><strong class="bold">可靠性</strong>:数据中的矛盾或重复会导致数据的不可靠性。可靠性是一个至关重要的特性；信任数据是必不可少的，主要是在使用 ML 进行实际决策时。在某种程度上，我们可以通过检查偏倚和分布来评估数据的可靠性。在任何极端情况下，数据对于 ML 训练可能是不可靠的，或者可能带有偏差。</li>
+				<li><strong class="bold">相关性</strong>:如果正在收集不相关的信息，数据的相关性在上下文和确定<a id="_idIndexMarker200"/>中起着至关重要的作用。拥有相关数据可以在现实生活中使用 ML 做出适当的决策。</li>
+				<li><strong class="bold">及时性</strong>:陈旧或过时的信息耗费企业的时间和金钱；在某些情况下，拥有最新的信息是至关重要的，可以提高数据的质量。ML 使用不合时宜的数据做出的决策可能代价高昂，并可能导致错误的决策。</li>
+			</ul>
+			<p>当这五个特征最大化时，它确保了最高的数据质量。记住这些原则，让我们深入研究代码与数据相遇的实现。</p>
+			<p>首先，让我们对数据进行评估和处理，为 ML 训练做好准备。首先，克隆您<a id="_idIndexMarker202"/>导入到您的 Azure DevOps 项目的存储库(从 GitHub):</p>
+			<pre>git clone <a href="mailto:https://xxxxxxxxx@dev.azure.com">https://xxxxxxxxx@dev.azure.com</a>/xxxxx/Learn_MLOps/_git/Learn_MLOps</pre>
+			<p>接下来，打开您的终端，访问克隆存储库的文件夹，启动 JupyterLab 服务器进行数据处理。为此，请在终端中键入以下命令:</p>
+			<pre>jupyter lab</pre>
+			<p>这将在浏览器的<code>http://localhost:8888</code>处自动打开一个窗口，您可以在这里编写并执行 JupyterLab 界面上的代码。在<code>Code_meets_data_c3</code>文件夹里，有一个 Python 脚本(<code>dataprocessing.py</code>)和一个<code>.ipynb</code>笔记本(<code>dataprocessing.ipynb</code>)；请随意运行这些文件或创建一个新的笔记本，然后按照下面的步骤操作。</p>
+			<p>我们将按照<em class="italic">图 3.6 </em>中描述的任务进行计算。数据处理将在您的 PC 上本地完成，然后在云中的计算目标上进行 ML 培训、部署和监控。这是为了获得在各种设置中实现模型的经验。在本章的其余部分，我们将(在本地)进行数据处理，以使数据达到最佳质量，从而进行 ML 训练(在云中，这将在下一章中描述)。</p>
+			<div><div><img src="img/B16572_03_06.jpg" alt="Figure 3.6 – Computation locations for data and ML tasks&#13;&#10;"/>
+				</div>
+			</div>
+			<p class="figure-caption">图 3.6-数据和 ML 任务的计算位置</p>
+			<p>为了处理原始数据并为 ML 做好准备，您将在本地 PC 上进行计算和数据处理。我们从安装和导入所需的包以及导入原始数据集开始(如<code>dataprocessing.ipynb</code>和<code>.py</code>脚本所示)。笔记本中的 Python 指令必须在现有笔记本中执行:</p>
+			<pre>%matplotlib inline
+import pandas as pd
+import numpy as np
+from matplotlib import pyplot as plt
+from matplotlib.pyplot import figure
+import seaborn as sns
+from azureml.core import Workspace, Dataset
+#import dataset
+df = pd.read_csv('Dataset/weather_dataset_raw.csv')</pre>
+			<p>这样，您已经将数据集导入到 pandas 数据帧<code>df</code>中，以进行进一步处理。</p>
+			<h1 id="_idParaDest-58"><a id="_idTextAnchor063"/>数据预处理</h1>
+			<p>原始数据不能直接传递给 ML 模型用于训练目的。在训练 ML 模型之前，我们必须细化或预处理<a id="_idIndexMarker204"/>数据。为了进一步分析导入的数据，我们将执行一系列步骤来将数据预处理成适合 ML 训练的形状。我们首先评估数据的质量，以检查准确性、完整性、可靠性、相关性和及时性。在这之后，我们校准所需的数据，并将文本编码成数字数据，这对于 ML 训练来说是非常理想的。最后，我们将分析相关性和时间序列，并过滤掉不相关的数据来训练最大似然模型。</p>
+			<h2 id="_idParaDest-59"><a id="_idTextAnchor064"/>数据质量评估</h2>
+			<p>为了评估数据的质量，我们寻求准确性、完整性、可靠性、相关性和及时性。首先，让我们通过评估格式、累积统计数据和异常(如缺失数据)来检查数据是否完整可靠。我们使用熊猫的功能如下:</p>
+			<pre>df.describe()</pre>
+			<p>通过使用<code>describe</code>函数，我们可以观察到如下输出中的描述性统计数据:</p>
+			<div><div><img src="img/B16572_03_07.jpg" alt="Figure 3.7 – Descriptive statistics of the DataFrame&#13;&#10;"/>
+				</div>
+			</div>
+			<p class="figure-caption">图 3.7-数据帧的描述性统计</p>
+			<p>一些观察可以得出结论，数据是连贯的，相关的，因为它描述了真实生活的统计数据，如平均温度约为 11°C，风速约为 10 公里/小时。芬兰的最低气温往往达到零下 21 摄氏度左右，平均能见度为 10 公里。诸如此类的事实描述了相关性和数据来源条件。现在，让我们<a id="_idIndexMarker206"/>观察列格式:</p>
+			<pre>df.dtypes</pre>
+			<p>以下是每列的格式:</p>
+			<ul>
+				<li><code>S_No</code> <code>int64</code></li>
+				<li><code>Timestamp</code>T3】</li>
+				<li><code>Location</code> <code>object</code></li>
+				<li><code>Temperature_C</code> <code>float64</code></li>
+				<li><code>Apparent_Temperature_C</code>T9】</li>
+				<li><code>Humidity</code>T11】</li>
+				<li><code>Wind_speed_kmph</code>T13】</li>
+				<li><code>Wind_bearing_degrees</code>T15】</li>
+				<li><code>Visibility_km</code> <code>float64</code></li>
+				<li><code>Pressure_millibars</code>T19】</li>
+				<li><code>Weather_conditions</code> <code>object</code></li>
+				<li><code>dtype:</code> <code>object</code></li>
+			</ul>
+			<p>正如所料，大多数列都是数字(<code>float</code>和<code>int</code>)。<code>Timestamp</code>栏为<code>object</code>格式，需改为<code>DateTime</code>格式:</p>
+			<pre>df['Timestamp'] = pd.to_datetime(df['Timestamp'])</pre>
+			<p>使用 pandas 的<code>to_datetime</code>函数，我们将<code>Timestamp</code>转换为<code>DateTime</code>格式。接下来，让我们看看是否有空值。我们使用 pandas 的<code>isnull</code>函数来检查这一点:</p>
+			<pre>df.isnull().values.any()</pre>
+			<p>在检查任何空值时，如果发现空值，作为下一步，缺失数据的校准是必要的。</p>
+			<h2 id="_idParaDest-60"><a id="_idTextAnchor065"/>校准缺失数据</h2>
+			<p>数据中有<a id="_idIndexMarker207"/>缺失值是不理想的，因为这是数据质量差的<a id="_idIndexMarker208"/>标志。可以使用各种技术替换缺失的数据或值，而不会损害数据的正确性和可靠性。在检查了我们一直在处理的数据之后，发现了一些缺失的值。我们使用<code>Forward fill</code>方法处理缺失数据:</p>
+			<pre>df['Weather_conditions'].fillna(method='ffill', inplace=True, axis=0)</pre>
+			<p><code>NaN</code>或空值仅出现在<code>Weather_conditions</code>栏中。我们通过使用 pandas 的<code>fillna()</code>方法和向前填充(<code>ffill</code>)方法来替换<code>NaN</code>值。由于天气是渐进的，它可能会复制数据中的前一个事件。因此，我们使用向前填充方法，该方法复制最后观察到的非空值，直到遇到另一个非空值。</p>
+			<h2 id="_idParaDest-61"><a id="_idTextAnchor066"/>标签编码</h2>
+			<p>由于机器不理解人类语言或文本，所有文本都必须转换成数字。在此之前，让我们处理文本。我们在文本中有一个<code>Weather_conditons</code>列，带有值或标签，如<code>rain</code>、<code>snow</code>和<code>clear</code>。使用 pandas 的<code>value_counts()</code>函数找到这些值，如下所示:</p>
+			<pre>df['Weather_conditions'].value_counts()</pre>
+			<p><code>Weather_conditions</code>可以通过将列标签分为两个标签<code>rain</code>或<code>no_rain</code>来简化。这两个类别的预测将使我们能够为货运公司解决业务问题:</p>
+			<pre>df['Weather_conditions'].replace({"snow": "no_rain",  "clear": "no_rain"}, inplace=True)</pre>
+			<p>这将用<code>no_rain</code>替换<code>snow</code>和<code>clear</code>值，因为这两种情况都意味着港口没有降雨。既然已经处理了标签，我们可以使用<code>rain</code>和<code>no_rain</code>将<code>Weather_conditions</code>列转换成机器可读的形式或数字，标签编码会很有效，因为它会将这些值转换成 0 和 1。如果有两个以上的值，<strong class="bold">一键编码</strong>是一个很好的<a id="_idIndexMarker212"/>选择，因为给分类变量分配增量数字可以在训练期间给变量更高的优先级或数值偏差。一键编码防止对任何变量的偏见或更高的偏好，确保对分类变量的每个值的中立特权。在我们的例子中，由于我们只有两个分类变量，我们使用 scikit-learn 执行标签编码，如下所示:</p>
+			<pre>from sklearn.preprocessing import LabelEncoder
+le = LabelEncoder()
+y = df['Weather_conditions']
+y = le.fit_transform(y)</pre>
+			<p>这里，我们导入了<code>LabelEncoder()</code>函数，它将使用<code>fit_transform()</code>方法将<code>Weather_conditions</code>列编码为 0 和 1。我们可以这样做，用标签编码或机器可读的形式替换<a id="_idIndexMarker213"/>之前的文本列到<code>Weather_condition</code>列，如下所示:</p>
+			<pre>y = pd.DataFrame(data=y, columns=["Weather_condition"])
+df = pd.concat([df,y], axis=1)
+df.drop(['Weather_conditions'], axis=1, inplace=True)</pre>
+			<p>这里，我们将新的标签编码或机器可读的<code>Weather_condition</code>列连接到数据帧，并删除先前的非机器可读或文本的<code>Weather_conditions</code>列。数据现在是机器可读的形式，并准备进一步处理。您可以通过执行笔记本中的<code>df.head()</code>来检查转换后的数据(可选)。</p>
+			<h2 id="_idParaDest-62"><a id="_idTextAnchor067"/>新功能–未来天气状况</h2>
+			<p>由于我们的任务是<a id="_idIndexMarker214"/>预测未来 4 小时的天气状况，我们通过将<code>Current_weather_condition</code>移动四行来创建一个名为<code>Future_weather_condition</code>的新功能，因为每行记录有一个小时的时间间隔。<code>Future_weather_condition</code>是未来 4 小时<a id="_idIndexMarker215"/>天气状况的标签。我们将使用这一新功能作为因变量，使用 ML 进行预测:</p>
+			<pre>df['Future_weather_condition'] = df.Current_weather_condition.shift(4, axis = 0) 
+df.dropna(inplace=True)</pre>
+			<p>我们将在 DataFrame 上使用 pandas 的<code>dropna()</code>函数来丢弃或删除空值，因为由于转移到新列，一些行将具有空值。</p>
+			<h2 id="_idParaDest-63"><a id="_idTextAnchor068"/>数据关联和过滤</h2>
+			<p>现在<a id="_idIndexMarker216"/>数据完全是机器可读的，我们<a id="_idIndexMarker217"/>可以使用<strong class="bold">皮尔逊相关系数</strong>来观察<a id="_idIndexMarker218"/>每一列如何与其他列相关。数据和特征关联是 ML 模型训练的特征选择之前的重要步骤，特别是当特征是连续的时，就像我们的情况。皮尔逊相关系数是每个变量(<em class="italic"> X </em>和<em class="italic"> y </em>)之间的统计线性相关，产生一个在<em class="italic"> +1 </em>和<em class="italic"> -1 </em>之间的值。值<em class="italic"> +1 </em>为正线性相关，<em class="italic"> -1 </em>为负线性相关，<em class="italic"> 0 </em>为无线性相关。它可以用来理解连续变量之间的关系，尽管值得注意的是，皮尔逊相关并不意味着因果关系。我们可以使用 pandas 观察我们数据的皮尔逊相关系数，如下所示:</p>
+			<pre>df.corr(method="pearson")
+# Visualizing using heatmap
+corrMatrix = df.corr()
+sn.heatmap(corrMatrix, annot=True)
+plt.show()</pre>
+			<p>下面是<code>Pearson</code>关联结果的热图:</p>
+			<div><div><img src="img/B16572_03_08.jpg" alt="Figure 3.8 – Heatmap of correlation scores&#13;&#10;"/>
+				</div>
+			</div>
+			<p class="figure-caption">图 3.8–关联分数热图</p>
+			<p>从<em class="italic">图 3.8 </em>中的<a id="_idIndexMarker219"/>热图可以看出<code>Temperature</code>和<code>Apparent_Temperature_C</code>系数为<code>0.99</code>。<code>S_No</code>(序列号)是一个连续值，它或多或少类似于数据帧的增量索引，可以被丢弃或过滤掉，因为它没有提供很大的价值。因此<code>Apparent_Temperature</code>和<code>S_No</code>都被丢弃或过滤。现在让我们观察我们的因变量<code>Future_weather_condition</code>，以及它与其他自变量的相关性:</p>
+			<div><div><img src="img/B16572_03_09.jpg" alt="Figure 3.9 – Pearson correlation for Future_weather_condition&#13;&#10;"/>
+				</div>
+			</div>
+			<p class="figure-caption">图 3.9–未来天气状况的皮尔逊相关</p>
+			<p>介于 0.5 和 1.0 之间的任何值都具有正相关性，介于-0.5 和-1.0 之间的任何值都具有负相关性。从图形来看，与<code>Current_weather_condition</code>呈正相关，<code>Temperature_C</code>也与<code>Future_weather_c</code>呈正相关。</p>
+			<h2 id="_idParaDest-64"><a id="_idTextAnchor069"/>时间序列分析</h2>
+			<p>由于<a id="_idIndexMarker223"/>温度是一个连续的变量，因此<a id="_idIndexMarker224"/>观察其随时间的变化是值得的。我们可以使用 matplotlib 可视化时间序列图，如下所示:</p>
+			<pre>time = df['Timestamp]
+temp = df['Temperature_C']
+# plot graph
+plt.plot(time, temp)
+plt.show()</pre>
+			<p>这是结果图:</p>
+			<div><div><img src="img/B16572_03_10.jpg" alt=" Figure 3.10 – Time series progression of Temperature in C&#13;&#10;"/>
+				</div>
+			</div>
+			<p class="figure-caption">图 3.10–温度的时间序列变化</p>
+			<p>在评估了<em class="italic">图 3.10 </em>中的温度时间序列之后，我们可以看到，它描绘了一个<a id="_idIndexMarker225"/>稳定模式，因为均值、方差和<a id="_idIndexMarker226"/>协方差被观察到是随时间稳定的。静态行为可以是趋势、周期、随机漫步或三者的组合。这是有道理的，因为温度会随着季节变化，遵循季节性模式。这给我们带来了数据分析和处理的结束；我们现在准备在继续训练 ML 模型之前在工作空间中注册已处理的数据。</p>
+			<h1 id="_idParaDest-65"><a id="_idTextAnchor070"/>数据注册和版本控制</h1>
+			<p>在<a id="_idIndexMarker228"/>开始 ML 训练之前，在工作空间中注册<a id="_idIndexMarker227"/>和版本化数据是至关重要的，因为它使我们能够回溯我们的实验或 ML 模型到用于训练模型的数据源。对数据进行版本控制的目的是在任何点进行回溯，复制模型的训练，或者根据用于解释 ML 模型的推断或测试数据来解释模型的工作方式。出于这些原因，我们将注册已处理的数据并对其进行版本化，以将其用于我们的 ML 管道。我们将使用 Azure Machine Learning SDK 将处理后的数据注册到 Azure Machine Learning workspace 并发布版本，如下所示:</p>
+			<pre>subscription_id = '---insert your subscription ID here----'
+resource_group = 'Learn_MLOps'
+workspace_name = 'MLOps_WS' 
+workspace = Workspace(subscription_id, resource_group, workspace_name)</pre>
+			<p>从 Azure 机器学习门户获取<a id="_idIndexMarker229"/>你的<code>subscription ID</code>、<code>resource_group</code>和<code>workspace_name</code>，如图<em class="italic">图 3.11 </em>所示<a id="_idIndexMarker230"/>:</p>
+			<div><div><img src="img/B16572_03_11.jpg" alt="Figure 3.11 – Workspace credentials (Resource group, Subscription ID, and Workspace name)&#13;&#10;"/>
+				</div>
+			</div>
+			<p class="figure-caption">图 3.11–工作区凭证(资源组、订阅 ID 和工作区名称)</p>
+			<p>通过请求工作区凭证，获得工作区对象。运行<code>Workspace()</code>功能时，你的笔记本会连接到 Azure 平台。系统会提示您点击一个身份验证链接，并提供一个随机代码和 Azure 帐户的详细信息。之后，脚本将确认身份验证。使用 workspace 对象，我们可以访问默认的数据存储，并将所需的数据文件上传到连接到工作区的 Azure Blob 存储上的数据存储:</p>
+			<pre># get the default datastore linked to upload prepared data
+datastore = workspace.get_default_datastore()
+#upload the local file from src_dir to target_path in datastore
+datastore.upload(src_dir='Dataset', target_path='data')
+dataset =  /
+Dataset.Tablular.from_delimited_files(datastore.path('data/weather_dataset_processed.csv'))</pre>
+			<p><code>Tabular.from_delimited_files()</code>可能会导致未安装的 Linux 或 MacOS 机器出现故障。安装了 NET Core 2.1。为了正确安装该附件，请遵循这些说明<a id="_idIndexMarker231"/>:<a href="https://docs.microsoft.com/en-us/dotnet/core/install/linux">https://docs.microsoft.com/en-us/dotnet/core/install/linux</a>。成功执行前面的<a id="_idIndexMarker232"/>命令后，您将把数据文件上传到数据存储器，并看到如图<em class="italic">图 3.12 </em>所示的结果。您可以从数据存储中预览数据集，如下所示:</p>
+			<pre># preview the first 3 rows of the dataset from the datastore
+dataset.take(3).to_pandas_dataframe()</pre>
+			<p>当数据上传到数据存储时，我们会将数据集注册到工作区，并按如下方式对其进行版本化:</p>
+			<pre>weather_ds = dataset.register(workspace=workspace, name=weather_ds_portofTurku, description='processed weather data')</pre>
+			<p><code>register(...)</code>函数将数据集注册到工作区，如图<em class="italic">图 3.12 </em>所示。有关详细文档，请访问 https://docs . Microsoft . com/en-us/azure/machine-learning/how-to-create-register-datasets # register-datasets:</p>
+			<div><div><img src="img/B16572_03_12.jpg" alt="Figure 3.12 – Processed dataset registered in the ML workspace&#13;&#10;"/>
+				</div>
+			</div>
+			<p class="figure-caption">图 3.12–在 ML 工作空间中注册的已处理数据集</p>
+			<h1 id="_idParaDest-66"><a id="_idTextAnchor071"/>走向 ML 管道</h1>
+			<p>到目前为止，我们已经通过处理缺失数据等不规则性来处理数据，通过观察相关性来选择特征，创建新特征，并最终将处理后的数据摄取并版本化到机器学习工作空间。有两种方式来为 ML 管道中的 ML 模型训练的数据摄取提供燃料。一种方法是从中央存储(存储所有原始数据的地方)获取，另一种方法是使用要素存储。因为知识就是力量，所以在我们进入 ML 管道之前，让我们先了解一下特性库的用途。</p>
+			<h2 id="_idParaDest-67"><a id="_idTextAnchor072"/>特色店</h2>
+			<p>特征存储通过存储重要的特征并使它们可用于训练或推断来补充中央存储。要素存储是将原始数据转换为有用的要素的存储，ML 模型可以直接使用这些要素进行训练和推断以进行预测。原始数据通常来自各种数据源，包括结构化数据源、非结构化数据源、流式数据源、批处理数据源和实时数据源。所有这些都需要被提取、转换(使用特性管道)，并存储在某个地方，而这个地方可以是特性存储。然后，功能存储获取数据并使其可供消费。数据科学家倾向于重复工作(尤其是数据处理)。如果我们有一个集中的特性库，这是可以避免的。要素存储允许数据科学家与其他团队有效地共享和重用要素，从而提高他们的工作效率，因为他们不必从头开始预处理要素。</p>
+			<div><div><img src="img/B16572_03_13.jpg" alt="Figure 3.13: Feature store workflow&#13;&#10;"/>
+				</div>
+			</div>
+			<p class="figure-caption">图 3.13:功能存储工作流</p>
+			<p>正如我们在<em class="italic">图 3.13 </em>中所看到的，一个<strong class="bold">特征库</strong>正在使用一个<strong class="bold">特征管道</strong>连接到一个<strong class="bold">中央存储器</strong>(它存储来自多个来源的数据)来将原始数据转换并存储为对 ML 训练有用的特征。存储在特征存储中的特征可被检索用于训练、服务或发现见解或趋势。以下是使用功能库的一些好处:</p>
+			<ul>
+				<li>高效的<strong class="bold">特征工程</strong>用于<strong class="bold">训练数据</strong></li>
+				<li>避免训练前不必要的数据预处理</li>
+				<li>避免重复的特征工程</li>
+				<li>可用于快速推理(测试)的特性</li>
+				<li>系统支持功能服务</li>
+				<li>按特征存储进行探索性数据分析</li>
+				<li>重用模型功能的机会</li>
+				<li>对功能的快速查询</li>
+				<li>训练数据集的再现性</li>
+				<li>在生产中监控特征漂移(我们将在第十二章 、<em class="italic">模型服务和监控</em>中了解特征漂移)</li>
+				<li>可用于数据漂移监控的特性</li>
+			</ul>
+			<p>了解特征库的优势是很好的，因为它可能有助于推动 ML 管道(尤其是数据摄取步骤)，但并不适用于所有情况。这取决于您的用例。对于我们的用例实现，我们将不会使用功能存储，而是直接从中央存储中连接数据，在中央存储中，我们已经预处理并注册了训练和测试所需的数据集。有了摄取和版本化的数据，您就可以着手构建您的 ML 管道了。ML 管道将实现进一步的特征工程、特征缩放、管理训练和测试数据集，这些数据集将用于训练 ML 模型和调整机器学习训练的超参数。ML 管道和功能将在云计算资源上执行，不像我们在本章中所做的那样在本地计算机上执行。它将完全基于云。</p>
+			<h1 id="_idParaDest-68"><a id="_idTextAnchor073"/>总结</h1>
+			<p>在这一章中，我们学习了如何为业务问题确定一个合适的 ML 解决方案，并对操作进行分类以实现合适的 MLOps。我们建立了我们的工具、资源和开发环境。讨论了源代码管理的 10 个原则，以及数据质量特征。恭喜你。到目前为止，您已经实现了 MLOps 工作流的一个关键构建模块——数据处理和将处理后的数据注册到工作空间。最后，我们对 ML 管道的本质有所了解。</p>
+			<p>在下一章中，您将完成 MLOps 中最激动人心的部分:构建 ML 管道。让我们继续前进！</p>
+		</div>
+	
+
+</body></html>

@@ -1,0 +1,233 @@
+<html><head/><body>
+
+
+	
+		<title>B16572_08_Final_JM_ePub</title>
+		
+	
+	
+		<div><h1 id="_idParaDest-138">第 8 章:API 和微服务管理</h1>
+			<p><a id="_idTextAnchor160"/>在本章中，您将了解 API 和微服务管理。到目前为止，我们已经部署了作为 API 的 ML 应用程序。现在我们将研究如何开发、组织、管理和服务 API。您将学习 ML 推理的 API 和微服务设计原则，以便您可以设计自己的定制 ML 解决方案。</p>
+			<p>在本章中，我们将边做边学，使用 FastAPI 和 Docker 构建一个微服务，并将其作为 API 使用。为此，我们将介绍为之前训练的 ML 模型设计 API 和微服务的基础知识(在<a href="B16572_04_Final_JM_ePub.xhtml#_idTextAnchor074"> <em class="italic">第 4 章</em> </a>，<em class="italic">机器学习管道</em>)。最后，我们将思考一些关键原则、挑战和技巧，以便为测试和生产环境设计一个健壮的、可扩展的微服务和 API。本章将涵盖以下主题:</p>
+			<ul>
+				<li><a id="_idTextAnchor161"/>API 和微服务介绍</li>
+				<li>ML 对微服务的需求</li>
+				<li>旧是金——REST 基于 API 的微服务</li>
+				<li>将 ML 模型作为 API 服务的实际实现</li>
+				<li>使用 Docker 开发微服务</li>
+				<li>测试 API 服务</li>
+			</ul>
+			<h1 id="_idParaDest-139"><a id="_idTextAnchor162"/>API 和微服务介绍</h1>
+			<p>API 和<a id="_idIndexMarker595"/>微服务是强大的工具，有助于使您的<strong class="bold"> ML </strong> ( <strong class="bold"> ML </strong>)模型<a id="_idIndexMarker596"/>在生产或遗留系统中变得有用，用于服务模型或与系统的其他组件通信。使用 API 和微服务，您可以设计一个健壮的、可扩展的 ML 解决方案来满足您的业务需求。让我们看看什么是 API 和微服务，以及它们如何在现实世界中实现你的模型的潜力。</p>
+			<h2 id="_idParaDest-140"><a id="_idTextAnchor163"/>什么是应用编程接口(API)？</h2>
+			<p>API 是使开发者能够与应用程序进行通信的网关。API 支持两件事:</p>
+			<ul>
+				<li>对应用程序数据的访问</li>
+				<li>应用程序功能的使用</li>
+			</ul>
+			<p>通过访问应用程序数据和功能并与之通信，API 使世界上的电子设备、应用程序和网页能够相互通信，以便协同工作来完成以业务或运营为中心的任务。</p>
+			<div><div><img src="img/B16572_08_01.jpg" alt="Figure 8.1 – Workings of an API&#13;&#10;"/>
+				</div>
+			</div>
+			<p class="figure-caption">图 8.1-API 的工作方式</p>
+			<p>在<em class="italic">图 8.1 </em>中，我们可以看到 API 的作用，因为它支持访问应用数据(从数据库)以及与第三方或其他应用的通信，例如移动应用(针对移动用户)、天气应用(在手机或网络上)、电动汽车等等。自从计算机出现以来，API 就一直在运行，旨在实现应用程序间的通信。随着<a id="_idIndexMarker600"/>时间的推移，我们已经看到开发人员在 2000 年代初与<strong class="bold">简单对象访问协议</strong> ( <strong class="bold"> SOAP </strong>)和<strong class="bold">表述性状态转移</strong> ( <strong class="bold"> REST </strong>)等协议达成共识。近年来，新一代的 API 协议<a id="_idIndexMarker601"/>被开发出来，如<strong class="bold">远程过程调用</strong> ( <strong class="bold"> RPC </strong>)和 GraphQL 如下表所示:</p>
+			<div><div><img src="img/Table_011.jpg" alt="Table 8.1 – API protocols comparison &#13;&#10;"/>
+				</div>
+			</div>
+			<p class="figure-caption">表 8.1–API 协议对比</p>
+			<p>如果您是应用程序(托管在云上或与其他服务通信)的开发人员，了解主流 API 协议是很有价值的。它帮助您根据业务或功能需求设计 API。作为一名程序员，你应该庆幸自己拥有许多 API 协议，因为 20 年前，只有 SOAP 和 REST 是可用的。现在，根据您的需要，有多种选择供您选择，例如，GraphQL、Thrift 和 JSON-RPC。这些协议各有优缺点，很容易找到最适合您情况的协议。</p>
+			<h2 id="_idParaDest-141"><a id="_idTextAnchor164"/>微服务</h2>
+			<p>微服务是一种设计和部署应用程序来运行服务的现代方式。微服务支持分布式应用程序，而不是一个大的整体应用程序，其中功能被分解成更小的片段(称为微服务)。微服务是微服务架构中的单个应用。这与集中式或单片架构相反，在集中式或单片架构中，所有功能都被<a id="_idIndexMarker604"/>捆绑在一个大的应用程序中。由于<strong class="bold">面向服务的架构</strong> ( <strong class="bold"> SOA </strong>)，微服务变得越来越受欢迎，这是开发传统单体(单一且自给自足的应用程序)的一种替代方案。</p>
+			<p>微服务获得了广泛的采用，因为它们使开发人员能够轻松开发、集成和维护应用程序。最终，这归结为一个事实，即单独的功能被独立对待，首先允许你一步一步地开发一个服务的单独功能。最后，它允许您独立处理每个功能，同时集成整个系统来编排服务。这样，您可以添加、改进或修复它，而不会有破坏整个应用程序的风险。微服务对于更大的公司来说是有价值的，因为它们允许团队在没有任何复杂组织的情况下处理孤立的事情。在<em class="italic">图 8.2 </em>中，我们可以看到单片和微服务的区别。与非分布式应用的单片相比，微服务支持分布式应用:</p>
+			<div><div><img src="img/B16572_08_02.jpg" alt="Figure 8.2 – Microservices versus monoliths&#13;&#10;"/>
+				</div>
+			</div>
+			<p class="figure-caption">图 8.2–微服务与整体服务</p>
+			<p>软件开发<a id="_idIndexMarker605"/>团队被授权在充分理解的服务职责范围内独立工作。基于微服务的架构鼓励软件开发团队拥有他们的服务或模块。基于微服务的架构的一个可能的缺点是，如果你将一个应用程序分解成几个部分，那么这些部分就非常需要有效地通信，以保持服务的运行。</p>
+			<p>API 和微服务之间的关系非常有趣，因为它有两个方面。作为基于微服务的架构的结果，API 是在应用中实现该架构的直接结果。而与此同时，API 是在基于微服务的架构中服务之间进行通信以有效运行的必要工具。让我们看看下一节，我们将浏览一些 ML 应用程序的例子。</p>
+			<h1 id="_idParaDest-142"><a id="_idTextAnchor165"/>对 ML 微服务的需求</h1>
+			<p>为了理解 ML 应用对基于微服务的架构的需求，让我们<a id="_idIndexMarker606"/>看一个假设的用例，并经历为该用例开发 ML 应用的各个阶段。</p>
+			<h2 id="_idParaDest-143"><a id="_idTextAnchor166"/>假设的用例</h2>
+			<p>一家大型汽车修理厂需要一种解决方案来<a id="_idIndexMarker607"/>估计工厂中的汽车数量及其准确位置。在维修站安装了一组 IP 摄像机，用于监控设施。设计一个监控和管理汽车维修设施的 ML 系统。</p>
+			<h2 id="_idParaDest-144"><a id="_idTextAnchor167"/>第 1 阶段–概念验证(整体)</h2>
+			<p>在典型案例中，使用可用的<a id="_idIndexMarker609"/>数据点并应用 ML 来展示和验证用例，并向业务利益相关方证明 ML 可以解决他们的问题或改善他们的业务，从而开发出快速 PoC<a id="_idIndexMarker608"/>。</p>
+			<p>在我们假设的用例中，开发了一个 monolith Python 应用程序，它执行以下操作:</p>
+			<ul>
+				<li>从所有摄像机获取流</li>
+				<li>从每个摄像机确定汽车的位置(车头或车尾)</li>
+				<li>将所有估计汇总到设施状态估计器中</li>
+			</ul>
+			<p>我们可以在<em class="italic">图 8.3 </em>中看到，app 被 dockerized 并部署到服务器:</p>
+			<div><div><img src="img/B16572_08_03.jpg" alt="Figure 8.3 – Monolith ML application (PoC for hypothetical use case)&#13;&#10;"/>
+				</div>
+			</div>
+			<p class="figure-caption">图 8.3–Monolith ML 应用程序(假设用例的概念验证)</p>
+			<p>所有摄像机都通过本地网络连接到该服务器。<a id="_idIndexMarker610"/>轿厢位置估计和设施状态估计的算法可以工作，但需要进一步改进，总体来说，PoC 可以工作。由于摄像头、本地网络和其他错误的不稳定性，这个庞大的应用程序很容易崩溃。微服务可以更好地处理这种不稳定性。让我们在第二阶段的实践中看到这一点。</p>
+			<h2 id="_idParaDest-145"><a id="_idTextAnchor168"/>第二阶段——生产(微服务)</h2>
+			<p>在这个阶段，一个不容易崩溃的<a id="_idIndexMarker611"/>应用程序对于持续运行汽车维修机构的监控操作至关重要。因此，基于微服务的架构取代了整体应用，如图<em class="italic">图 8.4 </em>所示:</p>
+			<div><div><img src="img/B16572_08_04.jpg" alt="Figure 8.4 – Microservices (production-ready application for hypothetical use case)&#13;&#10;"/>
+				</div>
+			</div>
+			<p class="figure-caption">图 8.4–微服务(假设用例的生产就绪应用)</p>
+			<p>应用程序以下列方式被分成多个服务:</p>
+			<ul>
+				<li>视频流收集器。</li>
+				<li><strong class="bold">图像处理器</strong>:它聚合图像——它接收、处理和缓存图像，并生成数据包以供进一步处理。</li>
+				<li><strong class="bold">位置分类器</strong>:估计停在修理厂的汽车的位置(车头或车尾)。</li>
+				<li><strong class="bold">设施设置估计器</strong>:异步<a id="_idIndexMarker612"/>接收车辆位置估计，校准设施设置，并将实时数据发送到云端。</li>
+				<li>云使用 MQTT(一种标准的轻量级发布-订阅网络协议，在设备之间传输消息)收集和存储数据。数据显示在仪表板上，供汽车设施操作员分析操作。</li>
+			</ul>
+			<p>每个微服务之间的所有通信都使用 API 来实现。微服务架构的优势在于，如果任何服务崩溃或发生错误，就会产生特定的微服务来替换失败的微服务，以保持整个服务的运行。其次，每个微服务可以由一个专门的团队(由数据科学家、开发人员和 DevOps 工程师组成)持续维护和改进，而不像协调团队那样在一个整体系统上工作。</p>
+			<h1 id="_idParaDest-146"><a id="_idTextAnchor169"/>老即是金——基于 REST API 的微服务</h1>
+			<p>老是金。另外，最好从有各种 API 协议的地方开始。这些年来，<strong class="bold">表述性状态转移</strong> ( <strong class="bold"> REST </strong>)协议已经成为许多应用程序的黄金标准，对于今天的 ML 应用程序来说，它并没有太大的不同。大多数公司更喜欢基于 REST API 协议开发他们的 ML 应用程序。</p>
+			<p>REST API 或 RESTful API 是基于 REST 的，REST 是一种架构方法，主要用于 web 服务开发中的通信。</p>
+			<p>RESTful APIs 被广泛使用；亚马逊、谷歌、LinkedIn 和 Twitter 等公司使用它们。通过 RESTful APIs 为我们的 ML 模型提供服务有很多好处，例如:</p>
+			<ul>
+				<li>向多个用户即时提供预测。</li>
+				<li>添加更多的实例来扩展负载平衡器后面的应用程序。</li>
+				<li>可能使用不同的 API 端点组合多个模型。</li>
+				<li>将我们的模型操作环境与面向用户的环境分开。</li>
+				<li>支持基于微服务的架构。因此，团队可以独立工作来开发和增强服务。</li>
+			</ul>
+			<p>RESTful API 使用 RFC 2616 协议定义的现有 HTTP 方法。表 8.2 总结了 HTTP 方法以及它们在 ML 应用中的 CRUD 操作和目的。</p>
+			<div><div><img src="img/Table_02.jpg" alt="Table 8.2 – REST API HTTP methods&#13;&#10;"/>
+				</div>
+			</div>
+			<p class="figure-caption">表 8.2–REST API HTTP 方法</p>
+			<p>基本的 HTTP 方法有<code>GET</code>、<code>POST</code>、<code>PUT</code>、<code>PATCH</code>和<code>DELETE</code>。这些方法<a id="_idIndexMarker615"/>对应<code>create</code>、<code>read</code>、<code>update</code>、<code>delete</code>。使用这些方法，我们可以开发 RESTful APIs 来服务 ML 模型。由于 OpenAPI 等驱动程序，RESTful APIs 获得了广泛的采用。OpenAPI 规范是一种标准化的 REST API 描述格式。已经成为人类和机器的标准化格式；它支持 REST API 的可理解性，并提供扩展工具，如 API 验证、测试和交互式文档生成器。实际上，OpenAPI 文件使您能够用关键信息描述整个 API，例如:</p>
+			<ul>
+				<li>可用端点(<code>/names</code>)和每个端点上的操作(<code>GET /names</code>、<code>POST /names</code>)</li>
+				<li>每个操作的输入和输出(操作参数)</li>
+				<li>认证方法</li>
+				<li>开发者文档</li>
+				<li>使用条款、许可和其他信息</li>
+			</ul>
+			<p>你可以在这个网站上找到更多关于 OpenAPI 的信息:<a href="https://swagger.io/specification/">https://swagger.io/specification/</a>。</p>
+			<p>在下一节中，我们将开发一个 RESTful API 来服务一个 ML 模型，并使用一个基于 OpenAPI 的名为 Swagger UI 的接口来测试它。</p>
+			<h1 id="_idParaDest-147"><a id="_idTextAnchor170"/>将 ML 模型作为 API 服务的实际实施</h1>
+			<p>在这一节中，我们将应用我们之前学过的 API 和微服务的原理(在<em class="italic">API 和微服务简介</em>一节中)并开发一个 RESTful API 服务来服务 ML 模型。我们将<a id="_idIndexMarker619"/>服务的 ML 模型将用于我们之前处理的业务问题(使用 ML 的天气预测)。我们将使用 FastAPI 框架作为 API 服务模型，并使用 Docker 将 API 服务封装成微服务。</p>
+			<p>FastAPI 是一个部署 ML 模型的框架。它易于快速编码，并通过异步调用和数据完整性检查等功能实现高性能。FastAPI 易于使用，并且遵循 OpenAPI 规范，使得测试和验证 API 变得容易。在这里找到更多关于 FastAPI 的信息:<a href="https://fastapi.tiangolo.com/.">https://fastapi.tiangolo.com/.</a></p>
+			<h2 id="_idParaDest-148"><a id="_idTextAnchor171"/> API 设计和开发</h2>
+			<p>我们将<a id="_idIndexMarker621"/>开发 API 服务并在本地计算机上运行它。(这也可以在我们之前在 Azure 机器学习工作区创建的虚拟机<a id="_idIndexMarker622"/>上开发。对于学习，建议在本地练习，方便起见。)</p>
+			<p>首先，在您的 PC 或笔记本电脑上克隆图书存储库，然后转到<code>08_API_Microservices</code>文件夹。我们将使用这些文件来构建 API 服务:</p>
+			<pre>Learn_MLOps
+├──08_API_Microservices
+│   ├── Dockerfile
+    ├── app
+            └── variables.py
+            └── weather_api.py
+            └── requirements.txt
+            └── artifacts
+                       └── model-scaler.pkl
+                       └── svc.onnx</pre>
+			<p>目录树中列出的文件夹<code>08_API_Microservices</code>的文件包括一个 Dockerfile(用于从<code>FASTAPI</code>服务构建 Docker 映像和容器)和一个名为<code>app</code>的文件夹。<code>app</code>文件夹包含文件<code>weather_api.py</code>(包含 API 端点<a id="_idIndexMarker624"/>定义的<a id="_idIndexMarker623"/>代码)、<code>variables.py</code>(包含输入变量定义)和<code>requirements.txt</code>(包含运行 API 服务所需的 Python 包)，以及一个包含模型构件的文件夹，例如模型缩放器(用于缩放输入数据)和序列化的模型文件(<code>svc.onnx</code>)。</p>
+			<p>该模型之前已经连载，在模型训练和评估阶段，参见<a href="B16572_05_Final_JM_ePub.xhtml#_idTextAnchor093"> <em class="italic">第 5 章</em> </a>、<em class="italic">模型评估和包装</em>。模型被下载并放置在 Azure 机器学习工作区(<code>Learn_MLOps</code>)的模型注册表的文件夹中，如图<em class="italic">图 8.3 </em>所示:</p>
+			<div><div><img src="img/B16572_08_05.jpg" alt="Figure 8.5 – Download the serialized model file&#13;&#10;"/>
+				</div>
+			</div>
+			<p class="figure-caption">图 8.5–下载序列化的模型文件</p>
+			<p>你可以<a id="_idIndexMarker625"/>用你在<a id="_idIndexMarker626"/>Azure Machine learning workspace 中训练过的文件替换<code>svc.onnx</code>和<code>model-scalar.pkl</code>文件，或者继续使用这些文件进行快速实验。现在我们将研究每个文件的代码。先说<code>variables.py</code>。</p>
+			<h3>变量. py</h3>
+			<p>我们只使用一个包来定义输入变量。我们用的包叫<code>pydantic</code>；这是一个使用 Python 类型注释的数据验证和设置管理包。使用<code>pydantic</code>，我们将在名为<code>WeatherVariables</code>的类中定义用于<code>fastAPI</code>服务的输入变量:</p>
+			<pre>from pydantic import BaseModel
+class WeatherVariables(BaseModel):
+                        temp_c: float 
+                        humidity: float 
+                        wind_speed_kmph: float 
+                        wind_bearing_degree: float
+                        visibility_km: float 
+                        pressure_millibars: float 
+                        current_weather_condition: float</pre>
+			<p>在<code>WeatherVariables</code>类中，定义变量及其类型，如前面的代码所示。在<a href="B16572_04_Final_JM_ePub.xhtml#_idTextAnchor074"> <em class="italic">第 4 章</em> </a>、<em class="italic">机器学习管道</em>中用于训练模型的相同变量将用于推理。我们在这里将这些输入变量定义为<code>temp_c</code>、<code>humidity</code>、<code>wind_speed_kmph</code>、<code>wind_bearing_degree</code>、<code>visibility_km</code>、<code>pressure_millibars</code>和<code>current_weather_condition</code>。这些变量的数据类型定义为<code>float</code>。我们将导入<code>WeatherVariables</code>类，<a id="_idIndexMarker628"/>使用<code>fastAPI</code>服务中定义的输入变量。让我们看看如何使用<code>Weather_api.py</code>文件在<code>fastAPI</code>服务中使用<code>WeatherVariables</code>类中定义的变量。</p>
+			<h3>Weather_api.py</h3>
+			<p>该文件用于<a id="_idIndexMarker629"/>定义<code>fastAPI</code>服务。所需的模型工件被导入并用于服务 API 端点，以推断用于实时或生产预测的模型:</p>
+			<ol>
+				<li>We start by importing the required packages as follows:<pre>import uvicorn
+from fastapi import FastAPI
+from variables import WeatherVariables
+import numpy
+import pickle
+import pandas as pd
+import onnxruntime as rt</pre><p>我们导入了需要的包，比如<code>uvicorn</code>(一个 ASGI 服务器实现包)<code>fastapi</code><code>numpy</code><code>pickle</code><code>pandas</code><code>onnxruntime</code>(用来反序列化和推断<code>onnx</code>模型)。</p><p class="callout-heading">注意</p><p class="callout">我们导入了之前在<code>variables.py</code>文件中创建的<code>WeatherVariables</code>类。我们将使用该文件中定义的变量来获取<code>fastAPI</code>服务的输入数据。</p></li>
+				<li>Next, we create an <code>app</code> object. You will notice some syntactic similarities of <code>fastAPI</code> with the Flask web framework (if you have ever used Flask). <p>例如，在下一步中，我们使用函数<code>FastAPI()</code>来创建<code>app</code>对象，从而创建<code>app</code>对象。创建一个<code>app</code>对象类似于我们通过<code>Flask</code>例子所做的:从 Flask，导入<code>Flask</code>，然后我们使用<code>Flask</code>函数以<code>app = Flask ()</code>的方式创建<code>app</code>对象。当我们使用<code>fastAPI</code>构建 API 端点时，您会注意到这样的<a id="_idIndexMarker630"/>相似之处:</p><pre>app = FastAPI()
+# Load model scalar
+pickle_in = open("artifacts/model-scaler.pkl", "rb")
+scaler = pickle.load(pickle_in)
+# Load the model
+sess = rt.InferenceSession("artifacts/svc.onnx")
+input_name = sess.get_inputs()[0].name
+label_name = sess.get_outputs()[0].name</pre></li>
+				<li>在创建了<code>app</code>对象之后，我们将导入必要的模型工件，以便在端点中进行推断。<code>Pickle</code>用于反序列化数据定标器文件<code>model-scaler.pkl</code>。该文件用于训练模型(在第 4 章 、<em class="italic">机器学习管道</em>中)，现在我们将在模型推断之前使用它来缩放传入的数据。我们将使用之前训练好的支持向量分类器模型，该模型被序列化到名为<code>scv.onnx</code>的文件中(我们可以访问并下载如图<em class="italic">图 8.3 </em>所示的文件)。</li>
+				<li><code>ONNX</code> Runtime is used to load the serialized model into inference sessions (<code>input_name</code> and <code>label_name</code>) for making ML model predictions. Next, we can move to the core part of defining the API endpoints to infer the ML model. To begin, we make a <code>GET</code> request to the index route using the wrapper function <code>@app.get('/')</code>:  <pre>@app.get('/')
+def index():
+    return {'Hello': 'Welcome to weather prediction service, access the api     docs and test the API at http://0.0.0.0/docs.'}</pre><p>为索引路径定义了一个名为<code>index()</code>的函数。它返回欢迎<a id="_idIndexMarker631"/>消息，指向 docs 链接。该消息旨在引导用户通过 docs 链接来访问和测试 API 端点。</p></li>
+				<li>Next, we will define the core API endpoint, <code>/predict</code>, which is used to infer the ML model. A wrapper function, <code>@app.post('/predict')</code>, is used to make a <code>POST</code> request: <pre>@app.post('/predict')
+def predict_weather(data: WeatherVariables):
+    data = data.dict()
+    # fetch input data using data varaibles
+    temp_c = data['temp_c']
+    humidity = data['humidity']
+    wind_speed_kmph = data['wind_speed_kmph']
+    wind_bearing_degree = data['wind_bearing_degree']
+    visibility_km = data['visibility_km']
+    pressure_millibars = data['pressure_millibars']
+    current_weather_condition = data['current_weather_condition']</pre><p>为端点<code>/predict</code>启动名为<code>predict_weather()</code>的功能。在函数内部，我们创建了一个名为<code>data</code>的变量，它将捕获输入数据；这个变量捕获我们通过<code>POST</code>请求获得的<code>JSON</code>数据，并指向<code>WeatherVariables</code>。一旦我们发出<code>POST</code>请求，传入数据中的所有<a id="_idIndexMarker632"/>变量将被映射到<code>variables.py</code>文件中的<code>WeatherVariables</code>类中的变量。</p></li>
+				<li>Next, we convert the data into a dictionary, fetch each input variable from the dictionary, and compress them into a <code>numpy</code> array variable, <code>data_to_pred</code>. We will use this variable to scale the data and infer the ML model: <pre>    data_to_pred = numpy.array([[temp_c, humidity, wind_speed_kmph,         
+wind_bearing_degree,visibility_km, pressure_millibars, 
+current_weather_condition]])
+    # Scale input data
+    data_to_pred = scaler.fit_transform(data_to_pred.reshape(1, 7))
+  # Model inference
+    prediction = sess.run(
+        [label_name], {input_name: data_to_pred.astype(numpy.float32)})[0]</pre><p>使用之前使用<code>fit_transform()</code>功能加载的定标器对数据(<code>data_to_pred</code>)进行整形和定标。</p></li>
+				<li>Next, the model inference step, which is the key step, is performed by inferencing scaled data to the model, as shown in the preceding code. The prediction inferred from the model is then returned as the output to the <code>prediction</code> variable: <pre>if(prediction[0] &gt; 0.5):
+        prediction = "Rain"
+    else:
+        prediction = "No_Rain"
+    return {
+        'prediction': prediction
+    }    </pre><p>最后，我们将通过基于 ML 模型的预测建议<code>rain</code>或<code>no_rain</code>来将<a id="_idIndexMarker633"/>模型推理转换为人类可读的格式，并将<code>POST</code>调用的<code>prediction</code>返回到<code>/predict</code>端点。这就把我们带到了<code>weather_api.py</code>文件的末尾。当通过传递输入数据发出<code>POST</code>请求时，服务以<code>0</code>或<code>1</code>的形式返回模型预测。该服务将根据模型预测返回<code>rain</code>或<code>not_rain</code>。当您得到这样的预测时，您的服务正在工作，并且足够健壮以满足生产需求。</p></li>
+			</ol>
+			<h3>Requirement.txt</h3>
+			<p>这个文本文件包含运行<code>fastAPI</code>服务所需的所有<a id="_idIndexMarker634"/>包:</p>
+			<pre>numpy
+fastapi
+uvicorn
+scikit-learn==0.20.3
+pandas
+onnx
+onnxruntime</pre>
+			<p>这些包应该安装在您希望运行 API 服务的环境中。我们将使用<code>numpy</code>、<code>fastapi</code>(创建健壮 API 的 ML 框架)、<code>uvicorn</code>(AGSI 服务器)、<code>scikit-learn</code>、<code>pandas</code>、<code>onnx</code>和<code>onnxruntime</code>(反序列化和推断<code>onnx</code>模型)来运行<a id="_idIndexMarker635"/>FastAPI 服务。为了以标准化的方式部署和运行 API 服务，我们将使用 Docker 在 Docker 容器中运行 FastAPI 服务。</p>
+			<p>接下来，让我们看看如何为服务创建 Dockerfile。</p>
+			<h1 id="_idParaDest-149"><a id="_idTextAnchor172"/>使用 Docker 开发微服务</h1>
+			<p>在本节中，我们<a id="_idIndexMarker636"/>将使用 Docker 以一种<a id="_idIndexMarker637"/>标准化的方式打包 FastAPI 服务。这样，我们可以在大约 5 分钟内将 Docker 映像或容器部署到您选择的部署目标上。</p>
+			<p>Docker 有几个优点，比如可复制性、安全性、开发简单性等等。我们可以使用 Docker Hub 的<code>fastAPI</code> ( <code>tiangolo/uvicorn-gunicorn-fastapi</code>)官方 Docker 图片。以下是 Dockerfile 文件的一个片段:</p>
+			<pre>FROM tiangolo/uvicorn-gunicorn-fastapi:python3.7
+COPY ./app /app
+RUN pip install -r requirements.txt
+EXPOSE 80
+CMD ["uvicorn", "weather_api:app", "--host", "0.0.0.0", "--port", "80"]</pre>
+			<p>首先，我们通过使用<code>FROM</code>命令并指向图像–<code>tiangolo/uvicorn-gunicorn-fastapi:python3.7</code>,使用来自 Docker Hub 的官方<code>fastAPI</code> Docker 图像。镜像使用 Python 3.7，兼容<code>fastAPI</code>。接下来，我们将<code>app</code>文件夹复制到<code>docker image/container</code>内名为<code>app</code>的目录中。将文件夹<code>app</code>复制到 Docker 镜像/容器中后，我们将使用<code>RUN</code>命令安装文件<code>requirements.txt</code>中列出的必要包。</p>
+			<p>由于<code>fastAPI</code>的<code>uvicorn</code>服务器(AGSI 服务器)默认使用端口<code>80</code>，我们将<code>EXPOSE</code>端口<code>80</code>用于 Docker 图像/容器。最后，我们将使用命令<code>CMD "uvicorn weather_api:app –host 0.0.0.0 –port 80"</code>启动<a id="_idIndexMarker638"/> Docker 映像/容器中的服务器。此<a id="_idIndexMarker639"/>命令指向<code>weather_api.py</code>文件，以访问服务的<code>fastAPI</code> app 对象，并将其托管在映像/容器的端口<code>80</code>上。</p>
+			<p>恭喜，你快成功了。现在，我们将测试微服务的就绪性，看看它是否以及如何工作。</p>
+			<h1 id="_idParaDest-150"><a id="_idTextAnchor173"/>测试 API</h1>
+			<p>为了测试 API 的<a id="_idIndexMarker640"/>准备情况，我们将执行以下步骤:</p>
+			<ol>
+				<li value="1">让我们从构建 Docker 映像开始。为此，先决条件是安装 Docker。转到您的终端或命令提示符，将存储库克隆到您想要的位置，并访问文件夹<code>08_API_Microservices</code>。执行以下 Docker 命令来构建 Docker 映像:<pre><code>build</code> command will start building the Docker image following the steps listed in the Dockerfile. The image is tagged with the name <code>fastapi</code>. After successful execution of the <code>build</code> command, you can validate whether the image is built and tagged successfully or not using the <code>docker images</code> command. It will output the information as follows, after successfully building the image:<pre><strong class="bold">(base) user ~ docker images   </strong> <strong class="bold">REPOSITORY   TAG       IMAGE ID       CREATED          SIZE</strong> <strong class="bold">fastapi      latest    1745e964f57f   56 seconds ago   1.31GB</strong></pre> </pre></li>
+				<li>在本地运行 Docker 容器。现在，我们可以从之前创建的 Docker 映像中派生出一个正在运行的 Docker 容器。要运行 Docker 容器，我们使用<code>RUN</code>命令:<pre><code>fastapi</code> Docker image. The name of the running container is <code>weathercontainer</code> and its port <code>80</code> is mapped to port <code>80</code> of the local computer. The container will run in the background as we have used <code>-d</code> in the <code>RUN</code> command. Upon successfully running a container, a container ID is output on the terminal, for example, <code>2729ff7a385b0a255c63cf03ec9b0e1411ce4426c9c49e8db 4883e0cf0fde567</code>.</pre></li>
+				<li>使用样本数据测试<a id="_idIndexMarker641"/> API 服务。我们将检查容器是否成功运行。要检查这一点，使用以下命令:<pre><code>fastapi</code> is mapped and successfully running on port <code>80</code> of the local machine. We can access the service and test it from the browser on our local machine at the address <code>0.0.0.0:80</code>.<p class="callout-heading">Note</p><p class="callout">If you have no response or errors when you run or test your API service, you may have to disable CORS validation from browsers such as Chrome, Firefox, and Brave or add an extension (for example, go to the Chrome Web Store and search for one) that will disable CORS validation for running and testing APIs locally. By default, you don't need to disable CORS; do it only if required.</p><p>You will see the message that follows:</p><div><img src="img/B16572_08_06.jpg" alt="Figure 8.6 – FastAPI service running on local port 80&#13;&#10;"/></div><p class="figure-caption">Figure 8.6 – FastAPI service running on local port 80</p><p>FastAPI uses the OpenAPI (read more: <a href="https://www.openapis.org/">https://www.openapis.org/</a>, <a href="https://swagger.io/specification/">https://swagger.io/specification/</a>) Specification to serve the model. The <code>0.0.0.0:80/docs</code> and it will direct you to a Swagger-based UI (it uses the OAS) to test your API. </p></pre></li>
+				<li>Now, test the <code>/predict</code> endpoint (by selecting the endpoint and clicking the <strong class="bold">Try it out</strong> button) using input data of your choice, as shown in <em class="italic">Figure 8.6</em>:<div><img src="img/B16572_08_07.jpg" alt="Figure 8.7 – Input for the request body of the FastAPI service&#13;&#10;"/></div><p class="figure-caption">图 8.7-FastAPI 服务请求主体的输入</p></li>
+				<li>点击<code>POST</code>呼叫和<a id="_idIndexMarker644"/>测试端点。使用服务中的模型推断输入，模型预测<code>Rain</code>或<code>No_Rain</code>是<code>POST</code>调用的输出，如图<em class="italic">图 8.7 </em>所示:</li>
+			</ol>
+			<div><div><img src="img/B16572_08_08.jpg" alt="Figure 8.8 – Output for the POST call (/predict endpoint)&#13;&#10;"/>
+				</div>
+			</div>
+			<p class="figure-caption">图 8.8–POST 调用的输出(/预测端点)</p>
+			<p>对<code>/predict</code> API 的<code>POST</code>调用的成功<a id="_idIndexMarker645"/>执行将导致输出模型预测，如图<em class="italic">图 8.6 </em>所示。Docker 容器中运行的模型输出天气状况作为<code>Rain</code>用于<code>POST</code>调用。恭喜你，你已经成功地生成了一个<code>fastAPI</code>容器并对其进行了测试。这个练习应该使您具备了为您的用例构建、部署和测试基于 ML 的 API 服务的技能。</p>
+			<h1 id="_idParaDest-151"><a id="_idTextAnchor174"/>总结</h1>
+			<p>在这一章中，我们学习了 API 设计和生产中微服务部署的关键原则。我们触及了 API 设计方法的基础，并学习了 FastAPI。对于我们的业务问题，我们已经通过在使用 FastAPI 和 Docker 将 ML 模型作为 API 部分的<em class="italic">动手实现中开发 API 服务的实际实现进行了学习。使用本章中获得的实用知识，您可以设计和开发健壮的 API 服务来服务您的 ML 模型。为 ML 模型开发 API 服务是将 ML 模型投入生产的敲门砖。</em></p>
+			<p>在下一章的<a id="_idTextAnchor175"/>中，我们将深入研究测试和安全的概念。我们将使用 Locust 实现一个测试方法来测试 API 服务的健壮性。我们走吧！</p>
+		</div>
+	
+
+</body></html>

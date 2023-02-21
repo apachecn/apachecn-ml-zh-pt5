@@ -1,0 +1,251 @@
+<html><head/><body>
+
+
+	
+		<title>B17076_11_ePub_RK</title>
+		
+	
+	
+		<div><h1 id="_idParaDest-194"><em class="italic"> <a id="_idTextAnchor197"/>第十一章</em>:用 Danfo.js 和 TensorFlow.js 搭建推荐系统</h1>
+			<p>在前一章中，我们向您介绍了 TensorFlow.js，并向您展示了如何创建一个简单的回归模型来预测销售价格。在本章中，我们将更进一步，创建一个推荐系统，在考虑用户偏好的同时，为不同的用户推荐电影。本章结束时，你将理解推荐系统是如何工作的，以及如何用 JavaScript 构建一个推荐系统。</p>
+			<p>具体来说，我们将涵盖以下主题:</p>
+			<ul>
+				<li>什么是推荐系统？</li>
+				<li>创建推荐系统的神经网络方法</li>
+				<li>构建电影推荐系统</li>
+			</ul>
+			<h1 id="_idParaDest-195"><a id="_idTextAnchor198"/>技术要求</h1>
+			<p>要学习本章内容，您需要具备以下条件:</p>
+			<ul>
+				<li>Chrome、Safari、Opera 或 Firefox 等现代浏览器</li>
+				<li>系统上安装的<strong class="bold"> Node.js </strong>、<strong class="bold"> Danfo.js </strong>、TensorFlow.js 和(可选)<strong class="bold"> Dnotebook </strong></li>
+				<li>用于下载数据集的稳定互联网连接</li>
+				<li>本章的代码是可用的，可以从 GitHub 的 https://GitHub . com/packt publishing/Building-Data-Driven-Applications-with-danfo . js/tree/main/chapter 11 中克隆</li>
+			</ul>
+			<p>Danfo.js、TensorFlow.js 和 Dnotebook 的安装说明可以在<a href="B17076_03_ePub_RK.xhtml#_idTextAnchor066"> <em class="italic">第 3 章</em> </a> <em class="italic">、Danfo.js 入门</em>、<a href="B17076_10_ePub_RK.xhtml#_idTextAnchor180"> <em class="italic">第 10 章</em> </a> <em class="italic">、TensorFlow.js 简介</em>和<a href="B17076_02_ePub_RK.xhtml#_idTextAnchor045"> <em class="italic">第 2 章</em> </a> <em class="italic">、Dnotebook-JavaScript 交互式计算环境【中找到</em></p>
+			<h1 id="_idParaDest-196"><a id="_idTextAnchor199"/>什么是推荐系统？</h1>
+			<p><strong class="bold">推荐系统</strong>是可以预测<a id="_idIndexMarker997"/>用户给予项目的偏好或有用性分数的任何系统。使用该偏好分数，它可以向用户推荐项目。</p>
+			<p>这里的物品可以是数码产品，比如电影、音乐、书籍，甚至衣服。每个推荐系统的目标都是能够推荐用户喜欢的项目。</p>
+			<p>推荐<a id="_idIndexMarker998"/>系统非常普及，几乎随处可见；例如:</p>
+			<ul>
+				<li>电影流媒体平台，如<em class="italic">网飞</em>、<em class="italic">亚马逊 Prime </em>、<em class="italic"> Hulu </em>、<em class="italic">迪士尼+ </em>都使用推荐系统向你推荐电影。</li>
+				<li>社交媒体网站如<em class="italic">脸书</em>、<em class="italic">推特</em>和<em class="italic"> Instagram </em>使用推荐系统推荐朋友联系。</li>
+				<li>像<em class="italic">亚马逊</em>和<em class="italic">全球速卖通</em>这样的电子商务网站使用推荐系统来推荐衣服、书籍和电子产品等产品。</li>
+			</ul>
+			<p>推荐系统大多是使用来自用户-项目交互的数据构建的。因此，在构建推荐系统时，有三种主要的方法可以遵循。它们是<strong class="bold">协同过滤</strong>、<strong class="bold">基于内容的过滤</strong>和<strong class="bold">混合方法</strong>。我们将在下面的小节中简要解释这些方法。</p>
+			<h2 id="_idParaDest-197"><a id="_idTextAnchor200"/>协同过滤方法</h2>
+			<p>在协同过滤方法中，<a id="_idIndexMarker999"/>推荐系统是基于用户过去的行为或历史来建模的。也就是说，这种方法利用现有的用户交互，例如对项目的评级、喜欢或评论来模拟用户的偏好，从而理解用户喜欢什么。下图显示了协同过滤方法如何帮助构建推荐系统:</p>
+			<div><div><img src="img/B17076_11_01.jpg" alt="Figure 11.1 – Collaborative filtering approach to building a recommendation system&#13;&#10;"/>
+				</div>
+			</div>
+			<p class="figure-caption">图 11.1-构建推荐系统的协同过滤方法</p>
+			<p>在上图中，您可以看到两个看过同一部电影并且可能评价相同的用户被分组为相似用户，因为左边的<a id="_idIndexMarker1000"/>看过的电影被推荐给了右边的人。在基于内容的过滤方法中，基于<strong class="bold">项目特征</strong>对<a id="_idIndexMarker1001"/>推荐系统进行建模。也就是说，项目可以预先标记有某些特征，例如类别、价格、流派、大小和接收的评级，并且使用这些特征，推荐系统可以推荐相似的项目。</p>
+			<p>下图显示了基于内容的过滤方法如何构建推荐系统:</p>
+			<div><div><img src="img/B17076_11_02.jpg" alt="Figure 11.2 – Content-based filtering approach to building a recommendation system&#13;&#10;"/>
+				</div>
+			</div>
+			<p class="figure-caption">图 11.2-构建推荐系统的基于内容的过滤方法</p>
+			<p class="figure-caption">在前面的<a id="_idIndexMarker1002"/>图中，您可以观察到彼此相似的电影被推荐给用户。</p>
+			<p><a id="_idTextAnchor201"/>混合滤波方法</p>
+			<h2 id="_idParaDest-198">正如其名<a id="_idIndexMarker1003"/>所示，混合方法是协作和基于内容的过滤方法的结合。也就是说，它结合了两种方法的优点，创建了一个更好的推荐系统。<a id="_idIndexMarker1004"/>当今现实世界中的大多数推荐系统都使用这种方法来减少单个方法的缺点。</h2>
+			<p>下图显示了一种将基于内容的过滤方法与协作过滤方法相结合来创建混合推荐系统的方法:</p>
+			<p>图 11.3–构建推荐系统的混合方法</p>
+			<div><div><img src="img/B17076_11_03.jpg" alt="Figure 11.3 – The hybrid approach to building a recommendation system&#13;&#10;"/>
+				</div>
+			</div>
+			<p class="figure-caption">在上图中，你可以看到我们有两个输入馈入混合系统。这些输入进入协作系统(<strong class="bold"> CF </strong>)和基于内容的系统，然后这些系统的输出被组合起来。这种<a id="_idIndexMarker1006"/>组合可以定制，甚至可以作为神经网络等其他高级系统的输入。这里的总体目标是通过组合多个推荐系统来创建一个强大的混合系统。</p>
+			<p>值得一提的是，任何用于创建推荐系统的方法都需要某种形式的数据。例如，在协作过滤方法中，您将需要<em class="italic">用户-项目交互</em>历史，而对于基于内容的方法，您将需要<em class="italic">项目元数据</em>。</p>
+			<p>如果你有足够的数据来训练一个推荐系统，你可以利用许多机器和非机器的<a id="_idIndexMarker1007"/>学习技术在做出推荐之前对数据进行建模。你可以使用的一些流行的<a id="_idIndexMarker1008"/>算法有<strong class="bold">K-最近邻</strong>(<a href="https://en.wikipedia.org/wiki/K-nearest_neighbors_algorithm">https://en.wikipedia.org/wiki/K-nearest_neighbors_algorithm</a>)、<strong class="bold">聚类算法</strong>(<a href="https://en.wikipedia.org/wiki/Cluster_analysis">https://en.wikipedia.org/wiki/Cluster_analysis</a>)、<strong class="bold">决策树</strong>(<a href="https://en.wikipedia.org/wiki/Decision_trees">https://en.wikipedia.org/wiki/Decision_trees</a>)、<strong class="bold">贝叶斯</strong> <strong class="bold"> <a id="_idIndexMarker1009"/> </strong> <strong class="bold">分类器</strong>(<a href="https://en.wikipedia.org/wiki/Naive_Bayes_classifier">https://en.wikipedia.org/wiki/Naive_Bayes_classifier</a>，甚至<strong class="bold">人工神经网络<strong class="bold"/></strong></p>
+			<p>在这一章中，我们将使用<strong class="bold">神经网络</strong>方法来构建一个<a id="_idIndexMarker1010"/>推荐系统。我们将在下面的<a id="_idIndexMarker1012"/>部分详细解释<a id="_idIndexMarker1011"/>。</p>
+			<p><a id="_idTextAnchor202"/>创建推荐系统的神经网络方法</p>
+			<h1 id="_idParaDest-199">近年来，在解决<strong class="bold">机器学习</strong> ( <strong class="bold"> ML </strong>)领域的诸多问题<a id="_idIndexMarker1014"/>时，神经网络<a id="_idIndexMarker1013"/>一直是瑞士军刀。这在 ML 突破的领域是显而易见的，比如<strong class="bold">图像分类</strong> / <strong class="bold">分割</strong>和<strong class="bold">自然语言处理</strong>。随着数据的可用性，神经<a id="_idIndexMarker1015"/>网络已经被成功地用于构建大规模<a id="_idIndexMarker1016"/>推荐<a id="_idIndexMarker1017"/>系统，例如在<em class="italic">https://research.netflix.com/research-area/machine-learning</em>(<a href="https://research.netflix.com/research-area/machine-learning">和<em class="italic">YouTube</em>(</a><a href="https://research.google/pubs/pub45530/">https://research.google/pubs/pub45530/</a>)使用的系统。</h1>
+			<p>尽管使用神经网络构建推荐系统有不同的方法，但它们都依赖于一个主要事实:它们需要一种有效的方法来学习项目或用户之间的相似性。在这一章中，我们将利用一个叫做<strong class="bold">嵌入</strong>的概念来有效地学习这些相似性，这样我们就可以轻松地驱动我们的推荐系统。</p>
+			<p>但是首先，什么是嵌入，我们为什么要使用它们？在下一小节中，我们将简要回答这些问题。</p>
+			<p>什么是嵌入？</p>
+			<h3>嵌入<a id="_idIndexMarker1018"/>是离散变量到连续或实值变量的映射。也就是说，给定一组变量，比如<code>[good, bad]</code>，嵌入可以将每个离散项映射到一个<em class="italic"> n </em>维的连续向量——比如好的可以表示为<code>[0.1, 0.6, 0.1, 0.8]</code>，坏的可以表示为<code>[0.8, 0.2, 0.6, 0.1]</code>，如下图所示:</h3>
+			<p>图 11.4–用实值变量表示离散类别</p>
+			<div><div><img src="img/B17076_11_04.jpg" alt="Figure 11.4 – Representing discrete categories with real-valued variables&#13;&#10;"/>
+				</div>
+			</div>
+			<p class="figure-caption">如果你熟悉编码<a id="_idIndexMarker1019"/>方案，比如<strong class="bold">一次性编码</strong>(<a href="https://en.wikipedia.org/wiki/One-hot">https://en.wikipedia.org/wiki/One-hot</a>)或者<strong class="bold">标签编码</strong>(<a href="https://machinelearningmastery.com/one-hot-encoding-for-categorical-data/">https://machine learning mastery . com/one-hot-encoding-for-categorical-data/</a>)，那么你可能<a id="_idIndexMarker1020"/>想知道嵌入与它们有什么不同。</p>
+			<p>嗯，嵌入有两个主要的区别和技术上的优势:</p>
+			<p>例如，下图显示了独一无二的编码表示所使用的维度是如何随着唯一国家的数量而增加的:</p>
+			<ul>
+				<li>Embedding representations can be small or large, depending on the specified dimension. This is different from encoding schemes such as one-hot encoding, where the dimensionality of the representation increases with the number of discrete classes.<p>图 11.5-嵌入和一键编码之间的大小比较</p></li>
+			</ul>
+			<div><div><img src="img/B17076_11_05.jpg" alt="Figure 11.5 – Size comparison between embeddings and one-hot encoding&#13;&#10;"/>
+				</div>
+			</div>
+			<p class="figure-caption">嵌入可以和神经网络中的权重一起学习。这是优于其他编码方案的主要优势，因为有了这个属性，学习到的嵌入成为离散类的相似性聚类，这意味着您可以很容易地找到相似的项目或用户。例如，看下面的校样，你可以看到我们有两组学习过的单词嵌入:</p>
+			<ul>
+				<li>图 11.6-在嵌入空间中嵌入单词并显示相似性(重绘自:https://medium.com/@hari4om/word-embedding-d816f643140)</li>
+			</ul>
+			<div><div><img src="img/B17076_11_06.jpg" alt="Figure 11.6 – Embedding words and showing similarity in an embedding space (Redrawn from: https://medium.com/@hari4om/word-embedding-d816f643140)&#13;&#10;"/>
+				</div>
+			</div>
+			<p class="figure-caption">在上图中，<a id="_idIndexMarker1023"/>可以看到描绘<strong class="bold">男人</strong>、<strong class="bold">女人</strong>、<strong class="bold">国王</strong>和<strong class="bold">王后</strong>的组正在通过嵌入，结果输出是一个嵌入空间，在这里，意义更接近的单词被分组。这是通过学习单词<em class="italic">嵌入</em>实现的。</p>
+			<p>那么，我们如何利用嵌入来创建一个推荐系统呢？正如我们之前提到的，嵌入可以有效地表示数据，这意味着我们可以使用它们来学习或表示用户-项目交互。因此，我们可以很容易地使用学习到的嵌入来找到类似的项目进行推荐。我们甚至可以通过将嵌入与受监督的机器学习任务相结合来更进一步。</p>
+			<p>这种将学习的嵌入表示与监督的 ML 任务相结合的方法是我们将在下一节中创建我们的电影推荐系统所要做的。</p>
+			<p><a id="_idTextAnchor203"/>构建电影推荐系统</p>
+			<h1 id="_idParaDest-200">为了构建一个<a id="_idIndexMarker1024"/>电影推荐系统，我们需要某种用户-电影交互数据集。幸运的是，我们可以使用<strong class="bold">group lens</strong>(<a href="https://grouplens.org/">https://grouplens.org/</a>)提供的<a id="_idIndexMarker1025"/>数据集(<a href="https://grouplens.org/datasets/movielens/100k/">https://grouplens.org/datasets/movielens/100k/</a>)。该数据包含由 1，000 个用户对 1，700 部电影给出的 100，000 个电影评级。</h1>
+			<p>以下屏幕截图显示了数据集的前几行:</p>
+			<p>图 11.7–movie lens 数据集的前几行</p>
+			<div><div><img src="img/B17076_11_07.jpg" alt="Figure 11.7 – The first few rows of the MovieLens dataset&#13;&#10;"/>
+				</div>
+			</div>
+			<p class="figure-caption">从前面的截图中，您可以看到我们有<code>user_id</code>、<code>item_id</code>(电影)，以及用户对该项目(电影)的评分。通过这种互动和嵌入的使用，我们可以有效地模拟用户的行为，从而了解他们喜欢什么类型的电影。</p>
+			<p>要了解我们将如何构建和学习这种与嵌入和神经网络的交互，请参考以下架构图:</p>
+			<p>图 11.8-我们推荐系统的高级架构</p>
+			<div><div><img src="img/B17076_11_08.jpg" alt="Figure 11.8 – High-level architecture of our recommendation system&#13;&#10;"/>
+				</div>
+			</div>
+			<p class="figure-caption">从上图中，您可以看到我们有两个嵌入层，一个用于用户，另一个用于项目(电影)。然后，在<a id="_idIndexMarker1026"/>被传递到密集层之前，这两个嵌入层被合并。</p>
+			<p>因此，本质上，我们将嵌入与监督学习任务相结合，嵌入的输出被传递到一个密集层，以预测用户对某个项目(电影)的评级。</p>
+			<p>你可能想知道，如果我们正在学习预测用户对产品的评价，这如何帮助我们做出推荐？诀窍在于，如果我们能够有效地预测用户对一部电影的评价，那么，利用学习到的相似性嵌入，我们可以预测用户对所有电影的评价。然后，利用这些信息，我们可以向用户推荐预测收视率最高的电影。</p>
+			<p>那么，如何用 JavaScript 搭建这个看似复杂的推荐系统呢？在下一小节中，我们将向您展示如何结合使用 TensorFlow.js 和 Danfo.js 来实现这一点。</p>
+			<p><a id="_idTextAnchor204"/>设置您的项目目录</p>
+			<h2 id="_idParaDest-201">您需要成功遵循本章的代码和<a id="_idIndexMarker1027"/>数据集在本章的代码库中提供(<a href="https://github.com/PacktPublishing/Building-Data-Driven-Applications-with-Danfo.js/tree/main/Chapter11">https://github . com/packt publishing/Building-Data-Driven-Applications-with-danfo . js/tree/main/chapter 11</a>)。</h2>
+			<p>您可以将整个项目下载到您的计算机上，以便轻松跟进。如果您已经下载了项目代码，那么导航到您的根目录，在那里可以看到<code>src</code>文件夹。</p>
+			<p>在<code>src</code>文件夹中，您有以下文件夹/脚本:</p>
+			<p><code>book_recommendation_model</code>:这是保存训练好的模型的文件夹。</p>
+			<ul>
+				<li><code>data</code>:这个文件夹包含了我们的训练数据。</li>
+				<li><code>data_proc.js</code>:这个脚本包含了我们所有的数据处理代码。</li>
+				<li><code>model.js</code>:该脚本定义并编译推荐模型。</li>
+				<li><code>recommend.js</code>:这个脚本包含了推荐的代码。</li>
+				<li><code>train.js</code>:这个脚本包含了训练推荐模型的代码。</li>
+				<li>要快速测试预训练的<a id="_idIndexMarker1028"/>推荐模型，首先，使用<code>yarn</code>(推荐)或<code>NPM</code>安装所有必需的软件包，然后运行以下命令:</li>
+			</ul>
+			<p>这会为用户 id 为<code>196</code>、<code>880</code>、<code>13</code>的用户推荐<code>10</code>、<code>5</code>和<code>20</code>部电影。如果成功，您应该会看到类似如下的输出:</p>
+			<pre> yarn recommend</pre>
+			<p>图 11.9-由训练有素的推荐系统提供的推荐电影</p>
+			<div><div><img src="img/B17076_11_09.jpg" alt="Figure 11.9 – Recommended movies provided by the trained recommendation system&#13;&#10;"/>
+				</div>
+			</div>
+			<p class="figure-caption">您也可以通过运行以下命令来重新训练模型:</p>
+			<p>默认情况下，前面的命令<a id="_idIndexMarker1029"/>将重新训练批量大小为<code>128</code>的模型，时期大小为<code>5</code>，完成后，将训练好的模型保存到<code>book_recommender_model</code>文件夹。</p>
+			<pre> yarn retrain</pre>
+			<p>现在您已经在本地设置了项目，我们将学习每一部分，并解释如何从头开始构建推荐系统。</p>
+			<p><a id="_idTextAnchor205"/>检索和处理训练数据集</p>
+			<h2 id="_idParaDest-202">我们使用的数据集是从 Grouplens 网站上检索的。默认情况下，电影数据(<code>https://files.grouplens.org/datasets/movielens/ml-100k.zip</code>)是一个包含<a id="_idIndexMarker1031"/>制表符分隔文件的 ZIP 文件<a id="_idIndexMarker1030"/>。为了简单起见，我已经下载了这个项目需要的两个文件，并将其转换为<code>CSV</code>格式。你可以从这个项目的代码库(<a href="https://github.com/PacktPublishing/Building-Data-Driven-Applications-with-Danfo.js/tree/main/Chapter11/src/data">https://github . com/packt publishing/Building-Data-Driven-Applications-with-danfo . js/tree/main/chapter 11/src/Data</a>)的<code>data</code>文件夹中获得这些文件。</h2>
+			<p>有两个主要文件:</p>
+			<p>这个文件包含了每部电影的元数据，比如标题、描述和链接。</p>
+			<ul>
+				<li><code>movielens.csv</code>:这是用户评分数据集。</li>
+				<li>要使用<code>movielens</code>数据集，我们必须用 Danfo.js 读取数据集，对其进行处理，然后将其转换为可以传递给我们的神经网络的张量。</li>
+			</ul>
+			<p>在项目代码中，打开<code>data_proc.js</code>脚本。该脚本使用以下代码导出一个名为<code>processData</code>的主函数:</p>
+			<p>那么，我们在前面的代码中做了什么呢？谢天谢地，我们不需要太多的数据预处理，因为<code>user_id</code>、<code>item_id</code>和<code>ratings</code>列已经是数字<a id="_idIndexMarker1032"/>形式了。所以，我们简单地<a id="_idIndexMarker1033"/>做两件事:</p>
+			<pre>...
+    const nItem = (moviesDF["item_id"]).max()
+    const nUser = (moviesDF["user_id"]).max()
+    const moviesIdTrainTensor = (moviesDF["item_id"]).tensor
+    const userIdTrainTensor = (moviesDF["user_id"]).tensor
+    const targetData = (moviesDF["rating"]).tensor
+    return {
+        trainingData: [moviesIdTrainTensor, userIdTrainTensor],
+        targetData,
+        nItem,
+        nUser
+    }
+...</pre>
+			<p>从项目和用户列中检索最大 id。这个数字称为<strong class="bold">词汇大小</strong>，在创建我们的模型时将被<a id="_idIndexMarker1034"/>传递给嵌入层。</p>
+			<ul>
+				<li>检索并返回用户、项目和评级列的基础张量。用户和项目张量将作为我们的训练输入，而评级张量将成为我们的监督学习目标。</li>
+				<li>现在您已经知道如何处理数据，让我们开始使用 TensorFlow.js 构建神经网络。</li>
+			</ul>
+			<p><a id="_idTextAnchor206"/>建立推荐模型</p>
+			<h2 id="_idParaDest-203">我们的<a id="_idIndexMarker1035"/>推荐<a id="_idIndexMarker1036"/>模型的完整代码可以在<code>model.js</code>文件中找到。正如我们在高级架构图中看到的，该模型使用了混合方法(参见<em class="italic">图 11.8 </em>)。</h2>
+			<p>注意</p>
+			<p class="callout-heading">我们正在使用我们在第 10 章<em class="italic">tensor flow . js</em>介绍中介绍的模型 API 来创建网络。这是因为我们正在创建一个复杂的架构，我们需要在输入和输出方面有更多的控制。</p>
+			<p class="callout">在下面的步骤中，我们将解释<a id="_idIndexMarker1037"/>模型并展示创建它的相应代码:</p>
+			<p>注意，输入有一个设置为<code>1</code>的形状参数。这是因为我们的输入张量是维数为<code>1</code>的向量。</p>
+			<ol>
+				<li><code>user</code> and the other from the items:<pre>...
+const itemInput = tf.layers.input({ name: "itemInput", shape: [1] })
+const userInput = tf.layers.input({ name: "userInput", shape: [1] })
+...</pre><p>b) <code>OutputDim</code>:这是用户指定的输出尺寸。也就是说，它用于配置嵌入向量的大小。</p></li>
+				<li><code>InputDim</code>: This is the vocabulary size of the embedding vector. The maximum integer index is <code>+ 1</code>. <p>接下来，我们将合并这些<a id="_idIndexMarker1040"/>嵌入层。</p><p>有了前面的输出，我们现在可以使用 Models API 定义我们的模型了。</p></li>
+				<li><code>dot</code> product, flattening the output, and passing the output to a dense layer:<pre>...
+const mergedOutput = tf.layers.dot({ axes: 0}).apply([itemEmbedding, userEmbedding])
+const flatten = tf.layers.flatten().apply(mergedOutput)
+const denseOut = tf.layers.dense({ units: 1, activation: "sigmoid", kernelInitializer: "leCunUniform" }).apply(flatten)
+...</pre><p>最后，我们将定义并编译模型，如下面的代码片段所示:<pre>... const model = tf.model({ inputs: [itemInput, userInput],  outputs: denseOut })       model.compile({         optimizer: tf.train.adam(LEARNING_RATE),         loss: tf.losses.meanSquaredError       }); ...</pre></p></li>
+				<li>前面的代码使用<a id="_idIndexMarker1042"/>Models API 来定义输入和输出，然后调用 compile 方法，该方法接受一个训练优化器(Adam optimizer)和一个损失函数(均方误差)。您可以在<code>model.js</code>文件中查看完整的型号代码。</li>
+			</ol>
+			<p>定义了模型架构之后，我们就可以开始训练模型了。</p>
+			<p><a id="_idTextAnchor207"/>训练并保存推荐模型</p>
+			<h2 id="_idParaDest-204">该型号的训练代码<a id="_idIndexMarker1043"/>可在<code>train.js</code>文件中找到。该代码有两个主要部分。我们将在这里两者都看。</h2>
+			<p>第一部分，如下面的代码块所示，使用批处理大小<code>128</code>、时期大小<code>5</code>和训练数据的验证拆分<code>0.1</code> - <code>10</code> %,对模型进行训练，为模型验证保留:</p>
+			<p>在前面的训练<a id="_idIndexMarker1045"/>代码中，我们在每个训练<a id="_idIndexMarker1046"/>时期后打印损失。这有助于我们跟踪训练进度。</p>
+			<pre>...
+await model.fit(trainingData, targetData, {
+        batchSize: 128,
+        epochs: 5,
+        validationSplit: 0.1,
+        callbacks: {
+            onEpochEnd: async (epoch, logs) =&gt; {
+                const progressUpdate = `EPOCH (${epoch + 1}): Train MSE: ${Math.sqrt(logs.loss)}, Val MSE:  ${Math.sqrt(logs.val_loss)}\n`
+                console.log(progressUpdate);
+            }
+        }
+    });
+...</pre>
+			<p>下面的代码块将定型模型保存到提供的文件路径中。在我们的例子中，我们将其保存到<code>movie_recommendation_model</code>文件夹:</p>
+			<p>记下该文件夹的名称，因为我们将在下一小节中提出建议时使用它。</p>
+			<pre>...
+await model.save(`file://${path.join(__dirname, "movie_recommendation_model")}`)
+...</pre>
+			<p>要训练模型，您可以在<code>src</code>文件夹中运行以下命令:</p>
+			<p>或者，您可以使用<code>node</code>直接运行<code>train.js</code>:</p>
+			<pre>yarn train </pre>
+			<p>这将启动指定数量的历元的模型训练，完成后，将模型保存到指定的文件夹。培训完成后，您应该会得到类似于以下内容的输出:</p>
+			<pre>node train.js</pre>
+			<p>图 11.10-推荐模型的训练日志</p>
+			<div><div><img src="img/B17076_11_10.jpg" alt="Figure 11.10 – Training logs of the recommendation model&#13;&#10;"/>
+				</div>
+			</div>
+			<p class="figure-caption">一旦你有了<a id="_idIndexMarker1047"/>一个经过训练和保存的模型，你就可以开始做<a id="_idIndexMarker1048"/>电影推荐了。</p>
+			<p><a id="_idTextAnchor208"/>用保存的模型制作电影推荐</p>
+			<h2 id="_idParaDest-205"><code>recommend.js</code>文件包含用于提出建议的代码。我们还包含了一个名为<code>getMovieDetails</code>的实用函数。这个函数将电影 ID 映射到电影<a id="_idIndexMarker1049"/>元数据，这样我们就可以显示有用的信息，比如电影的名称。</h2>
+			<p>但是我们怎么做推荐呢？既然我们已经训练了模型来预测用户对一组电影的评级，我们可以简单地将用户 ID 和所有电影传递给模型来进行评级预测。</p>
+			<p>有了所有电影的收视率预测，我们可以简单地按降序排序，然后返回热门电影作为推荐。</p>
+			<p>为此，请按照下列步骤操作:</p>
+			<p>首先，我们必须获得所有唯一的电影 id 来预测:<pre>... const moviesDF = await dfd.read_csv(moviesDataPath) const uniqueMoviesId = moviesDF["item_id"].unique().values const uniqueMoviesIdTensor = tf.tensor(uniqueMoviesId) ...</pre></p>
+			<ol>
+				<li value="1">接下来，我们必须构造一个与电影 ID 张量长度相同的用户张量。张量将在所有条目中具有相同的用户 ID，因为对于每部电影，我们预测相同用户将给出的评级:<pre>... const userToRecommendForTensor = tf.fill([uniqueMoviesIdTensor.shape[0]], userId) ...</pre></li>
+				<li>这将返回用户对每部电影的预测评级的<a id="_idIndexMarker1050"/>张量。</li>
+				<li>Next, we must load the model and call the <code>predict</code> function by passing the movie and user tensors as input:<pre>...
+const model = await loadModel()
+      const ratings = model.predict([uniqueMoviesIdTensor,
+   userToRecommendForTensor])
+...</pre><p>接下来，我们必须构建一个 DataFrame，它有两列，分别叫做<code>movie_id</code>(唯一的电影 id)和<code>ratings</code>(用户对每部电影的预测评级):<pre>... const recommendationDf = new dfd.DataFrame({         item_id: uniqueMoviesId,         ratings: ratings.arraySync()      }) ... </pre></p></li>
+				<li>将预测的<a id="_idIndexMarker1051"/>收视率和相应的电影 ID 存储在数据帧中有助于我们轻松地对收视率进行排序，如下面的代码所示:<pre>...     const topRecommendationsDF = recommendationDf         .sort_values({             by: "ratings",             ascending: false         })         .head(top) //return only the top rows ...</pre></li>
+				<li>最后，我们必须将排序后的电影 id 数组传递给<code>getMovieDetails</code>实用函数。该函数将每个电影 ID 映射到相应的元数据，并返回一个包含两列(电影标题和电影上映日期)的 DataFrame，如下面的代码所示:<pre>... const movieDetailsDF = await getMovieDetails(topRecommendationsDF["movie_id"].values) ...</pre></li>
+				<li><code>src</code>文件夹中的<code>recommend.js</code>脚本包含了用于推荐的完整代码，包括用于将电影 ID 映射到其元数据的实用函数。</li>
+			</ol>
+			<p>要测试一个推荐，您需要调用<code>recommend</code>函数并传递一个电影 ID 和您想要的推荐数量，如下例所示:</p>
+			<p>前面的代码<a id="_idIndexMarker1052"/>在控制台中给出了以下输出:</p>
+			<pre>recommend(196, 10) // Recommend 10 movies for user with id 196</pre>
+			<p>就是这样！您已经成功地创建了一个使用神经网络嵌入的推荐系统，它可以有效地向不同的用户推荐电影。使用你在本章中学到的概念，你可以很容易地创建不同的推荐系统来推荐不同的产品，比如音乐、书籍和视频。</p>
+			<pre>[
+  'Remains of the Day, The (1993)',
+  'Star Trek: First Contact (1996)',
+  'Kolya (1996)',
+  'Men in Black (1997)',
+  'Hunt for Red October, The (1990)',
+  'Sabrina (1995)',
+  'L.A. Confidential (1997)',
+  'Jackie Brown (1997)',
+  'Grease (1978)',
+  'Dr. Strangelove or: How I Learned to Stop Worrying and Love the Bomb (1963)'
+]</pre>
+			<p><a id="_idTextAnchor209"/>摘要</p>
+			<h1 id="_idParaDest-206">在这一章中，我们成功构建了一个推荐系统，可以根据用户的喜好向用户推荐电影。首先，在简要讨论设计推荐系统的三种方法之前，我们定义了什么是推荐模型。然后，我们讨论了神经网络嵌入以及为什么我们决定使用它们来创建我们的推荐模型。最后，我们通过构建一个可以向用户推荐指定数量的电影的电影推荐模型，将我们所学的所有概念放在一起。</h1>
+			<p>有了本章的知识，你可以轻松地创建一个可以嵌入到你的 JavaScript 应用程序中的推荐系统。</p>
+			<p>在下一章也是最后一章，您将使用 Danfo.js 和<strong class="bold"> Twitter API </strong>构建另一个实际应用程序。</p>
+			<p>In the next and final chapter, you'll build another hands-on application using Danfo.js and the <strong class="bold">Twitter API</strong>.</p>
+		</div>
+	
+
+</body></html>

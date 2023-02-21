@@ -1,0 +1,943 @@
+<html><head/><body>
+
+  
+    <title>Feature Engineering and Model Complexity – The Titanic Example Revisited</title>
+    <meta content="urn:uuid:b6d6a510-8f2b-40e4-8a30-e199afd87745" name="Adept.expected.resource"/>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+  
+
+
+  
+        
+
+                            
+                    <h1 class="header-title">特征工程和模型复杂性——重温泰坦尼克号的例子</h1>
+                
+            
+            
+                
+<p class="calibre2">模型复杂性和评估是构建成功的数据科学系统的必经步骤。有很多工具可以用来评估和选择你的模型。在本章中，我们将介绍一些工具，通过添加更多描述性要素和从现有要素中提取有意义的信息，帮助您提高数据的价值。我们还将讨论与最佳数量特征相关的其他工具，并了解为什么拥有大量特征和较少训练样本/观测值会成为一个问题。</p>
+<p class="calibre2">以下是本章将要解释的主题:</p>
+<ul class="calibre7">
+<li class="calibre8">特征工程</li>
+<li class="calibre8">维度的诅咒</li>
+<li class="calibre8">重温泰坦尼克号的例子——一起</li>
+<li class="calibre8">偏差-方差分解</li>
+<li class="calibre8">学习可视性</li>
+</ul>
+
+
+            
+
+            
+        
+    
+
+
+
+
+
+  
+    <title>Feature engineering</title>
+    <meta content="urn:uuid:b6d6a510-8f2b-40e4-8a30-e199afd87745" name="Adept.expected.resource"/>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+  
+
+
+  
+        
+
+                            
+                    <h1 class="header-title">特征工程</h1>
+                
+            
+            
+                
+<p class="calibre2">特征工程是影响模型性能的关键因素之一。具有正确特征的简单模型比具有较差特征的复杂模型性能更好。您可以将特征工程过程视为决定预测模型成败的最重要步骤。如果你理解了数据，特征工程就会容易得多。</p>
+<p class="calibre2">任何使用机器学习来解决一个问题的人都广泛使用特征工程，这个问题是:<strong class="calibre13">如何充分利用数据样本进行预测建模</strong>？这是特征工程的过程和实践所解决的问题，而你的数据科学技能的成功是从知道如何很好地表示你的数据开始的。</p>
+<p class="calibre2">预测建模是将一系列特征或输入变量(<em class="calibre19"> x </em> <sub class="calibre28"> 1 </sub>，<em class="calibre19"> x </em> <sub class="calibre28"> 2 </sub>，...，<em class="calibre19"> x </em> <sub class="calibre28"> n </sub>)转换成感兴趣的输出/目标(y)。那么，什么是特征工程呢？它是创建新的输入变量或特征的过程(<em class="calibre19"> z </em> <sub class="calibre28"> 1 </sub>，<em class="calibre19"> z </em> <sub class="calibre28"> 2 </sub>，...、<em class="calibre19">z</em>T24】n 从已有的输入变量(<em class="calibre19">x</em>T28】1、<em class="calibre19">x</em>T32】2，...、<em class="calibre19">x</em>T36】n)。我们不只是创造任何新功能；新创建的特征应该有助于模型的输出，并且与模型的输出相关。利用领域知识(如市场营销、医疗等)，创建与模型输出相关的特性将是一个简单的过程。即使机器学习实践者在这个过程中与一些领域专家进行了交互，特征工程过程的结果也会好得多。</p>
+<p class="calibre2">在给定一组输入变量/特征(温度、风速和云量百分比)的情况下，领域知识可以发挥作用的一个例子是对降雨的可能性进行建模。对于这个具体的例子，我们可以构造一个新的二元特征，称为<strong class="calibre13">多云</strong>，其中每当云覆盖的百分比小于 20%时，它的值等于 1 或否，否则等于 0 或是。在这个例子中，领域知识对于指定阈值或截止百分比是必不可少的。输入的信息越多，越有用，模型的可靠性和预测性就越好。</p>
+
+
+            
+
+            
+        
+    
+
+
+
+
+
+  
+    <title>Types of feature engineering</title>
+    <meta content="urn:uuid:b6d6a510-8f2b-40e4-8a30-e199afd87745" name="Adept.expected.resource"/>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+  
+
+
+  
+        
+
+                            
+                    <h1 class="header-title">特征工程的类型</h1>
+                
+            
+            
+                
+<p class="calibre2">特征工程作为一种技术有三个主要的子类。作为深度学习实践者，你有在它们之间进行选择或者以某种方式组合它们的自由。</p>
+
+
+            
+
+            
+        
+    
+
+
+
+
+
+  
+    <title>Feature selection</title>
+    <meta content="urn:uuid:b6d6a510-8f2b-40e4-8a30-e199afd87745" name="Adept.expected.resource"/>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+  
+
+
+  
+        
+
+                            
+                    <h1 class="header-title">特征选择</h1>
+                
+            
+            
+                
+<p class="calibre2">有时称为<strong class="calibre13">特征重要性</strong>，这是根据输入变量对目标/输出变量的贡献对其进行排序的过程。此外，该过程可以被认为是根据输入变量在模型预测能力中的值对输入变量进行排序的过程。</p>
+<p class="calibre2">一些学习方法将这种特征排序或重要性作为其内部过程的一部分(如决策树)。这类方法大多使用熵来过滤掉价值较低的变量。在某些情况下，深度学习实践者使用这样的学习方法来选择最重要的特征，然后将它们馈入更好的学习算法。</p>
+
+
+            
+
+            
+        
+    
+
+
+
+
+
+  
+    <title>Dimensionality reduction</title>
+    <meta content="urn:uuid:b6d6a510-8f2b-40e4-8a30-e199afd87745" name="Adept.expected.resource"/>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+  
+
+
+  
+        
+
+                            
+                    <h1 class="header-title">降维</h1>
+                
+            
+            
+                
+<p class="calibre2">降维有时是特征提取，它是将现有的输入变量组合成一组新的数量大大减少的输入变量的过程。这种类型的特征工程最常用的方法之一是<strong class="calibre13">主成分分析</strong> ( <strong class="calibre13"> PCA </strong>)，它利用数据中的方差来得出数量减少的输入变量，这些变量看起来不像原始输入变量。</p>
+
+
+            
+
+            
+        
+    
+
+
+
+
+
+  
+    <title>Feature construction</title>
+    <meta content="urn:uuid:b6d6a510-8f2b-40e4-8a30-e199afd87745" name="Adept.expected.resource"/>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+  
+
+
+  
+        
+
+                            
+                    <h1 class="header-title">特征构造</h1>
+                
+            
+            
+                
+<p class="calibre2">特征构造是特征工程的一种常用类型，人们在谈论特征工程时通常会提到它。这项技术是从原始数据手工制作或构建新要素的过程。在这种类型的特征工程中，领域知识对于从现有特征中手动组成其他特征是非常有用的。与其他特征工程技术一样，特征构造的目的是提高模型的可预测性。要素构造的一个简单示例是使用日期戳要素生成两个新要素，例如 AM 和 PM，这可能有助于区分白天和夜晚。我们还可以通过计算噪声特征的平均值，然后确定给定行是否大于或小于该平均值，将噪声数字特征转换为更简单的标称特征。</p>
+
+
+            
+
+            
+        
+    
+
+
+
+
+
+  
+    <title>Titanic example revisited</title>
+    <meta content="urn:uuid:b6d6a510-8f2b-40e4-8a30-e199afd87745" name="Adept.expected.resource"/>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+  
+
+
+  
+        
+
+                            
+                    <h1 class="header-title">重温泰坦尼克号的例子</h1>
+                
+            
+            
+                
+<p class="calibre2">在这一节中，我们将使用特征工程工具，从不同的角度再次回顾泰坦尼克号的例子。如果你跳过了<a href="6e292a27-8ff3-4d9c-9186-433455cb380c.xhtml" target="_blank" class="calibre11">第 2 章</a>，<em class="calibre19">活动中的数据建模——泰坦尼克号的例子</em>，泰坦尼克号的例子是一个 Kaggle 比赛，目的是预测特定乘客是否幸存。</p>
+<p class="calibre2">在这次重访 Titanic 示例的过程中，我们将使用 scikit-learn 和 pandas 库。首先，让我们从读取训练集和测试集开始，并获得一些关于数据的统计数据:</p>
+<pre class="calibre21"># reading the train and test sets using pandas<br class="title-page-name"/>train_data = pd.read_csv('data/train.csv', header=0)<br class="title-page-name"/>test_data = pd.read_csv('data/test.csv', header=0)<br class="title-page-name"/><br class="title-page-name"/># concatenate the train and test set together for doing the overall feature engineering stuff<br class="title-page-name"/>df_titanic_data = pd.concat([train_data, test_data])<br class="title-page-name"/><br class="title-page-name"/># removing duplicate indices due to coming the train and test set by re-indexing the data<br class="title-page-name"/>df_titanic_data.reset_index(inplace=True)<br class="title-page-name"/><br class="title-page-name"/># removing the index column the reset_index() function generates<br class="title-page-name"/>df_titanic_data.drop('index', axis=1, inplace=True)<br class="title-page-name"/><br class="title-page-name"/># index the columns to be 1-based index<br class="title-page-name"/>df_titanic_data = df_titanic_data.reindex_axis(train_data.columns, axis=1)</pre>
+<p class="calibre2">我们需要指出前面代码片段的一些内容:</p>
+<ul class="calibre7">
+<li class="calibre8">如图所示，我们使用了 pandas 的<kbd class="calibre12">concat</kbd>函数来组合训练集和测试集的数据帧。这对特征工程任务很有用，因为我们需要输入变量/特征分布的完整视图。</li>
+<li class="calibre8">合并两个数据帧后，我们需要对输出数据帧进行一些修改。</li>
+</ul>
+
+
+            
+
+            
+        
+    
+
+
+
+
+
+  
+    <title>Missing values</title>
+    <meta content="urn:uuid:b6d6a510-8f2b-40e4-8a30-e199afd87745" name="Adept.expected.resource"/>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+  
+
+
+  
+        
+
+                            
+                    <h1 class="header-title">缺少值</h1>
+                
+            
+            
+                
+<p class="calibre2">从客户那里获得新数据集后，首先要考虑的就是这一步，因为几乎每个数据集中都会有缺失/不正确的数据。在接下来的章节中，你会看到一些学习算法能够处理缺失值，而其他的需要你来处理缺失数据。在本例中，我们将使用 scikit-learn 的随机森林分类器，它需要单独处理丢失的数据。</p>
+<p class="calibre2">有不同的方法可以用来处理丢失的数据。</p>
+
+
+            
+
+            
+        
+    
+
+
+
+
+
+  
+    <title>Removing any sample with missing values in it</title>
+    <meta content="urn:uuid:b6d6a510-8f2b-40e4-8a30-e199afd87745" name="Adept.expected.resource"/>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+  
+
+
+  
+        
+
+                            
+                    <h1 class="header-title">移除任何含有缺失值的样本</h1>
+                
+            
+            
+                
+<p class="calibre2">如果您有一个包含大量缺失值的小数据集，那么这种方法不是一个好的选择，因为移除包含缺失值的样本会产生无用的数据。如果您有大量数据，这可能是一个快速而简单的选择，并且删除它不会对原始数据集产生太大影响。</p>
+
+
+            
+
+            
+        
+    
+
+
+
+
+
+  
+    <title>Missing value inputting</title>
+    <meta content="urn:uuid:b6d6a510-8f2b-40e4-8a30-e199afd87745" name="Adept.expected.resource"/>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+  
+
+
+  
+        
+
+                            
+                    <h1 class="header-title">缺失值输入</h1>
+                
+            
+            
+                
+<p class="calibre2">当您有分类数据时，这种方法很有用。这种方法背后的直觉是，丢失的值可能与其他变量相关，删除它们将导致信息丢失，从而对模型产生重大影响。<br class="calibre20"/>例如，如果我们有一个二进制变量，它有两个可能的值，-1 和 1，我们可以添加另一个值(0)来指示缺少的值。您可以使用以下代码将<strong class="calibre13">舱</strong>特征的空值替换为<kbd class="calibre12">U0</kbd>:</p>
+<pre class="calibre21"># replacing the missing value in cabin variable "U0"<br class="title-page-name"/>df_titanic_data['Cabin'][df_titanic_data.Cabin.isnull()] = 'U0'</pre>
+
+
+            
+
+            
+        
+    
+
+
+
+
+
+  
+    <title>Assigning an average value</title>
+    <meta content="urn:uuid:b6d6a510-8f2b-40e4-8a30-e199afd87745" name="Adept.expected.resource"/>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+  
+
+
+  
+        
+
+                            
+                    <h1 class="header-title">分配平均值</h1>
+                
+            
+            
+                
+<p class="calibre2">由于简单，这也是常用的方法之一。在数字特征的情况下，您可以用平均值或中值替换缺失值。对于分类变量，也可以使用这种方法，将模式(出现次数最多的值)分配给缺失值。</p>
+<p class="calibre2">以下代码将<kbd class="calibre12">Fare</kbd>特征的非缺失值的中值分配给缺失值:</p>
+<pre class="calibre21"># handling the missing values by replacing it with the median fare<br class="title-page-name"/>df_titanic_data['Fare'][np.isnan(df_titanic_data['Fare'])] = df_titanic_data['Fare'].median()</pre>
+<p class="calibre2">或者，您可以使用以下代码来查找在<kbd class="calibre12">Embarked</kbd>特性中出现次数最多的值，并将其分配给缺失的值:</p>
+<pre class="calibre21"># replacing the missing values with the most common value in the variable<br class="title-page-name"/>df_titanic_data.Embarked[df_titanic_data.Embarked.isnull()] = df_titanic_data.Embarked.dropna().mode().values</pre>
+
+
+            
+
+            
+        
+    
+
+
+
+
+
+  
+    <title>Using a regression or another simple model to predict the values of missing variables</title>
+    <meta content="urn:uuid:b6d6a510-8f2b-40e4-8a30-e199afd87745" name="Adept.expected.resource"/>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+  
+
+
+  
+        
+
+                            
+                    <h1 class="header-title">使用回归或其他简单模型来预测缺失变量的值</h1>
+                
+            
+            
+                
+<p class="calibre2">这是我们将用于泰坦尼克号的<kbd class="calibre12">Age</kbd>特征的方法。<kbd class="calibre12">Age</kbd>特征是预测乘客生存的重要一步，通过取平均值来应用之前的方法会使我们丢失一些信息。</p>
+<pre>Age feature:</pre>
+<pre class="calibre21"># Define a helper function that can use RandomForestClassifier for handling the missing values of the age variable<br class="title-page-name"/>def set_missing_ages():<br class="title-page-name"/>    global df_titanic_data<br class="title-page-name"/><br class="title-page-name"/>    age_data = df_titanic_data[<br class="title-page-name"/>        ['Age', 'Embarked', 'Fare', 'Parch', 'SibSp', 'Title_id', 'Pclass', 'Names', 'CabinLetter']]<br class="title-page-name"/>    input_values_RF = age_data.loc[(df_titanic_data.Age.notnull())].values[:, 1::]<br class="title-page-name"/>    target_values_RF = age_data.loc[(df_titanic_data.Age.notnull())].values[:, 0]<br class="title-page-name"/><br class="title-page-name"/>    # Creating an object from the random forest regression function of sklearn&lt;use the documentation for more details&gt;<br class="title-page-name"/>    regressor = RandomForestRegressor(n_estimators=2000, n_jobs=-1)<br class="title-page-name"/><br class="title-page-name"/>    # building the model based on the input values and target values above<br class="title-page-name"/>    regressor.fit(input_values_RF, target_values_RF)<br class="title-page-name"/><br class="title-page-name"/>    # using the trained model to predict the missing values<br class="title-page-name"/>    predicted_ages = regressor.predict(age_data.loc[(df_titanic_data.Age.isnull())].values[:, 1::])<br class="title-page-name"/><br class="title-page-name"/></pre>
+<pre class="calibre21">    # Filling the predicted ages in the original titanic dataframe<br class="title-page-name"/>    age_data.loc[(age_data.Age.isnull()), 'Age'] = predicted_ages</pre>
+
+
+            
+
+            
+        
+    
+
+
+
+
+
+  
+    <title>Feature transformations</title>
+    <meta content="urn:uuid:b6d6a510-8f2b-40e4-8a30-e199afd87745" name="Adept.expected.resource"/>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+  
+
+
+  
+        
+
+                            
+                    <h1 class="header-title">特征转换</h1>
+                
+            
+            
+                
+<p class="calibre2">在前两节中，我们介绍了如何读取训练集和测试集，以及如何组合它们。我们还处理了一些丢失的值。现在，我们将使用 scikit-learn 的随机森林分类器来预测乘客的存活率。随机森林算法的不同实现接受不同类型的数据。随机森林的 scikit-learn 实现只接受数字数据。因此，我们需要将分类特征转换成数字特征。</p>
+<p class="calibre2">有两种类型的功能:</p>
+<ul class="calibre7">
+<li class="calibre8">
+<p class="calibre9"><strong class="calibre13">量化</strong>:量化特征以数值尺度来衡量，可以有意义的排序。在 Titanic 数据样本中，<kbd class="calibre12">Age</kbd>特征是定量特征的一个例子。</p>
+</li>
+<li class="calibre8"><strong class="calibre1">定性</strong>:定性变量，也称为<strong class="calibre1">分类变量</strong>，是非数值变量。它们描述符合类别的数据。在 Titanic 数据样本中，<kbd class="calibre12">Embarked</kbd>(表示出发港口的名称)特征是定性特征的一个例子。</li>
+</ul>
+<p class="calibre2">我们可以对不同的变量应用不同的变换。下面是一些可以用来转换定性/分类特征的方法。</p>
+
+
+            
+
+            
+        
+    
+
+
+
+
+
+  
+    <title>Dummy features</title>
+    <meta content="urn:uuid:b6d6a510-8f2b-40e4-8a30-e199afd87745" name="Adept.expected.resource"/>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+  
+
+
+  
+        
+
+                            
+                    <h1 class="header-title">虚拟特征</h1>
+                
+            
+            
+                
+<p class="calibre2">这些变量也称为分类或二元特征。如果要转换的要素只有少量不同的值，这种方法将是一个不错的选择。在 Titanic 数据样本中，<kbd class="calibre12">Embarked</kbd>特征只有三个频繁出现的不同值(<kbd class="calibre12">S</kbd>、<kbd class="calibre12">C</kbd>和<kbd class="calibre12">Q</kbd>)。因此，我们可以将<kbd class="calibre12">Embarked</kbd>特性转换成三个虚拟变量，(<kbd class="calibre12">'Embarked_S'</kbd>、<kbd class="calibre12">'Embarked_C'</kbd>和<kbd class="calibre12">'Embarked_Q'</kbd>)，以便能够使用随机森林分类器。</p>
+<p class="calibre2">以下代码将向您展示如何进行这种转换:</p>
+<pre class="calibre21"># constructing binary features<br class="title-page-name"/>def process_embarked():<br class="title-page-name"/>    global df_titanic_data<br class="title-page-name"/><br class="title-page-name"/>    # replacing the missing values with the most common value in the variable<br class="title-page-name"/>    df_titanic_data.Embarked[df.Embarked.isnull()] = df_titanic_data.Embarked.dropna().mode().values<br class="title-page-name"/><br class="title-page-name"/>    # converting the values into numbers<br class="title-page-name"/>    df_titanic_data['Embarked'] = pd.factorize(df_titanic_data['Embarked'])[0]<br class="title-page-name"/><br class="title-page-name"/>    # binarizing the constructed features<br class="title-page-name"/>    if keep_binary:<br class="title-page-name"/>        df_titanic_data = pd.concat([df_titanic_data, pd.get_dummies(df_titanic_data['Embarked']).rename(<br class="title-page-name"/>            columns=lambda x: 'Embarked_' + str(x))], axis=1)</pre>
+
+
+            
+
+            
+        
+    
+
+
+
+
+
+  
+    <title>Factorizing</title>
+    <meta content="urn:uuid:b6d6a510-8f2b-40e4-8a30-e199afd87745" name="Adept.expected.resource"/>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+  
+
+
+  
+        
+
+                            
+                    <h1 class="header-title">因式分解</h1>
+                
+            
+            
+                
+<p class="calibre2">这种方法用于从任何其他特征创建数字分类特征。在熊猫中，<kbd class="calibre12">factorize()</kbd>函数就是这样做的。如果您的要素是字母数字分类变量，则这种类型的变换非常有用。在 Titanic 数据样本中，我们可以将<kbd class="calibre12">Cabin</kbd>特征转换为分类特征，表示船舱的字母:</p>
+<pre class="calibre21"># the cabin number is a sequence of of alphanumerical digits, so we are going to create some features<br class="title-page-name"/># from the alphabetical part of it<br class="title-page-name"/>df_titanic_data['CabinLetter'] = df_titanic_data['Cabin'].map(lambda l: get_cabin_letter(l))<br class="title-page-name"/>df_titanic_data['CabinLetter'] = pd.factorize(df_titanic_data['CabinLetter'])[0]</pre>
+<pre class="calibre21">def get_cabin_letter(cabin_value):<br class="title-page-name"/>    # searching for the letters in the cabin alphanumerical value<br class="title-page-name"/>    letter_match = re.compile("([a-zA-Z]+)").search(cabin_value)<br class="title-page-name"/><br class="title-page-name"/>    if letter_match:<br class="title-page-name"/>        return letter_match.group()<br class="title-page-name"/>    else:<br class="title-page-name"/>        return 'U'</pre>
+<p class="calibre2">我们还可以通过使用以下方法之一将转换应用于定量特征。</p>
+
+
+            
+
+            
+        
+    
+
+
+
+
+
+  
+    <title>Scaling</title>
+    <meta content="urn:uuid:b6d6a510-8f2b-40e4-8a30-e199afd87745" name="Adept.expected.resource"/>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+  
+
+
+  
+        
+
+                            
+                    <h1 class="header-title">缩放比例</h1>
+                
+            
+            
+                
+<p class="calibre2">这种变换只能应用于数字特征。</p>
+<p class="calibre2">比如泰坦尼克号数据中，<kbd class="calibre12">Age</kbd>特征可以达到 100，但家庭收入可能以百万计。一些模型对值的大小很敏感，因此缩放这些特征将有助于这些模型更好地执行。此外，缩放可用于将变量值压缩到特定范围内。</p>
+<p class="calibre2">以下代码将通过从每个值中移除其平均值来缩放<kbd class="calibre12">Age</kbd>特征，并缩放至单位方差:</p>
+<pre class="calibre21"># scale by subtracting the mean from each value</pre>
+<pre class="calibre21">scaler_processing = preprocessing.StandardScaler()</pre>
+<pre class="calibre21">df_titanic_data['Age_scaled'] = scaler_processing.fit_transform(df_titanic_data['Age'])</pre>
+
+
+            
+
+            
+        
+    
+
+
+
+
+
+  
+    <title>Binning</title>
+    <meta content="urn:uuid:b6d6a510-8f2b-40e4-8a30-e199afd87745" name="Adept.expected.resource"/>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+  
+
+
+  
+        
+
+                            
+                    <h1 class="header-title">扔掉</h1>
+                
+            
+            
+                
+<p class="calibre2">这种定量转换用于创建分位数。在这种情况下，定量特征值将是转换后的有序变量。对于线性回归来说，这种方法并不是一个好的选择，但是对于在使用有序/分类变量时能够有效响应的学习算法来说，这种方法可能很有效。</p>
+<p class="calibre2">以下代码将这种转换应用于<kbd class="calibre12">Fare</kbd>特征:</p>
+<pre class="calibre21"># Binarizing the features by binning them into quantiles<br class="title-page-name"/>df_titanic_data['Fare_bin'] = pd.qcut(df_titanic_data['Fare'], 4)<br class="title-page-name"/><br class="title-page-name"/>if keep_binary:<br class="title-page-name"/>    df_titanic_data = pd.concat(<br class="title-page-name"/>        [df_titanic_data, pd.get_dummies(df_titanic_data['Fare_bin']).rename(columns=lambda x: 'Fare_' + str(x))],<br class="title-page-name"/>        axis=1)</pre>
+
+
+            
+
+            
+        
+    
+
+
+
+
+
+  
+    <title>Derived features</title>
+    <meta content="urn:uuid:b6d6a510-8f2b-40e4-8a30-e199afd87745" name="Adept.expected.resource"/>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+  
+
+
+  
+        
+
+                            
+                    <h1 class="header-title">衍生特征</h1>
+                
+            
+            
+                
+<p class="calibre2">在上一节中，我们对 Titanic 数据应用了一些转换，以便能够使用 scikit-learn 的随机森林分类器(它只接受数字数据)。在本节中，我们将定义另一种类型的变量，它是从一个或多个其他特征中派生出来的。</p>
+<p class="calibre2">在这个定义下，我们可以说上一节的一些变换也叫做<strong class="calibre13">派生特征</strong>。在这一节中，我们将研究其他复杂的转换。</p>
+<p class="calibre2">在前面的部分中，我们提到了您需要使用您的特征工程技能来派生新的特征，以增强模型的预测能力。我们还讨论了特性工程在数据科学管道中的重要性，以及为什么您应该花费大部分时间和精力来开发有用的特性。领域知识在这一部分会很有帮助。</p>
+<p class="calibre2">衍生特征的非常简单的例子是从电话号码中提取国家代码和/或地区代码。您也可以从 GPS 坐标中提取国家/地区。</p>
+<p class="calibre2">Titanic 数据非常简单，不包含很多变量，但我们可以尝试从文本特征中获取一些特征。</p>
+
+
+            
+
+            
+        
+    
+
+
+
+
+
+  
+    <title>Name</title>
+    <meta content="urn:uuid:b6d6a510-8f2b-40e4-8a30-e199afd87745" name="Adept.expected.resource"/>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+  
+
+
+  
+        
+
+                            
+                    <h1 class="header-title">名字</h1>
+                
+            
+            
+                
+<p class="calibre2">对于大多数数据集来说，<kbd class="calibre12">name</kbd>变量本身是无用的，但是它有两个有用的属性。第一个是你名字的长度。例如，你名字的长度可能反映了你的身份，从而反映了你登上救生艇的能力:</p>
+<pre class="calibre21"># getting the different names in the names variable<br class="title-page-name"/>df_titanic_data['Names'] = df_titanic_data['Name'].map(lambda y: len(re.split(' ', y)))</pre>
+<p class="calibre2">第二个有趣的属性是<kbd class="calibre12">Name</kbd>头衔，它也可以用来表示身份和/或性别:</p>
+<pre class="calibre21"># Getting titles for each person<br class="title-page-name"/>df_titanic_data['Title'] = df_titanic_data['Name'].map(lambda y: re.compile(", (.*?)\.").findall(y)[0])<br class="title-page-name"/><br class="title-page-name"/># handling the low occurring titles<br class="title-page-name"/>df_titanic_data['Title'][df_titanic_data.Title == 'Jonkheer'] = 'Master'<br class="title-page-name"/>df_titanic_data['Title'][df_titanic_data.Title.isin(['Ms', 'Mlle'])] = 'Miss'<br class="title-page-name"/>df_titanic_data['Title'][df_titanic_data.Title == 'Mme'] = 'Mrs'<br class="title-page-name"/>df_titanic_data['Title'][df_titanic_data.Title.isin(['Capt', 'Don', 'Major', 'Col', 'Sir'])] = 'Sir'<br class="title-page-name"/>df_titanic_data['Title'][df_titanic_data.Title.isin(['Dona', 'Lady', 'the Countess'])] = 'Lady'<br class="title-page-name"/><br class="title-page-name"/># binarizing all the features<br class="title-page-name"/>if keep_binary:<br class="title-page-name"/>    df_titanic_data = pd.concat(<br class="title-page-name"/>        [df_titanic_data, pd.get_dummies(df_titanic_data['Title']).rename(columns=lambda x: 'Title_' + str(x))],<br class="title-page-name"/>        axis=1)</pre>
+<p class="calibre2">你也可以试着从<kbd class="calibre12">Name</kbd>功能中想出其他有趣的功能。例如，您可能会想到使用姓氏功能来找出泰坦尼克号上家庭成员的大小。</p>
+
+
+            
+
+            
+        
+    
+
+
+
+
+
+  
+    <title>Cabin</title>
+    <meta content="urn:uuid:b6d6a510-8f2b-40e4-8a30-e199afd87745" name="Adept.expected.resource"/>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+  
+
+
+  
+        
+
+                            
+                    <h1 class="header-title">小木屋</h1>
+                
+            
+            
+                
+<p class="calibre2">在泰坦尼克号的数据中，<kbd class="calibre12">Cabin</kbd>特征由一个表示甲板的字母和一个表示房间号的数字表示。房间号朝着船的后部增加，这将提供乘客位置的一些有用的测量。我们还可以从不同的甲板上获得乘客的状态，这将有助于确定谁上了救生艇:</p>
+<pre class="calibre21"># repllacing the missing value in cabin variable "U0"<br class="title-page-name"/>df_titanic_data['Cabin'][df_titanic_data.Cabin.isnull()] = 'U0'<br class="title-page-name"/><br class="title-page-name"/># the cabin number is a sequence of of alphanumerical digits, so we are going to create some features<br class="title-page-name"/># from the alphabetical part of it<br class="title-page-name"/>df_titanic_data['CabinLetter'] = df_titanic_data['Cabin'].map(lambda l: get_cabin_letter(l))<br class="title-page-name"/>df_titanic_data['CabinLetter'] = pd.factorize(df_titanic_data['CabinLetter'])[0]<br class="title-page-name"/><br class="title-page-name"/># binarizing the cabin letters features<br class="title-page-name"/>if keep_binary:<br class="title-page-name"/>    cletters = pd.get_dummies(df_titanic_data['CabinLetter']).rename(columns=lambda x: 'CabinLetter_' + str(x))<br class="title-page-name"/>    df_titanic_data = pd.concat([df_titanic_data, cletters], axis=1)<br class="title-page-name"/><br class="title-page-name"/># creating features from the numerical side of the cabin<br class="title-page-name"/>df_titanic_data['CabinNumber'] = df_titanic_data['Cabin'].map(lambda x: get_cabin_num(x)).astype(int) + 1<br class="title-page-name"/></pre>
+
+
+            
+
+            
+        
+    
+
+
+
+
+
+  
+    <title>Ticket</title>
+    <meta content="urn:uuid:b6d6a510-8f2b-40e4-8a30-e199afd87745" name="Adept.expected.resource"/>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+  
+
+
+  
+        
+
+                            
+                    <h1 class="header-title">票</h1>
+                
+            
+            
+                
+<p class="calibre2"><kbd class="calibre12">Ticket</kbd>特性的代码现在还不清楚，但是我们可以做一些猜测，并尝试将它们分组。在查看票证功能后，您可能会得到以下线索:</p>
+<ul class="calibre7">
+<li class="calibre8">几乎四分之一的彩票以一个字符开头，而其余的仅由数字组成。</li>
+<li class="calibre8">机票代码的数字部分似乎表明了乘客的等级。例如，以 1 开头的数字通常是头等票，2 通常是二等票，3 是三等票。我说<em class="calibre25">通常是</em>，因为它适用于大多数例子，但不是所有例子。也有 4-9 开头的票号，那些比较少见，几乎都是三等舱。</li>
+<li class="calibre8">几个人可以共享一个票号，这可能表明一个家庭或亲密的朋友一起旅行，表现得像一个家庭。</li>
+</ul>
+<p class="calibre2">以下代码尝试分析票据特征码，以找出前面的线索:</p>
+<pre class="calibre21"># Helper function for constructing features from the ticket variable<br class="title-page-name"/>def process_ticket():<br class="title-page-name"/>    global df_titanic_data<br class="title-page-name"/><br class="title-page-name"/>    df_titanic_data['TicketPrefix'] = df_titanic_data['Ticket'].map(lambda y: get_ticket_prefix(y.upper()))<br class="title-page-name"/>    df_titanic_data['TicketPrefix'] = df_titanic_data['TicketPrefix'].map(lambda y: re.sub('[\.?\/?]', '', y))<br class="title-page-name"/>    df_titanic_data['TicketPrefix'] = df_titanic_data['TicketPrefix'].map(lambda y: re.sub('STON', 'SOTON', y))<br class="title-page-name"/><br class="title-page-name"/>    df_titanic_data['TicketPrefixId'] = pd.factorize(df_titanic_data['TicketPrefix'])[0]<br class="title-page-name"/><br class="title-page-name"/>    # binarzing features for each ticket layer<br class="title-page-name"/>    if keep_binary:<br class="title-page-name"/>        prefixes = pd.get_dummies(df_titanic_data['TicketPrefix']).rename(columns=lambda y: 'TicketPrefix_' + str(y))<br class="title-page-name"/>        df_titanic_data = pd.concat([df_titanic_data, prefixes], axis=1)<br class="title-page-name"/><br class="title-page-name"/>    df_titanic_data.drop(['TicketPrefix'], axis=1, inplace=True)<br class="title-page-name"/><br class="title-page-name"/>    df_titanic_data['TicketNumber'] = df_titanic_data['Ticket'].map(lambda y: get_ticket_num(y))<br class="title-page-name"/>    df_titanic_data['TicketNumberDigits'] = df_titanic_data['TicketNumber'].map(lambda y: len(y)).astype(np.int)<br class="title-page-name"/>    df_titanic_data['TicketNumberStart'] = df_titanic_data['TicketNumber'].map(lambda y: y[0:1]).astype(np.int)<br class="title-page-name"/><br class="title-page-name"/>    df_titanic_data['TicketNumber'] = df_titanic_data.TicketNumber.astype(np.int)<br class="title-page-name"/><br class="title-page-name"/>    if keep_scaled:<br class="title-page-name"/>        scaler_processing = preprocessing.StandardScaler()<br class="title-page-name"/>        df_titanic_data['TicketNumber_scaled'] = scaler_processing.fit_transform(<br class="title-page-name"/>            df_titanic_data.TicketNumber.reshape(-1, 1))<br class="title-page-name"/><br class="title-page-name"/><br class="title-page-name"/>def get_ticket_prefix(ticket_value):<br class="title-page-name"/>    # searching for the letters in the ticket alphanumerical value<br class="title-page-name"/>    match_letter = re.compile("([a-zA-Z\.\/]+)").search(ticket_value)<br class="title-page-name"/>    if match_letter:<br class="title-page-name"/>        return match_letter.group()<br class="title-page-name"/>    else:<br class="title-page-name"/>        return 'U'<br class="title-page-name"/><br class="title-page-name"/><br class="title-page-name"/>def get_ticket_num(ticket_value):<br class="title-page-name"/>    # searching for the numbers in the ticket alphanumerical value<br class="title-page-name"/>    match_number = re.compile("([\d]+$)").search(ticket_value)<br class="title-page-name"/>    if match_number:<br class="title-page-name"/>        return match_number.group()<br class="title-page-name"/>    else:<br class="title-page-name"/>        return '0'<br class="title-page-name"/></pre>
+
+
+            
+
+            
+        
+    
+
+
+
+
+
+  
+    <title>Interaction features</title>
+    <meta content="urn:uuid:b6d6a510-8f2b-40e4-8a30-e199afd87745" name="Adept.expected.resource"/>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+  
+
+
+  
+        
+
+                            
+                    <h1 class="header-title">交互功能</h1>
+                
+            
+            
+                
+<p class="calibre2">交互特征通过对特征集执行数学运算来获得，并且指示变量之间的关系的效果。我们对数字特征使用基本的数学运算，并观察变量之间关系的影响:</p>
+<pre class="calibre21"># Constructing features manually based on  the interaction between the individual features<br class="title-page-name"/>numeric_features = df_titanic_data.loc[:,<br class="title-page-name"/>                   ['Age_scaled', 'Fare_scaled', 'Pclass_scaled', 'Parch_scaled', 'SibSp_scaled',<br class="title-page-name"/>                    'Names_scaled', 'CabinNumber_scaled', 'Age_bin_id_scaled', 'Fare_bin_id_scaled']]<br class="title-page-name"/>print("\nUsing only numeric features for automated feature generation:\n", numeric_features.head(10))<br class="title-page-name"/><br class="title-page-name"/>new_fields_count = 0<br class="title-page-name"/>for i in range(0, numeric_features.columns.size - 1):<br class="title-page-name"/>    for j in range(0, numeric_features.columns.size - 1):<br class="title-page-name"/>        if i &lt;= j:<br class="title-page-name"/>            name = str(numeric_features.columns.values[i]) + "*" + str(numeric_features.columns.values[j])<br class="title-page-name"/>            df_titanic_data = pd.concat(<br class="title-page-name"/>                [df_titanic_data, pd.Series(numeric_features.iloc[:, i] * numeric_features.iloc[:, j], name=name)],<br class="title-page-name"/>                axis=1)<br class="title-page-name"/>            new_fields_count += 1<br class="title-page-name"/>        if i &lt; j:<br class="title-page-name"/>            name = str(numeric_features.columns.values[i]) + "+" + str(numeric_features.columns.values[j])<br class="title-page-name"/>            df_titanic_data = pd.concat(<br class="title-page-name"/>                [df_titanic_data, pd.Series(numeric_features.iloc[:, i] + numeric_features.iloc[:, j], name=name)],<br class="title-page-name"/>                axis=1)<br class="title-page-name"/>            new_fields_count += 1<br class="title-page-name"/>        if not i == j:<br class="title-page-name"/>            name = str(numeric_features.columns.values[i]) + "/" + str(numeric_features.columns.values[j])<br class="title-page-name"/>            df_titanic_data = pd.concat(<br class="title-page-name"/>                [df_titanic_data, pd.Series(numeric_features.iloc[:, i] / numeric_features.iloc[:, j], name=name)],<br class="title-page-name"/>                axis=1)<br class="title-page-name"/>            name = str(numeric_features.columns.values[i]) + "-" + str(numeric_features.columns.values[j])<br class="title-page-name"/>            df_titanic_data = pd.concat(<br class="title-page-name"/>                [df_titanic_data, pd.Series(numeric_features.iloc[:, i] - numeric_features.iloc[:, j], name=name)],<br class="title-page-name"/>                axis=1)<br class="title-page-name"/>            new_fields_count += 2<br class="title-page-name"/><br class="title-page-name"/>print("\n", new_fields_count, "new features constructed")</pre>
+<p class="calibre2">这种特征工程可以产生大量的特征。在前面的代码片段中，我们使用了 9 个特性来生成 176 个交互特性。</p>
+<p class="calibre2">我们还可以移除高度相关的特征，因为这些特征的存在不会向模型添加任何信息。我们可以使用 Spearman 相关性来识别和去除高度相关的特征。Spearman 方法的输出中有一个等级系数，可用于识别高度相关的要素:</p>
+<pre class="calibre21"># using Spearman correlation method to remove the feature that have high correlation<br class="title-page-name"/><br class="title-page-name"/># calculating the correlation matrix<br class="title-page-name"/>df_titanic_data_cor = df_titanic_data.drop(['Survived', 'PassengerId'], axis=1).corr(method='spearman')<br class="title-page-name"/><br class="title-page-name"/># creating a mask that will ignore correlated ones<br class="title-page-name"/>mask_ignore = np.ones(df_titanic_data_cor.columns.size) - np.eye(df_titanic_data_cor.columns.size)<br class="title-page-name"/>df_titanic_data_cor = mask_ignore * df_titanic_data_cor<br class="title-page-name"/><br class="title-page-name"/>features_to_drop = []<br class="title-page-name"/><br class="title-page-name"/># dropping the correclated features<br class="title-page-name"/>for column in df_titanic_data_cor.columns.values:<br class="title-page-name"/><br class="title-page-name"/>    # check if we already decided to drop this variable<br class="title-page-name"/>    if np.in1d([column], features_to_drop):<br class="title-page-name"/>        continue<br class="title-page-name"/><br class="title-page-name"/>    # finding highly correlacted variables<br class="title-page-name"/>    corr_vars = df_titanic_data_cor[abs(df_titanic_data_cor[column]) &gt; 0.98].index<br class="title-page-name"/>    features_to_drop = np.union1d(features_to_drop, corr_vars)<br class="title-page-name"/><br class="title-page-name"/>print("\nWe are going to drop", features_to_drop.shape[0], " which are highly correlated features...\n")<br class="title-page-name"/>df_titanic_data.drop(features_to_drop, axis=1, inplace=True)</pre>
+
+
+            
+
+            
+        
+    
+
+
+
+
+
+  
+    <title>The curse of dimensionality</title>
+    <meta content="urn:uuid:b6d6a510-8f2b-40e4-8a30-e199afd87745" name="Adept.expected.resource"/>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+  
+
+
+  
+        
+
+                            
+                    <h1 class="header-title">维度的诅咒</h1>
+                
+            
+            
+                
+<p class="calibre2">为了更好地解释维数灾难和过度拟合的问题，我们将通过一个例子来说明我们有一组图像。每张图片里都有一只猫或一只狗。因此，我们想建立一个模型，可以区分猫和狗的图像。就像<em class="calibre19"> <a href="c6be0d67-2ba9-45ac-b6dd-116518853f42.xhtml" target="_blank" class="calibre11">第一章</a> </em>、<em class="calibre19">数据科学-鸟瞰图</em>中的鱼识别系统一样，我们需要找到一个学习算法可以用来区分两类(猫和狗)的解释性特征。在这个例子中，我们可以说颜色是用来区分猫和狗的一个很好的描述符。因此，平均红色、平均蓝色和平均绿色可用作区分这两个类别的解释性特征。</p>
+<p class="calibre2">然后，该算法将以某种方式组合这三个特征，以形成两个类别之间的决策边界。</p>
+<p class="calibre2">这三个特征的简单线性组合如下所示:</p>
+<pre class="calibre21">If 0.5*red + 0.3*green + 0.2*blue &gt; 0.6 : return cat;</pre>
+<pre class="calibre21">else return dog;</pre>
+<p class="calibre2">这些描述性特征不足以获得一个性能良好的分类器，因此我们可以决定添加更多的特征来增强模型的预测能力，以区分猫和狗。比如，我们可以考虑通过计算图像在 X 和 y 两个维度上的平均边缘或梯度强度来增加一些特征比如图像的纹理，增加这两个特征后，模型精度会提高。我们甚至可以通过添加越来越多的基于颜色、纹理直方图、统计矩等的特征来使模型/分类器获得更准确的分类能力。我们可以很容易地添加几百个这样的特征来增强模型的预测性。但是在增加特性超过一定限度后，反直觉的结果会更糟。通过查看<em class="calibre19">图 1 </em>，您会更好地理解这一点:</p>
+<div><img src="img/c2fec23b-79b5-4122-bafc-90c2ce8c0df8.png" class="calibre50"/></div>
+<p>图 1:模型性能与特性数量的关系</p>
+<p class="calibre2"><em class="calibre19">图 1 </em>显示，随着特征数量的增加，分类器的性能也会提高，直到我们达到最佳特征数量。基于相同大小的训练集添加更多特征将会降低分类器的性能。</p>
+
+
+            
+
+            
+        
+    
+
+
+
+
+
+  
+    <title>Avoiding the curse of dimensionality</title>
+    <meta content="urn:uuid:b6d6a510-8f2b-40e4-8a30-e199afd87745" name="Adept.expected.resource"/>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+  
+
+
+  
+        
+
+                            
+                    <h1 class="header-title">避免维数灾难</h1>
+                
+            
+            
+                
+<p class="calibre2">在前面的章节中，我们展示了当特征的数量超过某个最佳点时，分类器的性能会降低。理论上，如果你有无限个训练样本，维数灾难就不存在了。因此，最佳的要素数量完全取决于数据的大小。</p>
+<p class="calibre2">有一种方法可以帮助你避免这种诅咒的危害，那就是从大量的特性<em class="calibre19"> N </em>中挑选出<em class="calibre19"> M </em>个特性，其中<em class="calibre19">M&lt;T29】N</em>。来自<em class="calibre19"> M </em>的每个特征可以是<em class="calibre19"> N </em>中的一些特征的组合。有一些算法可以帮你做到这一点。这些算法试图找到原始<em class="calibre19"> N </em>特征的有用的、不相关的和线性的组合。一种常用的技术是<strong class="calibre13">主成分分析</strong> ( <strong class="calibre13"> PCA </strong>)。PCA 试图找到较少数量的特征来捕捉原始数据的最大变化。你可以在这个有趣的博客上找到更多关于 PCA 的见解和完整解释:<a href="http://www.visiondummy.com/2014/05/feature-extraction-using-pca/" class="calibre11">http://www . vision dummy . com/2014/05/feature-extraction-using-PCA/</a>。</p>
+<p class="calibre2">将 PCA 应用于原始训练特征的一种有用且简单的方法是使用以下代码:</p>
+<pre class="calibre21"># minimum variance percentage that should be covered by the reduced number of variables<br class="title-page-name"/>variance_percentage = .99<br class="title-page-name"/><br class="title-page-name"/># creating PCA object<br class="title-page-name"/>pca_object = PCA(n_components=variance_percentage)<br class="title-page-name"/><br class="title-page-name"/># trasforming the features<br class="title-page-name"/>input_values_transformed = pca_object.fit_transform(input_values, target_values)<br class="title-page-name"/><br class="title-page-name"/># creating a datafram for the transformed variables from PCA<br class="title-page-name"/>pca_df = pd.DataFrame(input_values_transformed)<br class="title-page-name"/><br class="title-page-name"/>print(pca_df.shape[1], " reduced components which describe ", str(variance_percentage)[1:], "% of the variance")</pre>
+<p class="calibre2">在 Titanic 示例中，我们尝试在对原始特征应用和不应用 PCA 的情况下构建分类器。因为我们在最后使用了随机森林分类器，我们发现应用主成分分析没有太大帮助；随机森林在没有任何特征转换的情况下工作得非常好，甚至相关的特征也不会对模型产生太大的影响。</p>
+
+
+            
+
+            
+        
+    
+
+
+
+
+
+  
+    <title>Titanic example revisited – all together</title>
+    <meta content="urn:uuid:b6d6a510-8f2b-40e4-8a30-e199afd87745" name="Adept.expected.resource"/>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+  
+
+
+  
+        
+
+                            
+                    <h1 class="header-title">重温泰坦尼克号的例子——一起</h1>
+                
+            
+            
+                
+<p class="calibre2">在这一节中，我们将把特征工程和降维的所有细节放在一起:</p>
+<pre class="calibre21">import re<br class="title-page-name"/>import numpy as np<br class="title-page-name"/>import pandas as pd<br class="title-page-name"/>import random as rd<br class="title-page-name"/>from sklearn import preprocessing<br class="title-page-name"/>from sklearn.cluster import KMeans<br class="title-page-name"/>from sklearn.ensemble import RandomForestRegressor<br class="title-page-name"/>from sklearn.decomposition import PCA<br class="title-page-name"/><br class="title-page-name"/># Print options<br class="title-page-name"/>np.set_printoptions(precision=4, threshold=10000, linewidth=160, edgeitems=999, suppress=True)<br class="title-page-name"/>pd.set_option('display.max_columns', None)<br class="title-page-name"/>pd.set_option('display.max_rows', None)<br class="title-page-name"/>pd.set_option('display.width', 160)<br class="title-page-name"/>pd.set_option('expand_frame_repr', False)<br class="title-page-name"/>pd.set_option('precision', 4)<br class="title-page-name"/><br class="title-page-name"/><br class="title-page-name"/># constructing binary features<br class="title-page-name"/>def process_embarked():<br class="title-page-name"/>    global df_titanic_data<br class="title-page-name"/><br class="title-page-name"/>    # replacing the missing values with the most common value in the variable<br class="title-page-name"/>    df_titanic_data.Embarked[df.Embarked.isnull()] = df_titanic_data.Embarked.dropna().mode().values<br class="title-page-name"/><br class="title-page-name"/>    # converting the values into numbers<br class="title-page-name"/>    df_titanic_data['Embarked'] = pd.factorize(df_titanic_data['Embarked'])[0]<br class="title-page-name"/><br class="title-page-name"/>    # binarizing the constructed features<br class="title-page-name"/>    if keep_binary:<br class="title-page-name"/>        df_titanic_data = pd.concat([df_titanic_data, pd.get_dummies(df_titanic_data['Embarked']).rename(<br class="title-page-name"/>            columns=lambda x: 'Embarked_' + str(x))], axis=1)<br class="title-page-name"/><br class="title-page-name"/><br class="title-page-name"/><br class="title-page-name"/># Define a helper function that can use RandomForestClassifier for handling the missing values of the age variable<br class="title-page-name"/>def set_missing_ages():<br class="title-page-name"/>    global df_titanic_data<br class="title-page-name"/><br class="title-page-name"/>    age_data = df_titanic_data[<br class="title-page-name"/>        ['Age', 'Embarked', 'Fare', 'Parch', 'SibSp', 'Title_id', 'Pclass', 'Names', 'CabinLetter']]<br class="title-page-name"/>    input_values_RF = age_data.loc[(df_titanic_data.Age.notnull())].values[:, 1::]<br class="title-page-name"/>    target_values_RF = age_data.loc[(df_titanic_data.Age.notnull())].values[:, 0]<br class="title-page-name"/><br class="title-page-name"/>    # Creating an object from the random forest regression function of sklearn&lt;use the documentation for more details&gt;<br class="title-page-name"/>    regressor = RandomForestRegressor(n_estimators=2000, n_jobs=-1)<br class="title-page-name"/><br class="title-page-name"/>    # building the model based on the input values and target values above<br class="title-page-name"/>    regressor.fit(input_values_RF, target_values_RF)<br class="title-page-name"/><br class="title-page-name"/>    # using the trained model to predict the missing values<br class="title-page-name"/>    predicted_ages = regressor.predict(age_data.loc[(df_titanic_data.Age.isnull())].values[:, 1::])<br class="title-page-name"/><br class="title-page-name"/>    # Filling the predicted ages in the original titanic dataframe<br class="title-page-name"/>    age_data.loc[(age_data.Age.isnull()), 'Age'] = predicted_ages<br class="title-page-name"/><br class="title-page-name"/><br class="title-page-name"/># Helper function for constructing features from the age variable<br class="title-page-name"/>def process_age():<br class="title-page-name"/>    global df_titanic_data<br class="title-page-name"/><br class="title-page-name"/>    # calling the set_missing_ages helper function to use random forest regression for predicting missing values of age<br class="title-page-name"/>    set_missing_ages()<br class="title-page-name"/><br class="title-page-name"/>    # # scale the age variable by centering it around the mean with a unit variance<br class="title-page-name"/>    # if keep_scaled:<br class="title-page-name"/>    # scaler_preprocessing = preprocessing.StandardScaler()<br class="title-page-name"/>    # df_titanic_data['Age_scaled'] = scaler_preprocessing.fit_transform(df_titanic_data.Age.reshape(-1, 1))<br class="title-page-name"/><br class="title-page-name"/>    # construct a feature for children<br class="title-page-name"/>    df_titanic_data['isChild'] = np.where(df_titanic_data.Age &lt; 13, 1, 0)<br class="title-page-name"/><br class="title-page-name"/>    # bin into quartiles and create binary features<br class="title-page-name"/>    df_titanic_data['Age_bin'] = pd.qcut(df_titanic_data['Age'], 4)<br class="title-page-name"/><br class="title-page-name"/>    if keep_binary:<br class="title-page-name"/>        df_titanic_data = pd.concat(<br class="title-page-name"/>            [df_titanic_data, pd.get_dummies(df_titanic_data['Age_bin']).rename(columns=lambda y: 'Age_' + str(y))],<br class="title-page-name"/>            axis=1)<br class="title-page-name"/><br class="title-page-name"/>    if keep_bins:<br class="title-page-name"/>        df_titanic_data['Age_bin_id'] = pd.factorize(df_titanic_data['Age_bin'])[0] + 1<br class="title-page-name"/><br class="title-page-name"/>    if keep_bins and keep_scaled:<br class="title-page-name"/>        scaler_processing = preprocessing.StandardScaler()<br class="title-page-name"/>        df_titanic_data['Age_bin_id_scaled'] = scaler_processing.fit_transform(<br class="title-page-name"/>            df_titanic_data.Age_bin_id.reshape(-1, 1))<br class="title-page-name"/><br class="title-page-name"/>    if not keep_strings:<br class="title-page-name"/>        df_titanic_data.drop('Age_bin', axis=1, inplace=True)<br class="title-page-name"/><br class="title-page-name"/><br class="title-page-name"/># Helper function for constructing features from the passengers/crew names<br class="title-page-name"/>def process_name():<br class="title-page-name"/>    global df_titanic_data<br class="title-page-name"/><br class="title-page-name"/>    # getting the different names in the names variable<br class="title-page-name"/>    df_titanic_data['Names'] = df_titanic_data['Name'].map(lambda y: len(re.split(' ', y)))<br class="title-page-name"/><br class="title-page-name"/>    # Getting titles for each person<br class="title-page-name"/>    df_titanic_data['Title'] = df_titanic_data['Name'].map(lambda y: re.compile(", (.*?)\.").findall(y)[0])<br class="title-page-name"/><br class="title-page-name"/>    # handling the low occurring titles<br class="title-page-name"/>    df_titanic_data['Title'][df_titanic_data.Title == 'Jonkheer'] = 'Master'<br class="title-page-name"/>    df_titanic_data['Title'][df_titanic_data.Title.isin(['Ms', 'Mlle'])] = 'Miss'<br class="title-page-name"/>    df_titanic_data['Title'][df_titanic_data.Title == 'Mme'] = 'Mrs'<br class="title-page-name"/>    df_titanic_data['Title'][df_titanic_data.Title.isin(['Capt', 'Don', 'Major', 'Col', 'Sir'])] = 'Sir'<br class="title-page-name"/>    df_titanic_data['Title'][df_titanic_data.Title.isin(['Dona', 'Lady', 'the Countess'])] = 'Lady'<br class="title-page-name"/><br class="title-page-name"/>    # binarizing all the features<br class="title-page-name"/>    if keep_binary:<br class="title-page-name"/>        df_titanic_data = pd.concat(<br class="title-page-name"/>            [df_titanic_data, pd.get_dummies(df_titanic_data['Title']).rename(columns=lambda x: 'Title_' + str(x))],<br class="title-page-name"/>            axis=1)<br class="title-page-name"/><br class="title-page-name"/>    # scaling<br class="title-page-name"/>    if keep_scaled:<br class="title-page-name"/>        scaler_preprocessing = preprocessing.StandardScaler()<br class="title-page-name"/>        df_titanic_data['Names_scaled'] = scaler_preprocessing.fit_transform(df_titanic_data.Names.reshape(-1, 1))<br class="title-page-name"/><br class="title-page-name"/>    # binning<br class="title-page-name"/>    if keep_bins:<br class="title-page-name"/>        df_titanic_data['Title_id'] = pd.factorize(df_titanic_data['Title'])[0] + 1<br class="title-page-name"/><br class="title-page-name"/>    if keep_bins and keep_scaled:<br class="title-page-name"/>        scaler = preprocessing.StandardScaler()<br class="title-page-name"/>        df_titanic_data['Title_id_scaled'] = scaler.fit_transform(df_titanic_data.Title_id.reshape(-1, 1))<br class="title-page-name"/><br class="title-page-name"/><br class="title-page-name"/><br class="title-page-name"/># Generate features from the cabin input variable<br class="title-page-name"/>def process_cabin():<br class="title-page-name"/>    # refering to the global variable that contains the titanic examples<br class="title-page-name"/>    global df_titanic_data<br class="title-page-name"/><br class="title-page-name"/>    # repllacing the missing value in cabin variable "U0"<br class="title-page-name"/>    df_titanic_data['Cabin'][df_titanic_data.Cabin.isnull()] = 'U0'<br class="title-page-name"/><br class="title-page-name"/>    # the cabin number is a sequence of of alphanumerical digits, so we are going to create some features<br class="title-page-name"/>    # from the alphabetical part of it<br class="title-page-name"/>    df_titanic_data['CabinLetter'] = df_titanic_data['Cabin'].map(lambda l: get_cabin_letter(l))<br class="title-page-name"/>    df_titanic_data['CabinLetter'] = pd.factorize(df_titanic_data['CabinLetter'])[0]<br class="title-page-name"/><br class="title-page-name"/>    # binarizing the cabin letters features<br class="title-page-name"/>    if keep_binary:<br class="title-page-name"/>        cletters = pd.get_dummies(df_titanic_data['CabinLetter']).rename(columns=lambda x: 'CabinLetter_' + str(x))<br class="title-page-name"/>        df_titanic_data = pd.concat([df_titanic_data, cletters], axis=1)<br class="title-page-name"/><br class="title-page-name"/>    # creating features from the numerical side of the cabin<br class="title-page-name"/>    df_titanic_data['CabinNumber'] = df_titanic_data['Cabin'].map(lambda x: get_cabin_num(x)).astype(int) + 1<br class="title-page-name"/><br class="title-page-name"/>    # scaling the feature<br class="title-page-name"/>    if keep_scaled:<br class="title-page-name"/>        scaler_processing = preprocessing.StandardScaler() # handling the missing values by replacing it with the median feare<br class="title-page-name"/>    df_titanic_data['Fare'][np.isnan(df_titanic_data['Fare'])] = df_titanic_data['Fare'].median()<br class="title-page-name"/>    df_titanic_data['CabinNumber_scaled'] = scaler_processing.fit_transform(df_titanic_data.CabinNumber.reshape(-1, 1))<br class="title-page-name"/><br class="title-page-name"/><br class="title-page-name"/>def get_cabin_letter(cabin_value):<br class="title-page-name"/>    # searching for the letters in the cabin alphanumerical value<br class="title-page-name"/>    letter_match = re.compile("([a-zA-Z]+)").search(cabin_value)<br class="title-page-name"/><br class="title-page-name"/>    if letter_match:<br class="title-page-name"/>        return letter_match.group()<br class="title-page-name"/>    else:<br class="title-page-name"/>        return 'U'<br class="title-page-name"/><br class="title-page-name"/><br class="title-page-name"/>def get_cabin_num(cabin_value):<br class="title-page-name"/>    # searching for the numbers in the cabin alphanumerical value<br class="title-page-name"/>    number_match = re.compile("([0-9]+)").search(cabin_value)<br class="title-page-name"/><br class="title-page-name"/>    if number_match:<br class="title-page-name"/>        return number_match.group()<br class="title-page-name"/>    else:<br class="title-page-name"/>        return 0<br class="title-page-name"/><br class="title-page-name"/><br class="title-page-name"/># helper function for constructing features from the ticket fare variable<br class="title-page-name"/>def process_fare():<br class="title-page-name"/>    global df_titanic_data<br class="title-page-name"/><br class="title-page-name"/>    # handling the missing values by replacing it with the median feare<br class="title-page-name"/>    df_titanic_data['Fare'][np.isnan(df_titanic_data['Fare'])] = df_titanic_data['Fare'].median()<br class="title-page-name"/><br class="title-page-name"/>    # zeros in the fare will cause some division problems so we are going to set them to 1/10th of the lowest fare<br class="title-page-name"/>    df_titanic_data['Fare'][np.where(df_titanic_data['Fare'] == 0)[0]] = df_titanic_data['Fare'][<br class="title-page-name"/>                                                                             df_titanic_data['Fare'].nonzero()[<br class="title-page-name"/>                                                                                 0]].min() / 10<br class="title-page-name"/><br class="title-page-name"/>    # Binarizing the features by binning them into quantiles<br class="title-page-name"/>    df_titanic_data['Fare_bin'] = pd.qcut(df_titanic_data['Fare'], 4)<br class="title-page-name"/><br class="title-page-name"/>    if keep_binary:<br class="title-page-name"/>        df_titanic_data = pd.concat(<br class="title-page-name"/>            [df_titanic_data, pd.get_dummies(df_titanic_data['Fare_bin']).rename(columns=lambda x: 'Fare_' + str(x))],<br class="title-page-name"/>            axis=1)<br class="title-page-name"/><br class="title-page-name"/>    # binning<br class="title-page-name"/>    if keep_bins:<br class="title-page-name"/>        df_titanic_data['Fare_bin_id'] = pd.factorize(df_titanic_data['Fare_bin'])[0] + 1<br class="title-page-name"/><br class="title-page-name"/>    # scaling the value<br class="title-page-name"/>    if keep_scaled:<br class="title-page-name"/>        scaler_processing = preprocessing.StandardScaler()<br class="title-page-name"/>        df_titanic_data['Fare_scaled'] = scaler_processing.fit_transform(df_titanic_data.Fare.reshape(-1, 1))<br class="title-page-name"/><br class="title-page-name"/>    if keep_bins and keep_scaled:<br class="title-page-name"/>        scaler_processing = preprocessing.StandardScaler()<br class="title-page-name"/>        df_titanic_data['Fare_bin_id_scaled'] = scaler_processing.fit_transform(<br class="title-page-name"/>            df_titanic_data.Fare_bin_id.reshape(-1, 1))<br class="title-page-name"/><br class="title-page-name"/>    if not keep_strings:<br class="title-page-name"/>        df_titanic_data.drop('Fare_bin', axis=1, inplace=True)<br class="title-page-name"/><br class="title-page-name"/><br class="title-page-name"/># Helper function for constructing features from the ticket variable<br class="title-page-name"/>def process_ticket():<br class="title-page-name"/>    global df_titanic_data<br class="title-page-name"/><br class="title-page-name"/>    df_titanic_data['TicketPrefix'] = df_titanic_data['Ticket'].map(lambda y: get_ticket_prefix(y.upper()))<br class="title-page-name"/>    df_titanic_data['TicketPrefix'] = df_titanic_data['TicketPrefix'].map(lambda y: re.sub('[\.?\/?]', '', y))<br class="title-page-name"/>    df_titanic_data['TicketPrefix'] = df_titanic_data['TicketPrefix'].map(lambda y: re.sub('STON', 'SOTON', y))<br class="title-page-name"/><br class="title-page-name"/>    df_titanic_data['TicketPrefixId'] = pd.factorize(df_titanic_data['TicketPrefix'])[0]<br class="title-page-name"/><br class="title-page-name"/>    # binarzing features for each ticket layer<br class="title-page-name"/>    if keep_binary:<br class="title-page-name"/>        prefixes = pd.get_dummies(df_titanic_data['TicketPrefix']).rename(columns=lambda y: 'TicketPrefix_' + str(y))<br class="title-page-name"/>        df_titanic_data = pd.concat([df_titanic_data, prefixes], axis=1)<br class="title-page-name"/><br class="title-page-name"/>    df_titanic_data.drop(['TicketPrefix'], axis=1, inplace=True)<br class="title-page-name"/><br class="title-page-name"/>    df_titanic_data['TicketNumber'] = df_titanic_data['Ticket'].map(lambda y: get_ticket_num(y))<br class="title-page-name"/>    df_titanic_data['TicketNumberDigits'] = df_titanic_data['TicketNumber'].map(lambda y: len(y)).astype(np.int)<br class="title-page-name"/>    df_titanic_data['TicketNumberStart'] = df_titanic_data['TicketNumber'].map(lambda y: y[0:1]).astype(np.int)<br class="title-page-name"/><br class="title-page-name"/>    df_titanic_data['TicketNumber'] = df_titanic_data.TicketNumber.astype(np.int)<br class="title-page-name"/><br class="title-page-name"/>    if keep_scaled:<br class="title-page-name"/>        scaler_processing = preprocessing.StandardScaler()<br class="title-page-name"/>        df_titanic_data['TicketNumber_scaled'] = scaler_processing.fit_transform(<br class="title-page-name"/>            df_titanic_data.TicketNumber.reshape(-1, 1))<br class="title-page-name"/><br class="title-page-name"/><br class="title-page-name"/>def get_ticket_prefix(ticket_value):<br class="title-page-name"/>    # searching for the letters in the ticket alphanumerical value<br class="title-page-name"/>    match_letter = re.compile("([a-zA-Z\.\/]+)").search(ticket_value)<br class="title-page-name"/>    if match_letter:<br class="title-page-name"/>        return match_letter.group()<br class="title-page-name"/>    else:<br class="title-page-name"/>        return 'U'<br class="title-page-name"/><br class="title-page-name"/><br class="title-page-name"/>def get_ticket_num(ticket_value):<br class="title-page-name"/>    # searching for the numbers in the ticket alphanumerical value<br class="title-page-name"/>    match_number = re.compile("([\d]+$)").search(ticket_value)<br class="title-page-name"/>    if match_number:<br class="title-page-name"/>        return match_number.group()<br class="title-page-name"/>    else:<br class="title-page-name"/>        return '0'<br class="title-page-name"/><br class="title-page-name"/><br class="title-page-name"/># constructing features from the passenger class variable<br class="title-page-name"/>def process_PClass():<br class="title-page-name"/>    global df_titanic_data<br class="title-page-name"/><br class="title-page-name"/>    # using the most frequent value(mode) to replace the messing value<br class="title-page-name"/>    df_titanic_data.Pclass[df_titanic_data.Pclass.isnull()] = df_titanic_data.Pclass.dropna().mode().values<br class="title-page-name"/><br class="title-page-name"/>    # binarizing the features<br class="title-page-name"/>    if keep_binary:<br class="title-page-name"/>        df_titanic_data = pd.concat(<br class="title-page-name"/>            [df_titanic_data, pd.get_dummies(df_titanic_data['Pclass']).rename(columns=lambda y: 'Pclass_' + str(y))],<br class="title-page-name"/>            axis=1)<br class="title-page-name"/><br class="title-page-name"/>    if keep_scaled:<br class="title-page-name"/>        scaler_preprocessing = preprocessing.StandardScaler()<br class="title-page-name"/>        df_titanic_data['Pclass_scaled'] = scaler_preprocessing.fit_transform(df_titanic_data.Pclass.reshape(-1, 1))<br class="title-page-name"/><br class="title-page-name"/><br class="title-page-name"/># constructing features based on the family variables subh as SibSp and Parch<br class="title-page-name"/>def process_family():<br class="title-page-name"/>    global df_titanic_data<br class="title-page-name"/><br class="title-page-name"/>    # ensuring that there's no zeros to use interaction variables<br class="title-page-name"/>    df_titanic_data['SibSp'] = df_titanic_data['SibSp'] + 1<br class="title-page-name"/>    df_titanic_data['Parch'] = df_titanic_data['Parch'] + 1<br class="title-page-name"/><br class="title-page-name"/>    # scaling<br class="title-page-name"/>    if keep_scaled:<br class="title-page-name"/>        scaler_preprocessing = preprocessing.StandardScaler()<br class="title-page-name"/>        df_titanic_data['SibSp_scaled'] = scaler_preprocessing.fit_transform(df_titanic_data.SibSp.reshape(-1, 1))<br class="title-page-name"/>        df_titanic_data['Parch_scaled'] = scaler_preprocessing.fit_transform(df_titanic_data.Parch.reshape(-1, 1))<br class="title-page-name"/><br class="title-page-name"/>    # binarizing all the features<br class="title-page-name"/>    if keep_binary:<br class="title-page-name"/>        sibsps_var = pd.get_dummies(df_titanic_data['SibSp']).rename(columns=lambda y: 'SibSp_' + str(y))<br class="title-page-name"/>        parchs_var = pd.get_dummies(df_titanic_data['Parch']).rename(columns=lambda y: 'Parch_' + str(y))<br class="title-page-name"/>        df_titanic_data = pd.concat([df_titanic_data, sibsps_var, parchs_var], axis=1)<br class="title-page-name"/><br class="title-page-name"/><br class="title-page-name"/># binarzing the sex variable<br class="title-page-name"/>def process_sex():<br class="title-page-name"/>    global df_titanic_data<br class="title-page-name"/>    df_titanic_data['Gender'] = np.where(df_titanic_data['Sex'] == 'male', 1, 0)<br class="title-page-name"/><br class="title-page-name"/><br class="title-page-name"/># dropping raw original<br class="title-page-name"/>def process_drops():<br class="title-page-name"/>    global df_titanic_data<br class="title-page-name"/>    drops = ['Name', 'Names', 'Title', 'Sex', 'SibSp', 'Parch', 'Pclass', 'Embarked', \<br class="title-page-name"/>             'Cabin', 'CabinLetter', 'CabinNumber', 'Age', 'Fare', 'Ticket', 'TicketNumber']<br class="title-page-name"/>    string_drops = ['Title', 'Name', 'Cabin', 'Ticket', 'Sex', 'Ticket', 'TicketNumber']<br class="title-page-name"/>    if not keep_raw:<br class="title-page-name"/>        df_titanic_data.drop(drops, axis=1, inplace=True)<br class="title-page-name"/>    elif not keep_strings:<br class="title-page-name"/>        df_titanic_data.drop(string_drops, axis=1, inplace=True)<br class="title-page-name"/><br class="title-page-name"/><br class="title-page-name"/># handling all the feature engineering tasks<br class="title-page-name"/>def get_titanic_dataset(binary=False, bins=False, scaled=False, strings=False, raw=True, pca=False, balanced=False):<br class="title-page-name"/>    global keep_binary, keep_bins, keep_scaled, keep_raw, keep_strings, df_titanic_data<br class="title-page-name"/>    keep_binary = binary<br class="title-page-name"/>    keep_bins = bins<br class="title-page-name"/>    keep_scaled = scaled<br class="title-page-name"/>    keep_raw = raw<br class="title-page-name"/>    keep_strings = strings<br class="title-page-name"/><br class="title-page-name"/>    # reading the train and test sets using pandas<br class="title-page-name"/>    train_data = pd.read_csv('data/train.csv', header=0)<br class="title-page-name"/>    test_data = pd.read_csv('data/test.csv', header=0)<br class="title-page-name"/><br class="title-page-name"/>    # concatenate the train and test set together for doing the overall feature engineering stuff<br class="title-page-name"/>    df_titanic_data = pd.concat([train_data, test_data])<br class="title-page-name"/><br class="title-page-name"/>    # removing duplicate indices due to coming the train and test set by re-indexing the data<br class="title-page-name"/>    df_titanic_data.reset_index(inplace=True)<br class="title-page-name"/><br class="title-page-name"/>    # removing the index column the reset_index() function generates<br class="title-page-name"/>    df_titanic_data.drop('index', axis=1, inplace=True)<br class="title-page-name"/><br class="title-page-name"/>    # index the columns to be 1-based index<br class="title-page-name"/>    df_titanic_data = df_titanic_data.reindex_axis(train_data.columns, axis=1)<br class="title-page-name"/><br class="title-page-name"/>    # processing the titanic raw variables using the helper functions that we defined above<br class="title-page-name"/>    process_cabin()<br class="title-page-name"/>    process_ticket()<br class="title-page-name"/>    process_name()<br class="title-page-name"/>    process_fare()<br class="title-page-name"/>    process_embarked()<br class="title-page-name"/>    process_family()<br class="title-page-name"/>    process_sex()<br class="title-page-name"/>    process_PClass()<br class="title-page-name"/>    process_age()<br class="title-page-name"/>    process_drops()<br class="title-page-name"/><br class="title-page-name"/>    # move the survived column to be the first<br class="title-page-name"/>    columns_list = list(df_titanic_data.columns.values)<br class="title-page-name"/>    columns_list.remove('Survived')<br class="title-page-name"/>    new_col_list = list(['Survived'])<br class="title-page-name"/>    new_col_list.extend(columns_list)<br class="title-page-name"/>    df_titanic_data = df_titanic_data.reindex(columns=new_col_list)<br class="title-page-name"/><br class="title-page-name"/>    print("Starting with", df_titanic_data.columns.size,<br class="title-page-name"/>          "manually constructing features based on the interaction between them...\n", df_titanic_data.columns.values)<br class="title-page-name"/><br class="title-page-name"/>    # Constructing features manually based on the interaction between the individual features<br class="title-page-name"/>    numeric_features = df_titanic_data.loc[:,<br class="title-page-name"/>                       ['Age_scaled', 'Fare_scaled', 'Pclass_scaled', 'Parch_scaled', 'SibSp_scaled',<br class="title-page-name"/>                        'Names_scaled', 'CabinNumber_scaled', 'Age_bin_id_scaled', 'Fare_bin_id_scaled']]<br class="title-page-name"/>    print("\nUsing only numeric features for automated feature generation:\n", numeric_features.head(10))<br class="title-page-name"/><br class="title-page-name"/>    new_fields_count = 0<br class="title-page-name"/>    for i in range(0, numeric_features.columns.size - 1):<br class="title-page-name"/>        for j in range(0, numeric_features.columns.size - 1):<br class="title-page-name"/>            if i &lt;= j:<br class="title-page-name"/>                name = str(numeric_features.columns.values[i]) + "*" + str(numeric_features.columns.values[j])<br class="title-page-name"/>                df_titanic_data = pd.concat(<br class="title-page-name"/>                    [df_titanic_data, pd.Series(numeric_features.iloc[:, i] * numeric_features.iloc[:, j], name=name)],<br class="title-page-name"/>                    axis=1)<br class="title-page-name"/>                new_fields_count += 1<br class="title-page-name"/>            if i &lt; j:<br class="title-page-name"/>                name = str(numeric_features.columns.values[i]) + "+" + str(numeric_features.columns.values[j])<br class="title-page-name"/>                df_titanic_data = pd.concat(<br class="title-page-name"/>                    [df_titanic_data, pd.Series(numeric_features.iloc[:, i] + numeric_features.iloc[:, j], name=name)],<br class="title-page-name"/>                    axis=1)<br class="title-page-name"/>                new_fields_count += 1<br class="title-page-name"/>            if not i == j:<br class="title-page-name"/>                name = str(numeric_features.columns.values[i]) + "/" + str(numeric_features.columns.values[j])<br class="title-page-name"/>                df_titanic_data = pd.concat(<br class="title-page-name"/>                    [df_titanic_data, pd.Series(numeric_features.iloc[:, i] / numeric_features.iloc[:, j], name=name)],<br class="title-page-name"/>                    axis=1)<br class="title-page-name"/>                name = str(numeric_features.columns.values[i]) + "-" + str(numeric_features.columns.values[j])<br class="title-page-name"/>                df_titanic_data = pd.concat(<br class="title-page-name"/>                    [df_titanic_data, pd.Series(numeric_features.iloc[:, i] - numeric_features.iloc[:, j], name=name)],<br class="title-page-name"/>                    axis=1)<br class="title-page-name"/>                new_fields_count += 2<br class="title-page-name"/><br class="title-page-name"/>    print("\n", new_fields_count, "new features constructed")<br class="title-page-name"/><br class="title-page-name"/>    # using Spearman correlation method to remove the feature that have high correlation<br class="title-page-name"/><br class="title-page-name"/>    # calculating the correlation matrix<br class="title-page-name"/>    df_titanic_data_cor = df_titanic_data.drop(['Survived', 'PassengerId'], axis=1).corr(method='spearman')<br class="title-page-name"/><br class="title-page-name"/>    # creating a mask that will ignore correlated ones<br class="title-page-name"/>    mask_ignore = np.ones(df_titanic_data_cor.columns.size) - np.eye(df_titanic_data_cor.columns.size)<br class="title-page-name"/>    df_titanic_data_cor = mask_ignore * df_titanic_data_cor<br class="title-page-name"/><br class="title-page-name"/>    features_to_drop = []<br class="title-page-name"/><br class="title-page-name"/>    # dropping the correclated features<br class="title-page-name"/>    for column in df_titanic_data_cor.columns.values:<br class="title-page-name"/><br class="title-page-name"/>        # check if we already decided to drop this variable<br class="title-page-name"/>        if np.in1d([column], features_to_drop):<br class="title-page-name"/>            continue<br class="title-page-name"/><br class="title-page-name"/>        # finding highly correlacted variables<br class="title-page-name"/>        corr_vars = df_titanic_data_cor[abs(df_titanic_data_cor[column]) &gt; 0.98].index<br class="title-page-name"/>        features_to_drop = np.union1d(features_to_drop, corr_vars)<br class="title-page-name"/><br class="title-page-name"/>    print("\nWe are going to drop", features_to_drop.shape[0], " which are highly correlated features...\n")<br class="title-page-name"/>    df_titanic_data.drop(features_to_drop, axis=1, inplace=True)<br class="title-page-name"/><br class="title-page-name"/>    # splitting the dataset to train and test and do PCA<br class="title-page-name"/>    train_data = df_titanic_data[:train_data.shape[0]]<br class="title-page-name"/>    test_data = df_titanic_data[test_data.shape[0]:]<br class="title-page-name"/><br class="title-page-name"/>    if pca:<br class="title-page-name"/>        print("reducing number of variables...")<br class="title-page-name"/>        train_data, test_data = reduce(train_data, test_data)<br class="title-page-name"/>    else:<br class="title-page-name"/>        # drop the empty 'Survived' column for the test set that was created during set concatenation<br class="title-page-name"/>        test_data.drop('Survived', axis=1, inplace=True)<br class="title-page-name"/><br class="title-page-name"/>    print("\n", train_data.columns.size, "initial features generated...\n") # , input_df.columns.values<br class="title-page-name"/><br class="title-page-name"/>    return train_data, test_data<br class="title-page-name"/><br class="title-page-name"/><br class="title-page-name"/># reducing the dimensionality for the training and testing set<br class="title-page-name"/>def reduce(train_data, test_data):<br class="title-page-name"/>    # join the full data together<br class="title-page-name"/>    df_titanic_data = pd.concat([train_data, test_data])<br class="title-page-name"/>    df_titanic_data.reset_index(inplace=True)<br class="title-page-name"/>    df_titanic_data.drop('index', axis=1, inplace=True)<br class="title-page-name"/>    df_titanic_data = df_titanic_data.reindex_axis(train_data.columns, axis=1)<br class="title-page-name"/><br class="title-page-name"/>    # converting the survived column to series<br class="title-page-name"/>    survived_series = pd.Series(df_titanic_data['Survived'], name='Survived')<br class="title-page-name"/><br class="title-page-name"/>    print(df_titanic_data.head())<br class="title-page-name"/><br class="title-page-name"/>    # getting the input and target values<br class="title-page-name"/>    input_values = df_titanic_data.values[:, 1::]<br class="title-page-name"/>    target_values = df_titanic_data.values[:, 0]<br class="title-page-name"/><br class="title-page-name"/>    print(input_values[0:10])<br class="title-page-name"/><br class="title-page-name"/>    # minimum variance percentage that should be covered by the reduced number of variables<br class="title-page-name"/>    variance_percentage = .99<br class="title-page-name"/><br class="title-page-name"/>    # creating PCA object<br class="title-page-name"/>    pca_object = PCA(n_components=variance_percentage)<br class="title-page-name"/><br class="title-page-name"/>    # trasforming the features<br class="title-page-name"/>    input_values_transformed = pca_object.fit_transform(input_values, target_values)<br class="title-page-name"/><br class="title-page-name"/>    # creating a datafram for the transformed variables from PCA<br class="title-page-name"/>    pca_df = pd.DataFrame(input_values_transformed)<br class="title-page-name"/><br class="title-page-name"/>    print(pca_df.shape[1], " reduced components which describe ", str(variance_percentage)[1:], "% of the variance")<br class="title-page-name"/><br class="title-page-name"/>    # constructing a new dataframe that contains the newly reduced vars of PCA<br class="title-page-name"/>    df_titanic_data = pd.concat([survived_series, pca_df], axis=1)<br class="title-page-name"/><br class="title-page-name"/>    # split into separate input and test sets again<br class="title-page-name"/>    train_data = df_titanic_data[:train_data.shape[0]]<br class="title-page-name"/>    test_data = df_titanic_data[test_data.shape[0]:]<br class="title-page-name"/>    test_data.reset_index(inplace=True)<br class="title-page-name"/>    test_data.drop('index', axis=1, inplace=True)<br class="title-page-name"/>    test_data.drop('Survived', axis=1, inplace=True)<br class="title-page-name"/><br class="title-page-name"/>    return train_data, test_data<br class="title-page-name"/><br class="title-page-name"/><br class="title-page-name"/># Calling the helper functions<br class="title-page-name"/>if __name__ == '__main__':<br class="title-page-name"/>    train, test = get_titanic_dataset(bins=True, scaled=True, binary=True)<br class="title-page-name"/>    initial_drops = ['PassengerId']<br class="title-page-name"/>    train.drop(initial_drops, axis=1, inplace=True)<br class="title-page-name"/>    test.drop(initial_drops, axis=1, inplace=True)<br class="title-page-name"/><br class="title-page-name"/>    train, test = reduce(train, test)<br class="title-page-name"/><br class="title-page-name"/>    print(train.columns.values)</pre>
+
+
+            
+
+            
+        
+    
+
+
+
+
+
+  
+    <title>Bias-variance decomposition</title>
+    <meta content="urn:uuid:b6d6a510-8f2b-40e4-8a30-e199afd87745" name="Adept.expected.resource"/>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+  
+
+
+  
+        
+
+                            
+                    <h1 class="header-title">偏差-方差分解</h1>
+                
+            
+            
+                
+<p class="calibre2">在上一节中，我们知道了如何为我们的模型选择最佳的超参数。这组最佳超参数是基于最小化交叉验证误差的度量来选择的。现在，我们需要了解模型如何处理看不见的数据，即所谓的样本外数据，即在模型训练阶段没有看到的新数据样本。</p>
+<p class="calibre2">考虑以下示例:我们有一个大小为 10，000 的数据样本，我们将使用不同的训练集大小训练相同的模型，并绘制每一步的测试误差。比如我们准备拿出 1000 个作为测试集，另外 9000 个用于训练。因此，在第一轮训练中，我们将从这 9000 个项目中随机选择一个大小为 100 的训练集。我们将基于<em class="calibre19">最佳</em>选定的超参数集训练模型，用测试集测试模型，最后绘制训练(样本内)误差和测试(样本外)误差。我们对不同的列车规模重复这种训练、测试和绘图操作(例如，从 9，000 个中选择 500 个，然后从 9，000 个中选择 1，000 个，以此类推)。</p>
+<p class="calibre2">在完成所有这些训练、测试和绘图之后，我们将得到两条曲线的图形，代表使用相同模型但跨不同训练集大小的训练和测试误差。从这个图表中，我们可以知道我们的模型有多好。</p>
+<p class="calibre2">输出图将包含两条代表训练和测试误差的曲线，是图 2 中<em class="calibre19">所示的四种可能形状之一。这种不同形状的来源是吴恩达在 Coursera 上的机器学习课程(<a href="https://www.coursera.org/learn/machine-learning" class="calibre11">https://www.coursera.org/learn/machine-learning</a>)。对于机器学习新手来说，这是一门很棒的课程，包含许多见解和最佳实践:</em></p>
+<div><img src="img/9a88f3c0-8a00-4e65-816b-022e6450a072.png" class="calibre51"/></div>
+<p>图 2:不同训练集大小的训练和测试误差的可能图形</p>
+<p class="calibre2">那么，我们应该什么时候接受我们的模型并将其投入生产呢？我们什么时候知道我们的模型在测试集上表现不好，因此不会有严重的泛化错误？这些问题的答案取决于绘制不同训练集大小的训练误差与测试误差的关系图时得到的形状:</p>
+<ul class="calibre7">
+<li class="calibre8">如果你的形状看起来像左上方的<em class="calibre25">形状，它代表一个较低的训练误差，并且在测试集上推广得很好。这种形状很受欢迎，您应该继续在生产中使用这种模型。</em></li>
+<li class="calibre8">如果您的形状与右上方的<em class="calibre25">形状相似，则表示训练误差较大(模型未能从训练样本中学习)，甚至在测试集上具有更差的泛化性能。这个形状是一个彻底的失败，你需要回去看看你的数据，选择的学习算法，和/或选择的超参数有什么问题。</em></li>
+<li class="calibre8">如果您的形状与左下方的<em class="calibre25">形状相似，则表示存在严重的训练错误，因为模型未能捕捉到数据的底层结构，这也符合新的测试数据。</em></li>
+<li class="calibre8">如果你的形状与右下方的<em class="calibre25">相似，则代表高偏差和方差。这意味着您的模型没有很好地计算出训练数据，因此没有很好地概括测试集。</em></li>
+</ul>
+<p class="calibre2">偏差和方差是我们可以用来判断我们的模型有多好的部分。在监督学习中，有两个相反的错误来源，使用<em class="calibre19">图 2 </em>中的学习曲线，我们可以找出我们的模型受到哪个(哪些)组件的影响。具有高方差和低偏差的问题被称为<strong class="calibre13">过拟合</strong>，这意味着该模型在训练样本上表现良好，但在测试集上推广不好。另一方面，具有高偏差和低方差的问题被称为<strong class="calibre13">欠拟合</strong>，这意味着模型没有利用数据，也没有设法根据输入特征估计输出/目标。有不同的方法可以用来避免陷入这些问题之一。但通常，增强其中一个会以牺牲第二个为代价。</p>
+<p class="calibre2">我们可以通过添加模型可以学习的更多特征来解决高方差的情况。这种解决方案很可能会增加偏差，因此您需要在它们之间进行某种权衡。</p>
+
+
+            
+
+            
+        
+    
+
+
+
+
+
+  
+    <title>Learning visibility</title>
+    <meta content="urn:uuid:b6d6a510-8f2b-40e4-8a30-e199afd87745" name="Adept.expected.resource"/>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+  
+
+
+  
+        
+
+                            
+                    <h1 class="header-title">学习可视性</h1>
+                
+            
+            
+                
+<p class="calibre2">有许多伟大的数据科学算法可以用来解决不同领域的问题，但使学习过程可见的关键因素是拥有足够的数据。你可能会问，学习过程需要多少数据才是可见的和值得做的。根据经验，研究人员和机器学习实践者同意，你需要的数据样本至少是你的模型中自由度<strong class="calibre13">的 10 倍。</strong></p>
+<p class="calibre2">例如，在线性模型的情况下，自由度表示数据集中的要素数量。如果数据中有 50 个解释性要素，那么数据中至少需要 500 个数据样本/观测值。</p>
+
+
+            
+
+            
+        
+    
+
+
+
+
+
+  
+    <title>Breaking the rule of thumb</title>
+    <meta content="urn:uuid:b6d6a510-8f2b-40e4-8a30-e199afd87745" name="Adept.expected.resource"/>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+  
+
+
+  
+        
+
+                            
+                    <h1 class="header-title">打破经验法则</h1>
+                
+            
+            
+                
+<p class="calibre2">在实践中，您可以摆脱这一规则，用少于 10 倍的数据特征进行学习；如果你的模型很简单，并且你正在使用一种叫做<strong class="calibre13">正则化</strong>的东西(在下一章中讨论)，这种情况会经常发生。</p>
+<p class="calibre2">Jake Vanderplas 写了一篇文章(<a href="https://jakevdp.github.io/blog/2015/07/06/model-complexity-myth/" class="calibre11">https://jakevdp . github . io/blog/2015/07/06/model-complexity-myth/</a>)来说明一个人即使数据的参数比例子多也是可以学习的。为了证明这一点，他使用了正则化。</p>
+
+
+            
+
+            
+        
+    
+
+
+
+
+
+  
+    <title>Summary</title>
+    <meta content="urn:uuid:b6d6a510-8f2b-40e4-8a30-e199afd87745" name="Adept.expected.resource"/>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+  
+
+
+  
+        
+
+                            
+                    <h1 class="header-title">摘要</h1>
+                
+            
+            
+                
+<p class="calibre2">在这一章中，我们讨论了机器学习实践者使用的最重要的工具，以便理解他们的数据，并获得学习算法来充分利用他们的数据。</p>
+<p class="calibre2">特征工程是数据科学中第一个常用的工具；这是任何数据科学管道中的必备组件。此工具的目的是更好地表示数据并提高模型的预测能力。</p>
+<p class="calibre2">我们看到了大量的特征是如何成为问题并导致更差的分类器性能的。我们还看到，应该使用最佳数量的特征来获得最大的模型性能，该最佳数量的特征是您获得的数据样本/观测值数量的函数。</p>
+<p class="calibre2">随后，我们介绍了一个最强大的工具，这就是偏差-方差分解。该工具广泛用于测试模型在测试集上的表现。</p>
+<p class="calibre2">最后，我们讨论了学习可见性，它回答了我们需要多少数据才能开展业务和进行机器学习的问题。经验法则表明，我们需要的数据样本/观测值至少是数据中要素数量的 10 倍。然而，这个经验法则可以通过使用另一个叫做正则化的工具来打破，这将在下一章中更详细地讨论。</p>
+<p class="calibre2">接下来，我们将继续增加我们的数据科学工具，我们可以使用这些工具从我们的数据中进行有意义的分析，并面临一些应用机器学习的日常问题。<br class="calibre20"/></p>
+
+
+            
+
+            
+        
+    
+
+
+</body></html>

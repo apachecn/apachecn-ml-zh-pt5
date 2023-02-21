@@ -1,0 +1,630 @@
+<html><head/><body>
+<html xmlns:epub="http://www.idpf.org/2007/ops">
+  <head>
+    <title>Generative Adversarial Networks</title>
+    <meta content="urn:uuid:b6d6a510-8f2b-40e4-8a30-e199afd87745" name="Adept.expected.resource"/>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+  
+
+</head>
+  <body class="calibre">
+        
+
+                            
+                    <h1 class="header-title">生成对抗网络</h1>
+                
+            
+            
+                
+<p class="calibre2"><strong class="calibre13">生成对抗网络</strong> ( <strong class="calibre13"> GANs </strong>)是深度神经网络架构，由两个相互对抗的网络组成(因此得名<strong class="calibre13">对抗</strong>)。</p>
+<p class="calibre2">2014 年，伊恩·古德菲勒和包括约舒阿·本吉奥在内的其他研究人员在蒙特利尔大学的一篇论文(<a href="https://arxiv.org/abs/1406.2661" target="_blank" class="calibre11">https://arxiv.org/abs/1406.2661</a>)中介绍了 gan。提到 GANs，脸书人工智能研究主任 Yann LeCun 称<strong class="calibre13">对抗性训练</strong>是过去 10 年机器学习中最有趣的想法。</p>
+<p class="calibre2">GANs 的潜力是巨大的，因为它们可以学习模仿任何数据分布。也就是说，甘人可以被训练创造出与我们的世界在任何领域都极其相似的世界:图像、音乐、演讲或散文。他们在某种意义上是机器人艺术家，他们的作品令人印象深刻(<a href="https://www.nytimes.com/2017/08/14/arts/design/google-how-ai-creates-new-music-and-new-artists-project-magenta.html" target="_blank" class="calibre11">https://www . nytimes . com/2017/08/14/arts/design/Google-how-ai-creates-new-music-and-new-artists-project-magenta . html</a>)——也令人心酸。</p>
+<p class="calibre2">本章将涵盖以下主题:</p>
+<ul class="calibre7">
+<li class="calibre8">直观的介绍</li>
+<li class="calibre8">GANs 的简单实现</li>
+<li class="calibre8">深度卷积 GANs</li>
+</ul>
+
+
+            
+
+            
+        
+    </body>
+
+</html>
+
+
+<html xmlns:epub="http://www.idpf.org/2007/ops">
+  <head>
+    <title>An intuitive introduction</title>
+    <meta content="urn:uuid:b6d6a510-8f2b-40e4-8a30-e199afd87745" name="Adept.expected.resource"/>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+  
+
+</head>
+  <body class="calibre">
+        
+
+                            
+                    <h1 class="header-title">直观的介绍</h1>
+                
+            
+            
+                
+<p class="calibre2">在本节中，我们将以非常直观的方式介绍 GANs。为了了解 GANs 是如何工作的，我们将采用一个获得一张聚会门票的假场景。</p>
+<p class="calibre2">故事以某地正在举行的一个非常有趣的聚会或活动开始，你非常有兴趣参加。你很晚才听说这个活动，所有的票都卖完了，但你会想尽一切办法进入派对。所以你想出了一个主意！你会试着伪造一张需要和原来一模一样，或者非常非常相似的票。但是因为生活不容易，所以还有另一个挑战:你不知道原始的票是什么样的。所以从你参加这种聚会的经验来看，你开始想象票可能是什么样子，并开始根据你的想象来设计票。</p>
+<p class="calibre2">你将尝试设计门票，然后去活动现场，向安保人员展示门票。希望他们会被说服，让你加入。但是你不想在保安面前多次露脸，所以你决定向你的朋友求助，他会把你对原始票的最初猜测拿给保安看。如果他们不让他进去，他会根据看到一些人拿着实际的票进去，为你提供一些关于票可能是什么样子的信息。你会根据你朋友的评论来细化罚单，直到保安让他进去。在这一点上——也只有在这一点上——你将设计另一个完全相同的外观，并让自己进去。</p>
+<p class="calibre2">确实，想多了这个故事有多不切实际，但是 GANs 的工作方式和这个故事很像。GANs 现在非常流行，人们正在计算机视觉领域的许多应用中使用它们。</p>
+<p class="calibre2">有许多有趣的应用可以使用 GANs，我们将实现并提到其中的一些。</p>
+<p class="calibre2">在 GANs 中，有两个主要组件在许多计算机视觉领域取得了突破。第一个组件称为<strong class="calibre13">发生器</strong>，第二个组件称为<strong class="calibre13">鉴别器</strong>:</p>
+<ul class="calibre7">
+<li class="calibre8">生成器将尝试从特定的概率分布中生成数据样本，这与试图复制活动门票的人非常相似</li>
+<li class="calibre8">鉴别器将判断(就像试图在票证中寻找缺陷以确定它是原始还是伪造的安全人员一样)它的输入是来自原始训练集(原始票证)还是来自生成器部分(由试图复制原始票证的人员设计):</li>
+</ul>
+<div><img src="img/4961129f-2166-4bfd-9304-70a05d5d46c8.png" class="calibre167"/></div>
+<div><p>图 1:GANs-总体架构</p>
+</div>
+
+
+            
+
+            
+        
+    </body>
+
+</html>
+
+
+<html xmlns:epub="http://www.idpf.org/2007/ops">
+  <head>
+    <title>Simple implementation of GANs</title>
+    <meta content="urn:uuid:b6d6a510-8f2b-40e4-8a30-e199afd87745" name="Adept.expected.resource"/>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+  
+
+</head>
+  <body class="calibre">
+        
+
+                            
+                    <h1 class="header-title">GANs 的简单实现</h1>
+                
+            
+            
+                
+<p class="calibre2">从假票到某活动的故事，甘斯的想法似乎很直观。因此，为了清楚地理解 GAN 如何工作以及如何实现它们，我们将在 MNIST 数据集上演示一个 GAN 的简单实现。</p>
+<p class="calibre2">首先，我们需要构建 GAN 网络的核心，它由两个主要组件组成:生成器和鉴别器。我们说过，生成器会试图从特定的概率分布中想象或伪造数据样本；可以访问并看到实际数据样本的鉴别器将判断发生器的输出是否在设计上有任何缺陷，或者它是否非常接近原始数据样本。与事件的场景类似，生成器的整个目的是试图说服鉴别者，生成的图像来自真实的数据集，从而试图愚弄他。</p>
+<p class="calibre2">训练过程有一个类似于事件故事的结尾；生成器将最终设法生成看起来与原始数据样本非常相似的图像:</p>
+<div><img src="img/45302309-65dd-4e06-96f8-c1c5ca5d1569.png" class="calibre168"/></div>
+<p>图 2:MNIST 数据集的 GAN 通用架构<br class="title-page-name"/></p>
+<div><p class="calibre2">任何 GAN 的典型结构如图<em class="calibre19">图 2 </em>所示，将在 MNIST 数据集上进行训练。该图中的<kbd class="calibre12">Latent sample</kbd>部分是一个随机的想法或向量，生成器使用它来用假图像复制真实图像。</p>
+<p class="calibre2">正如我们提到的，鉴别器作为一个法官工作，它会试图将真实的图像与生成器设计的虚假图像分开。所以这个网络的输出会是二进制的，可以用一个 sigmoid 函数来表示，0(表示输入是假图像)和 1(表示输入是真图像)。</p>
+</div>
+<p class="calibre2">让我们开始实施这一架构，看看它在 MNIST 数据集上的表现如何。</p>
+<p class="calibre2">让我们从导入实现所需的库开始:</p>
+<pre class="calibre21">%matplotlib inline<br class="title-page-name"/><br class="title-page-name"/>import matplotlib.pyplot as plt<br class="title-page-name"/>import pickle as pkl<br class="title-page-name"/><br class="title-page-name"/>import numpy as np<br class="title-page-name"/>import tensorflow as tf</pre>
+<p class="calibre2">我们将使用 MNIST 数据集，因此我们将使用 TensorFlow 助手来获取数据集并将其存储在某个位置:</p>
+<pre class="calibre21">from tensorflow.examples.tutorials.mnist import input_data<br class="title-page-name"/>mnist_dataset = input_data.read_data_sets('MNIST_data')</pre>
+<pre class="calibre21">Output:<br class="title-page-name"/>Extracting MNIST_data/train-images-idx3-ubyte.gz<br class="title-page-name"/>Extracting MNIST_data/train-labels-idx1-ubyte.gz<br class="title-page-name"/>Extracting MNIST_data/t10k-images-idx3-ubyte.gz<br class="title-page-name"/>Extracting MNIST_data/t10k-labels-idx1-ubyte.gz</pre>
+
+
+            
+
+            
+        
+    </body>
+
+</html>
+
+
+<html xmlns:epub="http://www.idpf.org/2007/ops">
+  <head>
+    <title>Model inputs</title>
+    <meta content="urn:uuid:b6d6a510-8f2b-40e4-8a30-e199afd87745" name="Adept.expected.resource"/>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+  
+
+</head>
+  <body class="calibre">
+        
+
+                            
+                    <h1 class="header-title">模型输入</h1>
+                
+            
+            
+                
+<p class="calibre2">在深入构建由生成器和鉴别器表示的 GAN 核心之前，我们将定义计算图的输入。如图<em class="calibre19">图 2 </em>所示，我们需要两个输入。第一个将是真实图像，它将被馈送到鉴别器。另一个输入被称为<strong class="calibre13">潜在空间</strong>，它将被馈送到生成器并用于生成其假图像:</p>
+<pre class="calibre21"># Defining the model input for the generator and discrimator<br class="title-page-name"/>def inputs_placeholders(discrimator_real_dim, gen_z_dim):<br class="title-page-name"/>    real_discrminator_input = tf.placeholder(tf.float32, (None, discrimator_real_dim), name="real_discrminator_input")<br class="title-page-name"/>    generator_inputs_z = tf.placeholder(tf.float32, (None, gen_z_dim), name="generator_input_z")<br class="title-page-name"/>    <br class="title-page-name"/>    return real_discrminator_input, generator_inputs_z</pre>
+<div><img src="img/c738df95-3bb7-40dd-9862-b5d6f2d3292a.png" class="calibre169"/></div>
+<p>图 3:MNIST GAN 实施的架构</p>
+<p class="calibre2">现在是时候开始构建我们架构的两个核心组件了。我们将从构建发电机部分开始。如图<em class="calibre19">图 3 </em>所示，发生器将由至少一个隐藏层组成，它将作为一个近似器工作。此外，我们将使用一种称为泄漏 ReLU 的东西，而不是使用正常的 ReLU 激活函数。这将允许梯度值不受任何限制地流过图层(更多内容将在下一节介绍)。</p>
+
+
+            
+
+            
+        
+    </body>
+
+</html>
+
+
+<html xmlns:epub="http://www.idpf.org/2007/ops">
+  <head>
+    <title>Variable scope</title>
+    <meta content="urn:uuid:b6d6a510-8f2b-40e4-8a30-e199afd87745" name="Adept.expected.resource"/>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+  
+
+</head>
+  <body class="calibre">
+        
+
+                            
+                    <h1 class="header-title">变量作用域</h1>
+                
+            
+            
+                
+<p class="calibre2">变量作用域是 TensorFlow 的一个特性，它可以帮助我们完成以下任务:</p>
+<ul class="calibre7">
+<li class="calibre8">确保我们有一些命名约定，以便稍后检索它们，例如，让它们以单词生成器或鉴别器开始，这将在网络训练期间帮助我们。我们本来可以使用名称范围特性，但是这个特性对我们的第二个目的没有帮助。</li>
+<li class="calibre8">能够重用或重新训练相同的网络，但具有不同的输入。例如，我们将对生成器中的假图像进行采样，以查看生成器在复制原始图像方面有多好。此外，鉴别器将可以访问真实和虚假的图像，这将使我们在构建计算图时可以轻松地重用变量，而不是创建新的变量。</li>
+</ul>
+<p class="calibre2">以下语句将展示如何使用 TensorFlow 的可变范围功能:</p>
+<pre class="calibre21">with tf.variable_scope('scopeName', reuse=False):<br class="title-page-name"/>    # Write your code here</pre>
+<p class="calibre2">你可以在<a href="https://www.tensorflow.org/programmers_guide/variable_scope#the_problem" target="_blank" class="calibre11">https://www . tensor flow . org/programmers _ guide/variable _ scope # the _ problem</a>了解更多关于使用可变范围特性的好处。</p>
+
+
+            
+
+            
+        
+    </body>
+
+</html>
+
+
+<html xmlns:epub="http://www.idpf.org/2007/ops">
+  <head>
+    <title>Leaky ReLU</title>
+    <meta content="urn:uuid:b6d6a510-8f2b-40e4-8a30-e199afd87745" name="Adept.expected.resource"/>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+  
+
+</head>
+  <body class="calibre">
+        
+
+                            
+                    <h1 class="header-title">泄漏 ReLU</h1>
+                
+            
+            
+                
+<p class="calibre2">我们提到，我们将使用一个不同于 ReLU 激活函数的版本，它被称为 leaky ReLU。传统版本的 ReLU 激活函数将只取输入值和零之间的最大值，通过其他方式将负值截断为零。Leaky ReLU 是我们将要使用的版本，它允许一些负值存在，因此得名<strong class="calibre13"> leaky ReLU </strong>。</p>
+<p class="calibre2">有时，如果我们使用传统的 ReLU 激活函数，网络会陷入一种流行的状态，称为垂死状态，这是因为网络对所有输出只产生零。</p>
+<p class="calibre2">使用 leaky ReLU 的想法是通过允许一些负值通过来防止这种垂死状态。</p>
+<p class="calibre2">让生成器工作的整个想法是从鉴别器接收梯度值，如果网络陷入垂死的境地，学习过程就不会发生。</p>
+<p class="calibre2">下图说明了传统 ReLU 与其泄漏版本之间的差异:</p>
+<div><img src="img/282a88ea-0437-4ea8-b383-342103b56ce6.png" class="calibre170"/></div>
+<p>图 4: ReLU 函数</p>
+<div><img src="img/1138c8e8-e7cd-47a0-b5d0-7a899bc7e5e9.png" class="calibre171"/></div>
+<p>图 5:泄漏的 ReLU 激活函数</p>
+<p class="calibre2">TensorFlow 中没有实现 leaky ReLU 激活功能，需要我们自己实现。如果输入为正，则该激活函数的输出为正，如果输入为负，则该激活函数的输出为受控的负值。我们将通过一个名为<strong class="calibre13"> alpha </strong>的参数来控制负值，该参数将通过允许一些负值通过来引入网络的容差。</p>
+<p class="calibre2">下面的等式代表了我们将要实现的泄漏 ReLU:</p>
+<div><img class="fm-editor-equation33" src="img/87b4a5a5-f789-4a60-b7a6-30053c8fb0cd.png"/></div>
+
+
+            
+
+            
+        
+    </body>
+
+</html>
+
+
+<html xmlns:epub="http://www.idpf.org/2007/ops">
+  <head>
+    <title>Generator</title>
+    <meta content="urn:uuid:b6d6a510-8f2b-40e4-8a30-e199afd87745" name="Adept.expected.resource"/>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+  
+
+</head>
+  <body class="calibre">
+        
+
+                            
+                    <h1 class="header-title">发电机</h1>
+                
+            
+            
+                
+<div><p class="calibre2">MNIST 图像在 0 和 1 之间归一化，此时<kbd class="calibre12">sigmoid</kbd>激活功能可以发挥最佳作用。但是在实践中，我们发现<kbd class="calibre12">tanh</kbd>激活函数比其他任何函数都有更好的性能。因此，为了使用<kbd class="calibre12">tanh</kbd>激活功能，我们需要将这些图像的像素值范围调整到-1 到 1:</p>
+<pre class="calibre21">def generator(gen_z, gen_out_dim, num_hiddern_units=128, reuse_vars=False, leaky_relu_alpha=0.01):<br class="title-page-name"/>    <br class="title-page-name"/>    ''' Building the generator part of the network<br class="title-page-name"/>    <br class="title-page-name"/>        Function arguments<br class="title-page-name"/>        ---------<br class="title-page-name"/>        gen_z : the generator input tensor<br class="title-page-name"/>        gen_out_dim : the output shape of the generator<br class="title-page-name"/>        num_hiddern_units : Number of neurons/units in the hidden layer<br class="title-page-name"/>        reuse_vars : Reuse variables with tf.variable_scope<br class="title-page-name"/>        leaky_relu_alpha : leaky ReLU parameter<br class="title-page-name"/>        <br class="title-page-name"/>        Function Returns<br class="title-page-name"/>        -------<br class="title-page-name"/>        tanh_output, logits_layer: <br class="title-page-name"/>    '''<br class="title-page-name"/>    with tf.variable_scope('generator', reuse=reuse_vars):<br class="title-page-name"/>        <br class="title-page-name"/>        # Defining the generator hidden layer<br class="title-page-name"/>        hidden_layer_1 = tf.layers.dense(gen_z, num_hiddern_units, activation=None)<br class="title-page-name"/>        <br class="title-page-name"/>        # Feeding the output of hidden_layer_1 to leaky relu<br class="title-page-name"/>        hidden_layer_1 = tf.maximum(hidden_layer_1, leaky_relu_alpha*hidden_layer_1)<br class="title-page-name"/>        <br class="title-page-name"/>        # Getting the logits and tanh layer output<br class="title-page-name"/>        logits_layer = tf.layers.dense(hidden_layer_1, gen_out_dim, activation=None)<br class="title-page-name"/>        tanh_output = tf.nn.tanh(logits_layer)<br class="title-page-name"/>        <br class="title-page-name"/>        return tanh_output, logits_layer</pre></div>
+<p class="calibre2">现在我们已经准备好了发电机部分。让我们继续定义网络的第二个组件。</p>
+
+
+            
+
+            
+        
+    </body>
+
+</html>
+
+
+<html xmlns:epub="http://www.idpf.org/2007/ops">
+  <head>
+    <title>Discriminator</title>
+    <meta content="urn:uuid:b6d6a510-8f2b-40e4-8a30-e199afd87745" name="Adept.expected.resource"/>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+  
+
+</head>
+  <body class="calibre">
+        
+
+                            
+                    <h1 class="header-title">鉴别器</h1>
+                
+            
+            
+                
+<p class="calibre2">接下来，我们将构建生成性对抗网络中的第二个主要组件，即鉴别器。鉴别器与生成器非常相似，但是我们将使用<kbd class="calibre12">sigmoid</kbd>激活函数，而不是使用<kbd class="calibre12">tanh</kbd>激活函数；它将产生一个二进制输出，代表鉴别器对输入图像的判断:</p>
+<pre class="calibre21">def discriminator(disc_input, num_hiddern_units=128, reuse_vars=False, leaky_relu_alpha=0.01):<br class="title-page-name"/>    ''' Building the discriminator part of the network<br class="title-page-name"/>    <br class="title-page-name"/>        Function Arguments<br class="title-page-name"/>        ---------<br class="title-page-name"/>        disc_input : discrminator input tensor<br class="title-page-name"/>        num_hiddern_units : Number of neurons/units in the hidden layer<br class="title-page-name"/>        reuse_vars : Reuse variables with tf.variable_scope<br class="title-page-name"/>        leaky_relu_alpha : leaky ReLU parameter<br class="title-page-name"/>        <br class="title-page-name"/>        Function Returns<br class="title-page-name"/>        -------<br class="title-page-name"/>        sigmoid_out, logits_layer: <br class="title-page-name"/>    '''<br class="title-page-name"/>    with tf.variable_scope('discriminator', reuse=reuse_vars):<br class="title-page-name"/>        <br class="title-page-name"/>        # Defining the generator hidden layer<br class="title-page-name"/>        hidden_layer_1 = tf.layers.dense(disc_input, num_hiddern_units, activation=None)<br class="title-page-name"/>        <br class="title-page-name"/>        # Feeding the output of hidden_layer_1 to leaky relu<br class="title-page-name"/>        hidden_layer_1 = tf.maximum(hidden_layer_1, leaky_relu_alpha*hidden_layer_1)<br class="title-page-name"/>        <br class="title-page-name"/>        logits_layer = tf.layers.dense(hidden_layer_1, 1, activation=None)<br class="title-page-name"/>        sigmoid_out = tf.nn.sigmoid(logits_layer)<br class="title-page-name"/>        <br class="title-page-name"/>        return sigmoid_out, logits_layer</pre>
+
+
+            
+
+            
+        
+    </body>
+
+</html>
+
+
+<html xmlns:epub="http://www.idpf.org/2007/ops">
+  <head>
+    <title>Building the GAN network</title>
+    <meta content="urn:uuid:b6d6a510-8f2b-40e4-8a30-e199afd87745" name="Adept.expected.resource"/>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+  
+
+</head>
+  <body class="calibre">
+        
+
+                            
+                    <h1 class="header-title">构建 GAN 网络</h1>
+                
+            
+            
+                
+<p class="calibre2">在定义了构建生成器和鉴别器部分的主要函数之后，是时候将它们堆叠起来，并为这个实现定义模型损耗和优化器了。</p>
+
+
+            
+
+            
+        
+    </body>
+
+</html>
+
+
+<html xmlns:epub="http://www.idpf.org/2007/ops">
+  <head>
+    <title>Model hyperparameters</title>
+    <meta content="urn:uuid:b6d6a510-8f2b-40e4-8a30-e199afd87745" name="Adept.expected.resource"/>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+  
+
+</head>
+  <body class="calibre">
+        
+
+                            
+                    <h1 class="header-title">模型超参数</h1>
+                
+            
+            
+                
+<p class="calibre2">我们可以通过更改以下一组超参数来微调 GANs:</p>
+<pre class="calibre21"># size of discriminator input image<br class="title-page-name"/>#28 by 28 will flattened to be 784<br class="title-page-name"/>input_img_size = 784 <br class="title-page-name"/><br class="title-page-name"/># size of the generator latent vector<br class="title-page-name"/>gen_z_size = 100<br class="title-page-name"/><br class="title-page-name"/># number of hidden units for the generator and discriminator hidden layers<br class="title-page-name"/>gen_hidden_size = 128<br class="title-page-name"/>disc_hidden_size = 128<br class="title-page-name"/><br class="title-page-name"/>#leaky ReLU alpha parameter which controls the leak of the function<br class="title-page-name"/>leaky_relu_alpha = 0.01<br class="title-page-name"/><br class="title-page-name"/># smoothness of the label <br class="title-page-name"/>label_smooth = 0.1</pre>
+
+
+            
+
+            
+        
+    </body>
+
+</html>
+
+
+<html xmlns:epub="http://www.idpf.org/2007/ops">
+  <head>
+    <title>Defining the generator and discriminator</title>
+    <meta content="urn:uuid:b6d6a510-8f2b-40e4-8a30-e199afd87745" name="Adept.expected.resource"/>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+  
+
+</head>
+  <body class="calibre">
+        
+
+                            
+                    <h1 class="header-title">定义生成器和鉴别器</h1>
+                
+            
+            
+                
+<p class="calibre2">在定义了我们的架构的两个主要部分之后，这两个部分将用于生成假的 MNIST 图像(看起来与真的图像完全一样)，现在是时候使用我们到目前为止定义的函数来构建网络了。为了构建网络，我们将遵循以下步骤:</p>
+<ol class="calibre16">
+<li class="calibre8">为我们的模型定义输入，它将由两个变量组成。这些变量中的一个是将被馈送到鉴别器的真实图像，第二个是生成器用来复制原始图像的潜在空间。</li>
+<li class="calibre8">调用已定义的生成器函数来构建网络的生成器部分。</li>
+<li class="calibre8">调用定义的鉴别器函数来构建网络的鉴别器部分，但是我们要调用这个函数两次。一个调用是对真实数据的调用，第二个调用是对来自生成器的虚假数据的调用。</li>
+<li class="calibre8">通过重用变量来保持真实和虚假图像的权重相同:</li>
+</ol>
+<pre class="calibre172">tf.reset_default_graph()<br class="title-page-name"/><br class="title-page-name"/># creating the input placeholders for the discrminator and generator<br class="title-page-name"/>real_discrminator_input, generator_input_z = inputs_placeholders(input_img_size, gen_z_size)<br class="title-page-name"/><br class="title-page-name"/>#Create the generator network<br class="title-page-name"/>gen_model, gen_logits = generator(generator_input_z, input_img_size, gen_hidden_size, reuse_vars=False, leaky_relu_alpha=leaky_relu_alpha)<br class="title-page-name"/><br class="title-page-name"/># gen_model is the output of the generator<br class="title-page-name"/>#Create the generator network<br class="title-page-name"/>disc_model_real, disc_logits_real = discriminator(real_discrminator_input, disc_hidden_size, reuse_vars=False, leaky_relu_alpha=leaky_relu_alpha)<br class="title-page-name"/>disc_model_fake, disc_logits_fake = discriminator(gen_model, disc_hidden_size, reuse_vars=True, leaky_relu_alpha=leaky_relu_alpha)</pre>
+
+
+            
+
+            
+        
+    </body>
+
+</html>
+
+
+<html xmlns:epub="http://www.idpf.org/2007/ops">
+  <head>
+    <title>Discriminator and generator losses</title>
+    <meta content="urn:uuid:b6d6a510-8f2b-40e4-8a30-e199afd87745" name="Adept.expected.resource"/>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+  
+
+</head>
+  <body class="calibre">
+        
+
+                            
+                    <h1 class="header-title">鉴频器和发电机损耗</h1>
+                
+            
+            
+                
+<p class="calibre2">在这一部分，我们需要定义鉴频器和发电机损耗，这可能是实现中最棘手的部分。</p>
+<p class="calibre2">我们知道生成器试图复制原始图像，鉴别器作为一个法官工作，接收来自生成器的图像和原始输入图像。因此，在设计每个零件的损耗时，我们需要针对两件事。</p>
+<p class="calibre2">首先，我们需要网络的鉴别器部分能够区分生成器生成的假图像和来自原始训练样本的真实图像。在训练期间，我们将把一批分为两类的产品送入鉴别器部分。第一类是原始输入的图像，第二类是生成器生成的假图像。</p>
+<p class="calibre2">所以鉴别器的最终总损失将是它接受真的为真的和检测假的为假的能力的总和；那么最终的总损失将是:</p>
+<div><img class="fm-editor-equation34" src="img/85448d3e-1c11-4804-a615-f1b6463e6b26.png"/></div>
+<pre class="calibre21">tf.reduce_mean(tf.nn.sigmoid_cross_entropy_with_logits(logits=logits_layer, labels=labels))</pre>
+<p class="calibre2">因此，我们需要计算两个损耗，以得出最终的鉴频器损耗。</p>
+<p class="calibre2">第一个损失<kbd class="calibre12">disc_loss_real</kbd>将基于我们将从鉴别器和<kbd class="calibre12">labels</kbd>获得的<kbd class="calibre12">logits</kbd>值来计算，在这种情况下，它们都是 1，因为我们知道这个小批量中的所有图像都来自 MNIST 数据集的真实输入图像。为了增强模型在测试集上的概括能力并给出更好的结果，人们发现实际上将值 1 改变为 0.9 更好。这种对标签的改变引入了一种叫做<strong class="calibre13">标签平滑</strong>的东西:</p>
+<pre class="calibre21"> labels = tf.ones_like(tensor) * (1 - smooth)</pre>
+<p class="calibre2">对于鉴别器损失的第二部分，即鉴别器检测伪图像的能力，损失将在我们将从鉴别器和标签获得的 logits 值之间；所有这些都是零，因为我们知道这个小批量中的所有图像都来自生成器，而不是来自原始输入。</p>
+<p class="calibre2">既然我们已经讨论了鉴频器损耗，我们还需要计算发电机损耗。发生器损耗将被称为<kbd class="calibre12">gen_loss</kbd>，它将是<kbd class="calibre12">disc_logits_fake</kbd>(伪图像鉴别器的输出)和标签(由于发生器试图用其伪图像的设计来说服鉴别器，所以标签将全部为 1)之间的损耗:</p>
+<pre class="calibre21"><br class="title-page-name"/># calculating the losses of the discrimnator and generator<br class="title-page-name"/>disc_labels_real = tf.ones_like(disc_logits_real) * (1 - label_smooth)<br class="title-page-name"/>disc_labels_fake = tf.zeros_like(disc_logits_fake)<br class="title-page-name"/><br class="title-page-name"/>disc_loss_real = tf.nn.sigmoid_cross_entropy_with_logits(labels=disc_labels_real, logits=disc_logits_real)<br class="title-page-name"/>disc_loss_fake = tf.nn.sigmoid_cross_entropy_with_logits(labels=disc_labels_fake, logits=disc_logits_fake)<br class="title-page-name"/><br class="title-page-name"/>#averaging the disc loss<br class="title-page-name"/>disc_loss = tf.reduce_mean(disc_loss_real + disc_loss_fake)<br class="title-page-name"/><br class="title-page-name"/>#averaging the gen loss<br class="title-page-name"/>gen_loss = tf.reduce_mean(<br class="title-page-name"/>    tf.nn.sigmoid_cross_entropy_with_logits(<br class="title-page-name"/>        labels=tf.ones_like(disc_logits_fake), <br class="title-page-name"/>        logits=disc_logits_fake))</pre>
+
+
+            
+
+            
+        
+    </body>
+
+</html>
+
+
+<html xmlns:epub="http://www.idpf.org/2007/ops">
+  <head>
+    <title>Optimizers</title>
+    <meta content="urn:uuid:b6d6a510-8f2b-40e4-8a30-e199afd87745" name="Adept.expected.resource"/>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+  
+
+</head>
+  <body class="calibre">
+        
+
+                            
+                    <h1 class="header-title">优化者</h1>
+                
+            
+            
+                
+<p class="calibre2">最后，优化部分！在本节中，我们将定义在培训过程中使用的优化标准。首先，我们将分别更新生成器和鉴别器的变量，因此我们需要能够检索每个部分的变量。</p>
+<p class="calibre2">对于第一个优化器，generator one，我们将从计算图的可训练变量中检索所有以名称<kbd class="calibre12">generator</kbd>开始的变量；然后我们可以通过引用它的名字来检查哪个变量是哪个。</p>
+<p class="calibre2">我们也将对鉴别器变量做同样的事情，让所有以<kbd class="calibre12">discriminator</kbd>开头的变量进入。之后，我们可以将希望优化的变量列表传递给优化器。</p>
+<p class="calibre2">TensorFlow 的变量范围特性使我们能够检索以某个字符串开头的变量，然后我们可以有两个不同的变量列表，一个用于生成器，另一个用于鉴别器:</p>
+<pre class="calibre21"><br class="title-page-name"/># building the model optimizer<br class="title-page-name"/><br class="title-page-name"/>learning_rate = 0.002<br class="title-page-name"/><br class="title-page-name"/># Getting the trainable_variables of the computational graph, split into Generator and Discrimnator parts<br class="title-page-name"/>trainable_vars = tf.trainable_variables()<br class="title-page-name"/>gen_vars = [var for var in trainable_vars if var.name.startswith("generator")]<br class="title-page-name"/>disc_vars = [var for var in trainable_vars if var.name.startswith("discriminator")]<br class="title-page-name"/><br class="title-page-name"/>disc_train_optimizer = tf.train.AdamOptimizer().minimize(disc_loss, var_list=disc_vars)<br class="title-page-name"/>gen_train_optimizer = tf.train.AdamOptimizer().minimize(gen_loss, var_list=gen_vars)</pre>
+
+
+            
+
+            
+        
+    </body>
+
+</html>
+
+
+<html xmlns:epub="http://www.idpf.org/2007/ops">
+  <head>
+    <title>Model training</title>
+    <meta content="urn:uuid:b6d6a510-8f2b-40e4-8a30-e199afd87745" name="Adept.expected.resource"/>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+  
+
+</head>
+  <body class="calibre">
+        
+
+                            
+                    <h1 class="header-title">模特培训</h1>
+                
+            
+            
+                
+<p class="calibre2">现在让我们开始训练过程，看看 GANs 将如何设法生成类似于 MNIST 的图像:</p>
+<pre class="calibre21">train_batch_size = 100<br class="title-page-name"/>num_epochs = 100<br class="title-page-name"/>generated_samples = []<br class="title-page-name"/>model_losses = []<br class="title-page-name"/><br class="title-page-name"/>saver = tf.train.Saver(var_list = gen_vars)<br class="title-page-name"/><br class="title-page-name"/>with tf.Session() as sess:<br class="title-page-name"/>    sess.run(tf.global_variables_initializer())<br class="title-page-name"/>    <br class="title-page-name"/>    for e in range(num_epochs):<br class="title-page-name"/>        for ii in range(mnist_dataset.train.num_examples//train_batch_size):<br class="title-page-name"/>            input_batch = mnist_dataset.train.next_batch(train_batch_size)<br class="title-page-name"/>            <br class="title-page-name"/>            # Get images, reshape and rescale to pass to D<br class="title-page-name"/>            input_batch_images = input_batch[0].reshape((train_batch_size, 784))<br class="title-page-name"/>            input_batch_images = input_batch_images*2 - 1<br class="title-page-name"/>            <br class="title-page-name"/>            # Sample random noise for G<br class="title-page-name"/>            gen_batch_z = np.random.uniform(-1, 1, size=(train_batch_size, gen_z_size))<br class="title-page-name"/>            <br class="title-page-name"/>            # Run optimizers<br class="title-page-name"/>            _ = sess.run(disc_train_optimizer, feed_dict={real_discrminator_input: input_batch_images, generator_input_z: gen_batch_z})<br class="title-page-name"/>            _ = sess.run(gen_train_optimizer, feed_dict={generator_input_z: gen_batch_z})<br class="title-page-name"/>        <br class="title-page-name"/>        # At the end of each epoch, get the losses and print them out<br class="title-page-name"/>        train_loss_disc = sess.run(disc_loss, {generator_input_z: gen_batch_z, real_discrminator_input: input_batch_images})<br class="title-page-name"/>        train_loss_gen = gen_loss.eval({generator_input_z: gen_batch_z})<br class="title-page-name"/>            <br class="title-page-name"/>        print("Epoch {}/{}...".format(e+1, num_epochs),<br class="title-page-name"/>              "Disc Loss: {:.3f}...".format(train_loss_disc),<br class="title-page-name"/>              "Gen Loss: {:.3f}".format(train_loss_gen)) <br class="title-page-name"/>        <br class="title-page-name"/>        # Save losses to view after training<br class="title-page-name"/>        model_losses.append((train_loss_disc, train_loss_gen))<br class="title-page-name"/>        <br class="title-page-name"/>        # Sample from generator as we're training for viegenerator_inputs_zwing afterwards<br class="title-page-name"/>        gen_sample_z = np.random.uniform(-1, 1, size=(16, gen_z_size))<br class="title-page-name"/>        generator_samples = sess.run(<br class="title-page-name"/>                       generator(generator_input_z, input_img_size, reuse_vars=True),<br class="title-page-name"/>                       feed_dict={generator_input_z: gen_sample_z})<br class="title-page-name"/>        <br class="title-page-name"/>        generated_samples.append(generator_samples)<br class="title-page-name"/>        saver.save(sess, './checkpoints/generator_ck.ckpt')<br class="title-page-name"/><br class="title-page-name"/># Save training generator samples<br class="title-page-name"/>with open('train_generator_samples.pkl', 'wb') as f:<br class="title-page-name"/>    pkl.dump(generated_samples, f)</pre>
+<pre class="calibre21">Output:<br class="title-page-name"/>.<br class="title-page-name"/>.<br class="title-page-name"/>.<br class="title-page-name"/>Epoch 71/100... Disc Loss: 1.078... Gen Loss: 1.361
+Epoch 72/100... Disc Loss: 1.037... Gen Loss: 1.555
+Epoch 73/100... Disc Loss: 1.194... Gen Loss: 1.297
+Epoch 74/100... Disc Loss: 1.120... Gen Loss: 1.730
+Epoch 75/100... Disc Loss: 1.184... Gen Loss: 1.425
+Epoch 76/100... Disc Loss: 1.054... Gen Loss: 1.534
+Epoch 77/100... Disc Loss: 1.457... Gen Loss: 0.971
+Epoch 78/100... Disc Loss: 0.973... Gen Loss: 1.688
+Epoch 79/100... Disc Loss: 1.324... Gen Loss: 1.370
+Epoch 80/100... Disc Loss: 1.178... Gen Loss: 1.710
+Epoch 81/100... Disc Loss: 1.070... Gen Loss: 1.649
+Epoch 82/100... Disc Loss: 1.070... Gen Loss: 1.530
+Epoch 83/100... Disc Loss: 1.117... Gen Loss: 1.705
+Epoch 84/100... Disc Loss: 1.042... Gen Loss: 2.210
+Epoch 85/100... Disc Loss: 1.152... Gen Loss: 1.260
+Epoch 86/100... Disc Loss: 1.327... Gen Loss: 1.312
+Epoch 87/100... Disc Loss: 1.069... Gen Loss: 1.759
+Epoch 88/100... Disc Loss: 1.001... Gen Loss: 1.400
+Epoch 89/100... Disc Loss: 1.215... Gen Loss: 1.448
+Epoch 90/100... Disc Loss: 1.108... Gen Loss: 1.342
+Epoch 91/100... Disc Loss: 1.227... Gen Loss: 1.468
+Epoch 92/100... Disc Loss: 1.190... Gen Loss: 1.328
+Epoch 93/100... Disc Loss: 0.869... Gen Loss: 1.857
+Epoch 94/100... Disc Loss: 0.946... Gen Loss: 1.740
+Epoch 95/100... Disc Loss: 0.925... Gen Loss: 1.708
+Epoch 96/100... Disc Loss: 1.067... Gen Loss: 1.427
+Epoch 97/100... Disc Loss: 1.099... Gen Loss: 1.573
+Epoch 98/100... Disc Loss: 0.972... Gen Loss: 1.884
+Epoch 99/100... Disc Loss: 1.292... Gen Loss: 1.610
+Epoch 100/100... Disc Loss: 1.103... Gen Loss: 1.736</pre>
+<p class="calibre2">在运行模型 100 个时期后，我们有了一个经过训练的模型，它将能够生成与我们提供给鉴别器的原始输入图像相似的图像:</p>
+<pre class="calibre21">fig, ax = plt.subplots()<br class="title-page-name"/>model_losses = np.array(model_losses)<br class="title-page-name"/>plt.plot(model_losses.T[0], label='Disc loss')<br class="title-page-name"/>plt.plot(model_losses.T[1], label='Gen loss')<br class="title-page-name"/>plt.title("Model Losses")<br class="title-page-name"/>plt.legend()</pre>
+<p class="calibre2">输出:</p>
+<div><img src="img/f56c476d-c084-4820-81e9-d1571c8a5033.png" class="calibre173"/></div>
+<p>图 6:鉴频器和发电机损耗</p>
+<p class="calibre2">如上图所示，您可以看到由鉴频器和发生器线表示的模型损耗正在收敛。</p>
+
+
+            
+
+            
+        
+    </body>
+
+</html>
+
+
+<html xmlns:epub="http://www.idpf.org/2007/ops">
+  <head>
+    <title>Generator samples from training</title>
+    <meta content="urn:uuid:b6d6a510-8f2b-40e4-8a30-e199afd87745" name="Adept.expected.resource"/>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+  
+
+</head>
+  <body class="calibre">
+        
+
+                            
+                    <h1 class="header-title">来自培训的生成器样本</h1>
+                
+            
+            
+                
+<p class="calibre2">让我们测试模型的性能，甚至看看在培训过程接近尾声时，生成器的生成技能(设计活动门票)是如何得到增强的:</p>
+<pre class="calibre21">def view_generated_samples(epoch_num, g_samples):<br class="title-page-name"/>    fig, axes = plt.subplots(figsize=(7,7), nrows=4, ncols=4, sharey=True, sharex=True)<br class="title-page-name"/>    <br class="title-page-name"/>    print(gen_samples[epoch_num][1].shape)<br class="title-page-name"/>    <br class="title-page-name"/>    for ax, gen_image in zip(axes.flatten(), g_samples[0][epoch_num]):<br class="title-page-name"/>        ax.xaxis.set_visible(False)<br class="title-page-name"/>        ax.yaxis.set_visible(False)<br class="title-page-name"/>        img = ax.imshow(gen_image.reshape((28,28)), cmap='Greys_r')<br class="title-page-name"/>    <br class="title-page-name"/>    return fig, axes<br class="title-page-name"/><br class="title-page-name"/></pre>
+<p class="calibre2">在绘制来自训练过程中最后一个时期的一些生成图像之前，我们需要加载包含训练过程中每个时期生成的样本的持久化文件:</p>
+<pre class="calibre21"># Load samples from generator taken while training<br class="title-page-name"/>with open('train_generator_samples.pkl', 'rb') as f:<br class="title-page-name"/>    gen_samples = pkl.load(f)</pre>
+<p class="calibre2">现在，让我们绘制从训练过程的最后一个时期生成的 16 幅图像，并查看生成器如何能够生成有意义的数字，如 3、7 和 2:</p>
+<pre class="calibre21">_ = view_generated_samples(-1, gen_samples)</pre>
+<div><img src="img/2e23c0b1-d92c-4a30-8967-03d5a3da995e.png" class="calibre174"/></div>
+<p>图 7:来自最终训练时期的样本</p>
+<p class="calibre2">我们甚至可以看到不同时代的发电机设计技巧。让我们想象一下它每 10 个时期产生的图像:</p>
+<pre class="calibre21">rows, cols = 10, 6<br class="title-page-name"/>fig, axes = plt.subplots(figsize=(7,12), nrows=rows, ncols=cols, sharex=True, sharey=True)<br class="title-page-name"/><br class="title-page-name"/>for gen_sample, ax_row in zip(gen_samples[::int(len(gen_samples)/rows)], axes):<br class="title-page-name"/>    for image, ax in zip(gen_sample[::int(len(gen_sample)/cols)], ax_row):<br class="title-page-name"/>        ax.imshow(image.reshape((28,28)), cmap='Greys_r')<br class="title-page-name"/>        ax.xaxis.set_visible(False)<br class="title-page-name"/>        ax.yaxis.set_visible(False)</pre>
+<div><img src="img/0f84e24e-868e-4667-a52c-52afb81d2dc9.png" class="calibre175"/></div>
+<p>图 8:网络训练时生成的图像，每 10 个时期</p>
+<p class="calibre2">正如你所看到的，生成器的设计技巧和它生成假图像的能力在一开始是非常有限的，然后在训练过程的最后得到了增强。</p>
+
+
+            
+
+            
+        
+    </body>
+
+</html>
+
+
+<html xmlns:epub="http://www.idpf.org/2007/ops">
+  <head>
+    <title>Sampling from the generator</title>
+    <meta content="urn:uuid:b6d6a510-8f2b-40e4-8a30-e199afd87745" name="Adept.expected.resource"/>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+  
+
+</head>
+  <body class="calibre">
+        
+
+                            
+                    <h1 class="header-title">从发电机取样</h1>
+                
+            
+            
+                
+<p class="calibre2">在上一节中，我们介绍了在这种 GAN 架构的培训过程中产生的一些示例。我们还可以从生成器生成全新的图像，方法是加载我们保存的检查点，并为生成器提供一个新的潜在空间，它可以使用该空间来生成新的图像:</p>
+<pre class="calibre21"># Sampling from the generator<br class="title-page-name"/>saver = tf.train.Saver(var_list=g_vars)<br class="title-page-name"/><br class="title-page-name"/>with tf.Session() as sess:<br class="title-page-name"/>    <br class="title-page-name"/>    #restoring the saved checkpints<br class="title-page-name"/>    saver.restore(sess, tf.train.latest_checkpoint('checkpoints'))<br class="title-page-name"/>    gen_sample_z = np.random.uniform(-1, 1, size=(16, z_size))<br class="title-page-name"/>    generated_samples = sess.run(<br class="title-page-name"/>                   generator(generator_input_z, input_img_size, reuse_vars=True),<br class="title-page-name"/>                   feed_dict={generator_input_z: gen_sample_z})<br class="title-page-name"/>view_generated_samples(0, [generated_samples])</pre>
+<div><img src="img/a01f9682-b0f7-4eff-8906-4baaacce3ec9.png" class="calibre176"/></div>
+<p>图 9:来自生成器的样本</p>
+<div><p class="calibre2">在实现这个示例时，您可以得出一些观察结果。在训练过程的第一个时期，生成器没有任何技能来生成与真实图像相似的图像，因为它不知道它们看起来像什么。即使是鉴别者也不知道如何区分由生成器和。在训练开始时，会出现两种有趣的情况。首先，生成器不知道如何创建像我们最初提供给网络的真实图像那样的图像。第二，鉴别者不知道真假图像的区别。</p>
+<p class="calibre2">稍后，生成器开始伪造在某种程度上有意义的图像，这是因为生成器将了解原始输入图像来自的数据分布。与此同时，鉴别器将能够区分真假图像，并在训练过程结束时被愚弄。</p>
+</div>
+
+
+            
+
+            
+        
+    </body>
+
+</html>
+
+
+<html xmlns:epub="http://www.idpf.org/2007/ops">
+  <head>
+    <title>Summary</title>
+    <meta content="urn:uuid:b6d6a510-8f2b-40e4-8a30-e199afd87745" name="Adept.expected.resource"/>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+  
+
+</head>
+  <body class="calibre">
+        
+
+                            
+                    <h1 class="header-title">摘要</h1>
+                
+            
+            
+                
+<p class="calibre2">如今，gan 正被用于许多有趣的应用。GANs 可用于不同的设置，如半监督和非监督任务。此外，由于大量研究人员在研究 GANs，这些模型每天都在进步，它们生成图像或视频的能力也越来越好。</p>
+<p class="calibre2">这些类型的模型可以用于许多有趣的商业应用，例如在 Photoshop 中添加一个插件，可以接受像<kbd class="calibre12">make my smile more appealing</kbd>这样的命令。它们也可以用于图像去噪。</p>
+
+
+            
+
+            
+        
+    </body>
+
+</html>
+</body></html>

@@ -1,0 +1,197 @@
+<html><head/><body>
+
+
+	
+		<title>B16572_01_Final_JM_ePub</title>
+		
+	
+	
+		<div><h1 id="_idParaDest-15">第 1 章:MLOps 工作流程的基础</h1>
+			<p><strong class="bold">机器学习</strong> ( <strong class="bold"> ML </strong>)正从研究走向应用商业解决方案的成熟。然而，据 DeepLearning 报道，严峻的现实是，只有 2%的使用 ML 的公司成功地在生产中部署了一个模型来增强他们的业务流程。AI(<a href="https://info.deeplearning.ai/the-batch-companies-slipping-on-ai-goals-self-training-for-better-vision-muppets-and-models-china-vs-us-only-the-best-examples-proliferating-patents">https://info . deep learning . AI/the-batch-companies-slipping-on-AI-goals-self-training-for-better-vision-muppets-and-models-China-vs-us-only-the-best-examples-prolifying-patents</a>)。是什么让它如此艰难？我们需要做些什么来改善这种情况？</p>
+			<p>为了更好地理解这个问题及其解决方案，在这一章中，我们将深入研究软件开发和 ML 的发展和交叉。我们将从反思传统软件开发中的一些趋势开始，从瀑布模型到敏捷到 DevOps 实践，以及这些如何演变为工业化的以 ML 为中心的应用程序。你将被介绍一个使用<strong class="bold">机器学习操作</strong> ( <strong class="bold"> MLOps </strong>)来操作 AI 的系统方法。在本章结束时，您将对 MLOps 有一个坚实的理解，并且您将能够实现一个通用的 MLOps 工作流，该工作流可用于构建、部署和监控各种 ML 应用程序。</p>
+			<p>在本章中，我们将讨论以下主要话题:</p>
+			<ul>
+				<li>基础设施和软件开发的演变</li>
+				<li>传统软件开发挑战</li>
+				<li>软件开发中采用 ML 的趋势</li>
+				<li>了解 MLOps</li>
+				<li>MLOps 的概念和工作流程</li>
+			</ul>
+			<h1 id="_idParaDest-16"><a id="_idTextAnchor016"/>基础设施和软件开发的演变</h1>
+			<p>随着现代互联网时代的开始(大约在 1995 年)，我们见证了软件应用的兴起，从 Windows 95 这样的操作系统到 Linux 操作系统，以及 Google 和 Amazon 这样的网站，它们已经为世界(在线)服务了二十多年。这导致了一种通过收集、存储和处理来自用户交互的大量数据来不断改进服务的文化。这样的发展已经塑造了 IT 基础设施和软件开发的演变。</p>
+			<p>自本世纪初以来，IT 基础设施的转型步伐已经加快。从那时起，企业越来越多地采用云计算，因为它为企业外包 it 基础架构维护提供了新的可能性，同时提供了必要的 IT 资源，如运行和扩展其运营所需的存储和计算资源及服务。</p>
+			<p>云计算提供 IT 资源(如数据存储和计算资源)的按需供应和可用性，而不需要用户主动管理 IT 资源。例如，调配计算和存储资源的企业不必直接管理这些资源，也不必负责保持这些资源的运行——维护工作外包给了云服务提供商。</p>
+			<p>使用云计算的企业可以获益，因为不需要购买和维护 IT 资源；这使他们能够减少 it 资源维护的内部专业知识，并使企业能够优化成本和资源。云计算支持按需扩展，用户按资源使用付费。因此，我们已经看到许多公司将云计算作为其业务和 IT 基础设施的一部分。</p>
+			<p>从 2006 年开始，当 Sun Microsystems 在 2006 年 3 月推出 Sun Grid 时，云计算开始在业界流行起来。这是一种硬件和数据资源共享服务。这项服务被甲骨文收购，后来被命名为 Sun Cloud。与此同时，在同一年(2006 年)，亚马逊推出了另一项云计算服务，名为弹性计算云。这为企业按需提供计算、存储和扩展能力提供了新的可能性。从那时起，跨行业的转型就有机地朝着采用云计算的方向发展。</p>
+			<p>在过去十年中，全球和地区范围内的许多公司都推动了云转型，谷歌、IBM、微软、UpCloud、阿里巴巴和其他公司都在云服务的研发方面进行了大量投资。因此，由于强大且可扩展的云服务的出现，从本地化计算(公司拥有自己的服务器和数据中心)到按需计算的转变已经发生。现在，企业和组织能够在云上按需供应<a id="_idIndexMarker004"/>资源，以满足他们的数据处理需求。</p>
+			<p>随着这些<a id="_idIndexMarker005"/>的发展，我们见证了<strong class="bold">摩尔定律</strong>的运行，该定律指出，微芯片上的晶体管数量每两年翻一番——尽管计算机的成本已经减半，但这是迄今为止的事实。随后，一些趋势发展如下。</p>
+			<h2 id="_idParaDest-17"><a id="_idTextAnchor017"/>机器学习和深度学习的兴起</h2>
+			<p>在过去的<a id="_idIndexMarker006"/>十年中，我们见证了<a id="_idIndexMarker007"/> ML 在日常生活应用中的采用。不仅仅是对于深奥的应用程序，如<strong class="bold"> Dota </strong>或<strong class="bold"> AlphaGo </strong>，ML 也已经进入了相当标准的应用程序，如机器翻译、图像处理和语音识别。</p>
+			<p>这种采用是由基础设施的发展推动的，特别是在计算能力的利用方面。它释放了深度学习和 ML 的潜力..我们可以在<em class="italic">图 1.1 </em>中观察到与计算发展相关的深度学习突破(来源于 open ai:<a href="https://openai.com/blog/ai-and-compute">https://openai.com/blog/ai-and-compute</a>):</p>
+			<div><div><img src="img/B16572_01_01.jpg" alt="Figure 1.1 – Demand for deep learning over time supported by computation&#13;&#10;"/>
+				</div>
+			</div>
+			<p class="figure-caption">图 1.1–随着时间的推移，由计算支持的深度学习需求</p>
+			<p>这些深度学习的突破是由计算的指数增长实现的，计算每 18 个月增长约 35 倍。展望未来，面对这样的需求，我们可能会在为 CPU、GPU 或 TPU 扩展中央计算方面遇到障碍。这迫使我们关注<a id="_idIndexMarker010"/>替代方案，例如<strong class="bold">分布式学习</strong>，其中数据处理的计算分布在多个计算节点上。我们已经看到了分布式学习的一些突破，比如联邦学习和边缘计算方法。分布式学习有望满足深度学习不断增长的需求。</p>
+			<h2 id="_idParaDest-18"><a id="_idTextAnchor018"/>摩尔定律的终结</h2>
+			<p>在 2012 年之前，人工智能的结果非常接近摩尔定律，计算每两年翻一番。2012 年后，计算能力每 3.4 个月翻一番(来源于 2019 年人工智能指数-<a href="https://hai.stanford.edu/research/ai-index-2019">https://hai.stanford.edu/research/ai-index-2019</a>)。我们可以从<em class="italic">图 1.1 </em>中观察到，对深度学习和<strong class="bold">高性能计算</strong> ( <strong class="bold"> HPC </strong>)的需求一直呈指数级增长，计算每 18 个月增长约 35 倍，而摩尔定律的速度被超越了(每 18 个月增长 2 倍)。摩尔定律仍然适用于 CPU(单核性能)的情况，但不适用于新的硬件架构<a id="_idIndexMarker012"/>，如 GPU 和 TPU。这使得摩尔定律变得过时，与当前的需求和趋势形成鲜明对比。</p>
+			<h2 id="_idParaDest-19"><a id="_idTextAnchor019"/>以人工智能为中心的应用</h2>
+			<p>应用程序正在变得以人工智能为中心——我们在多个行业中都看到了这一点。几乎每个应用都在启动<a id="_idIndexMarker014"/>使用 AI，这些应用分别运行在分布式工作负载上，如<strong class="bold"> HPC </strong>、<strong class="bold">微服务</strong>和<strong class="bold">大数据</strong>，如图<em class="italic">图 1.2 </em>所示<a id="_idIndexMarker015"/>:</p>
+			<div><div><img src="img/B16572_01_002.jpg" alt="Figure 1.2 – Applications running on distributed workloads&#13;&#10;"/>
+				</div>
+			</div>
+			<p class="figure-caption">图 1.2–分布式工作负载上运行的应用程序</p>
+			<p>通过结合 HPC 和 AI，我们可以实现训练深度学习和 ML 模型所需的计算优势。随着大数据和人工智能的重叠，我们可以利用提取所需的大规模数据进行人工智能模型训练，随着微服务和人工智能的重叠，我们可以为人工智能模型提供推理服务，以增强业务运营和<a id="_idIndexMarker016"/>影响。这样，分布式应用程序已经成为新的标准。大规模开发以人工智能为中心的应用程序需要分布式应用程序(HPC、微服务和大数据)的协同作用，为此，需要一种开发软件的新方法。</p>
+			<h2 id="_idParaDest-20"><a id="_idTextAnchor020"/>软件开发进化</h2>
+			<p>软件开发与基础设施开发携手发展，以促进使用基础设施的应用程序的高效开发。传统上，软件开发从瀑布式开发方法开始，通过收集设计和开发的需求来线性地进行开发。瀑布模型有许多局限性，这导致了软件开发多年来以敏捷方法和 DevOps 方法的形式发展，如图 1.3 所示:</p>
+			<div><div><img src="img/B16572_01_003.jpg" alt="Figure 1.3 – Software development evolution&#13;&#10;"/>
+				</div>
+			</div>
+			<p class="figure-caption">图 1.3-软件开发演进</p>
+			<h3>瀑布法</h3>
+			<p>从互联网时代开始(大约 1995 年)，瀑布方法被<a id="_idIndexMarker018"/>用于开发软件。这是一种非迭代的软件开发方式。它是单向传递的。从需求收集到软件设计、开发和测试，每个阶段都是预先组织好的，并且一个接一个地执行。当需求定义明确、具体且不随时间变化时，瀑布方法是可行且合适的。因此，这不适合动态项目，因为在动态项目中，需求会随着用户的需求而变化和发展。在这种情况下，如果有持续的修改，瀑布方法就不能用于开发软件。这些是瀑布开发方法的主要缺点:</p>
+			<ul>
+				<li>在开始开发之前，必须给出整套需求；在项目开发期间或之后修改它们是不可能的。</li>
+				<li>创建或实现可重用组件的机会越来越少。</li>
+				<li>测试只能在开发完成后进行。测试并不是可迭代的；事情一旦发生，就不可能回头去解决。此外，客户验收测试经常引入变更，导致交付延迟和高成本。这种开发和测试方式会对项目交付时间表和成本产生负面影响。</li>
+				<li>大多数时候，系统的用户是根据开发人员的理解来配置系统的，这不是以用户为中心的，可能无法满足他们的需求。</li>
+			</ul>
+			<h3>敏捷方法</h3>
+			<p><strong class="bold">敏捷方法</strong>促进了软件开发的<a id="_idIndexMarker019"/>迭代和渐进方法。与瀑布方法不同，敏捷方法是精确的和以用户为中心的。这种方法是双向的，通常会让最终用户或客户参与到开发和测试过程中，这样他们就有机会在整个项目开发过程和阶段中进行测试、给出反馈并提出改进建议。与瀑布方法相比，敏捷有几个优点:</p>
+			<ul>
+				<li>需求是在开始开发之前定义的，但是可以随时修改。</li>
+				<li>创建或实现可重用的组件是可能的。</li>
+				<li>解决方案或项目可以通过将项目分离成定期交付的不同模块来实现模块化。</li>
+				<li>用户或客户可以通过定期测试和评估开发的解决方案模块来共同创造，以确保业务需求得到满足。这种以用户为中心的流程确保了专注于满足客户和业务需求的高质量结果。</li>
+			</ul>
+			<p>下图<a id="_idIndexMarker020"/>显示了<strong class="bold">瀑布</strong>和<strong class="bold">敏捷</strong>方法之间的区别:</p>
+			<div><div><img src="img/B16572_01_004.jpg" alt="Figure 1.4 – Difference between waterfall and agile methods&#13;&#10;"/>
+				</div>
+			</div>
+			<p class="figure-caption">图 1.4-瀑布方法和敏捷方法的区别</p>
+			<h3>DevOps 方法</h3>
+			<p><strong class="bold"> DevOps 方法</strong>通过在<em class="italic">构建</em>、<em class="italic">测试</em>、<em class="italic">部署</em>和<em class="italic">交付</em>阶段进一步简化软件变更<a id="_idIndexMarker021"/>的运动，扩展了敏捷开发实践。DevOps 使跨职能团队能够自主执行由持续集成、持续部署和持续交付驱动的软件应用程序。它鼓励软件开发人员和 It 操作人员之间的协作、集成和自动化，以提高交付以客户为中心的软件的效率、速度和质量。DevOps 为设计、测试、部署和监控生产系统提供了一个简化的软件开发框架。DevOps 使得在几分钟内将软件交付生产并保持其可靠运行成为可能。</p>
+			<h1 id="_idParaDest-21"><a id="_idTextAnchor021"/>传统软件开发挑战</h1>
+			<p>在前面的章节中，我们观察到了传统软件开发从瀑布模型到敏捷和 DevOps 实践的转变。敏捷和 DevOps 实践使得公司能够可靠地交付软件。DevOps 使得在几分钟内将软件交付生产并保持其可靠运行成为可能。这种方法如此成功，以至于许多公司已经在采用它，那么为什么我们不能继续为 ML 应用程序做同样的事情呢？</p>
+			<p>主要原因是 ML 开发和传统软件开发之间有一个根本的区别:<em class="italic">机器学习不仅仅是代码；是代码加数据</em>。通过应用算法(通过代码)来拟合数据以产生 ML 模型，从而创建 ML 模型，如图<em class="italic">图 1.5 </em>所示:</p>
+			<div><div><img src="img/B16572_01_005.jpg" alt="Figure 1.5 – Machine learning = data + code&#13;&#10;"/>
+				</div>
+			</div>
+			<p class="figure-caption">图 1.5–机器学习=数据+代码</p>
+			<p>虽然代码是在开发环境中<a id="_idIndexMarker023"/>精心制作的，但是数据来自多个来源，用于训练、测试和推断。就数量、速度、准确性和多样性而言，它是稳健的，并且随着时间而变化。为了跟上不断发展的数据，代码会随着时间而发展。从长远来看，它们之间的关系可以被看作是代码和数据生活在不同的平面上，它们共享时间维度，但在所有其他方面都是独立的。ML 开发过程的挑战是以可控的方式在这两个层面之间建立一座桥梁:</p>
+			<div><div><img src="img/B16572_01_006.jpg" alt="Figure 1.6 – Data and code progression over time&#13;&#10;"/>
+				</div>
+			</div>
+			<p class="figure-caption">图 1.6–数据和代码随时间的进展</p>
+			<p>随着时间的推移，数据和代码最终会朝着两个方向发展，一个目标是建立和维护一个健壮的、可扩展的 ML 系统。这种脱节导致了几个挑战，任何试图将 ML 模型投入生产的人都需要解决这些挑战。它带来了一些挑战，如部署缓慢、脆弱、分散和不一致，以及缺乏可重复性和可追溯性。</p>
+			<p>为了克服这些挑战，MLOps 提供了一种系统化的方法，通过随时间的推移将数据和代码连接在一起。这是对传统软件开发方法在 ML 应用方面提出的挑战的解决方案。使用 MLOps 方法，数据和代码随着时间在一个方向上前进，一个目标是建立和维护一个健壮的和可伸缩的 ML 系统:</p>
+			<div><div><img src="img/B16572_01_007.jpg" alt="Figure 1.7 – MLOps – data and code progressing together&#13;&#10;"/>
+				</div>
+			</div>
+			<p class="figure-caption">图 1.7–MLOps–数据和代码一起前进</p>
+			<p>MLOps 以简化和系统化的方式促进 ML 模型开发、部署和监控。它使数据科学和 It 团队能够协作、验证和<a id="_idIndexMarker025"/>管理他们的运营。团队执行的所有操作都被记录或审核，端到端可追踪，可重复。在接下来的章节中，我们将了解 MLOps 如何支持数据科学和 IT 团队构建和维护强大且可扩展的 ML 系统。</p>
+			<h1 id="_idParaDest-22">软件开发中采用 ML 的趋势</h1>
+			<p>在我们深入研究<a id="_idIndexMarker026"/>MLOps 方法和工作流程的工作方式之前，了解 m lops 在哪里以及<a id="_idIndexMarker027"/>如何扰乱世界的大背景和趋势是有益的。随着许多应用程序变得以人工智能为中心，软件开发也在进化以促进人工智能。ML 将越来越成为软件开发的一部分，主要原因如下:</p>
+			<ul>
+				<li><strong class="bold">投资</strong>:2019 年，全球私人人工智能投资超过 700 亿美元，与人工智能相关的初创企业投资超过 370 亿美元，M&amp;340 亿美元，IPO 50 亿美元，少数股权价值约 20 亿美元。对全球人工智能的预测显示，2018 年人工智能的市场价值将快速增长，达到 95 亿美元，预计到 2025 年将达到 1180 亿美元的市场价值。据评估，到 2030 年，人工智能带来的经济活动增长将具有很高的价值和意义。目前，美国吸引了大约 50%的全球风险投资资金，中国吸引了大约 39%，11%流向了欧洲。</li>
+				<li><strong class="bold">大数据</strong>:数据在数量、速度、准确性和多样性方面呈指数级<a id="_idIndexMarker028"/>增长。例如，观察表明欧洲的数据量每年增长 61%，预计到 2025 年创建的数据将是现在的四倍。数据是开发人工智能必不可少的原材料。</li>
+				<li><strong class="bold">基础设施开发和采用</strong>:摩尔定律已被密切跟踪并观察到在 2012 年之前已经实现。2012 年后，计算能力每 3.4 个月翻一番。</li>
+				<li><strong class="bold">加大研发</strong> : AI 研究在质和量上一直繁荣。从 1998 年到 2018 年，同行评审的人工智能论文数量增长了 300%，占已发表会议论文的 9%，同行评审期刊出版物的 3%。</li>
+				<li><strong class="bold">Industry</strong>: Based on a surveyed report, 47% of large companies have reported having adopted AI in at <a id="_idIndexMarker029"/>least one function or <a id="_idIndexMarker030"/>business unit. In 2019, it went up to 58% and is expected to increase.<p class="callout-heading">信息</p><p class="callout">这些观点来源于可信人工智能-欧盟委员会的政策和投资建议(<a href="https://ec.europa.eu/digital-single-market/en/news/policy-and-investment-recommendations-trustworthy-artificial-intelligence">https://EC . Europa . eu/digital-single-market/en/news/policy-and-investment-recommendations-trust-artificial-intelligence</a>)和人工智能指数 2019(【https://hai.stanford.edu/research/ai-index-2019】)。</p></li>
+			</ul>
+			<p>所有这些发展都表明了人工智能产业化的强大推动力，而这通过将工业和研究联系起来是可能的。MLOps 将在人工智能产业化中发挥关键作用。如果你投资学习这种方法，它会让你在你的公司或团队中领先一步，你可以成为操作 ML 和产业化 AI 的催化剂。</p>
+			<p>到目前为止，我们已经了解了 IT、软件开发和人工智能方面的一些挑战和发展。接下来，我们将深入理解概念上的 MLOps，并详细了解可用于任何用例的通用 MLOps 工作流。这些基本原则将帮助你牢牢掌握 MLOps。</p>
+			<h1 id="_idParaDest-23"><a id="_idTextAnchor023"/>了解 MLOps</h1>
+			<p>软件开发是跨学科的，并且正在发展以促进 ML。MLOps 是一种新兴的方法，通过集成多个领域来融合 ML 与软件开发，因为 MLOps 结合了 ML、DevOps 和数据工程，旨在可靠有效地在生产中构建、部署和维护 ML 系统。因此，MLOps 可以通过这个<a id="_idIndexMarker032"/>交集来阐述。</p>
+			<div><div><img src="img/B16572_01_008.jpg" alt="Figure 1.8 – MLOps intersection&#13;&#10;"/>
+				</div>
+			</div>
+			<p class="figure-caption">图 1.8–MLOps 交叉点</p>
+			<p>为了让这个交集(MLOps)可操作，我设计了一个模块化框架，遵循威林加(<a href="https://doi.org/10.1007/978-3-662-43839-8">https://doi.org/10.1007/978-3-662-43839-8</a>)提出的系统<em class="italic">设计科学方法，开发一个工作流，将这三者结合在一起(数据工程、机器学习和<em class="italic"> DevOps </em>)。设计科学伴随着设计在问题和环境中的应用。设计科学是在一定背景下对人工制品的设计和研究。这种情况下的工件是 MLOps 工作流，它通过与问题上下文(人工智能应用的行业用例)交互来迭代设计:</em></p>
+			<div><div><img src="img/B16572_01_009.jpg" alt="Figure 1.9 – Design science workflow&#13;&#10;"/>
+				</div>
+			</div>
+			<p class="figure-caption">图 1.9–设计科学工作流程</p>
+			<p>在结构化和迭代方法中，通过迭代执行两个周期(设计周期和经验周期)来对 MLOps 工作流设计进行定性和定量分析。作为这些循环的结果，一个 MLOps 工作流被开发出来，并通过将其应用于多个问题环境<a id="_idIndexMarker033"/>而得到验证，也就是说，跨多个行业(例如，金融、制造、医疗保健、零售、汽车行业、能源等)的数十个 ML 用例(例如，异常检测、实时交易、预测性维护、推荐系统、虚拟助理等)。我已经在多个行业的各种项目中成功地应用和验证了这个 MLOps 工作流，以实施 ML。在下一节中，我们将介绍作为设计科学过程的结果而设计的 MLOps 工作流的概念。</p>
+			<h1 id="_idParaDest-24"><a id="_idTextAnchor024"/>m lops 的概念和工作流程</h1>
+			<p>在本节中，我们<a id="_idIndexMarker034"/>将了解一般的 MLOps 工作流程；它是许多设计周期迭代的结果，如前一节讨论的<a id="_idIndexMarker035"/>。它以简化的方式将数据工程、ML 和 DevOps 结合在一起。<em class="italic">图 1.10 </em>是一个通用的 MLOps 工作流程；它是模块化的、灵活的，可用于在任何商业或行业中构建概念证明或实施 ML 解决方案:</p>
+			<div><div><img src="img/B16572_01_010.jpg" alt="Figure 1.10 – MLOps workflow&#13;&#10;"/>
+				</div>
+			</div>
+			<p class="figure-caption">图 1.10–m lops 工作流程</p>
+			<p>该工作流程分为两个模块:</p>
+			<ul>
+				<li><strong class="bold"> MLOps 管道</strong>(构建、部署和<a id="_idIndexMarker036"/>监控)——上层<a id="_idIndexMarker037"/></li>
+				<li><strong class="bold">驱动</strong>:数据、代码、工件、中间件和<a id="_idIndexMarker038"/>基础设施——中间层和下层</li>
+			</ul>
+			<p>上层是 MLOps 管道(构建、部署和监控)，由数据、代码、工件、中间件和基础设施等驱动程序实现。MLOps pipeline 由一系列服务、驱动程序、中间件和基础设施提供支持，它打造 ML 驱动的解决方案。通过使用这种管道，企业或个人可以进行快速的原型制作、测试和验证，并经济高效地将模型部署到生产中。</p>
+			<p>为了理解 MLOps 工作流的工作和实现，我们将使用一个形象化的业务用例来查看每个层和步骤的实现。</p>
+			<h2 id="_idParaDest-25"><a id="_idTextAnchor025"/>讨论用例</h2>
+			<p>在这个用例中，我们将运行(原型制作和生产部署)一个图像分类服务，以对西班牙巴塞罗那一家宠物公园的猫和狗进行分类。该服务将根据安装在宠物公园的闭路电视摄像头的推断数据，实时识别猫和狗。</p>
+			<p>宠物公园为您提供运营服务所需的数据和基础设施:</p>
+			<ul>
+				<li><strong class="bold">数据</strong>:宠物公园已经给了你访问他们的数据湖的权限，其中包含 100，000 张猫和狗的标记图像，我们将用它们来训练模型。</li>
+				<li><strong class="bold">基础设施</strong>:公共云(IaaS)。</li>
+			</ul>
+			<p>此用例类似于操作 ML 的真实用例，用于解释 MLOps 工作流的工作和实现。请记住，在 MLOps 工作流程的每个环节和步骤中，都要寻找对该用例实现的解释。现在，让我们详细看看每一层和每一步的工作原理。</p>
+			<h3>MLOps 管道</h3>
+			<p>MLOps 管道是上层，它执行诸如构建、部署和监视之类的操作，这些操作以模块化方式彼此同步工作。让我们看看每个模块的功能。</p>
+			<h4>建设</h4>
+			<p>构建模块有<a id="_idIndexMarker040"/>核心 ML 管道，这纯粹是为了训练、打包和版本化 ML 模型。它由所需的计算(例如，云或分布式计算上的 CPU 或 GPU)资源提供支持，以运行 ML 培训和管道:</p>
+			<div><div><img src="img/B16572_01_11.jpg" alt="Figure 1.11 – MLOps – build pipeline &#13;&#10;"/>
+				</div>
+			</div>
+			<p class="figure-caption">图 1.11–MLOps–构建管道</p>
+			<p>管道从左向右工作。让我们详细看看每个步骤的功能:</p>
+			<ul>
+				<li><strong class="bold">Data ingestion</strong>: This step is a trigger step for the ML pipeline. It deals with the volume, velocity, veracity, and variety of data by extracting data from various data sources (for example, databases, data warehouses, or data lakes) and ingesting the required data for the model training step. Robust data pipelines connected to multiple <a id="_idIndexMarker041"/>data sources enable it to perform <strong class="bold">extract, transform, and load </strong>(<strong class="bold">ETL</strong>) operations to provide the necessary data for ML training purposes. In this step, we can split and version data for model training in the required <a id="_idIndexMarker042"/>format (for example, the training or test set). As a result of this step, any experiment (that is, model training) can be audited and is back-traceable. <p>为了更好地理解数据摄取步骤，下面是之前描述的用例实现:</p><p><em class="italic">用例实现</em></p><p>由于您可以访问宠物公园的数据湖，您现在可以获得数据来开始。使用数据管道(数据摄取步骤的一部分)，您可以执行以下操作:</p><p>1.提取、转换和加载 100，000 张猫和狗的图像。</p><p>2.将此数据拆分并版本化为训练和测试拆分(80%和 20%拆分)。</p><p>对这些数据进行版本控制将为训练好的模型提供端到端的可追溯性。</p><p>恭喜——现在您已经准备好使用这些数据开始训练和测试 ML 模型了。</p></li>
+				<li><strong class="bold">Model training</strong>: After procuring the required data for ML model training in the previous step, this step will enable model training; it has modular scripts or code that perform <a id="_idIndexMarker043"/>all the traditional steps in ML, such as data preprocessing, feature engineering, and feature scaling before training or retraining any model. Following this, the ML model is trained while performing hyperparameter tuning to fit the model to the dataset (training set). This step can be done manually, but efficient and automatic solutions such as <strong class="bold">Grid Search</strong> or <strong class="bold">Random Search</strong> exist. As a result, all important steps of ML model training are executed with a ML model as the output of this step.<p><em class="italic">用例实现</em></p><p>在这一步中，我们实现了训练图像分类模型的所有重要步骤。目标是训练一个 ML 模型来对猫和狗进行分类。对于<a id="_idIndexMarker044"/>这个案例，我们为图像分类服务训练一个<strong class="bold">卷积神经网络</strong>(<strong class="bold">CNN</strong>–<a href="https://towardsdatascience.com/wtf-is-image-classification-8e78a8235acb">https://towardsdatascience . com/wtf-is-image-class ification-8e 78 a 8235 ACB</a>)。实现以下步骤:训练前的数据预处理、特征工程和特征缩放，随后用超参数调整训练模型。因此，我们有一个 CNN 模型，可以以 97%的准确率对猫和狗进行分类。</p></li>
+				<li><strong class="bold">Model testing</strong>: In this step, we <a id="_idIndexMarker045"/>evaluate the trained model performance on a separated set of data points named test data (which was split and versioned in the data ingestion step). The inference of the trained model is evaluated according to selected metrics as per the use case. The output of this step is a report on the trained model's performance.<p><em class="italic">用例实现</em></p><p>我们在测试数据上测试训练好的模型(我们在前面的<em class="italic">数据摄取</em>步骤中分割数据)以评估训练好的模型的性能。在这种情况下，我们寻找精确度和召回分数来验证模型在分类猫和狗方面的性能，以评估假阳性和真阳性，从而获得对<a id="_idIndexMarker046"/>模型的 pe <a id="_idTextAnchor026"/>性能的真实理解。如果我们对结果满意，我们可以继续下一步，或者重复前面的步骤，以获得宠物公园图像分类服务的良好性能模型。</p></li>
+				<li><strong class="bold">Model packaging</strong>: After the trained model has been tested in the previous step, the model can be serialized <a id="_idIndexMarker047"/>into a file or containerized (using Docker) to be exported to the production environment.<p><em class="italic">用例实现</em></p><p>我们在前面的步骤中训练和测试的模型被序列化为 ONNX 文件，并准备好部署到生产环境中。</p></li>
+				<li><strong class="bold">Model registering</strong>: In this step, the model that was serialized or containerized in the previous step is <a id="_idIndexMarker048"/>registered and stored in the model registry. A registered model is a logical collection or package of one or more files that assemble, represent, and execute your ML model. For example, multiple files can be registered as one model. For instance, a classification model can be comprised of a vectorizer, model weights, and serialized model files. All these files can be registered as one single model. After registering, the model (all files or a single file) can be downloaded and deployed as needed.<p><em class="italic">用例实现</em></p><p>上一步中的序列化模型在模型注册中心注册，可以快速部署到 pet park 生产环境中。</p><p>通过实现前面的步骤，我们成功地执行了为我们的用例设计的 ML 管道。因此，我们已经在模型注册中心训练了模型，准备在生产环境中部署。接下来，我们将研究部署管道的工作方式。</p></li>
+			</ul>
+			<h4>部署</h4>
+			<p>部署模块支持操作我们在之前的<a id="_idIndexMarker049"/>模块(构建)中开发的 ML 模型。在本模块中，我们将在生产或类似生产的(测试)环境中测试我们的模型性能和行为，以确保 ML 模型在生产中的健壮性和可扩展性。<em class="italic">图 1.12 </em>描述了部署管道，它有两个组成部分——生产测试和生产发布——并且部署管道通过将开发连接到生产环境的简化 CI/CD 管道来实现:</p>
+			<div><div><img src="img/B16572_01_12.jpg" alt="Figure 1.12 – MLOps – deploy pipeline &#13;&#10;"/>
+				</div>
+			</div>
+			<p class="figure-caption">图 1.12–MLOps–部署管道</p>
+			<p>它从左到右工作。让我们详细看看每个步骤的功能:</p>
+			<ul>
+				<li><strong class="bold">Application testing</strong>: Before deploying an <a id="_idIndexMarker050"/>ML model to production, it is vital to test its robustness and performance via testing. Hence we have the "application testing" phase where we rigorously test all the trained models for robustness and performance in a <a id="_idIndexMarker051"/>production-like environment called a test environment. In the application testing phase, we deploy the models in the test environment (pre-production), which replicates the production environment. <p>用于测试的 ML 模型在测试环境中作为 API 或流服务部署到部署目标，如 Kubernetes 集群、容器实例或可扩展虚拟机或边缘设备，根据需要和用例而定。在模型被部署用于测试之后，我们使用测试数据(不用于训练模型；测试数据是来自已部署模型的生产<a id="_idIndexMarker052"/>环境的样本数据，在此期间，批量或周期性地进行模型推断，以测试部署在测试环境中的模型的健壮性和性能。</p><p>性能结果由质量保证专家自动或手动审查。当 ML 模型的性能满足标准时，它就被批准部署到生产环境中，在生产环境中，该模型将被用于批量或实时推断，以做出业务决策。</p><p><em class="italic">用例实现</em></p><p>我们将该模型作为 API 服务部署在宠物公园的本地计算机上，这是为了测试目的而设置的。这台电脑连接到公园的闭路电视摄像头，获取实时推断数据，以预测视频帧中的猫或狗。CI/CD 管道支持模型部署。在这一步中，我们在类似生产的环境中测试模型的健壮性，即模型是否一致地执行推理，以及准确性、公平性和错误分析。在这一步结束时，质量保证专家会验证模型是否符合标准。</p></li>
+				<li><strong class="bold">Production release</strong>: Previously tested <a id="_idIndexMarker053"/>and approved models are deployed in the production environment for model inference to generate business or operational value. This production release is deployed to the production environment enabled by CI/CD pipelines. <p><em class="italic">用例实现</em></p><p>我们在连接到宠物公园(生产设置)的 CCTV 的计算机上部署一个先前测试和批准的模型(由质量保证专家)作为 API 服务。这个<a id="_idIndexMarker054"/>部署的模型对来自宠物公园的 CCTV 摄像机的输入视频数据执行 ML 推理，以实时对猫或狗进行分类。</p></li>
+			</ul>
+			<h4>班长</h4>
+			<p>监控模块与部署模块同步工作。使用可解释的监控(稍后将在第 11 章 、<em class="italic">监控您的 ML 系统的关键原则</em>中详细讨论)，我们可以监控、分析和治理部署的 ML 应用程序(ML 模型和应用程序)。首先，我们可以监控 ML 模型(使用预定义的指标)和部署的应用程序(使用遥测数据)的性能。其次，可以使用预定义的可解释性框架来分析模型性能，最后，可以使用基于模型的质量保证和控制的警报和动作来治理 ML 应用程序。这确保了生产系统的强大监控机制:</p>
+			<div><div><img src="img/B16572_01_13.jpg" alt="Figure 1.13 – MLOps – monitor pipeline &#13;&#10;"/>
+				</div>
+			</div>
+			<p class="figure-caption">图 1.13–MLOps–监控管道</p>
+			<p>让我们详细了解一下监控模块的每项功能:</p>
+			<ul>
+				<li><strong class="bold">Monitor</strong>: The monitoring module <a id="_idIndexMarker056"/>captures critical information to monitor data integrity, model drift, and application performance. Application performance can be monitored using telemetry data. It depicts the device performance of a production system over a period of time. With telemetry data such as accelerometer, gyroscope, humidity, magnetometer, pressure, and temperature we can keep a check on the production system's performance, health, and longevity. <p><em class="italic">用例实现</em></p><p>对于公园计算机上部署的 API 服务，我们将实时监控三个方面——数据完整性、模型漂移和应用程序性能。跟踪准确性、F1 分数、精确度和召回率等指标，以了解数据完整性和模型漂移。我们通过跟踪运行已部署的<a id="_idIndexMarker057"/> ML 模型的生产系统(园区内的本地计算机)的遥测数据来监控应用性能，以确保生产系统的正常运行。监控遥测数据，以预见任何异常或潜在故障，并提前修复。遥测数据被记录下来，可用于评估生产系统随时间推移的性能，以检查其健康状况和寿命。</p></li>
+				<li><strong class="bold">Analyze</strong>: It is critical to analyze the model performance of ML models deployed in production systems to ensure optimal performance and governance in correlation to <a id="_idIndexMarker058"/>business decisions or impact. We use model explainability techniques to measure the model performance in real time. Using this, we evaluate important aspects such as model fairness, trust, bias, transparency, and error analysis with the intention of improving the model in correlation to business. <p>随着时间的推移，我们试图预测的目标变量的统计属性会以不可预见的方式发生变化。这种<a id="_idIndexMarker059"/>变化被称为“模型漂移”，例如，我们部署了一个推荐系统模型来为用户推荐合适的项目。由于在用于训练模型的历史数据中无法观察到的不可预见的趋势，用户行为可能会改变。有必要考虑这些不可预见的因素，以确保部署的模型提供最佳和最相关的业务价值。当观察到模型漂移时，应执行以下任一操作:</p><p>a)需要提醒产品所有者或质量保证专家。</p><p>b)模型需要切换或更新。</p><p>c)重新训练应触发管道，以根据最新数据或需求重新训练和更新模型。</p><p><em class="italic">用例实现</em></p><p>我们在生产系统(一台连接到宠物公园闭路电视的计算机)中监控部署模型的性能。我们将定期(每天一次)分析模型的准确度、精确度和召回分数<a id="_idIndexMarker060"/>,以确保模型的性能不会下降到阈值以下。当模型性能下降到阈值以下时，我们启动系统管理机制(例如，触发重新训练模型)。</p></li>
+				<li><strong class="bold">Govern</strong>: Monitoring and analyzing is done to govern the deployed application to drive optimal performance <a id="_idIndexMarker061"/>for the business (or the purpose of the ML system). After monitoring and analyzing the production data, we can generate certain alerts and actions to govern the system. For example, the product owner or the quality assurance expert gets alerted when model performance deteriorates (for example, low accuracy, high bias, and so on) below a pre-defined threshold. The product owner initiates a trigger to retrain and deploy an alternative model. Lastly, an important aspect of governance is "compliance" with the local and global laws and rules. For compliance, model explainability and transparency are vital. For this, model auditing and reporting are done to provide end-to-end traceability and explainability for production models.  <p><em class="italic">用例实现</em></p><p>我们在生产系统(一台连接到宠物公园闭路电视的计算机)中监控和分析部署模型的性能。根据对已部署模型的准确度、精确度和召回分数的分析，当模型性能下降到预定义阈值以下时，会定期(每天一次)生成警报。公园的产品所有者产生动作，并且这些动作基于警报。例如，生成一个警报，通知产品<a id="_idIndexMarker062"/>所有者生产模型对狗的检测比猫多 30%。然后，产品所有者触发模型重新训练管道，使用最新数据更新模型，以减少偏差，从而在生产中产生公平且健壮的模型。通过这种方式，巴塞罗那宠物公园的 ML 系统得到了良好的管理，以满足业务需求。</p></li>
+			</ul>
+			<p>这就把我们带到了 MLOps 管道的末端。使用 MLOps 方法训练、部署和监控的所有模型都是端到端可追踪的，并且它们的谱系被记录以便追踪模型的起源，这包括模型用于训练的源代码、用于训练和测试模型的数据以及用于收敛模型的参数。完整沿袭对于审计操作或复制模型是有用的，或者当遇到拦截器时，记录的 ML 模型沿袭对于回溯模型的起源或观察和调试拦截器的原因是有用的。由于 ML 模型在推理期间在生产中生成数据，所以该数据可以被绑定到模型训练和部署谱系，以确保端到端谱系，这对于某些遵从性需求是重要的。接下来，我们将了解支持 MLOps 渠道的关键驱动因素。</p>
+			<h3>司机</h3>
+			<p>这些是<a id="_idIndexMarker063"/>MLOps 管道的关键驱动因素:数据、代码、工件、中间件和基础设施。让我们来看看每一个驱动因素，以了解它们如何支持 MLOps 管道:</p>
+			<div><div><img src="img/B16572_01_14.jpg" alt="Figure 1.14 – MLOps drivers &#13;&#10;"/>
+				</div>
+			</div>
+			<p class="figure-caption">图 1.14–MLOps 驱动程序</p>
+			<p>MLOps 管道的每个关键驱动因素定义如下:</p>
+			<ul>
+				<li><strong class="bold">数据</strong>:数据可以是多种形式，如文本、音频、视频、图像等。在传统的软件应用程序中，数据往往是结构化的，然而，对于 ML 应用程序，数据可以是结构化的，也可以是非结构化的。为了在 ML 应用程序中管理数据，数据通过以下步骤进行处理:数据获取、数据注释、数据编目、数据准备、数据质量检查、数据采样和数据扩充。每一步都涉及到它自己的生命周期。这使得 ML 应用程序需要一套全新的过程和工具。为了 ML 管道的有效运行，数据被分割和版本化为训练数据、测试数据和监控数据(在生产中收集，例如，模型输入、输出和遥测数据)。这些数据操作是 MLOps 流水线的一部分。</li>
+				<li><strong class="bold">代码</strong>:有三个基本的<a id="_idIndexMarker065"/>代码模块驱动 MLOps 管道:训练代码、测试代码和应用程序代码。使用 CI/CD 和数据管道来执行这些脚本或代码，以确保 MLOps 管道的健壮工作。源代码管理系统(例如，使用 Git 或 Mercurial)将支持编排，并在管理和无缝集成 CI、CD 和数据管道方面发挥重要作用。所有的代码都在源代码管理设置(例如 Git)中进行阶段化和版本化。</li>
+				<li><strong class="bold">工件</strong>:m lops 管道生成诸如数据、序列化模型、代码片段、系统日志、ML 模型训练和测试度量信息之类的工件。所有这些<a id="_idIndexMarker066"/>工件都有助于 MLOps 管道的成功运作，确保其可追溯性和可持续性。这些工件使用中间件服务来管理，比如模型注册中心、工作区、日志服务、源代码管理服务、数据库等等。</li>
+				<li>中间件(Middleware):中间件是一种计算机软件，它为软件应用程序提供比操作系统更<a id="_idIndexMarker067"/>的服务。中间件服务确保多个应用程序为 MLOps 管道自动化和编排流程。我们可以根据使用案例使用不同的中间件软件和服务，例如，Git 用于源代码管理，VNets 用于支持所需的网络配置，Docker 用于容器化我们的模型，Kubernetes 用于容器编排以自动化应用程序部署、扩展和管理。</li>
+				<li><strong class="bold">Infrastructure</strong>: To ensure the successful working of the MLOps pipeline, we need essential compute and storage resources to train Test and deploy the ML models. Compute resources enable us to train, deploy and monitor our ML models. Two types of storages resources can facilitate ML operations, central storage and feature stores. A central storage stores the logs, artifacts, training, testing and monitoring data. A feature store is optional and complementary to central storage. It extracts, transforms and stores needed features for ML model training and inference using a feature pipeline. When it comes to the infrastructure, there are various options such as on-premises resources or <strong class="bold">infrastructure as a service (IaaS)</strong>, which is cloud services. These days, there are many cloud players providing IaaS, such as Amazon, Microsoft, Google, Alibaba, and so on. Having the right infrastructure for your use case will enable robust, efficient, and frugal operations for your team and company.<p>通过智能优化和所有这些驱动因素与 MLOps 管道的协同作用，可以实现全自动工作流程。实施自动化 MLOps 工作流的一些直接优势是 IT 团队效率的提升(通过减少数据科学家和开发人员在日常和可重复任务上花费的时间<a id="_idIndexMarker068"/>)和资源的优化，从而降低成本，这两者对任何企业都非常有利。</p></li>
+			</ul>
+			<h1 id="_idParaDest-26"><a id="_idTextAnchor027"/>总结</h1>
+			<p>在这一章中，我们已经了解了软件开发和基础设施的演变，以促进 ML。我们深入研究了 MLOps 的概念，然后熟悉了一个通用的 MLOps 工作流，该工作流可以在多个行业的各种 ML 解决方案中实施。</p>
+			<p>在下一章中，您将学习如何将任何 ML 问题描述为 MLOps 驱动的解决方案，并开始使用 MLOps 工作流开发它。</p>
+		</div>
+	
+
+</body></html>

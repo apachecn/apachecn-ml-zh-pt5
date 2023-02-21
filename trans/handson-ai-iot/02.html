@@ -1,0 +1,1064 @@
+<html><head/><body>
+    
+        <title>Data Access and Distributed Processing for IoT</title>
+        
+        <meta charset="utf-8"/>
+    
+<!-- kobo-style -->
+<style type="text/css" id="koboSpanStyle">.koboSpan { -webkit-text-combine: inherit; }</style>
+
+
+
+    
+        
+
+                            
+                    <h1 class="header-title">物联网的数据访问和分布式处理</h1>
+                
+            
+            
+                
+<p class="mce-root">数据无处不在:图像、语音、文本、天气信息、汽车速度、最近一次电磁干扰、不断变化的股票价格。随着<strong>物联网</strong> ( <strong> IoT </strong>)系统的整合，产生的数据量成倍增长；传感器读数就是一个例子，可以用来测量室温、土壤碱度等等。这些数据以各种格式存储和提供。在本章中，我们将学习如何读取、保存和处理一些流行格式的数据。具体来说，您将执行以下操作:</p>
+<ul>
+<li>以 TXT 格式访问数据</li>
+<li>通过 csv、pandas 和 NumPy 模块读写 CSV 格式的数据</li>
+<li>使用 JSON 和 pandas 访问 JSON 数据</li>
+<li>学习使用 PyTables、pandas 和 h5py 处理 HDF5 格式</li>
+<li>使用 SQLite 和 MySQL 处理 SQL 数据库</li>
+<li>使用 MongoDB 处理 NoSQL</li>
+<li>使用 Hadoop 的分布式文件系统</li>
+</ul>
+
+
+            
+
+            
+        
+    
+
+
+
+    
+        <title>TXT format</title>
+        
+        <meta charset="utf-8"/>
+    
+<!-- kobo-style -->
+<style type="text/css" id="koboSpanStyle">.koboSpan { -webkit-text-combine: inherit; }</style>
+
+
+
+    
+        
+
+                            
+                    <h1 class="header-title">TXT 格式</h1>
+                
+            
+            
+                
+<p>用于存储数据的最简单和常见的格式之一是 TXT 格式；许多物联网传感器以简单的<kbd>.txt</kbd>文件格式记录带有不同时间戳的传感器读数。Python 提供了创建、读取和写入 TXT 文件的内置函数。</p>
+<p>我们可以在 Python 本身不使用任何模块的情况下访问 TXT 文件；在这种情况下，数据是字符串类型，您需要将其转换为其他类型才能使用。或者，我们可以使用 NumPy 或熊猫。</p>
+<p class="mce-root"/>
+
+
+            
+
+            
+        
+    
+
+
+
+    
+        <title>Using TXT files in Python</title>
+        
+        <meta charset="utf-8"/>
+    
+<!-- kobo-style -->
+<style type="text/css" id="koboSpanStyle">.koboSpan { -webkit-text-combine: inherit; }</style>
+
+
+
+    
+        
+
+                            
+                    <h1 class="header-title">在 Python 中使用 TXT 文件</h1>
+                
+            
+            
+                
+<p>Python 内置了读写 TXT 文件的函数。使用四组功能提供完整的功能:<kbd>open()</kbd>、<kbd>read()</kbd>、<kbd>write()</kbd>和<kbd>close()</kbd>。顾名思义，它们用于打开文件、读取文件、写入文件，最后关闭文件。如果您正在处理字符串数据(文本)，这是最佳选择。本节我们将使用 TXT 形式的<kbd>Shakespeare</kbd>播放；该文件可从麻省理工学院网站下载:<a href="https://ocw.mit.edu/ans7870/6/6.006/s08/lecturenotes/files/t8.shakespeare.txt">https://OCW . MIT . edu/ans 7870/6/6.006/s08/lecture notes/files/t8 . Shakespeare . txt</a>。</p>
+<p>我们定义以下变量来访问数据:</p>
+<pre>data_folder = '../../data/Shakespeare'<br/>data_file = 'alllines.txt'</pre>
+<p>这里的第一步是打开文件:</p>
+<pre>f = open(data_file)</pre>
+<p>接下来，我们读取整个文件；我们可以使用<kbd>read </kbd>函数，它将整个文件作为一个单独的字符串读取:</p>
+<pre>contents = f.read()</pre>
+<p>这会将整个文件(由 4，583，798 个字符组成)读入<kbd>contents</kbd>变量。让我们探索一下<kbd>contents</kbd>变量的内容；以下命令将打印第一个<kbd>1000</kbd>字符:</p>
+<pre>print(contents[:1000])</pre>
+<p>前面的代码将输出如下:</p>
+<pre>"ACT I"<br/>"SCENE I. London. The palace."<br/>"Enter KING HENRY, LORD JOHN OF LANCASTER, the EARL of WESTMORELAND, SIR WALTER BLUNT, and others"<br/>"So shaken as we are, so wan with care,"<br/>"Find we a time for frighted peace to pant,"<br/>"And breathe short-winded accents of new broils"<br/>"To be commenced in strands afar remote."<br/>"No more the thirsty entrance of this soil"<br/>"will daub her lips with her own children's blood,"<br/>"Nor more will trenching war channel her fields,"<br/>"Nor bruise her flowerets with the armed hoofs"<br/>"Of hostile paces: those opposed eyes,"<br/>"Which, like the meteors of a troubled heaven,"<br/>"All of one nature, of one substance bred,"<br/>"Did lately meet in the intestine shock"<br/>"And furious close of civil butchery"<br/>"will now, in mutual well-beseeming ranks,"<br/>"March all one way and be no more opposed"<br/>"Against acquaintance, kindred and allies:"<br/>"The edge of war, like an ill-sheathed knife,"<br/>"No more will cut his master. Therefore, friends,"<br/>"As far as to the sepulchre of Christ,"<br/>"Whose</pre>
+<p>如果 TXT 文件包含数值型数据，最好使用 NumPy 如果数据是混合的，熊猫是最好的选择。</p>
+
+
+            
+
+            
+        
+    
+
+
+
+    
+        <title>CSV format</title>
+        
+        <meta charset="utf-8"/>
+    
+<!-- kobo-style -->
+<style type="text/css" id="koboSpanStyle">.koboSpan { -webkit-text-combine: inherit; }</style>
+
+
+
+    
+        
+
+                            
+                    <h1 class="header-title">逗号分隔值（csv）文件格式</h1>
+                
+            
+            
+                
+<p><strong>C</strong>T31】omma 分隔值 ( <strong> CSV </strong>)文件是存储物联网系统生成的表格数据最流行的格式。在一个<kbd>.csv </kbd>文件中，记录的值存储在纯文本行中，每行包含由分隔符分隔的字段的值。默认情况下，分隔符是逗号，但可以配置为任何其他字符。在本节中，我们将学习如何通过 Python 的<kbd>csv</kbd>、<kbd>numpy</kbd>和<kbd>pandas</kbd>模块使用 CSV 文件中的数据。我们将使用<kbd>household_power_consumption</kbd>数据文件。该文件可从以下 GitHub 链接下载:<a href="https://github.com/ahanse/machlearning/blob/master/household_power_consumption.csv">https://GitHub . com/a hanse/mach learning/blob/master/household _ power _ consumption . CSV</a>。为了访问数据文件，我们定义了以下变量:</p>
+<pre>data_folder = '../../data/household_power_consumption' <br/>data_file = 'household_power_consumption.csv'</pre>
+<p>一般来说，要快速读取 CSV 文件中的数据，使用 Python <kbd>csv</kbd>模块；但是，如果需要将数据解释为日期和数字数据字段的混合，最好使用 pandas 包。如果数据只是数字，NumPy 是最合适的包。</p>
+
+
+            
+
+            
+        
+    
+
+
+
+    
+        <title>Working with CSV files with the csv module</title>
+        
+        <meta charset="utf-8"/>
+    
+<!-- kobo-style -->
+<style type="text/css" id="koboSpanStyle">.koboSpan { -webkit-text-combine: inherit; }</style>
+
+
+
+    
+        
+
+                            
+                    <h1 class="header-title">使用 csv 模块处理 CSV 文件</h1>
+                
+            
+            
+                
+<p>在 Python 中，<kbd>csv</kbd>模块提供了读取和写入 CSV 文件的类和方法。<kbd>csv.reader</kbd>方法创建一个 reader 对象，从中可以迭代地读取行。每次从文件中读取一行时，reader 对象都返回一个字段列表。例如，下面的代码演示了读取数据文件和打印行:</p>
+<pre>import csv<br/>import os<br/><br/>with open(os.path.join(data_folder,data_file),newline='') as csvfile:<br/>   csvreader = csv.reader(csvfile)<br/>   for row in csvreader:<br/>     print(row)</pre>
+<p>这些行被打印为字段值列表:</p>
+<pre>['date', 'time', 'global_active_power', 'global_reactive_power', 'voltage', 'global_intensity', 'sub_metering_1', 'sub_metering_2', 'sub_metering_3'] ['0007-01-01', '00:00:00', '2.58', '0.136', '241.97', '10.6', '0', '0', '0'] ['0007-01-01', '00:01:00', '2.552', '0.1', '241.75', '10.4', '0', '0', '0'] ['0007-01-01', '00:02:00', '2.55', '0.1', '241.64', '10.4', '0', '0', '0']</pre>
+<p><kbd>csv.writer</kbd>方法返回一个可以用来将行写入文件的对象。例如，以下代码将文件的前 10 行写入临时文件，然后打印出来:</p>
+<pre># read the file and write first ten rows<br/>with open(os.path.join(data_folder, data_file), newline='') as csvfile, \<br/>        open(os.path.join(data_folder, 'temp.csv'), 'w', newline='') as tempfile:<br/>    csvreader = csv.reader(csvfile)<br/>    csvwriter = csv.writer(tempfile)<br/>    for row, i in zip(csvreader, range(10)):<br/>        csvwriter.writerow(row)<br/>        <br/># read and print the newly written file<br/>with open(os.path.join(data_folder, 'temp.csv'), newline='') as tempfile:<br/>    csvreader = csv.reader(tempfile)<br/>    for row in csvreader:<br/>        print(row)</pre>
+<p><kbd>delimiter</kbd>字段和<kbd>quoting </kbd>字段字符是创建<kbd>reader</kbd>和<kbd>writer</kbd>对象时可以设置的重要属性。</p>
+<p>默认情况下，<kbd>delimiter</kbd>字段为<kbd>,</kbd>，其他分隔符由<kbd>reader</kbd>或<kbd>writer</kbd>函数的<kbd>delimiter</kbd>参数指定。例如，下面的代码将带有<kbd>|</kbd>的文件保存为<kbd>delimiter</kbd>:</p>
+<pre>    # read the file and write first ten rows with '|' delimiter<br/>with open(os.path.join(data_folder, data_file), newline='') as csvfile, \<br/>        open(os.path.join(data_folder, 'temp.csv'), 'w', newline='') as tempfile:<br/>    csvreader = csv.reader(csvfile)<br/>    csvwriter = csv.writer(tempfile, delimiter='|')<br/>    for row, i in zip(csvreader, range(10)):<br/>        csvwriter.writerow(row)<br/>        <br/># read and print the newly written file<br/>with open(os.path.join(data_folder, 'temp.csv'), newline='') as tempfile:<br/>    csvreader = csv.reader(tempfile, delimiter='|')<br/>    for row in csvreader:<br/>        print(row)</pre>
+<p>如果在读取文件时没有指定<kbd>delimiter</kbd>字符，这些行将作为一个字段读取并打印如下:</p>
+<pre>['0007-01-01|00:00:00|2.58|0.136|241.97|10.6|0|0|0']</pre>
+<p><kbd>quotechar</kbd>指定包围字段的字符。<kbd>quoting</kbd>参数指定哪种字段可以用<kbd>quotechar</kbd>包围。<kbd>quoting</kbd>参数可以是下列值之一:</p>
+<ul>
+<li><kbd>csv.QUOTE_ALL</kbd>:所有字段都被引用</li>
+<li><kbd>csv.QUOTE_MINIMAL</kbd>:仅引用包含特殊字符的字段</li>
+<li><kbd>csv.QUOTE_NONNUMERIC</kbd>:所有非数值字段都被引用</li>
+<li><kbd>csv.QUOTE_NONE</kbd>:没有字段被引用</li>
+</ul>
+<p>例如，让我们首先打印临时文件:</p>
+<pre>0007-01-01|00:00:00|2.58|0.136|241.97|10.6|0|0|0
+0007-01-01|00:01:00|2.552|0.1|241.75|10.4|0|0|0
+0007-01-01|00:02:00|2.55|0.1|241.64|10.4|0|0|0
+0007-01-01|00:03:00|2.55|0.1|241.71|10.4|0|0|0
+0007-01-01|00:04:00|2.554|0.1|241.98|10.4|0|0|0
+0007-01-01|00:05:00|2.55|0.1|241.83|10.4|0|0|0
+0007-01-01|00:06:00|2.534|0.096|241.07|10.4|0|0|0
+0007-01-01|00:07:00|2.484|0|241.29|10.2|0|0|0
+0007-01-01|00:08:00|2.468|0|241.23|10.2|0|0|0</pre>
+<p>现在让我们保存它，并引用所有字段:</p>
+<pre># read the file and write first ten rows with '|' delimiter, all quoting and * as a quote charachetr.<br/>with open(os.path.join(data_folder, data_file), newline='') as csvfile, \<br/>        open('temp.csv', 'w', newline='') as tempfile:<br/>    csvreader = csv.reader(csvfile)<br/>    csvwriter = csv.writer(tempfile, delimiter='|', quotechar='*',quoting=csv.QUOTE_ALL)<br/>    for row, i in zip(csvreader, range(10)):<br/>        csvwriter.writerow(row)</pre>
+<p class="mce-root"/>
+<p>文件用指定的引号字符保存:</p>
+<pre>*0007-01-01*|*00:00:00*|*2.58*|*0.136*|*241.97*|*10.6*|*0*|*0*|*0*
+*0007-01-01*|*00:01:00*|*2.552*|*0.1*|*241.75*|*10.4*|*0*|*0*|*0*
+*0007-01-01*|*00:02:00*|*2.55*|*0.1*|*241.64*|*10.4*|*0*|*0*|*0*
+*0007-01-01*|*00:03:00*|*2.55*|*0.1*|*241.71*|*10.4*|*0*|*0*|*0*
+*0007-01-01*|*00:04:00*|*2.554*|*0.1*|*241.98*|*10.4*|*0*|*0*|*0*
+*0007-01-01*|*00:05:00*|*2.55*|*0.1*|*241.83*|*10.4*|*0*|*0*|*0*
+*0007-01-01*|*00:06:00*|*2.534*|*0.096*|*241.07*|*10.4*|*0*|*0*|*0*
+*0007-01-01*|*00:07:00*|*2.484*|*0*|*241.29*|*10.2*|*0*|*0*|*0*
+*0007-01-01*|*00:08:00*|*2.468*|*0*|*241.23*|*10.2*|*0*|*0*|*0*</pre>
+<p>记得用相同的参数读取文件；否则，<kbd>*</kbd>引号字符将被视为字段值的一部分，并打印如下:</p>
+<pre>['*0007-01-01*', '*00:00:00*', '*2.58*', '*0.136*', '*241.97*', '*10.6*', '*0*', '*0*', '*0*']</pre>
+<p>对<kbd>reader</kbd>对象使用正确的参数会打印以下内容:</p>
+<pre>['0007-01-01', '00:00:00', '2.58', '0.136', '241.97', '10.6', '0', '0', '0']</pre>
+<p>现在让我们看看如何用 pandas 读取 CSV 文件，pandas 是另一个流行的 Python 库。</p>
+
+
+            
+
+            
+        
+    
+
+
+
+    
+        <title>Working with CSV files with the pandas module</title>
+        
+        <meta charset="utf-8"/>
+    
+<!-- kobo-style -->
+<style type="text/css" id="koboSpanStyle">.koboSpan { -webkit-text-combine: inherit; }</style>
+
+
+
+    
+        
+
+                            
+                    <h1 class="header-title">使用熊猫模块处理 CSV 文件</h1>
+                
+            
+            
+                
+<p>在 pandas 中，<kbd>read_csv()</kbd>函数在读取 CSV 文件后返回一个数据帧:</p>
+<pre>df = pd.read_csv('temp.csv')<br/>print(df)</pre>
+<p>数据帧打印如下:</p>
+<pre>         date      time  global_active_power  global_reactive_power  voltage  \
+0  0007-01-01  00:00:00                2.580                  0.136   241.97   
+1  0007-01-01  00:01:00                2.552                  0.100   241.75   
+2  0007-01-01  00:02:00                2.550                  0.100   241.64   
+3  0007-01-01  00:03:00                2.550                  0.100   241.71   
+4  0007-01-01  00:04:00                2.554                  0.100   241.98   
+5  0007-01-01  00:05:00                2.550                  0.100   241.83   
+6  0007-01-01  00:06:00                2.534                  0.096   241.07   
+7  0007-01-01  00:07:00                2.484                  0.000   241.29   
+8  0007-01-01  00:08:00                2.468                  0.000   241.23   
+
+   global_intensity  sub_metering_1  sub_metering_2  sub_metering_3  
+0              10.6               0               0               0  
+1              10.4               0               0               0  
+2              10.4               0               0               0  
+3              10.4               0               0               0  
+4              10.4               0               0               0  
+5              10.4               0               0               0  
+6              10.4               0               0               0  
+7              10.2               0               0               0  
+8              10.2               0               0               0  </pre>
+<p>我们在前面的输出中看到，pandas 自动将<kbd>date</kbd>和<kbd>time</kbd>列解释为它们各自的数据类型。熊猫数据帧可以用<kbd>to_csv()</kbd>功能保存为 CSV 文件:</p>
+<pre>df.to_csv('temp1.cvs')</pre>
+<p>熊猫在读写 CSV 文件时，提供了大量的论据。下面是其中的一些，以及它们的使用方法:</p>
+<ul>
+<li><kbd>header</kbd>:定义用作标题的行号，如果文件不包含任何标题，则不定义。</li>
+<li><kbd>sep</kbd>:定义行中分隔字段的字符。默认情况下，<kbd>sep</kbd>的值被设置为<kbd>,</kbd>。</li>
+<li><kbd>names</kbd>:定义文件中每一列的列名。</li>
+<li><kbd>usecols</kbd>:定义需要从 CSV 文件中提取的列。不读取此参数中未提及的列。</li>
+<li><kbd>dtype</kbd>:定义数据帧中各列的数据类型。</li>
+</ul>
+<p>许多其他可用选项记录在以下链接中:<a href="https://pandas.pydata.org/pandas-docs/stable/generated/pandas.read_csv.html">https://pandas . pydata . org/pandas-docs/stable/generated/pandas . read _ CSV . html</a>和<a href="https://pandas.pydata.org/pandas-docs/stable/generated/pandas.DataFrame.to_csv.html">https://pandas . pydata . org/pandas-docs/stable/generated/pandas。DataFrame.to_csv.html </a>。</p>
+<p>现在让我们看看如何使用 NumPy 模块从 CSV 文件中读取数据。</p>
+<p class="mce-root"/>
+<p class="mce-root"/>
+
+
+            
+
+            
+        
+    
+
+
+
+    
+        <title>Working with CSV files with the NumPy module</title>
+        
+        <meta charset="utf-8"/>
+    
+<!-- kobo-style -->
+<style type="text/css" id="koboSpanStyle">.koboSpan { -webkit-text-combine: inherit; }</style>
+
+
+
+    
+        
+
+                            
+                    <h1 class="header-title">使用 NumPy 模块处理 CSV 文件</h1>
+                
+            
+            
+                
+<p>NumPy 模块提供了两个从 CSV 文件中读取值的函数:<kbd>np.loadtxt()</kbd>和<kbd>np.genfromtxt()</kbd>。</p>
+<p><kbd>np.loadtxt</kbd>的一个例子如下:</p>
+<pre>arr = np.loadtxt('temp.csv', skiprows=1, usecols=(2,3), delimiter=',')<br/>arr</pre>
+<p>前面的代码从我们之前创建的文件中读取列<kbd>3</kbd>和<kbd>4</kbd>，并将它们保存在一个 9 × 2 数组中，如下所示:</p>
+<div><div><div><div><div><pre>array([[2.58 , 0.136],
+       [2.552, 0.1  ],
+       [2.55 , 0.1  ],
+       [2.55 , 0.1  ],
+       [2.554, 0.1  ],
+       [2.55 , 0.1  ],
+       [2.534, 0.096],
+       [2.484, 0.   ],
+       [2.468, 0.   ]])</pre></div>
+</div>
+</div>
+</div>
+</div>
+<p><kbd>np.loadtxt()</kbd>功能无法处理丢失数据的 CSV 文件。对于数据缺失的情况，可以使用<kbd>np.genfromtxt()</kbd>。这两个函数都提供了更多的参数；详细信息可以在 NumPy 文档中找到。可使用<kbd>np.genfromtxt()</kbd>编写上述代码，如下所示:</p>
+<pre>arr = np.genfromtxt('temp.csv', skip_header=1, usecols=(2,3), delimiter=',')</pre>
+<p>将 AI 应用于物联网数据而产生的 NumPy 数组可以用<kbd>np.savetxt()</kbd>保存。例如，我们之前加载的数组可以保存如下:</p>
+<pre>np.savetxt('temp.csv', arr, delimiter=',')</pre>
+<p><kbd>np.savetxt()</kbd>函数也接受各种其他有用的参数，比如保存的字段和标题的格式。关于这个函数的更多细节，请查阅 NumPy 文档。</p>
+<p>CSV 是物联网平台和设备上最流行的数据格式。在本节中，我们学习了如何使用 Python 中的三个不同的包来读取 CSV 数据。让我们在下一节了解另一种流行的格式 XLSX。</p>
+<p class="mce-root"/>
+
+
+            
+
+            
+        
+    
+
+
+
+    
+        <title>XLSX format</title>
+        
+        <meta charset="utf-8"/>
+    
+<!-- kobo-style -->
+<style type="text/css" id="koboSpanStyle">.koboSpan { -webkit-text-combine: inherit; }</style>
+
+
+
+    
+        
+
+                            
+                    <h1 class="header-title">XLSX 格式</h1>
+                
+            
+            
+                
+<p>Excel 是 Microsoft Office pack 的一个组件，是存储和可视化数据的常用格式之一。从 2010 年开始，Office 已经支持<kbd>.xlsx</kbd>格式。我们可以使用 OpenPyXl 和 pandas 函数读取 XLSX 文件。</p>
+
+
+            
+
+            
+        
+    
+
+
+
+    
+        <title>Using OpenPyXl for XLSX files</title>
+        
+        <meta charset="utf-8"/>
+    
+<!-- kobo-style -->
+<style type="text/css" id="koboSpanStyle">.koboSpan { -webkit-text-combine: inherit; }</style>
+
+
+
+    
+        
+
+                            
+                    <h1 class="header-title">对 XLSX 文件使用 OpenPyXl</h1>
+                
+            
+            
+                
+<p>OpenPyXl 是一个用于读写 Excel 文件的 Python 库。这是一个开源项目。使用以下命令创建一个新的<kbd>workbook</kbd>:</p>
+<pre>wb = Workbook()</pre>
+<p>我们可以使用以下命令访问当前的<kbd>active</kbd>表:</p>
+<pre>ws = wb.active()</pre>
+<p>要更改工作表名称，使用<kbd>title</kbd>命令:</p>
+<pre>ws.title = "Demo Name"</pre>
+<p>使用<kbd>append</kbd>方法，可在板材上添加一行:</p>
+<pre>ws.append()</pre>
+<p>可以使用<kbd>create_sheet()</kbd>方法创建一个新的工作表。可使用<kbd>column</kbd>和<kbd>row</kbd>值创建活动工作表中的单个单元格:</p>
+<pre># Assigns the cell corresponding to <br/># column A and row 10 a value of 5<br/>ws.['A10'] = 5  <br/>#or<br/>ws.cell(column=1, row=10, value=5)</pre>
+<p>可以使用<kbd>save</kbd>方法保存工作簿。要加载一个现有的工作簿，我们可以使用<kbd>load_workbook</kbd>方法。使用<kbd>get_sheet_names()</kbd>可以访问 Excel 工作簿中不同工作表的名称。</p>
+<p class="mce-root"/>
+<p>下面的代码创建一个包含三张工作表的 Excel 工作簿并保存它；稍后，它加载工作表并访问单元格。代码可以从 GitHub 的<kbd>OpenPyXl_example.ipynb</kbd>处获得:</p>
+<pre># Creating and writing into xlsx file<br/>from openpyxl import Workbook<br/>from openpyxl.compat import range<br/>from openpyxl.utils import get_column_letter<br/>wb = Workbook()<br/>dest_filename = 'empty_book.xlsx'<br/>ws1 = wb.active<br/>ws1.title = "range names"<br/>for row in range(1, 40):<br/> ws1.append(range(0,100,5))<br/>ws2 = wb.create_sheet(title="Pi")<br/>ws2['F5'] = 2 * 3.14<br/>ws2.cell(column=1, row=5, value= 3.14)<br/>ws3 = wb.create_sheet(title="Data")<br/>for row in range(1, 20):<br/> for col in range(1, 15):<br/> _ = ws3.cell(column=col, row=row, value="\<br/> {0}".format(get_column_letter(col)))<br/>print(ws3['A10'].value)<br/>wb.save(filename = dest_filename)<br/><br/># Reading from xlsx file<br/>from openpyxl import load_workbook<br/>wb = load_workbook(filename = 'empty_book.xlsx')<br/>sheet_ranges = wb['range names']<br/>print(wb.get_sheet_names())<br/>print(sheet_ranges['D18'].value)</pre>
+<p>你可以从它的文档中了解更多关于 OpenPyXL 的信息，可以在<a href="https://openpyxl.readthedocs.io/en/stable/">https://openpyxl.readthedocs.io/en/stable/</a>找到。</p>
+
+
+            
+
+            
+        
+    
+
+
+
+    
+        <title>Using pandas with XLSX files</title>
+        
+        <meta charset="utf-8"/>
+    
+<!-- kobo-style -->
+<style type="text/css" id="koboSpanStyle">.koboSpan { -webkit-text-combine: inherit; }</style>
+
+
+
+    
+        
+
+                            
+                    <h1 class="header-title">使用带有 XLSX 文件的熊猫</h1>
+                
+            
+            
+                
+<p>我们可以在熊猫的帮助下加载现有的<kbd>.xlsx</kbd>文件。<kbd>read_excel</kbd>方法用于将 Excel 文件作为数据帧读取。这个方法使用了一个参数<kbd>sheet_name</kbd>，它用于指定我们想要加载的工作表。工作表名称可以指定为字符串或从 0 开始的数字。<kbd>to_excel</kbd>方法可以用来写入 Excel 文件。</p>
+<p class="mce-root"/>
+<p class="mce-root"/>
+<p>下面的代码读取一个 Excel 文件，操作它，并保存它。代码可从 GitHub 的<kbd>Pandas_xlsx_example.ipynb</kbd>处获得:</p>
+<pre>import pandas as pd<br/>df = pd.read_excel("empty_book.xlsx", sheet_name=0)<br/>df.describe()<br/>result = df * 2<br/>result.describe()<br/>result.to_excel("empty_book_modified.xlsx")</pre>
+
+
+            
+
+            
+        
+    
+
+
+
+    
+        <title>Working with the JSON format</title>
+        
+        <meta charset="utf-8"/>
+    
+<!-- kobo-style -->
+<style type="text/css" id="koboSpanStyle">.koboSpan { -webkit-text-combine: inherit; }</style>
+
+
+
+    
+        
+
+                            
+                    <h1 class="header-title">使用 JSON 格式</h1>
+                
+            
+            
+                
+<p><strong>JavaScript</strong><strong>Object</strong><strong>Notation</strong>(<strong>JSON</strong>)是物联网系统中另一种流行的数据格式。在这一节中，我们将学习如何用 Python 的 JSON、NumPy 和 pandas 包读取 JSON 数据。</p>
+<p>对于这一部分，我们将使用<kbd>zips.json</kbd>文件，它包含美国邮政编码、城市代码、地理位置详细信息和州代码。该文件包含以下列格式记录的 JSON 对象:</p>
+<pre>{ "_id" : "01001", "city" : "AGAWAM", "loc" : [ -72.622739, 42.070206 ], "pop" : 15338, "state" : "MA" }</pre>
+
+
+            
+
+            
+        
+    
+
+
+
+    
+        <title>Using JSON files with the JSON module</title>
+        
+        <meta charset="utf-8"/>
+    
+<!-- kobo-style -->
+<style type="text/css" id="koboSpanStyle">.koboSpan { -webkit-text-combine: inherit; }</style>
+
+
+
+    
+        
+
+                            
+                    <h1 class="header-title">通过 JSON 模块使用 JSON 文件</h1>
+                
+            
+            
+                
+<p>要加载和解码 JSON 数据，使用<kbd>json.load()</kbd>或<kbd>json.loads() </kbd>函数。例如，下面的代码从<kbd>zips.json</kbd>文件中读取前 10 行，并很好地打印出来:</p>
+<pre>import os<br/>import json<br/>from pprint import pprint<br/><br/>with open(os.path.join(data_folder,data_file)) as json_file:<br/>    for line,i in zip(json_file,range(10)):<br/>        json_data = json.loads(line)<br/>        pprint(json_data)</pre>
+<p class="mce-root"/>
+<p>对象打印如下:</p>
+<pre>{'_id': '01001',
+ 'city': 'AGAWAM',
+ 'loc': [-72.622739, 42.070206],
+ 'pop': 15338,
+ 'state': 'MA'}</pre>
+<p><kbd>json.loads()</kbd>函数将字符串对象作为输入，而<kbd>json.load()</kbd>函数将文件对象作为输入。两个函数都对 JSON 对象进行解码，并将其作为 Python 字典对象加载到<kbd>json_data</kbd>文件中。</p>
+<p><kbd>json.dumps()</kbd>函数接受一个对象并产生一个 JSON 字符串，而<kbd>json.dump()</kbd>函数接受一个对象并将 JSON 字符串写入文件。因此，这两个功能与<kbd>json.loads()</kbd>和<kbd>json.load()</kbd>功能相反。</p>
+
+
+            
+
+            
+        
+    
+
+
+
+    
+        <title>JSON files with the pandas module</title>
+        
+        <meta charset="utf-8"/>
+    
+<!-- kobo-style -->
+<style type="text/css" id="koboSpanStyle">.koboSpan { -webkit-text-combine: inherit; }</style>
+
+
+
+    
+        
+
+                            
+                    <h1 class="header-title">带有熊猫模块的 JSON 文件</h1>
+                
+            
+            
+                
+<p>JSON 字符串或文件可以用<kbd>pandas.read_json()</kbd>函数读取，该函数返回一个 DataFrame 或 series 对象。例如，以下代码读取<kbd>zips.json</kbd>文件:</p>
+<pre>df = pd.read_json(os.path.join(data_folder,data_file), lines=True)<br/>print(df)</pre>
+<p>我们设置<kbd>lines=True</kbd>是因为每行包含一个 JSON 格式的单独对象。没有这个参数设置为<kbd>True</kbd>，熊猫会养<kbd>ValueError</kbd>。数据帧打印如下:</p>
+<pre>         _id             city                               loc    pop state
+0       1001           AGAWAM           [-72.622739, 42.070206]  15338    MA
+1       1002          CUSHMAN            [-72.51565, 42.377017]  36963    MA
+...      ...              ...                               ...    ...   ...
+29351  99929         WRANGELL          [-132.352918, 56.433524]   2573    AK
+29352  99950        KETCHIKAN           [-133.18479, 55.942471]    422    AK
+
+[29353 rows x 5 columns]</pre>
+<p class="mce-root"/>
+<p>要将 pandas 数据帧或系列对象保存到 JSON 文件或字符串，使用<kbd>Dataframe.to_json() </kbd>功能。</p>
+<p>关于这两个函数的更多信息可以在以下链接中找到:<a href="https://pandas.pydata.org/pandas-docs/stable/generated/pandas.read_json.html">https://pandas . pydata . org/pandas-docs/stable/generated/pandas . read _ JSON . html</a>和<a href="https://pandas.pydata.org/pandas-docs/stable/generated/pandas.DataFrame.to_json.html">https://pandas . pydata . org/pandas-docs/stable/generated/pandas。DataFrame.to_json.html </a>。</p>
+<p>虽然 CSV 和 JSON 仍然是最受欢迎的物联网数据格式，但由于其较大的大小，通常需要分发数据。有两种流行的分布式数据存储和访问机制:HDF5 和 HDFS。我们先来了解一下 HDF5 格式。</p>
+
+
+            
+
+            
+        
+    
+
+
+
+    
+        <title>HDF5 format</title>
+        
+        <meta charset="utf-8"/>
+    
+<!-- kobo-style -->
+<style type="text/css" id="koboSpanStyle">.koboSpan { -webkit-text-combine: inherit; }</style>
+
+
+
+    
+        
+
+                            
+                    <h1 class="header-title">HDF5 格式</h1>
+                
+            
+            
+                
+<p><strong>分层数据格式</strong>(<strong>https://support.hdfgroup.org/HDF5/</strong>)是由学术和行业组织组成的联盟 HDF 集团(<a href="https://support.hdfgroup.org/HDF5/"/>)制定的规范。在 HDF5 文件中，数据被组织成组和数据集。一个组是<strong>组</strong>或<strong>数据集</strong>的集合。数据集是一个多维同质数组。</p>
+<p>在 Python 中，PyTables 和 h5py 是处理 HDF5 文件的两个主要库。这两个库都需要安装 HDF5。对于 HDF5 的并行版本，还需要安装 MPI 版本。HDF5 和 MPI 的安装超出了本书的范围。并行 HDF5 的安装说明可以在以下链接找到:<a href="https://support.hdfgroup.org/ftp/HDF5/current/src/unpacked/release_docs/INSTALL_parallel">https://support . hdf group . org/FTP/HD F5/current/src/unpacked/release _ docs/INSTALL _ parallel</a>。</p>
+
+
+            
+
+            
+        
+    
+
+
+
+    
+        <title>Using HDF5 with PyTables</title>
+        
+        <meta charset="utf-8"/>
+    
+<!-- kobo-style -->
+<style type="text/css" id="koboSpanStyle">.koboSpan { -webkit-text-combine: inherit; }</style>
+
+
+
+    
+        
+
+                            
+                    <h1 class="header-title">将 HDF5 用于 PyTables</h1>
+                
+            
+            
+                
+<p>让我们首先根据<kbd>temp.csv</kbd>文件中的数字数据创建一个 HDF5 文件，步骤如下:</p>
+<ol>
+<li>获取数字数据:</li>
+</ol>
+<pre style="padding-left: 60px">import numpy as np<br/>arr = np.loadtxt('temp.csv', skiprows=1, usecols=(2,3), delimiter=',')</pre>
+<p class="mce-root"/>
+<ol start="2">
+<li>打开 HDF5 文件:</li>
+</ol>
+<pre style="padding-left: 60px">import tables<br/>h5filename = 'pytable_demo.hdf5'<br/>with tables.open_file(h5filename,mode='w') as h5file:</pre>
+<ol start="3">
+<li>获取<kbd>root</kbd>节点:</li>
+</ol>
+<pre style="padding-left: 60px">    root = h5file.root</pre>
+<ol start="4">
+<li>用<kbd>create_group()</kbd>创建一个组或用<kbd>create_array()</kbd>创建一个数据集，重复此操作直到所有数据都被存储:</li>
+</ol>
+<pre style="padding-left: 60px">    h5file.create_array(root,'global_power',arr)</pre>
+<ol start="5">
+<li>关闭文件:</li>
+</ol>
+<pre style="padding-left: 60px">    h5file.close()</pre>
+<p>让我们读取文件并打印数据集，以确保它被正确写入:</p>
+<pre style="padding-left: 60px">with tables.open_file(h5filename,mode='r') as h5file:<br/>    root = h5file.root<br/>    for node in h5file.root:<br/>        ds = node.read()<br/>        print(type(ds),ds.shape)<br/>        print(ds)</pre>
+<p>我们拿回 NumPy 数组。</p>
+
+
+            
+
+            
+        
+    
+
+
+
+    
+        <title>Using HDF5 with pandas</title>
+        
+        <meta charset="utf-8"/>
+    
+<!-- kobo-style -->
+<style type="text/css" id="koboSpanStyle">.koboSpan { -webkit-text-combine: inherit; }</style>
+
+
+
+    
+        
+
+                            
+                    <h1 class="header-title">对熊猫使用 HDF5</h1>
+                
+            
+            
+                
+<p>我们还可以用熊猫读写 HDF5 文件。要用 pandas 读取 HDF5 文件，必须先用它创建文件。例如，让我们使用 pandas 创建一个包含全局功率值的 HDF5 文件:</p>
+<pre>import pandas as pd<br/>import numpy as np<br/>arr = np.loadtxt('temp.csv', skiprows=1, usecols=(2,3), delimiter=',')<br/>import pandas as pd<br/>store=pd.HDFStore('hdfstore_demo.hdf5')<br/>print(store)<br/>store['global_power']=pd.DataFrame(arr)<br/>store.close()</pre>
+<p class="mce-root"/>
+<p class="mce-root"/>
+<p>现在，让我们读取我们创建的 HDF5 文件，并将阵列打印出来:</p>
+<pre>import pandas as pd<br/>store=pd.HDFStore('hdfstore_demo.hdf5')<br/>print(store)<br/>print(store['global_power'])<br/>store.close()</pre>
+<p>数据帧的值可以通过三种不同的方式读取:</p>
+<ul>
+<li><kbd>store['global_power']</kbd></li>
+<li><kbd>store.get('global_power')</kbd></li>
+<li><kbd>store.global_power</kbd></li>
+</ul>
+<p>pandas 还提供了高级的<kbd>read_hdf()</kbd>函数和用于读写 HDF5 文件的<kbd>to_hdf()</kbd> DataFrame 方法。</p>
+<p>更多关于熊猫 HDF5 的文献可从以下链接获得:<a href="http://pandas.pydata.org/pandas-docs/stable/io.html#io-hdf5">http://pandas.pydata.org/pandas-docs/stable/io.html#io-hdf5</a>。</p>
+
+
+            
+
+            
+        
+    
+
+
+
+    
+        <title>Using HDF5 with h5py</title>
+        
+        <meta charset="utf-8"/>
+    
+<!-- kobo-style -->
+<style type="text/css" id="koboSpanStyle">.koboSpan { -webkit-text-combine: inherit; }</style>
+
+
+
+    
+        
+
+                            
+                    <h1 class="header-title">配合 h5py 使用 HDF5</h1>
+                
+            
+            
+                
+<p><kbd>h5py</kbd>模块是 Python 中处理 HDF5 文件最流行的方式。可以使用<kbd>h5py.File()</kbd>功能打开新的或现有的 HDF5 文件。文件打开后，只需在文件对象上加上下标就可以访问它的组，就好像它是一个字典对象一样。例如，以下代码使用<kbd>h5py</kbd>打开一个 HDF5 文件，然后打印存储在<kbd>/global_power </kbd>组中的数组:</p>
+<pre>import h5py<br/>hdf5file = h5py.File('pytable_demo.hdf5')<br/>ds=hdf5file['/global_power']<br/>print(ds)<br/>for i in range(len(ds)):<br/>    print(arr[i])<br/>hdf5file.close()</pre>
+<p><kbd>arr</kbd>变量打印一个<kbd>HDF5 dataset</kbd>类型:</p>
+<pre>&lt;HDF5 dataset "global_power": shape (9, 2), type "&lt;f8"&gt;
+[2.58  0.136]
+[2.552 0.1  ]
+[2.55 0.1 ]
+[2.55 0.1 ]
+[2.554 0.1  ]
+[2.55 0.1 ]
+[2.534 0.096]
+[2.484 0.   ]
+[2.468 0.   ]</pre>
+<p>对于新的<kbd>hdf5file</kbd>，可以通过使用<kbd>hdf5file.create_dataset()</kbd>函数创建数据集和组，返回数据集对象，使用<kbd>hdf5file.create_group()</kbd>函数创建文件夹对象。<kbd>hdf5file</kbd>文件对象也是代表根文件夹<kbd>/</kbd>的文件夹对象。数据集对象支持数组样式切片和切割，以设置或读取其中的值。例如，以下代码创建一个 HDF5 文件并存储一个数据集:</p>
+<pre>import numpy as np<br/>arr = np.loadtxt('temp.csv', skiprows=1, usecols=(2,3), delimiter=',')<br/><br/>import h5py<br/>hdf5file = h5py.File('h5py_demo.hdf5')<br/>dataset1 = hdf5file.create_dataset('global_power',data=arr)<br/>hdf5file.close()</pre>
+<p><kbd>h5py</kbd>提供了一个<kbd>attrs</kbd>代理对象，它有一个类似字典的接口来存储和检索关于文件、文件夹和数据集的元数据。例如，下面的代码设置并打印数据集和文件属性:</p>
+<pre>dataset1.attrs['owner']='City Corp.'<br/>print(dataset1.attrs['owner'])<br/><br/>hdf5file.attrs['security_level']='public'<br/>print(hdf5file.attrs['security_level'])</pre>
+<p>有关<kbd>h5py</kbd>库的更多信息，请参考以下链接的文档:<a href="http://docs.h5py.org/en/latest/index.html">http://docs.h5py.org/en/latest/index.html</a>。</p>
+<p>到目前为止，我们已经了解了不同的数据格式。通常，大型数据是存储在数据库中的，因此我们接下来将探讨如何访问 SQL 和 NoSQL 数据库。</p>
+<p class="mce-root"/>
+
+
+            
+
+            
+        
+    
+
+
+
+    
+        <title>SQL data</title>
+        
+        <meta charset="utf-8"/>
+    
+<!-- kobo-style -->
+<style type="text/css" id="koboSpanStyle">.koboSpan { -webkit-text-combine: inherit; }</style>
+
+
+
+    
+        
+
+                            
+                    <h1 class="header-title">SQL 数据</h1>
+                
+            
+            
+                
+<p>大多数数据库是用关系模型组织的。关系数据库由一个或多个相关的信息表组成，不同表中的信息之间的关系用键来描述。通常，这些数据库使用<strong>数据库管理系统</strong> ( <strong> DBMS </strong>)进行管理，该软件与最终用户、不同的应用程序以及数据库本身进行交互，以捕获和分析数据。商用数据库管理系统使用结构化查询语言来访问和操作数据库。我们还可以使用 Python 访问关系数据库。在这一节中，我们将探索 SQLite 和 MySQL，这是两个非常流行的使用 Python 的数据库引擎。</p>
+
+
+            
+
+            
+        
+    
+
+
+
+    
+        <title>The SQLite database engine</title>
+        
+        <meta charset="utf-8"/>
+    
+<!-- kobo-style -->
+<style type="text/css" id="koboSpanStyle">.koboSpan { -webkit-text-combine: inherit; }</style>
+
+
+
+    
+        
+
+                            
+                    <h1 class="header-title">SQLite 数据库引擎</h1>
+                
+            
+            
+                
+<p>根据 SQLite 主页(<a href="https://sqlite.org/index.html">https://sqlite.org/index.html</a>)<em>SQLite 是一个自包含、高可靠性、嵌入式、全功能、公共领域的 SQL 数据库引擎</em>。</p>
+<p>SQLite 针对嵌入式应用进行了优化。这是简单的使用和相当快。我们需要使用<kbd>sqlite3</kbd> Python 模块来集成 SQLite 和 Python。<kbd>sqlite3</kbd>模块是 Python 3 捆绑的，不需要安装。</p>
+<p>我们将使用来自欧洲足球数据库(<a href="https://github.com/hugomathien/football-data-collection">https://github.com/hugomathien/football-data-collection</a>)的数据进行演示。我们假设您已经安装并启动了一台 SQL server:</p>
+<ol>
+<li>导入<kbd>sqlite3</kbd>后的第一步是使用<kbd>connect</kbd>方法创建一个到数据库的连接:</li>
+</ol>
+<pre style="padding-left: 60px">import sqlite3 <br/>import pandas as pd<br/>connection = sqlite3.connect('database.sqlite')<br/>print("Database opened successfully")</pre>
+<ol start="2">
+<li>欧洲足球数据库由八个表组成。我们可以使用<kbd>read_sql</kbd>将数据库表或 SQL 查询读入 DataFrame。这将打印数据库中所有表的列表:</li>
+</ol>
+<pre style="padding-left: 60px">tables = pd.read_sql("SELECT * FROM sqlite_master WHERE <br/>        type='table';", connection)<br/>print(tables)</pre>
+<p class="CDPAlignCenter CDPAlign"><img src="img/94e3fff5-08d7-4fe5-ae06-5be6fdd7816a.png" style="width:38.58em;height:23.42em;"/></p>
+<ol start="3">
+<li>让我们从<kbd>Country</kbd>表中读取数据:</li>
+</ol>
+<pre style="padding-left: 60px">countries = pd.read_sql("SELECT * FROM Country;", connection)<br/>countries.head()</pre>
+<p class="CDPAlignCenter CDPAlign"><img src="img/5836ebd8-3242-4d4e-9db5-f0ac1f3b2a3b.png" style="width:11.83em;height:13.75em;"/></p>
+<p class="mce-root"/>
+<ol start="4">
+<li>我们可以在表上使用 SQL 查询。在下面的例子中，我们选择了身高大于等于<kbd>180</kbd>，体重大于等于<kbd>170</kbd>的玩家:</li>
+</ol>
+<pre style="padding-left: 60px">selected_players = pd.read_sql_query("SELECT * FROM Player WHERE<br/>         height &gt;= 180 AND weight &gt;= 170 ", connection)<br/>print(selected_players)</pre>
+<p class="CDPAlignCenter CDPAlign"><img src="img/4f0a7a4b-6b6f-4a6a-b613-aa60f23e8ca8.png" style="width:49.33em;height:15.25em;"/></p>
+<ol start="5">
+<li>最后，不要忘记使用<kbd>close</kbd>方法关闭连接:</li>
+</ol>
+<pre style="padding-left: 60px">connection.close()</pre>
+<p>如果您对数据库进行了任何更改，您将需要使用<kbd>commit()</kbd>方法。</p>
+
+
+            
+
+            
+        
+    
+
+
+
+    
+        <title>The MySQL database engine</title>
+        
+        <meta charset="utf-8"/>
+    
+<!-- kobo-style -->
+<style type="text/css" id="koboSpanStyle">.koboSpan { -webkit-text-combine: inherit; }</style>
+
+
+
+    
+        
+
+                            
+                    <h1 class="header-title">MySQL 数据库引擎</h1>
+                
+            
+            
+                
+<p>虽然我们可以对大型数据库使用 SQLite，但 MySQL 通常是首选。除了对大型数据库的可伸缩性，MySQL 在数据安全至关重要的地方也很有用。在使用 MySQL 之前，您需要安装 Python MySQL 连接器。有许多可能的 Python MySQL 连接器，如 MySQLdb、PyMySQL 和 MySQL；我们将使用<kbd>mysql-connector-python</kbd>。</p>
+<p>在这三个例子中，在使用<kbd>connect</kbd>方法建立连接之后，我们定义了<kbd>cursor</kbd>元素，并使用<kbd>execute</kbd>方法运行不同的 SQL 查询。要安装 MySQL，我们使用以下代码:</p>
+<pre>pip install mysql-connector-python </pre>
+<ol>
+<li>现在已经安装了 Python MySQL 连接器，我们可以开始连接 SQL server 了。用您的 SQL server 配置替换<kbd>host</kbd>、<kbd>user</kbd>和<kbd>password</kbd>配置:</li>
+</ol>
+<pre style="padding-left: 60px">import mysql.connector <br/>connection = mysql.connector.connect(host="127.0.0.1", # your host <br/>        user="root", # username<br/>        password="**********" ) # password</pre>
+<ol start="2">
+<li>让我们检查服务器中现有的数据库并列出它们。为此，我们使用<kbd>cursor</kbd>方法:</li>
+</ol>
+<pre style="padding-left: 60px">mycursor = connection.cursor()<br/>mycursor.execute("SHOW DATABASES")<br/>for x in mycursor:<br/>    print(x)</pre>
+<p class="CDPAlignCenter CDPAlign"><img src="img/303fb99e-29d7-48b9-9ef8-00eecf6b76de.png"/></p>
+<ol start="3">
+<li>我们可以进入一个现有的数据库。让我们列出其中一个数据库中的表:</li>
+</ol>
+<pre style="padding-left: 60px">connection = mysql.connector.connect(host="127.0.0.1", # your host <br/>user="root", # username<br/>password="**********" ,  #replace with your password<br/>database = 'mysql')<br/>mycursor = connection.cursor()<br/>mycursor.execute("SHOW TABLES")<br/>for x in mycursor:<br/>    print(x)</pre>
+
+
+            
+
+            
+        
+    
+
+
+
+    
+        <title>NoSQL data</title>
+        
+        <meta charset="utf-8"/>
+    
+<!-- kobo-style -->
+<style type="text/css" id="koboSpanStyle">.koboSpan { -webkit-text-combine: inherit; }</style>
+
+
+
+    
+        
+
+                            
+                    <h1 class="header-title">NoSQL 数据</h1>
+                
+            
+            
+                
+<p><strong>不仅结构化查询语言</strong> ( <strong> NoSQL </strong>)数据库不是关系数据库；相反，数据可以以键值、JSON、文档、列或图形格式存储。它们经常用于大数据和实时应用。我们将在这里学习如何使用 MongoDB 访问 NoSQL 数据，我们假设您已经正确配置了 MongoDB 服务器，并且在:</p>
+<ol>
+<li>我们需要使用<kbd>MongoClient</kbd>对象建立与 Mongo 守护进程的连接。以下代码建立了到默认主机<kbd>localhost</kbd>和端口<kbd>27017</kbd>的连接。它让我们可以访问数据库:</li>
+</ol>
+<pre style="padding-left: 60px">from pymongo import MongoClient<br/>client = MongoClient()<br/>db = client.test</pre>
+<ol start="2">
+<li>在本例中，我们尝试将 scikit-learn 中可用的<kbd>cancer</kbd>数据集加载到 Mongo 数据库中。所以，我们首先获得乳腺癌数据集，并将其转换成熊猫数据帧:</li>
+</ol>
+<pre style="padding-left: 60px">from sklearn.datasets import load_breast_cancer<br/>import pandas as pd<br/><br/>cancer = load_breast_cancer()<br/>data = pd.DataFrame(cancer.data, columns=[cancer.feature_names])<br/><br/>data.head()</pre>
+<ol start="3">
+<li>接下来，我们将其转换为 JSON 格式，使用<kbd>json.loads()</kbd>函数对其进行解码，并将解码后的数据插入到开放数据库中:</li>
+</ol>
+<pre style="padding-left: 60px">import json<br/>data_in_json = data.to_json(orient='split')<br/>rows = json.loads(data_in_json)<br/>db.cancer_data.insert(rows)</pre>
+<p class="mce-root"/>
+<ol start="4">
+<li>这将创建一个包含数据的名为<kbd>cancer_data</kbd>的集合。我们可以使用<kbd>cursor</kbd>对象查询刚刚创建的文档:</li>
+</ol>
+<pre style="padding-left: 60px">cursor = db['cancer_data'].find({})<br/>df = pd.DataFrame(list(cursor))<br/>print(df)</pre>
+<p class="CDPAlignCenter CDPAlign"><img src="img/cc5f0782-9f58-4952-b32a-fb0a42de7824.png" style="width:38.33em;height:14.08em;"/></p>
+<p>谈到物联网上的分布式数据，<strong> Hadoop 分布式文件系统</strong> ( <strong> HDFS </strong>)是另一种在物联网系统中提供分布式数据存储和访问的流行方法。在下一节中，我们将学习如何在 HDFS 中访问和存储数据。</p>
+
+
+            
+
+            
+        
+    
+
+
+
+    
+        <title>HDFS</title>
+        
+        <meta charset="utf-8"/>
+    
+<!-- kobo-style -->
+<style type="text/css" id="koboSpanStyle">.koboSpan { -webkit-text-combine: inherit; }</style>
+
+
+
+    
+        
+
+                            
+                    <h1 class="header-title">HDFS</h1>
+                
+            
+            
+                
+<p>HDFS 是一种流行的存储和访问方法，用于存储和检索物联网解决方案的数据文件。HDFS 格式可以以可靠和可扩展的方式保存大量数据。它的设计基于<strong>谷歌文件系统</strong>(<a href="https://ai.google/research/pubs/pub51">https://ai.google/research/pubs/pub51</a>)。HDFS 将单个文件分割成固定大小的块，存储在集群中的计算机上。为了确保可靠性，它复制文件块并将其分布到整个群集；默认情况下，复制因子为 3。HDFS 有两个主要的架构组件:</p>
+<ul>
+<li>第一个是<strong> NodeName </strong>，存储整个文件系统的元数据，比如文件名、它们的权限以及每个文件的每个块的位置。</li>
+<li>第二个，<strong> DataNode </strong>(一个或多个)，是存储文件块的地方。它使用 protobufs 执行<strong>远程过程调用</strong> ( <strong> RPCs </strong>)。</li>
+</ul>
+<p class="mce-root"/>
+<div><p>RPC 是一种协议，一个程序可以用它向网络上另一台计算机上的程序请求服务，而不必知道网络的细节。程序调用有时也被称为<strong>功能调用</strong>或<strong>子程序调用</strong>。</p>
+</div>
+<p>Python 中编程访问 HDFS 有很多选项，比如<kbd>snakebite</kbd>、<kbd>pyarrow</kbd>、<kbd>hdfs3</kbd>、<kbd>pywebhdfs</kbd>、<kbd>hdfscli</kbd>等等。在这一节中，我们将主要关注提供本地 RPC 客户端接口并使用 Python 3 的库。</p>
+<p>Snakebite 是一个纯 Python 模块和 CLI，允许您从 Python 程序访问 HDFS。目前只对 Python 2 有效；不支持 Python 3。此外，它还不支持写操作，所以我们没有把它包括在书中。不过，如果你有兴趣了解更多这方面的内容，可以参考 Spotify 的 GitHub:<a href="https://github.com/spotify/snakebite">https://github.com/spotify/snakebite</a>。</p>
+
+
+            
+
+            
+        
+    
+
+
+
+    
+        <title>Using hdfs3 with HDFS</title>
+        
+        <meta charset="utf-8"/>
+    
+<!-- kobo-style -->
+<style type="text/css" id="koboSpanStyle">.koboSpan { -webkit-text-combine: inherit; }</style>
+
+
+
+    
+        
+
+                            
+                    <h1 class="header-title">将 hdfs3 与 hdfs 配合使用</h1>
+                
+            
+            
+                
+<p><kbd>hdfs3</kbd>是围绕 C/C++ <kbd>libhdfs3</kbd>库的轻量级 Python 包装器。它允许我们从 Python 中本地使用 HDFS。首先，我们需要连接 HDFS 的 NameNode 这是使用<kbd>HDFileSystem</kbd>类完成的:</p>
+<pre>from hdfs3 import HDFileSystem<br/>hdfs = HDFileSystem(host = 'localhost', port=8020)</pre>
+<p>这将自动建立与 NameNode 的连接。现在，我们可以使用以下代码访问目录列表:</p>
+<pre>print(hdfs.ls('/tmp')) </pre>
+<p>这将列出<kbd>tmp</kbd>文件夹中的所有文件和目录。你可以使用<kbd>mkdir</kbd>来创建一个目录，使用<kbd>cp</kbd>来将文件从一个位置复制到另一个位置。为了写入一个文件，我们首先使用<kbd>open</kbd>方法打开它，并使用<kbd>write</kbd>:</p>
+<pre>with hdfs.open('/tmp/file1.txt','wb') as f:<br/>    f.write(b'You are Awesome!')</pre>
+<p class="mce-root"/>
+<p class="mce-root"/>
+<p>可以从文件中读取数据:</p>
+<pre>with hdfs.open('/tmp/file1.txt') as f:<br/>    print(f.read())</pre>
+<p>你可以从它的文档中了解更多关于<kbd>hdfs3</kbd>的信息:<a href="https://media.readthedocs.org/pdf/hdfs3/latest/hdfs3.pdf">https://media.readthedocs.org/pdf/hdfs3/latest/hdfs3.pdf</a>。</p>
+
+
+            
+
+            
+        
+    
+
+
+
+    
+        <title>Using PyArrow's filesystem interface for HDFS</title>
+        
+        <meta charset="utf-8"/>
+    
+<!-- kobo-style -->
+<style type="text/css" id="koboSpanStyle">.koboSpan { -webkit-text-combine: inherit; }</style>
+
+
+
+    
+        
+
+                            
+                    <h1 class="header-title">为 HDFS 使用 PyArrow 的文件系统接口</h1>
+                
+            
+            
+                
+<p>PyArrow 有一个基于 C++的 HDFS 接口。默认情况下，它使用<kbd>libhdfs</kbd>，一个基于 JNI 的接口，用于 Java Hadoop 客户端。或者，我们也可以使用 HDFS 的 C++库<kbd>libhdfs3</kbd>。我们使用<kbd>hdfs.connect</kbd>连接到 NameNode:</p>
+<pre>import pyarrow as pa<br/>hdfs = pa.hdfs.connect(host='hostname', port=8020, driver='libhdfs')</pre>
+<p>如果我们将驱动程序更改为<kbd>libhdfs3</kbd>，我们将使用 Pivotal Labs 的 HDFS c++库。一旦与 NameNode 建立了连接，就可以使用与 hdfs3 相同的方法访问文件系统。</p>
+<p>当数据非常大时，首选 HDFS。它允许我们成块地读写数据；这有助于访问和处理流数据。下面这篇博文对三种本地 RPC 客户端接口做了一个很好的比较:【http://wesmckinney.com/blog/python-hdfs-interfaces/<a href="http://wesmckinney.com/blog/python-hdfs-interfaces/"/>。</p>
+
+
+            
+
+            
+        
+    
+
+
+
+    
+        <title>Summary</title>
+        
+        <meta charset="utf-8"/>
+    
+<!-- kobo-style -->
+<style type="text/css" id="koboSpanStyle">.koboSpan { -webkit-text-combine: inherit; }</style>
+
+
+
+    
+        
+
+                            
+                    <h1 class="header-title">摘要</h1>
+                
+            
+            
+                
+<p>本章讨论了许多不同的数据格式，并且在这个过程中，讨论了许多不同的数据集。我们从最简单的 TXT 数据开始，访问<kbd>Shakespeare</kbd>播放数据。我们学习了如何使用<kbd>csv</kbd>、<kbd>numpy</kbd>和<kbd>pandas</kbd>模块从 CSV 文件中读取数据。我们转向了 JSON 格式；我们使用 Python 的 JSON 和 pandas 模块来访问 JSON 数据。从数据格式，我们进展到访问数据库，并涵盖了 SQL 和 NoSQL 数据库。接下来，我们学习了如何在 Python 中使用 Hadoop 文件系统。</p>
+<p>访问数据是第一步。在下一章中，我们将了解机器学习工具，这些工具将帮助我们设计、建模和对数据做出明智的预测。</p>
+
+
+            
+
+            
+        
+    
+
+</body></html>

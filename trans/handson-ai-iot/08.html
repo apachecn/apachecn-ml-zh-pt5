@@ -1,0 +1,647 @@
+<html><head/><body>
+    
+        <title>Distributed AI for IoT</title>
+        
+        <meta charset="utf-8"/>
+    
+<!-- kobo-style -->
+<style type="text/css" id="koboSpanStyle">.koboSpan { -webkit-text-combine: inherit; }</style>
+
+
+
+    
+        
+
+                            
+                    <h1 class="header-title">面向物联网的分布式人工智能</h1>
+                
+            
+            
+                
+<p class="mce-root">分布式计算环境的进步和互联网在世界范围内的便利性导致了<strong>分布式人工智能</strong> ( <strong>戴</strong>)的出现。在这一章中，我们将了解两个框架，一个是 Apache 的<strong>机器学习库</strong> ( <strong> MLlib </strong>)，另一个是 H2O.ai，两者都为大型流数据提供分布式和可扩展的<strong>机器学习</strong> ( <strong> ML </strong>)。本章将首先介绍 Apache 的 Spark，即事实上的分布式数据处理系统。本章将涵盖以下主题:</p>
+<ul>
+<li>Spark 及其在分布式数据处理中的重要性</li>
+<li>了解 Spark 架构</li>
+<li>了解 MLlib</li>
+<li>在深度学习管道中使用 MLlib</li>
+<li>深入钻研 H2O.ai 平台</li>
+</ul>
+
+
+            
+
+            
+        
+    
+
+
+
+    
+        <title>Introduction</title>
+        
+        <meta charset="utf-8"/>
+    
+<!-- kobo-style -->
+<style type="text/css" id="koboSpanStyle">.koboSpan { -webkit-text-combine: inherit; }</style>
+
+
+
+    
+        
+
+                            
+                    <h1 class="header-title">介绍</h1>
+                
+            
+            
+                
+<p>物联网系统产生大量数据；虽然在许多情况下可以从容地分析数据，但对于某些任务，如安全、欺诈检测等，这种延迟是不可接受的。在这种情况下，我们需要的是一种在指定时间内处理大数据的方法——解决方案——DAI，集群中的许多机器以分布式方式处理大数据(数据并行)和/或训练深度学习模型(模型并行)。有许多方法可以执行 DAI，大多数方法都是基于或围绕 Apache Spark 构建的。Apache Spark 于 2010 年在 BSD 许可下发布，目前是大数据领域最大的开源项目。它帮助用户创建一个快速通用的集群计算系统。</p>
+<p>Spark 运行在 Java 虚拟机上，这使得它可以在任何安装了 Java 的机器上运行，无论是笔记本电脑还是集群。它支持包括 Python、Scala、r 在内的多种编程语言，围绕 Spark 和 TensorFlow 构建了大量的深度学习框架和 API，使 DAI 的任务变得更加简单，例如<strong>TensorFlowOnSpark</strong>(<strong>TFoS</strong>)、Spark MLlib、SparkDl、Hydrogen sparking(H2O . ai 和 Spark 的组合)。</p>
+
+
+            
+
+            
+        
+    
+
+
+
+    
+        <title>Spark components</title>
+        
+        <meta charset="utf-8"/>
+    
+<!-- kobo-style -->
+<style type="text/css" id="koboSpanStyle">.koboSpan { -webkit-text-combine: inherit; }</style>
+
+
+
+    
+        
+
+                            
+                    <h1 class="header-title">火花部件</h1>
+                
+            
+            
+                
+<p>Spark 采用主从架构，有一个中央协调器(称为<strong> Spark driver </strong>)和许多分布式工作器(称为<strong> Spark executors </strong>)。驱动程序进程创建一个<kbd>SparkContext</kbd>对象，并将用户应用程序划分成更小的执行单元(任务)。这些任务由工人执行。工人之间的资源由一个<strong>集群</strong> <strong>管理者</strong>管理。下图显示了 Spark 的工作原理:</p>
+<p class="CDPAlignCenter CDPAlign"><img class="aligncenter size-full wp-image-1000 image-border" src="img/2b18990e-1d8c-4cb0-a01b-7e2c24272ba8.png" style="width:42.50em;height:20.50em;"/></p>
+<p>火花工作</p>
+<p>现在让我们来看看 Spark 的不同组件。下图显示了构成 Spark 的基本组件:</p>
+<p class="CDPAlignCenter CDPAlign"><img class="aligncenter size-full wp-image-1001 image-border" src="img/ab3d925a-6e1b-426e-a3ba-9dbabe167138.png" style="width:30.33em;height:24.42em;"/></p>
+<p>构成火花的部件</p>
+<p class="mce-root">简单地说，让我们看看本章中将要用到的一些组件，如下所示:</p>
+<ul>
+<li><strong>弹性分布式数据集</strong> : <strong>弹性分布式数据集</strong> ( <strong> RDDs </strong>)是 Spark 中的主要 API。它们代表不可变的、分区的数据集合，可以并行操作。更高层次的 API 数据帧和数据集建立在 rdd 之上。</li>
+<li><strong>分布式变量</strong> : Spark 有两种类型的分布式变量:广播变量和累加器。它们由用户定义的函数使用。累加器用于将来自所有执行者的信息聚集成一个共享的结果。或者，广播变量是在整个集群中共享的变量。</li>
+<li>这是一个分布式的数据集合，非常像熊猫的数据框架。它们可以读取各种文件格式，并使用单个命令对整个数据帧执行操作。它们分布在整个集群中。</li>
+<li><strong>库</strong> : Spark 内置了 MLlib 库和 GraphX 库。在本章中，我们将使用使用 Spark 框架的 MLlib 和 SparkDl。我们将学习如何应用它们进行最大似然预测。</li>
+</ul>
+<p>Spark 是一个很大的话题，给出关于 Spark 的进一步细节已经超出了本书的范围。我们推荐感兴趣的读者参考 Spark 文档:<a href="http://spark.apache.org/docs/latest/index.html">http://spark.apache.org/docs/latest/index.html</a>。</p>
+
+
+            
+
+            
+        
+    
+
+
+
+    
+        <title>Apache MLlib</title>
+        
+        <meta charset="utf-8"/>
+    
+<!-- kobo-style -->
+<style type="text/css" id="koboSpanStyle">.koboSpan { -webkit-text-combine: inherit; }</style>
+
+
+
+    
+        
+
+                            
+                    <h1 class="header-title">阿帕奇 MLlib</h1>
+                
+            
+            
+                
+<p>Apache Spark MLlib 为 ML 提供了强大的计算环境。它在大规模的基础上提供了一个分布式体系结构，允许人们更快更有效地运行 ML 模型。这还不是全部；它是开源的，有一个不断发展和活跃的社区在不断努力改进和提供最新的特性。它提供了流行的 ML 算法的可伸缩实现。它包括以下算法:</p>
+<ul>
+<li><strong>分类</strong>:逻辑回归、线性支持向量机、朴素贝叶斯</li>
+<li><strong>回归</strong>:广义线性回归</li>
+<li><strong>协同滤波</strong>:交替最小二乘法</li>
+<li><strong>聚类</strong> : K 均值</li>
+<li><strong>分解</strong>:奇异值分解和主成分分析</li>
+</ul>
+<p>事实证明，它比 Hadoop MapReduce 更快。我们可以用 Java、Scala、R 或 Python 编写应用程序。它也可以很容易地与 TensorFlow 集成。</p>
+
+
+            
+
+            
+        
+    
+
+
+
+    
+        <title>Regression in MLlib</title>
+        
+        <meta charset="utf-8"/>
+    
+<!-- kobo-style -->
+<style type="text/css" id="koboSpanStyle">.koboSpan { -webkit-text-combine: inherit; }</style>
+
+
+
+    
+        
+
+                            
+                    <h1 class="header-title">MLlib 中的回归</h1>
+                
+            
+            
+                
+<p>Spark MLlib 有内置的回归方法。为了能够使用 Spark 的内置方法，您必须在您的集群(独立或分布式集群)上安装<kbd>pyspark</kbd>。可以使用以下方法完成安装:</p>
+<pre>pip install pyspark</pre>
+<p>MLlib 库有以下回归方法:</p>
+<ul>
+<li>线性回归:我们已经在前面的章节中学习了线性回归；我们可以通过在<kbd>pyspark.ml.regression</kbd>定义的<kbd>LinearRegression</kbd>类来使用这个方法。默认情况下，它使用正则化的最小平方误差。它支持 L1 和 L2 正则化，以及它们的组合。</li>
+<li><strong>广义线性回归</strong>:Spark MLlib 有一个指数族分布的子集，如高斯、泊松等。使用类<kbd>GeneralizedLinearRegression</kbd>实例化回归。</li>
+<li><strong>决策树回归</strong>:使用决策树回归，<kbd>DecisionTreeRegressor</kbd>类可用于进行预测。</li>
+<li><strong>随机森林回归</strong>:流行的 ML 方法之一，在<kbd>RandomForestRegressor</kbd>类中定义。</li>
+<li><strong>梯度提升树回归</strong>:我们可以使用<kbd>GBTRegressor</kbd>类来集成决策树。</li>
+</ul>
+<p>此外，MLlib 还支持使用<kbd>AFTSurvivalRegression</kbd>和<kbd>IsotonicRegression</kbd>类的生存回归和保序回归。</p>
+<p>在这些类的帮助下，我们可以用少至 10 行代码构建一个 ML 回归模型(或分类，您将在下一节看到)。基本步骤概述如下:</p>
+<ol>
+<li>建立 Spark 会话</li>
+<li>实现数据加载管道:加载数据文件，指定格式，并将其读入 Spark 数据帧</li>
+<li>识别要用作输入和目标的特征(可选择在训练/测试中分割数据集)</li>
+<li>实例化所需的类对象</li>
+<li>使用<kbd>fit()</kbd>方法，将训练数据集作为参数</li>
+<li>根据所选的回归变量，您可以查看学习参数并评估拟合模型</li>
+</ol>
+<p>让我们对波士顿房价预测数据集(<a href="https://www.cs.toronto.edu/~delve/data/boston/bostonDetail.html">https://www . cs . Toronto . edu/~ delve/data/Boston/Boston detail . html</a>)使用线性回归，其中数据集的格式为<kbd>csv</kbd>:</p>
+<ol>
+<li>导入必要的模块。我们将使用<kbd>LinearRegressor</kbd>定义线性回归类，使用<kbd>RegressionEvaluator</kbd>评估训练后的模型，使用<kbd>VectorAssembler</kbd>将特征组合为一个输入向量，使用<kbd>SparkSession</kbd>启动 Spark 会话:</li>
+</ol>
+<pre style="padding-left: 60px">from pyspark.ml.regression import LinearRegression as LR<br/>from pyspark.ml.feature import VectorAssembler<br/>from pyspark.ml.evaluation import RegressionEvaluator<br/><br/>from pyspark.sql import SparkSession</pre>
+<p class="mce-root"/>
+<ol start="2">
+<li>接下来，使用<kbd>SparkSession</kbd>类启动 Spark 会话，如下所示:</li>
+</ol>
+<pre style="padding-left: 60px">spark = SparkSession.builder \<br/> .appName("Boston Price Prediction") \<br/> .config("spark.executor.memory", "70g") \<br/> .config("spark.driver.memory", "50g") \<br/> .config("spark.memory.offHeap.enabled",True) \<br/> .config("spark.memory.offHeap.size","16g") \<br/> .getOrCreate()</pre>
+<ol start="3">
+<li>让我们现在读取数据；我们首先从给定的路径加载数据，定义我们想要使用的格式，最后，将它读入 Spark 数据帧，如下所示:</li>
+</ol>
+<pre style="padding-left: 60px">house_df = spark.read.format("csv"). \<br/>    options(header="true", inferschema="true"). \<br/>    load("boston/train.csv")</pre>
+<ol start="4">
+<li>您可以看到现在加载到内存中的数据帧及其结构，如下面的屏幕截图所示:</li>
+</ol>
+<p class="CDPAlignCenter CDPAlign"><img class="aligncenter size-full wp-image-1002 image-border" src="img/6ec3ba28-bb23-4336-a1fc-d38953ce1723.png" style="width:56.08em;height:37.50em;"/></p>
+<ol start="5">
+<li>像 pandas 数据帧一样，Spark 数据帧也可以用一个命令来处理。让我们更深入地了解一下我们的数据集，如下图所示:</li>
+</ol>
+<p class="CDPAlignCenter CDPAlign"><img src="img/316109bd-4504-4877-b9b8-09d4c053b456.png" style="width:48.83em;height:31.75em;"/></p>
+<ol start="6">
+<li>接下来，我们定义我们想要用于训练的特征；为此，我们使用了<kbd>VectorAssembler</kbd>类。我们将来自<kbd>house_df</kbd>数据帧的列定义为输入特征向量和相应的输出预测(类似于定义<kbd>X_train</kbd>、<kbd>Y_train</kbd>)，然后执行相应的转换，如下所示:</li>
+</ol>
+<pre style="padding-left: 60px">vectors = VectorAssembler(inputCols = ['crim', 'zn','indus','chas',<br/>    'nox','rm','age','dis', 'rad', 'tax',<br/>    'ptratio','black', 'lstat'],<br/>    outputCol = 'features')<br/>vhouse_df = vectors.transform(house_df)<br/>vhouse_df = vhouse_df.select(['features', 'medv'])<br/>vhouse_df.show(5)</pre>
+<p class="CDPAlignCenter CDPAlign"><img src="img/0c1de199-e1b3-4e5f-9f54-4a3b79e57c5d.png" style="width:21.50em;height:13.83em;"/></p>
+<ol start="7">
+<li>然后，数据集被拆分为训练/测试数据集，如以下代码所示:</li>
+</ol>
+<pre style="padding-left: 60px">train_df, test_df = vhouse_df.randomSplit([0.7,0.3])</pre>
+<ol start="8">
+<li>现在我们已经准备好了数据集，我们实例化<kbd>LinearRegression</kbd>类并使其适合训练数据集，如下所示:</li>
+</ol>
+<pre style="padding-left: 60px">regressor = LR(featuresCol = 'features', labelCol='medv',\<br/>    maxIter=20, regParam=0.3, elasticNetParam=0.8)<br/>model = regressor.fit(train_df)</pre>
+<ol start="9">
+<li>我们可以获得线性回归的结果系数，如下所示:</li>
+</ol>
+<pre style="padding-left: 60px">print("Coefficients:", model.coefficients)<br/>print("Intercept:", model.intercept)</pre>
+<p class="CDPAlignCenter CDPAlign"><img src="img/1446b664-709e-4413-883e-4337b7bf15f5.png"/></p>
+<p class="mce-root"/>
+<ol start="10">
+<li>该模型在<kbd>21</kbd>迭代中的训练数据集上提供了<kbd>4.73</kbd>的 RMSE 值和<kbd>0.71</kbd>的<kbd>r2</kbd>值；</li>
+</ol>
+<pre style="padding-left: 60px">modelSummary = model.summary<br/>print("RMSE is {} and r2 is {}"\ <br/>   .format(modelSummary.rootMeanSquaredError,\<br/>    modelSummary.r2))<br/>print("Number of Iterations is ",modelSummary.totalIterations)</pre>
+<ol start="11">
+<li>接下来，我们在测试数据集上评估我们的模型；我们获得了<kbd>5.55</kbd>的 RMSE 和<kbd>0.68</kbd>的 R2 值:</li>
+</ol>
+<pre style="padding-left: 60px">model_evaluator = RegressionEvaluator(predictionCol="prediction",\<br/>    labelCol="medv", metricName="r2")<br/>print("R2 value on test dataset is: ",\<br/>    model_evaluator.evaluate(model_predictions))<br/>print("RMSE value is", model.evaluate(test_df).rootMeanSquaredError)</pre>
+<p>一旦工作完成，您应该使用<kbd>stop()</kbd>方法停止 Spark 会话。完整代码见<kbd>Chapter08/Boston_Price_MLlib.ipynb</kbd>。低<kbd>r2</kbd>值和高 RMSE 的原因是，我们将训练数据集中的所有要素都视为输入要素向量，其中许多要素在确定房价时没有发挥重要作用。尝试减少功能，保留与价格高度相关的功能。</p>
+
+
+            
+
+            
+        
+    
+
+
+
+    
+        <title>Classification in MLlib</title>
+        
+        <meta charset="utf-8"/>
+    
+<!-- kobo-style -->
+<style type="text/css" id="koboSpanStyle">.koboSpan { -webkit-text-combine: inherit; }</style>
+
+
+
+    
+        
+
+                            
+                    <h1 class="header-title">MLlib 中的分类</h1>
+                
+            
+            
+                
+<p>MLlib 还提供了广泛的分类器；它提供了二项式和多项式逻辑回归。支持决策树分类器、随机森林分类器、梯度增强树分类器、多层感知器分类器、线性支持向量机分类器和朴素贝叶斯分类器。它们中的每一个都在其类中定义；详见<a href="https://spark.apache.org/docs/2.2.0/ml-classification-regression.html#naive-bayes">https://spark . Apache . org/docs/2 . 2 . 0/ml-classification-regression . html</a>。基本步骤与我们在回归案例中学到的相同；唯一的区别是，现在模型评估的是准确性，而不是 RMSE 或 r2 指标。</p>
+<p class="mce-root"/>
+<p>本节将向您介绍使用 Spark MLlib 逻辑回归分类器实现的葡萄酒质量分类问题:</p>
+<ol>
+<li>对于这个分类问题，我们将使用通过<kbd>LogisticRegressor</kbd>类可用的逻辑回归。与前面的例子一样，<kbd>VectorAssembler</kbd>将用于将输入特征合并为一个矢量。在我们已经看到的葡萄酒质量数据集中(<a href="fa0444a6-ce5c-4bed-8d9d-ddab846fe571.xhtml">第 1 章</a>、<em>物联网和人工智能的原理和基础</em>)，质量是一个 0-10 之间的整数，我们需要处理它。这里，我们将使用<kbd>StringIndexer</kbd>进行处理。</li>
+</ol>
+<p style="padding-left: 60px">Spark 的一个伟大特性是我们可以将所有预处理步骤定义为一个管道。当有大量预处理步骤时，这变得非常有用。这里，我们只有两个预处理步骤，但是为了展示管道是如何形成的，我们将使用<kbd>Pipeline</kbd>类。我们的第一步是导入所有这些模块，并创建一个 Spark 会话，如以下代码所示:</p>
+<pre style="padding-left: 60px">from pyspark.ml.classification import LogisticRegression as LR<br/>from pyspark.ml.feature import VectorAssembler<br/>from pyspark.ml.feature import StringIndexer<br/>from pyspark.ml import Pipeline<br/><br/>from pyspark.sql import SparkSession<br/><br/>spark = SparkSession.builder \<br/>    .appName("Wine Quality Classifier") \<br/>    .config("spark.executor.memory", "70g") \<br/>    .config("spark.driver.memory", "50g") \<br/>    .config("spark.memory.offHeap.enabled",True) \<br/>    .config("spark.memory.offHeap.size","16g") \<br/>    .getOrCreate()</pre>
+<ol start="2">
+<li>我们将加载并读取<kbd>winequality-red.csv</kbd>数据文件，如下所示:</li>
+</ol>
+<pre style="padding-left: 60px">wine_df = spark.read.format("csv"). \<br/>    options(header="true",\<br/>    inferschema="true",sep=';'). \<br/>    load("winequality-red.csv")</pre>
+<p class="mce-root"/>
+<p class="mce-root"/>
+<ol start="3">
+<li>我们处理给定数据集中的<kbd>quality</kbd>标签，将其分成三个不同的类，并将其作为新的<kbd>quality_new</kbd>列添加到现有的 Spark DataFrame 中，如以下代码所示:</li>
+</ol>
+<pre style="padding-left: 60px">from pyspark.sql.functions import when<br/>wine_df = wine_df.withColumn('quality_new',\<br/>    when(wine_df['quality']&lt; 5, 0 ).\<br/>    otherwise(when(wine_df['quality']&lt;8,1)\<br/>    .otherwise(2)))</pre>
+<ol start="4">
+<li>虽然修改了质量，<kbd>quality_new</kbd>已经是一个整数，我们可以直接用它作为我们的标签。在本例中，为了便于说明，我们添加了<kbd>StringIndexer</kbd>将其转换为数字指数。可以使用<kbd>StringIndexer</kbd>将字符串标签转换成数字索引。我们还使用<kbd>VectorAssembler</kbd>将列组合成一个特征向量。使用<kbd>Pipeline</kbd>将两个阶段结合在一起，如下所示:</li>
+</ol>
+<pre style="padding-left: 60px">string_index = StringIndexer(inputCol='quality_new',\<br/>    outputCol='quality'+'Index')<br/>vectors = VectorAssembler(inputCols = \<br/>    ['fixed acidity','volatile acidity',\<br/>    'citric acid','residual sugar','chlorides',\<br/>    'free sulfur dioxide', 'total sulfur dioxide', \<br/>    'density','pH','sulphates', 'alcohol'],\<br/>    outputCol = 'features')<br/><br/>stages = [vectors, string_index]<br/><br/>pipeline = Pipeline().setStages(stages)<br/>pipelineModel = pipeline.fit(wine_df)<br/>pl_data_df = pipelineModel.transform(wine_df)</pre>
+<ol start="5">
+<li>管道后获得的数据然后被分成训练和测试数据集，如下面的代码所示:</li>
+</ol>
+<pre style="padding-left: 60px">train_df, test_df = pl_data_df.randomSplit([0.7,0.3])</pre>
+<ol start="6">
+<li>接下来，我们实例化<kbd>LogisticRegressor</kbd>类，并使用<kbd>fit</kbd>方法在训练数据集上训练它，如下所示:</li>
+</ol>
+<pre style="padding-left: 60px">classifier= LR(featuresCol = 'features', \<br/>    labelCol='qualityIndex',\<br/>    maxIter=50)<br/>model = classifier.fit(train_df)</pre>
+<ol start="7">
+<li>在下面的截图中，我们可以看到学习到的模型参数:</li>
+</ol>
+<p class="CDPAlignCenter CDPAlign"><img src="img/7e2b0f57-da14-409a-ac9a-6eca299087e6.png"/></p>
+<ol start="8">
+<li>模型的准确率为 94.75%。我们还可以在下面的代码中看到其他评估指标，如<kbd>precision</kbd>和<kbd>recall</kbd>、F 度量、真阳性率和假阳性率:</li>
+</ol>
+<pre style="padding-left: 60px">modelSummary = model.summary<br/><br/>accuracy = modelSummary.accuracy<br/>fPR = modelSummary.weightedFalsePositiveRate<br/>tPR = modelSummary.weightedTruePositiveRate<br/>fMeasure = modelSummary.weightedFMeasure()<br/>precision = modelSummary.weightedPrecision<br/>recall = modelSummary.weightedRecall<br/>print("Accuracy: {} False Positive Rate {} \<br/>    True Positive Rate {} F {} Precision {} Recall {}"\<br/>    .format(accuracy, fPR, tPR, fMeasure, precision, recall))</pre>
+<p>我们可以看到，使用 MLlib 的葡萄酒质量分类器的性能与我们早期的方法相当。完整的代码可以在 GitHub 资源库的<kbd>Chapter08/Wine_Classification_MLlib.pynb</kbd>下找到。</p>
+
+
+            
+
+            
+        
+    
+
+
+
+    
+        <title>Transfer learning using SparkDL</title>
+        
+        <meta charset="utf-8"/>
+    
+<!-- kobo-style -->
+<style type="text/css" id="koboSpanStyle">.koboSpan { -webkit-text-combine: inherit; }</style>
+
+
+
+    
+        
+
+                            
+                    <h1 class="header-title">使用 SparkDL 迁移学习</h1>
+                
+            
+            
+                
+<p>前几节阐述了如何使用 Spark 框架及其 MLlib 来解决 ML 问题。然而，在大多数复杂的任务中，深度学习模型提供了更好的性能。Spark 支持 SparkDL，这是一个基于 MLlib 的高级 API。它在后端使用 TensorFlow，还需要 TensorFrames、Keras 和 TFoS 模块。</p>
+<p>在本节中，我们将使用 SparkDL 对图像进行分类。这将使您熟悉 Spark 对图像的支持。对于图像，正如我们在<a href="cb9d27c5-e98d-44b6-a947-691b0bc64766.xhtml">第四章</a>、<em>物联网深度学习</em>、<strong>卷积神经网络</strong>(<strong>CNN</strong>)是事实上的选择。在<a href="cb9d27c5-e98d-44b6-a947-691b0bc64766.xhtml">第四章</a>、<em>面向物联网的深度学习</em>、<em>、</em>我们从零开始构建 CNN，也了解了一些流行的 CNN 架构。CNN 的一个非常有趣的特性是，每个卷积层学会从图像中识别不同的特征，这就是它们充当特征提取器。较低的卷积层过滤掉线条和圆形等基本形状，而较高的卷积层过滤掉更抽象的形状。该属性可用于采用在一组图像上训练的 CNN，通过仅改变顶部完全连接的层来对另一组相似域图像进行分类。这种技术被称为<strong>迁移学习</strong>。根据新数据集图像的可用性和两个域之间的相似性，迁移学习可以极大地帮助减少训练时间和对大数据集的需求。</p>
+<p>在 NIPS 2016 教程中，人工智能领域的关键人物之一吴恩达表示，<em>迁移学习将是商业成功的下一个驱动力</em>。在图像领域，使用在 ImageNet 数据中训练的 CNN 对其他领域的图像进行分类，在迁移学习方面取得了巨大成功。将迁移学习应用到其他数据领域的大量研究正在进行中。你可以从 Sebastian Ruder 的博客文章<a href="http://ruder.io/transfer-learning/">http://ruder.io/transfer-learning/</a>中获得关于<em>迁移学习</em>的入门知识。</p>
+<p>我们将使用由谷歌(<a href="https://arxiv.org/pdf/1409.4842.pdf">https://arxiv.org/pdf/1409.4842.pdf</a>)提出的 CNN 架构 InceptionV3，在 ImageNet 数据集(<a href="http://www.image-net.org">http://www.image-net.org</a>)上进行训练，以识别道路上的车辆(目前我们仅限于公共汽车和小汽车)。</p>
+<p class="mce-root"/>
+<p class="mce-root"/>
+<p>开始之前，请确保您的工作环境中安装了以下模块:</p>
+<ul>
+<li>PySpark</li>
+<li>张量流</li>
+<li>克拉斯</li>
+<li>TFoS</li>
+<li>张量框架</li>
+<li>包</li>
+<li>枕头</li>
+<li>熊猫</li>
+<li>Py4J</li>
+<li>SparkDL</li>
+<li>卡夫卡</li>
+<li>街霸</li>
+</ul>
+<p>这些可以使用<kbd>pip install</kbd>命令在您的独立机器或集群中的机器上安装。</p>
+<p>接下来，您将学习如何使用 Spark 和 SparkDL 进行图像分类。我们已经用谷歌图片搜索对雏菊和郁金香这两种不同的花进行了截图；有 42 个雏菊的图像和 65 个郁金香的图像。在下面的截图中，你可以看到雏菊的样本截图:</p>
+<p class="CDPAlignCenter CDPAlign"><img class="aligncenter size-full wp-image-1103 image-border" src="img/47e5e4e6-3443-4225-a3e7-823cc396503e.png" style="width:73.08em;height:24.92em;"/></p>
+<p>以下截图显示了郁金香的样本图像:</p>
+<p class="CDPAlignCenter CDPAlign"><img class="aligncenter size-full wp-image-1104 image-border" src="img/99141d8d-f0cd-46b7-9bf0-f20d83a22267.png" style="width:73.08em;height:24.42em;"/></p>
+<p>我们的数据集太小，因此如果我们从头开始制作 CNN，它将无法提供任何有用的性能。在这种情况下，我们可以利用迁移学习。SparkDL 模块在类<kbd>DeepImageFeaturizer</kbd>的帮助下，提供了一种使用预训练模型的简单方便的方法。它支持以下 CNN 模型(在 ImageNet 数据集上预先训练(<a href="http://www.image-net.org">http://www.image-net.org</a>):</p>
+<ul>
+<li>InceptionV3</li>
+<li>例外</li>
+<li>ResNet50</li>
+<li>VGG16</li>
+<li>VGG19</li>
+</ul>
+<p>我们将使用 Google 的 InceptionV3 作为我们的基础模型。完整的代码可以从 GitHub 库的<kbd>Chapter08/Transfer_Learning_Sparkdl.ipynb</kbd>下获得:</p>
+<ol>
+<li>第一步，我们需要为 SparkDL 库指定环境。这是重要的一步；没有它，内核将不知道从哪里加载 SparkDL 包:</li>
+</ol>
+<pre style="padding-left: 60px">import os<br/>SUBMIT_ARGS = "--packages databricks:spark-deep-learning:1.3.0-spark2.4-s_2.11 pyspark-shell"<br/>os.environ["PYSPARK_SUBMIT_ARGS"] = SUBMIT_ARGS</pre>
+<p>即使在某些操作系统上使用<kbd>pip</kbd>安装 SparkDL，也需要指定操作系统环境或 SparkDL。</p>
+<ol start="2">
+<li>接下来，让我们初始化一个<kbd>SparkSession</kbd>，如下面的代码所示:</li>
+</ol>
+<pre style="padding-left: 60px">from pyspark.sql import SparkSession<br/>spark = SparkSession.builder \<br/>    .appName("ImageClassification") \<br/>    .config("spark.executor.memory", "70g") \<br/>    .config("spark.driver.memory", "50g") \<br/>    .config("spark.memory.offHeap.enabled",True) \<br/>    .config("spark.memory.offHeap.size","16g") \<br/>    .getOrCreate()</pre>
+<ol start="3">
+<li>我们导入必要的模块并读取数据图像。除了读取图像路径，我们还为 Spark 数据帧中的每个图像分配标签，如下所示:</li>
+</ol>
+<pre style="padding-left: 60px">import pyspark.sql.functions as f<br/>import sparkdl as dl<br/>from pyspark.ml.image import ImageSchema<br/>from sparkdl.image import imageIO<br/>dftulips = ImageSchema.readImages('data/flower_photos/tulips').\<br/>    withColumn('label', f.lit(0))<br/>dfdaisy = ImageSchema.readImages('data/flower_photos/daisy').\<br/>    withColumn('label', f.lit(1))</pre>
+<ol start="4">
+<li>接下来，您可以看到两个数据帧的顶五行。第一列包含每个图像的路径，该列显示其标签(是属于雏菊(标签 1)还是属于郁金香(标签 0)):</li>
+</ol>
+<p class="CDPAlignCenter CDPAlign"><img src="img/99b1dae8-6d59-4f48-92e9-e94b553da9a2.png" style="width:34.42em;height:32.92em;"/></p>
+<ol start="5">
+<li>我们使用<kbd>randomSplit</kbd>函数将两个图像数据集分成训练集和测试集(这总是一个好的做法)。传统上，人们选择 60%—40%、70%—30%或 80%—20%的测试列车分割。我们在这里选择了 70%—30%的比例。为了训练的目的，我们然后组合在<kbd>trainDF</kbd>数据帧中的两朵花的训练图像和在<kbd>testDF</kbd>数据帧中的测试数据集图像，如下:</li>
+</ol>
+<pre style="padding-left: 60px">trainDFdaisy, testDFdaisy = dfdaisy.randomSplit([0.70,0.30],\<br/>        seed = 123)<br/>trainDFtulips, testDFtulips = dftulips.randomSplit([0.70,0.30],\<br/>        seed = 122)<br/>trainDF = trainDFdaisy.unionAll(trainDFtulips)<br/>testDF = testDFdaisy.unionAll(testDFtulips)</pre>
+<ol start="6">
+<li>接下来，我们构建流水线，使用<kbd>InceptionV3</kbd>作为特征提取器，后跟逻辑回归分类器。我们使用<kbd>trainDF</kbd>数据框架来训练模型:</li>
+</ol>
+<pre style="padding-left: 60px">from pyspark.ml.classification import LogisticRegression<br/>from pyspark.ml import Pipeline<br/><br/>vectorizer = dl.DeepImageFeaturizer(inputCol="image",\<br/>        outputCol="features", modelName="InceptionV3")<br/>logreg = LogisticRegression(maxIter=20, labelCol="label")<br/>pipeline = Pipeline(stages=[vectorizer, logreg])<br/>pipeline_model = pipeline.fit(trainDF)</pre>
+<ol start="7">
+<li>现在让我们在测试数据集上评估我们的训练模型。我们可以看到，在测试数据集上，我们使用以下代码获得了 90.32%的准确率:</li>
+</ol>
+<pre style="padding-left: 60px">predictDF = pipeline_model.transform(testDF) #predict on test dataset<br/><br/>from pyspark.ml.evaluation import MulticlassClassificationEvaluator as MCE<br/>scoring = predictDF.select("prediction", "label")<br/>accuracy_score = MCE(metricName="accuracy")<br/>rate = accuracy_score.evaluate(scoring)*100<br/>print("accuracy: {}%" .format(round(rate,2)))</pre>
+<ol start="8">
+<li>这是两个类别的混淆矩阵:</li>
+</ol>
+<p class="CDPAlignCenter CDPAlign"><img src="img/884fed21-8f17-44bc-8c0d-a1c3b39a3bcd.png" style="width:39.50em;height:10.75em;"/></p>
+<p>在不到 20 行代码中，我们能够训练模型并获得 90.32%的正确率。记住，这里使用的数据集是原始的；通过增加数据集图像并过滤掉低质量的图像，可以提高模型的性能。你可以从 GitHub 官方资源库:<a href="https://github.com/databricks/spark-deep-learning">https://github.com/databricks/spark-deep-learning</a>了解更多深度学习库 SparkDL。</p>
+<p class="mce-root"/>
+
+
+            
+
+            
+        
+    
+
+
+
+    
+        <title>Introducing H2O.ai</title>
+        
+        <meta charset="utf-8"/>
+    
+<!-- kobo-style -->
+<style type="text/css" id="koboSpanStyle">.koboSpan { -webkit-text-combine: inherit; }</style>
+
+
+
+    
+        
+
+                            
+                    <h1 class="header-title">H2O.ai 简介</h1>
+                
+            
+            
+                
+<p>H2O 是一个快速、可扩展的 ML 和深度学习框架，由 H2O.ai 开发，在开源 Apache 许可下发布。根据该公司提供的详细信息，超过 9，000 个组织和 80，000 多名数据科学家使用 H2O 来满足他们的 ML/深度学习需求。它使用内存压缩，这使它能够处理内存中的大量数据，即使是一个小型的机器集群。它有一个用于 R、Python、Java、Scala 和 JavaScript 的接口，甚至还有一个内置的 web 接口。H2O 可以在独立模式下运行，也可以在 Hadoop 或 Spark 集群上运行。</p>
+<p>H2O 包括大量的 ML 算法，如广义线性建模、朴素贝叶斯、随机森林、梯度推进和深度学习算法。H2O 最好的部分是，你可以建立数以千计的模型，比较结果，甚至用几行代码进行超参数调整。H2O 也有更好的数据预处理工具。</p>
+<p>H2O 需要 Java，因此，请确保您的系统上安装了 Java。您可以使用<kbd>PyPi</kbd>在 Python 中安装 H2O，如以下代码所示:</p>
+<pre>pip install h2o</pre>
+
+
+            
+
+            
+        
+    
+
+
+
+    
+        <title>H2O AutoML</title>
+        
+        <meta charset="utf-8"/>
+    
+<!-- kobo-style -->
+<style type="text/css" id="koboSpanStyle">.koboSpan { -webkit-text-combine: inherit; }</style>
+
+
+
+    
+        
+
+                            
+                    <h1 class="header-title">H2O 汽车公司</h1>
+                
+            
+            
+                
+<p>H2O 最令人兴奋的特色之一是自动 ML。这是开发一个非专家也能使用的用户友好的 ML 界面的尝试。H2O 汽车公司自动化了大量候选模型的训练和调整过程。其界面的设计使得用户只需指定他们的数据集、输入和输出特征，以及他们想要的对训练的总模型数量的任何约束，或时间约束。剩下的工作由 AutoML 自己完成；在指定的时间限制内，它会找出表现最佳的型号，并提供排行榜。已经观察到，通常，堆叠集成模型，所有先前训练的模型的集成，占据排行榜的顶部位置。高级用户可以使用大量选项；这些选项及其各种功能的详细信息可在 http://docs.h2o.ai/h2o/latest-stable/h2o-docs/automl.html<a href="http://docs.h2o.ai/h2o/latest-stable/h2o-docs/automl.html">获得。</a></p>
+<p>想了解更多关于 H2O 的情况，你可以访问他们的网站:<a href="http://h2o.ai"> http://h2o.ai </a>。</p>
+<p class="mce-root"/>
+
+
+            
+
+            
+        
+    
+
+
+
+    
+        <title>Regression in H2O</title>
+        
+        <meta charset="utf-8"/>
+    
+<!-- kobo-style -->
+<style type="text/css" id="koboSpanStyle">.koboSpan { -webkit-text-combine: inherit; }</style>
+
+
+
+    
+        
+
+                            
+                    <h1 class="header-title">H2O 的倒退</h1>
+                
+            
+            
+                
+<p>我们将首先展示如何在 H2O 进行回归。我们将使用与前面使用 MLlib 相同的数据集，即波士顿房价，并预测房屋的成本。完整的代码可以在 GitHub 找到:<kbd>Chapter08/boston_price_h2o.ipynb</kbd>:</p>
+<ol>
+<li>该任务所需的模块如下:</li>
+</ol>
+<pre style="padding-left: 60px">import h2o<br/>import time<br/>import seaborn<br/>import itertools<br/>import numpy as np<br/>import pandas as pd<br/>import seaborn as sns<br/>import matplotlib.pyplot as plt<br/>from h2o.estimators.glm import H2OGeneralizedLinearEstimator as GLM<br/>from h2o.estimators.gbm import H2OGradientBoostingEstimator as GBM<br/>from h2o.estimators.random_forest import H2ORandomForestEstimator as RF<br/>%matplotlib inline</pre>
+<ol start="2">
+<li>导入必要的模块后，第一步是启动一个<kbd>h2o</kbd>服务器。我们使用<kbd>h2o.init()</kbd>命令来完成这项工作。它首先检查任何现有的<kbd>h20</kbd>实例，如果没有，它将启动一个。还可以通过将 IP 地址和端口号指定为<kbd>init()</kbd>函数的参数来连接到现有集群。在下面的截图中，您可以看到<kbd>init()</kbd>在独立系统上的结果:</li>
+</ol>
+<p class="CDPAlignCenter CDPAlign"><img src="img/53f4cd2a-ca1f-4c61-b9f7-3b6252b263fd.png" style="width:49.25em;height:35.17em;"/></p>
+<ol start="3">
+<li>接下来，我们使用<kbd>h20</kbd> <kbd>import_file</kbd>函数读取数据文件。它把它载入 H2O 数据帧，这个数据帧可以像熊猫的数据帧一样容易处理。使用<kbd>cor()</kbd>方法，我们可以很容易地找到<kbd>h20</kbd>数据帧中不同输入特征之间的相关性:</li>
+</ol>
+<pre style="padding-left: 60px">boston_df = h2o.import_file("../Chapter08/boston/train.csv", destination_frame="boston_df")<br/><br/>plt.figure(figsize=(20,20))<br/>corr = boston_df.cor()<br/>corr = corr.as_data_frame()<br/>corr.index = boston_df.columns<br/>#print(corr)<br/>sns.heatmap(corr, annot=True, cmap='YlGnBu',vmin=-1, vmax=1)<br/>plt.title("Correlation Heatmap")</pre>
+<p style="padding-left: 60px" class="mce-root">以下是波士顿房价数据集不同要素之间的关联图输出:</p>
+<p class="CDPAlignCenter CDPAlign"><img class="aligncenter size-full wp-image-1105 image-border" src="img/4034fa0e-2e34-41ca-abd7-67bd6550ba9a.png" style="width:39.67em;height:42.25em;"/></p>
+<ol start="4">
+<li class="CDPAlignLeft CDPAlign">现在，像往常一样，我们将数据集分为训练、验证和测试数据集。定义用作输入特征的特征(<kbd>x</kbd>):</li>
+</ol>
+<pre style="padding-left: 60px">train_df,valid_df,test_df = boston_df.split_frame(ratios=[0.6, 0.2],\<br/>         seed=133)<br/>features =  boston_df.columns[:-1]</pre>
+<p class="mce-root"/>
+<ol start="5">
+<li>这项工作一旦完成，流程就非常简单了。我们只是实例化了 H2O 库中可用的回归模型类，并使用带有训练和验证数据集的<kbd>train()</kbd>作为参数。在<kbd>train</kbd>函数中，我们还指定了什么是输入特征(<kbd>x</kbd>)和输出特征(<kbd>y</kbd>)。在本例中，我们将所有可用的特征作为输入特征，将房价<kbd>medv</kbd>作为输出特征。我们可以通过使用打印语句来查看训练模型的特征。接下来，您可以看到广义线性回归模型的模型声明，以及在训练和验证数据集上训练后的结果:</li>
+</ol>
+<pre style="padding-left: 60px">model_glm = GLM(model_id='boston_glm')<br/>model_glm.train(training_frame= train_df,\<br/>         validation_frame=valid_df, \<br/>         y = 'medv', x=features)<br/>print(model_glm)</pre>
+<p class="CDPAlignCenter CDPAlign"><img class="aligncenter size-full wp-image-1004 image-border" src="img/05ca2730-9046-4226-9f2a-0a3fde5fc9c4.png" style="width:40.42em;height:35.92em;"/></p>
+<ol start="6">
+<li>训练之后，下一步是检查测试数据集的性能，这可以使用<kbd>model_performance()</kbd>函数轻松完成。我们还可以将它传递给任何数据集:训练、验证、测试或一些新的类似数据集:</li>
+</ol>
+<pre style="padding-left: 60px">test_glm = model_glm.model_performance(test_df)<br/>print(test_glm)</pre>
+<p class="CDPAlignCenter CDPAlign"><img class="aligncenter size-full wp-image-1005 image-border" src="img/37608bc5-7c4d-45e8-891e-00fbcf07a17d.png" style="width:25.33em;height:17.17em;"/></p>
+<ol start="7">
+<li>如果我们要使用梯度增强估计回归，或随机森林回归，我们将实例化各自的类对象；以下步骤将保持不变。变化的是输出参数；对于梯度增强估计器和随机森林，我们还将了解不同输入要素的相对重要性:</li>
+</ol>
+<pre style="padding-left: 60px"><strong>#Gradient Boost Estimator</strong><br/>model_gbm = GBM(model_id='boston_gbm')<br/>model_gbm.train(training_frame= train_df, \<br/>        validation_frame=valid_df, \<br/>        y = 'medv', x=features)<br/><br/>test_gbm = model_gbm.model_performance(test_df)<br/><br/><strong>#Random Forest</strong><br/>model_rf = RF(model_id='boston_rf')<br/>model_rf.train(training_frame= train_df,\<br/>        validation_frame=valid_df, \<br/>        y = 'medv', x=features)<br/><br/>test_rf = model_rf.model_performance(test_df)</pre>
+<p class="mce-root"/>
+<ol start="8">
+<li>机器和深度学习最困难的部分是选择正确的超参数。在 H2O，这个任务在它的<kbd>H2OGridSearch</kbd>类的帮助下变得相当容易。以下代码片段对先前定义的梯度增强估计器的超参数深度执行网格搜索:</li>
+</ol>
+<pre style="padding-left: 60px">from h2o.grid.grid_search import H2OGridSearch as Grid<br/>hyper_params = {'max_depth':[2,4,6,8,10,12,14,16]}<br/>grid = Grid(model_gbm, hyper_params, grid_id='depth_grid')<br/>grid.train(training_frame= train_df,\<br/>        validation_frame=valid_df,\<br/>        y = 'medv', x=features)</pre>
+<ol start="9">
+<li>H2O 最好的部分是使用 AutoML 自动找到最好的模型。让它在 10 个模型中搜索我们，时间约束是 100 秒。AutoML 将使用这些参数构建 10 个不同的模型，不包括堆叠的整体。在训练最终堆叠集合模型之前，它将最多运行 100 秒:</li>
+</ol>
+<pre style="padding-left: 60px">from h2o.automl import H2OAutoML as AutoML<br/>aml = AutoML(max_models = 10, max_runtime_secs=100, seed=2)<br/>aml.train(training_frame= train_df, \<br/>        validation_frame=valid_df, \<br/>        y = 'medv', x=features)</pre>
+<ol start="10">
+<li>我们回归任务的排行榜如下:</li>
+</ol>
+<p class="CDPAlignCenter CDPAlign"><img class="aligncenter size-full wp-image-1106 image-border" src="img/63da4e07-dad8-4b77-b3a0-a6935ec13e70.png" style="width:40.00em;height:15.83em;"/></p>
+<p>排行榜中的不同型号可以使用各自的<kbd>model_id</kbd>进行访问。最佳模型通过 leader 参数访问。在我们的例子中，<kbd>aml.leader</kbd>代表最好的模型，所有模型的堆叠集合。我们可以使用<kbd>h2o.save_model</kbd>函数以二进制或 MOJO 格式保存最佳模型。</p>
+
+
+            
+
+            
+        
+    
+
+
+
+    
+        <title>Classification in H20</title>
+        
+        <meta charset="utf-8"/>
+    
+<!-- kobo-style -->
+<style type="text/css" id="koboSpanStyle">.koboSpan { -webkit-text-combine: inherit; }</style>
+
+
+
+    
+        
+
+                            
+                    <h1 class="header-title">H20 中的分类</h1>
+                
+            
+            
+                
+<p>相同的模型可以用于 H2O 的分类，只有一个变化；我们需要使用<kbd>asfactor()</kbd>函数将输出特征从数值改为分类值。我们将对红酒的质量进行分类，并使用我们的旧红酒数据库(<a href="09538353-bf5b-4035-8b98-cc131bcfcf24.xhtml"/> <a href="09538353-bf5b-4035-8b98-cc131bcfcf24.xhtml">第三章</a>，<em>物联网的机器学习</em>)。我们将需要导入相同的模块，并启动 H2O 服务器。完整代码可在<kbd>Chapter08/wine_classification_h2o.ipynb</kbd>文件中找到:</p>
+<ol>
+<li>下面是导入必要模块和启动 H2O 服务器的代码:</li>
+</ol>
+<pre style="padding-left: 60px">import h2o<br/>import time<br/>import seaborn<br/>import itertools<br/>import numpy as np<br/>import pandas as pd<br/>import seaborn as sns<br/>import matplotlib.pyplot as plt<br/>from h2o.estimators.glm import H2OGeneralizedLinearEstimator as GLM<br/>from h2o.estimators.gbm import H2OGradientBoostingEstimator as GBM<br/>from h2o.estimators.random_forest import H2ORandomForestEstimator as RF<br/><br/>%matplotlib inline<br/><br/>h2o.init()</pre>
+<ol start="2">
+<li>下一步是读取数据文件。我们首先修改输出特性以说明两个类别(好酒和坏酒),然后使用<kbd>asfactor()</kbd>函数将其转换为分类变量。这是 H2O 迈出的重要一步；因为我们对回归和分类使用相同的类对象，所以它们要求回归的输出标签为数字，分类的输出标签为分类，如代码块所示:</li>
+</ol>
+<pre style="padding-left: 60px">wine_df = h2o.import_file("../Chapter08/winequality-red.csv",\<br/>        destination_frame="wine_df")    <br/>features = wine_df.columns[:-1]<br/>print(features)<br/>wine_df['quality'] = (wine_df['quality'] &gt; 7).ifelse(1,0)<br/>wine_df['quality'] = wine_df['quality'].asfactor()</pre>
+<ol start="3">
+<li>接下来，将数据分成训练、验证和测试数据集。我们将训练和验证数据集馈送到广义线性估计器，其中有一个变化；我们指定了<kbd>family=binomial</kbd>参数，因为在这里，我们只有两个分类，好酒或坏酒。如果您有两个以上的类，请使用<kbd>family=multinomial</kbd>。记住，指定参数是可选的；H2O 自动检测输出特性:</li>
+</ol>
+<pre style="padding-left: 60px">train_df,valid_df,test_df = wine_df.split_frame(ratios=[0.6, 0.2],\<br/>        seed=133)    <br/><br/>model_glm = GLM(model_id='wine_glm', family = 'binomial')<br/>model_glm.train(training_frame= train_df, \<br/>        validation_frame=valid_df,\<br/>        y = 'quality', x=features)<br/>print(model_glm)</pre>
+<ol start="4">
+<li>经过训练后，您可以看到模型在所有性能指标上的表现:准确度、精确度、召回率、F1 值和 AUC，甚至是混淆指标。您可以为所有三个数据集(训练、验证和测试)获取它们。以下是从广义线性估计量中获得的测试数据集的指标:</li>
+</ol>
+<p class="CDPAlignCenter CDPAlign"><img src="img/485b7663-f7da-4308-aacc-2c9eef924c7f.png" style="width:44.50em;height:27.17em;"/></p>
+<p class="CDPAlignCenter CDPAlign"><img src="img/9c6bc796-6352-41ab-bf64-9259a084c731.png" style="width:44.50em;height:24.83em;"/></p>
+<ol start="5">
+<li>在不改变之前代码的情况下，我们可以执行超调并使用 H2O 的 AutoML 来获得更好的模型:</li>
+</ol>
+<pre style="padding-left: 60px">from h2o.automl import H2OAutoML as AutoML<br/>aml = AutoML(max_models = 10, max_runtime_secs=100, seed=2)<br/>aml.train(training_frame= train_df, \<br/>        validation_frame=valid_df, \<br/>        y = 'quality', x=features)</pre>
+<p class="CDPAlignCenter CDPAlign"><img src="img/62356947-6833-41e5-9c11-5a6a2947e263.png" style="width:43.83em;height:17.33em;"/></p>
+<p>我们看到，对于葡萄酒质量分类，最好的模型是 XGBoost。</p>
+<p class="mce-root"/>
+
+
+            
+
+            
+        
+    
+
+
+
+    
+        <title>Summary</title>
+        
+        <meta charset="utf-8"/>
+    
+<!-- kobo-style -->
+<style type="text/css" id="koboSpanStyle">.koboSpan { -webkit-text-combine: inherit; }</style>
+
+
+
+    
+        
+
+                            
+                    <h1 class="header-title">摘要</h1>
+                
+            
+            
+                
+<p>随着物联网的无处不在，产生的数据正以指数级的速度增长。这些数据大多是非结构化的，并且数量庞大，通常被称为大数据。已经提出了大量的框架和解决方案来处理大量的数据。一个有前途的解决方案是 DAI，它在机器集群中分发模型或数据。我们可以使用分布式 TensorFlow 或 TFoS 框架来执行分布式模型训练。近年来，已经提出了一些易于使用的开源解决方案。最受欢迎和最成功的两个解决方案是 Apache Spark 的 MLlib 和 H2O.ai 的 H2O。在这一章中，我们展示了如何在 MLlib 和 H2O 中为回归和分类训练 ML 模型。Apache Spark MLlib 支持 SparkDL，它为图像分类和检测任务提供了出色的支持。本章使用 SparkDL 通过预训练的 InceptionV3 对花卉图像进行分类。另一方面，H2O.ai 的 H2O 可以很好地处理数值和表格数据。它提供了一个有趣而有用的 AutoML 功能，即使是非专家也可以在大量的 ML/深度学习模型中进行调整和搜索，只需用户提供非常少的细节。本章介绍了一个如何使用 AutoML 进行回归和分类任务的例子。</p>
+<p>当在机器集群上工作时，可以充分利用这些分布式平台。随着计算和数据以可承受的速度转移到云，将 ML 的任务转移到云是有意义的。因此，接下来的一章，你将了解不同的云平台，以及如何使用它们来分析物联网设备生成的数据。</p>
+<p> </p>
+<p> </p>
+<p> </p>
+<p> </p>
+<p class="mce-root"> </p>
+
+
+            
+
+            
+        
+    
+
+</body></html>

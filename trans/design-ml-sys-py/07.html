@@ -1,0 +1,144 @@
+<html><head/><body>
+
+
+
+<title>Chapter 7. Features – How Algorithms See the World</title><meta name="generator" content="DocBook XSL Stylesheets V1.75.2"/><div><div><div><div><h1 class="title"><a id="ch07"/>第七章。特征——算法如何看待世界</h1></div></div></div><p>到目前为止，在本书中，我们提出了创建、提取或操作特征的许多方法和原因。在这一章中，我们将正面讨论这个话题。正确的特征，有时被称为<strong>属性</strong>，是机器学习模型的核心组件。功能错误的复杂模型毫无价值。功能是我们的应用程序看待世界的方式。对于除了最简单的任务之外的所有任务，我们将在将特征输入模型之前对其进行处理。我们可以用许多有趣的方式来做到这一点，这是一个如此重要的主题，以至于用整整一章来讨论它是合适的。</p><p>只是在最近十年左右，机器学习模型才例行公事地使用数万个或更多的特征。这使我们能够处理许多不同的问题，例如那些与样本数量相比我们的特征集很大的问题。两个典型的应用是<a id="id392" class="indexterm"/>基因分析和文本分类。对于遗传分析，我们的变量是一组<strong>基因表达系数</strong>。这些是基于样本中存在的 mRNA 数量的，例如，取自组织活检。可以执行分类任务来预测患者是否患有癌症。训练样本和测试样本的总数可以小于 100。另一方面，原始数据中变量的数量可以在 6000 到 60000 的范围内。这不仅会转化为大量的特性，还意味着特性之间的值的范围也相当大。在本章中，我们将讨论以下主题:</p><div><ul class="itemizedlist"><li class="listitem" style="list-style-type: disc">特征类型</li><li class="listitem" style="list-style-type: disc">运营和统计</li><li class="listitem" style="list-style-type: disc">结构化特征</li><li class="listitem" style="list-style-type: disc">转换功能</li><li class="listitem" style="list-style-type: disc">主成分分析</li></ul></div><div><div><div><div><h1 class="title"><a id="ch07lvl1sec42"/>特征类型</h1></div></div></div><p>有三种不同类型的特征:数量特征、顺序特征和分类特征。我们还可以考虑第四种类型的特征——布尔型——因为这种类型确实有一些独特的性质，尽管它实际上是一种分类特征。这些特征类型可以根据它们传达的信息量来排序。数量特征具有最高的信息容量，其次是序数、分类和布尔。</p><p>让我们来看看表格分析:</p><div><table border="1"><colgroup><col style="text-align: left"/><col style="text-align: left"/><col style="text-align: left"/><col style="text-align: left"/><col style="text-align: left"/><col style="text-align: left"/></colgroup><thead><tr><th style="text-align: left" valign="bottom">
+<p>特征类型</p>
+</th><th style="text-align: left" valign="bottom">
+<p>命令</p>
+</th><th style="text-align: left" valign="bottom">
+<p>规模</p>
+</th><th style="text-align: left" valign="bottom">
+<p>趋势</p>
+</th><th style="text-align: left" valign="bottom">
+<p>散布</p>
+</th><th style="text-align: left" valign="bottom">
+<p>形状</p>
+</th></tr></thead><tbody><tr><td style="text-align: left" valign="top">
+<p><strong>定量</strong></p>
+</td><td style="text-align: left" valign="top">
+<p>是</p>
+</td><td style="text-align: left" valign="top">
+<p>是</p>
+</td><td style="text-align: left" valign="top">
+<p>平均</p>
+</td><td style="text-align: left" valign="top">
+<p>范围、方差和标准差</p>
+</td><td style="text-align: left" valign="top">
+<p>偏斜度，峰度</p>
+</td></tr><tr><td style="text-align: left" valign="top">
+<p><strong>序数</strong></p>
+</td><td style="text-align: left" valign="top">
+<p>是</p>
+</td><td style="text-align: left" valign="top">
+<p>不</p>
+</td><td style="text-align: left" valign="top">
+<p>中位数</p>
+</td><td style="text-align: left" valign="top">
+<p>分位数</p>
+</td><td style="text-align: left" valign="top">
+<p>钠</p>
+</td></tr><tr><td style="text-align: left" valign="top">
+<p><strong>分类</strong></p>
+</td><td style="text-align: left" valign="top">
+<p>不</p>
+</td><td style="text-align: left" valign="top">
+<p>不</p>
+</td><td style="text-align: left" valign="top">
+<p>方式</p>
+</td><td style="text-align: left" valign="top">
+<p>钠</p>
+</td><td style="text-align: left" valign="top">
+<p>钠</p>
+</td></tr></tbody></table></div><p>上表显示了三种类型的要素、它们的统计数据和属性。每个要素都继承了表中下一行要素的统计数据。例如，对数量特征的集中趋势的测量包括中位数和众数。</p><div><div><div><div><h2 class="title"><a id="ch07lvl2sec32"/>数量特征</h2></div></div></div><p>数量特征的显著特征是它们是连续的，并且它们通常涉及到将它们映射成实数。通常，特征值可以映射到实数的子集，例如，用<a id="id396" class="indexterm"/>年表示年龄；但是，在计算统计数据时，必须注意使用满量程，例如平均值或标准差。因为定量特征具有有意义的数值范围，所以它们通常用于几何模型中。当在树模型中使用它们时，它们会导致二进制分割，例如，使用阈值，其中高于阈值的值会进入一个子节点，而等于或低于阈值的值会进入另一个子节点。树模型对尺度的单调变换不敏感，也就是说，变换不改变特征值的排序。例如，如果我们用厘米或英寸来测量长度，或者使用对数或线性标度，对树模型来说并不重要，我们只需将阈值改变到相同的标度。树模型忽略数量特征的尺度，将它们视为序数。对于基于规则的模型也是如此。对于概率模型，如朴素贝叶斯分类器，定量特征需要离散化到有限数量的箱中，并因此转换为分类特征。</p></div><div><div><div><div><h2 class="title"><a id="ch07lvl2sec33"/>序数特征</h2></div></div></div><p>序数特征是具有明显顺序但没有标度的特征。它们可以被编码为整数值；然而，这样做并不意味着任何规模。一个典型的例子是门牌号。在这里，我们可以通过门牌号辨别出街道上房子的位置。我们假设 1 号房屋将在 20 号房屋之前，10 号和 11 号房屋将会彼此靠近。然而，数字的大小并不意味着任何规模；例如，没有理由相信 20 号门牌会比 1 号门牌大。序数特征的域<a id="id398" class="indexterm"/>是一个完全有序的集合，例如一组字符或字符串。因为序数特征缺乏线性标度，所以对它们进行加减是没有意义的；因此，诸如对序号要素求平均值之类的操作通常没有意义，也不会产生关于要素的任何信息。类似于树模型中的数量特征，序数特征导致二进制分割。一般来说，序数特征不容易在大多数几何模型中使用。例如，线性模型假设欧几里得实例空间，其中特征值被视为笛卡尔坐标。对于基于距离的模型，如果我们将它们编码为整数，并且它们之间的距离就是它们的差，那么我们可以使用序数特征。这有时被称为<a id="id399" class="indexterm"/> <strong>海明距离</strong>。</p></div><div><div><div><div><h2 class="title"><a id="ch07lvl2sec34"/>分类特征</h2></div></div></div><p>分类特征，有时被称为<strong>名义特征</strong>，没有任何排序或标度，因此，除了指示一个值最频繁出现的模式之外，它们<a id="id400" class="indexterm"/>不允许任何统计汇总<a id="id401" class="indexterm"/>。分类特征<a id="id402" class="indexterm"/>通常最好由概率模型处理；但是，也可以在基于距离的模型中使用汉明距离，将距离设置为 0 表示值相等，设置为 1 表示值不相等。分类特征<a id="id403" class="indexterm"/>的一个子类型是<strong>布尔特征，</strong>映射为布尔值真或假。</p></div></div></div>
+
+
+
+
+
+<title>Operations and statistics</title><meta name="generator" content="DocBook XSL Stylesheets V1.75.2"/><div><div><div><div><h1 class="title"><a id="ch07lvl1sec43"/>操作和统计</h1></div></div></div><p>特征可由可对其执行的允许操作来定义。考虑两个特征:一个人的年龄和他们的电话号码。尽管这两个特征都可以用整数来描述，但它们实际上代表了两种截然不同的信息类型。当我们看到我们可以对它们有效地执行哪些操作时，这就很清楚了。比如计算一群人的平均年龄，会给我们一个有意义的结果；计算平均电话号码不会。</p><p>我们可以将可以对某个特征执行的可能计算的范围称为其统计数据。这些统计描述了数据的三个不同方面。这就是——它的<strong>中心倾向</strong>，它的<a id="id406" class="indexterm"/> <strong>分散</strong>，它的<a id="id407" class="indexterm"/> <strong>形状</strong>。</p><p>为了计算数据的<a id="id408" class="indexterm"/>中心趋势，我们通常使用以下一种或多种统计方法:均值(或平均值)、中位数(或有序列表中的中间值)和<a id="id409" class="indexterm"/>模式(或所有值的多数)。模式是唯一可以应用于所有数据类型的统计信息。为了计算中值，我们需要可以以某种方式排序的特征值，即序数或数量。为了计算平均值，数值必须用某种标度来表示，例如线性标度。换句话说，它们必须是定量特征。</p><p>最常见的计算离差的方法是通过方差或标准差的统计。这两者实际上是相同的测量值，但比例不同，标准差非常有用，因为它与要素本身的比例相同。此外，请记住，平均值和中位数之间的绝对差异永远不会大于标准差。测量离差的一个更简单的统计量是范围，即最小值和最大值之间的差值。当然，从这里，我们可以通过计算中点来估计特征的集中趋势。测量离差的另一种方法是使用单位(如百分位数或十分位数)来测量低于特定值的实例的比率。例如，<em> p <sup> th </sup> </em>百分位数是实例的<em> p </em>百分比低于的值。</p><p>测量形状统计稍微复杂一点，可以使用样本的<a id="id411" class="indexterm"/> <strong>中心矩</strong>的概念来理解。其定义如下:</p><div><img src="img/B05198_07_13.jpg" alt="Operations and statistics"/></div><p>这里，<em> n </em>为样本数，<em> μ </em>为样本均值，<em> k </em>为整数。当<em> k = 1 </em>时，第一个中心矩为<em> 0 </em>，因为这只是平均值的平均偏差，平均值始终为<em> 0 </em>。第二个中心矩是均值的平均方差，也就是方差。我们<a id="id412" class="indexterm"/>可以定义<strong>偏斜度</strong>如下:</p><div><img src="img/B05198_07_14.jpg" alt="Operations and statistics"/></div><p>这里的<em> ơ </em>是标准差。如果该公式给出一个正值，那么有更多实例的<a id="id413" class="indexterm"/>值高于平均值而不是低于平均值。数据在绘制时向右倾斜。当偏斜为负时，反之亦然。</p><p>我们可以将<strong>峰度</strong>定义为<a id="id414" class="indexterm"/>第四中心矩的类似关系:</p><div><img src="img/B05198_07_15.jpg" alt="Operations and statistics"/></div><p>可以看出，正态分布的峰度为 3。在这个值以上，分布将更加<em>见顶</em>。峰度值低于 3 时，分布将<em>变平</em>。</p><p>我们之前讨论了三种类型的数据，即分类数据、顺序数据和数量数据。</p><p>机器学习模型将以截然不同的方式对待不同的数据类型。例如，在分类特征上的决策树分裂将产生与值一样多的子代。对于序数和<a id="id415" class="indexterm"/>数量特征，分割将是二进制的，每个父代产生两个基于阈值的子代。因此，树模型将数量特征视为序数，忽略特征尺度。当我们将<a id="id416" class="indexterm"/>这样的概率模型视为<strong>贝叶斯分类器</strong>时，我们可以看到，它实际上将序数特征视为分类特征，并且它处理数量特征的唯一方式是将它们转换为有限数量的离散值，从而将它们转换为分类数据。</p><p>一般来说，几何模型需要量化的特征。例如，线性模型在欧几里得实例空间中操作，特征充当笛卡尔坐标。每个特征值都被视为与其他特征值的标量关系。基于距离的模型(如 k-最近邻)可以通过将距离设置为 0(对于相等的值)和 1(对于不相等的值)来合并分类特征。类似地，我们可以通过计算两个值之间的值的数量<a id="id417" class="indexterm"/>来将序数特征合并到基于距离的模型中。如果我们将特征值编码为整数，那么<a id="id418" class="indexterm"/>距离就是数字差。通过选择适当的距离度量，可以将有序和分类特征合并到基于距离的模型中。</p></div>
+
+
+
+
+
+<title>Structured features</title><meta name="generator" content="DocBook XSL Stylesheets V1.75.2"/><div><div><div><div><h1 class="title"><a id="ch07lvl1sec44"/>结构化特征</h1></div></div></div><p>我们假设每个<a id="id419" class="indexterm"/>实例可以表示为一个特征值向量，并且所有相关方面都由这个向量表示。这有时被称为<a id="id420" class="indexterm"/> <strong>抽象</strong>，因为我们过滤掉了不必要的信息，用向量来表示现实世界的现象。例如，将列夫·托尔斯泰的全部作品表示为词频向量是一种抽象。我们并不认为这种抽象将服务于一个非常特殊的有限的应用。我们可以学到一些关于托尔斯泰使用语言的知识，也许可以引出一些关于托尔斯泰作品的情感和主题的信息。然而，我们不太可能对这些作品中描绘的 19 世纪俄罗斯的广阔背景有任何深刻的了解。一个人类读者，或者一个更复杂的算法，将不会从每个单词的计数中获得这些洞察力，而是通过这些单词的结构。</p><p>我们可以用类似于数据库编程语言(如 SQL)中的查询的方式来考虑结构化特性。SQL 查询可以表示变量的集合，以完成诸如查找特定短语或查找包含特定字符的所有段落之类的任务。我们在机器学习环境中所做的是用这些集合属性创建另一个特征。</p><p>结构化特征可以在构建模型之前创建，也可以作为模型本身的一部分创建。在第一种情况下，这个过程可以理解为从一阶逻辑到命题逻辑的转换。这种方法的一个问题是，由于与现有功能的组合，它可能会导致潜在功能的数量激增。另一个要点是，在 SQL 中，一个子句可以覆盖另一个子句的子集，同样地，结构特性也可以是逻辑相关的。这是在<a id="id421" class="indexterm"/>机器学习的分支中开发的，它特别适合自然语言处理，被称为<strong>归纳逻辑编程</strong>。</p></div>
+
+
+
+
+
+<title>Transforming features</title><meta name="generator" content="DocBook XSL Stylesheets V1.75.2"/><div><div><div><div><h1 class="title"><a id="ch07lvl1sec45"/>转换功能</h1></div></div></div><p>当我们转换特征时，我们的目标显然是让它们对我们的模型更有用。这可以通过添加、删除或更改特征所代表的信息来实现。一个<a id="id422" class="indexterm"/>常见特征<a id="id423" class="indexterm"/>转换是改变特征类型。典型的例子是<strong>二值化</strong>，即将一个分类特征转化为一组二值特征。另一个例子是将序数特征改变成分类特征。在这两种情况下，我们都会丢失信息。在第一种情况下，单个分类特征的值是互斥的，并且这不是由二进制表示传达的。在第二种情况下，我们丢失了订购信息。这些类型的转换可以被认为是归纳性的，因为它们由定义明确的逻辑过程组成，除了首先决定执行这些转换之外，不涉及客观的选择。</p><p>使用<code class="literal">sklearn.preprocessing.Binarizer</code>模块可以轻松实现二值化。让我们来看看以下命令:</p><div><pre class="programlisting">
+<strong>from sklearn.preprocessing import Binarizer</strong>
+<strong>from random import randint</strong>
+<strong>bin=Binarizer(5)</strong>
+<strong>X=[randint(0,10) for b in range(1,10)]</strong>
+<strong>print(X)</strong>
+<strong>print(bin.transform(X))</strong>
+</pre></div><p>以下是上述命令的输出:</p><div><img src="img/B05198_07_3.jpg" alt="Transforming features"/></div><p>分类特征通常需要编码成整数。考虑一个非常简单的数据集<a id="id424" class="indexterm"/>，它只有一个分类特征，即城市，有三个可能的值，悉尼、珀斯和墨尔本，我们决定将这三个值分别编码为 0、1 和 2。如果这个信息在线性分类器中使用，那么我们将约束写成带有权重参数的线性不等式。然而，问题是这个权重不能编码为三路选择。假设我们有两个类，东海岸和西海岸，我们需要我们的模型来提供一个决策函数，该函数将反映珀斯在西海岸，而悉尼和墨尔本都在东海岸的事实。对于简单的线性模型，当要素以这种方式编码时，决策函数无法得出将悉尼和墨尔本归入同一类的规则。解决方案是将特征空间扩大为三个特征，每个特征都有自己的权重。这个<a id="id425" class="indexterm"/>叫做<strong>一个热编码</strong>。Sciki-learn 实现了<code class="literal">OneHotEncoder()</code>函数来执行这个任务。这是一个估计器，它将每个具有<em> m </em>个可能值的分类特征转换为<em> m </em>个二进制特征。假设我们正在使用一个模型，其中的数据包含前面示例中描述的城市特征和另外两个特征，即性别(可以是男性或女性)和职业(可以有三个值，即医生、律师或银行家)。因此，例如，<em>一位来自悉尼的女银行家</em>将被表示为<em>【1，2，0】</em>。为以下示例添加了另外三个示例:</p><div><pre class="programlisting">
+<strong>from sklearn.preprocessing import OneHotEncoder</strong>
+<strong>enc = OneHotEncoder()</strong>
+<strong>enc.fit([[1,2,0], [1, 1, 0], [0, 2, 1], [1, 0, 2]])</strong>
+<strong>print(enc.transform([1,2,0]).toarray())</strong>
+</pre></div><p>我们将获得以下输出:</p><div><img src="img/B05198_07_04.jpg" alt="Transforming features"/></div><p>由于我们在这个数据集中有两种性别、三个城市和三份工作，所以<a id="id426" class="indexterm"/>转换数组中的前两个数字代表性别，接下来的三个数字代表城市，最后的三个数字代表职业。</p><div><div><div><div><h2 class="title"><a id="ch07lvl2sec35"/>离散化</h2></div></div></div><p>我已经简要地<a id="id427" class="indexterm"/>提到了与决策树相关的阈值化的想法，其中我们通过找到合适的特征值进行分割，将序数或数量特征转换为二进制特征。有许多监督和非监督的方法可用于在连续数据中找到适当的分割，例如，使用集中趋势(监督)的统计，如平均值或中值，或基于信息增益等标准优化目标函数。</p><p>我们可以更进一步，创建<a id="id428" class="indexterm"/>多个阈值，将一个定量特征转化为<a id="id429" class="indexterm"/>一个有序特征。这里，我们将一个连续的数量特征分成许多离散的序数值。这些值中的每一个都被称为<strong>箱</strong>，并且每个箱代表原始定量特征上的一个区间。许多机器学习模型需要离散值。使用离散值创建基于规则的模型变得更加容易和易于理解。离散化也使得特征更紧凑，并且可以使我们的算法更有效。</p><p>最常见的方法之一是选择库，使得每个库具有大约相同数量的<a id="id430" class="indexterm"/>实例。这被称为<strong>等频率离散化</strong>，如果我们仅将它应用于两个仓，那么这与使用中值作为阈值是一样的。这种方法非常有用，因为可以用表示分位数的方式来设置容器边界。例如，如果我们有 100 个箱，那么每个箱代表一个百分点。</p><p>或者，我们可以选择边界，使每个箱具有相同的间隔宽度。这被称为<strong>等宽离散化</strong>。计算该容器宽度间隔值的一种方法是简单的<a id="id431" class="indexterm"/>将特征范围除以容器的数量。有时，特征没有上限或下限，我们无法计算它的范围。在这种情况下，可以使用高于和低于平均值的标准偏差的整数。宽度和频率离散化都是无监督的。它们不需要任何类别标签的知识就可以工作。</p><p>现在让我们把注意力转向监督离散化。基本上有两种方法:自上而下的<a id="id432" class="indexterm"/>或<strong>分裂的</strong>，以及<strong>聚集的</strong>或自下而上的方法。顾名思义，divider<a id="id433" class="indexterm"/>的工作原理是首先假设所有样本都属于同一个箱，然后逐步分割箱。凝聚的<a id="id434" class="indexterm"/>方法从每个实例的一个 bin 开始，并逐步合并这些 bin。这两种方法都需要一些停止标准来决定是否需要进一步拆分。</p><p>通过阈值处理递归分割特征值的过程是除法离散化的一个例子。要做到这一点，我们需要一个评分函数，为特定的特征值找到最佳阈值。一种常见的方法是计算分裂的信息增益<a id="id435" class="indexterm"/>或其熵。通过确定特定分割覆盖了多少正样本和负样本，我们可以基于该标准逐步分割特征。</p><p>简单的离散化操作可以通过 Pandas <strong> cut </strong>和<strong> qcut </strong>方法进行。考虑下面的例子:</p><div><pre class="programlisting">
+<strong>import pandas as pd</strong>
+<strong>import numpy as np</strong>
+<strong>print(pd.cut(np.array([1,2,3,4]), 3, retbins = True, right = False))</strong>
+</pre></div><p>下面是观察到的输出:</p><div><img src="img/B05198_07_11.jpg" alt="Discretization"/></div></div><div><div><div><div><h2 class="title"><a id="ch07lvl2sec36"/>正常化</h2></div></div></div><p>阈值化和离散化都去除了定量特征的比例，并且根据应用，这可能不是我们想要的。或者，我们可能想给序数或分类特征增加一个尺度的度量<a id="id436" class="indexterm"/>。在无监督的设置中，我们称之为<strong>规范化</strong>。这通常用于处理在不同尺度上测量的定量特征<a id="id437" class="indexterm"/>。近似正态分布的特征值可以转换为<em> z </em>分数。这只是高于或低于平均值的标准偏差的有符号数。正的<em> z </em>分数表示高于平均值的标准偏差数，负的<em> z </em>分数表示低于平均值的标准偏差数。对于某些特征，使用方差可能比标准差更方便。</p><p>更严格的标准化形式表示 0 到 1 范围内的特征。如果我们知道一个特征范围，我们可以简单地使用线性缩放，即，用最低值和最高值之间的差除以原始特征值和最低值之间的差。这表现在以下方面:</p><div><img src="img/B05198_07_16.jpg" alt="Normalization"/></div><p>这里，<em>f<sub>n</sub>T36】为归一化特征，<em> f </em>为原始特征，<em> l </em>和<em> h </em>分别为最低值和最高值。很多情况下，我们可能要猜测范围。如果我们对某个<a id="id438" class="indexterm"/>特定分布有所了解，例如，在正态分布中，超过 99%的值可能落在平均值的+3 或-3 标准偏差范围内，那么我们可以编写一个线性标度，如下所示:</em></p><div><img src="img/B05198_07_17.jpg" alt="Normalization"/></div><p>这里，<em> μ </em>是平均值，<em> ơ </em>是标准差。</p></div><div><div><div><div><h2 class="title"><a id="ch07lvl2sec37"/>校准</h2></div></div></div><p>有时，我们需要向有序或分类特征添加标度<a id="id439" class="indexterm"/>信息。这叫做特性<a id="id440" class="indexterm"/>校准 T3。这是一种有监督的特征变换，具有许多重要的应用。例如，它允许需要缩放特征的模型(如线性分类器)处理分类和顺序数据。它还为模型提供了将特征视为有序、分类或定量的灵活性。对于二元分类，我们可以使用给定特征值的正类的后验概率来计算尺度。对于许多概率模型，如朴素贝叶斯，这种校准方法具有额外的优势，因为一旦校准了特征，模型就不需要任何额外的训练。对于分类特征，我们可以通过简单地从训练集中收集相对频率来确定这些概率。</p><p>有些情况下<a id="id441" class="indexterm"/>我们可能需要将数量或顺序特征转变为分类特征，同时保持一个顺序。我们这样做的主要方式之一是通过<strong>逻辑校准</strong>的过程<a id="id442" class="indexterm"/>。如果我们假设特征正态分布，具有相同的方差，那么我们可以表示一个似然比，即给定一个特征值<em> v </em>的正类和负类的比率，如下所示:</p><div><img src="img/B05198_07_18.jpg" alt="Calibration"/></div><p>其中 d prime 是两个类别的平均值之差除以标准偏差:</p><div><img src="img/B05198_07_19.jpg" alt="Calibration"/></div><p>另外，<em> z </em>是<em> z </em>的分数:</p><div><img src="img/B05198_07_20.jpg" alt="Calibration"/></div><p>为了中和不均匀类别分布的<a id="id443" class="indexterm"/>效应，我们可以使用以下公式计算校准特征:</p><div><img src="img/B05198_07_21.jpg" alt="Calibration"/></div><p>你可能会注意到，这正是我们用于逻辑回归的 sigmoid 激活函数。总结逻辑校准，我们主要使用三个步骤:</p><div><ol class="orderedlist arabic"><li class="listitem">估计正类和负类的类均值。</li><li class="listitem">将特征转换成<em> z </em>分数。</li><li class="listitem">应用 sigmoid 函数给出校准概率。</li></ol></div><p>有时，我们可能会跳过最后一步，特别是当我们使用基于距离的模型时，我们希望比例是可加的，以便计算欧几里德距离。您可能会注意到，我们最终校准的功能在规模上是倍增的。</p><p>另一种校准<a id="id444" class="indexterm"/>技术<strong>等渗校准</strong>用于定量和顺序<a id="id445" class="indexterm"/>特征。这使用了所谓的<strong> ROC </strong>曲线(代表<strong>接收器操作员特性</strong>)，类似于<a class="link" href="ch04.html" title="Chapter 4. Models – Learning from Information">第 4 章</a>、<em>模型-从信息中学习</em>中讨论逻辑模型时使用的覆盖图。不同的是，对于 ROC 曲线，我们将轴归一化为<em>【0，1】</em>。</p><p>我们可以使用<code class="literal">sklearn</code>包来创建 ROC 曲线:</p><div><pre class="programlisting">
+<strong>import matplotlib.pyplot as plt</strong>
+<strong>from sklearn import svm, datasets</strong>
+<strong>from sklearn.metrics import roc_curve, auc</strong>
+<strong>from sklearn.cross_validation import train_test_split</strong>
+<strong>from sklearn.preprocessing import label_binarize</strong>
+<strong>from sklearn.multiclass import OneVsRestClassifier</strong>
+
+<strong>X, y = datasets.make_classification(n_samples=100,n_classes=3,n_features=5, n_informative=3, n_redundant=0,random_state=42)</strong>
+<strong># Binarize the output</strong>
+<strong>y = label_binarize(y, classes=[0, 1, 2])</strong>
+<strong>n_classes = y.shape[1]</strong>
+<strong>X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=.5)</strong>
+<strong>classifier = OneVsRestClassifier(svm.SVC(kernel='linear', probability=True, ))</strong>
+<strong>y_score = classifier.fit(X_train, y_train).decision_function(X_test)</strong>
+<strong>fpr, tpr, _ = roc_curve(y_test[:,0], y_score[:,0]) </strong>
+<strong>roc_auc = auc(fpr, tpr)</strong>
+<strong>plt.figure()</strong>
+<strong>plt.plot(fpr, tpr, label='ROC AUC %0.2f' % roc_auc)</strong>
+<strong>plt.plot([0, 1], [0, 1], 'k--')</strong>
+<strong>plt.xlim([0.0, 1.0])</strong>
+<strong>plt.ylim([0.0, 1.05])</strong>
+<strong>plt.xlabel('False Positive Rate')</strong>
+<strong>plt.ylabel('True Positive Rate')</strong>
+<strong>plt.title('Receiver operating characteristic')</strong>
+<strong>plt.legend(loc="best")</strong>
+<strong>plt.show()</strong>
+</pre></div><p>下面是观察到的输出:</p><div><img src="img/B05198_07_6.jpg" alt="Calibration"/></div><p>ROC 曲线绘制了不同阈值的<a id="id446" class="indexterm"/>真阳性率和假阳性率。在上图中，这由虚线表示。一旦我们构建了 ROC 曲线，我们就计算凸壳的每一段中的阳性的数量，<em>m<sub>I</sub>T36】，以及实例的总数，<em>n<sub>I</sub>T40】。然后，使用以下公式计算校准后的特征值:</em></em></p><div><img src="img/B05198_07_22.jpg" alt="Calibration"/></div><p>在这个公式中，<em> c </em>是先验赔率，即正类概率与负类概率之比。</p><p>到目前为止，在我们关于特性转换的讨论中，我们假设我们知道每个特性的所有值。在现实世界中，情况往往并非如此。如果我们使用概率模型，我们可以通过对所有特征值进行加权平均来估计缺失特征的值。一个重要的考虑是缺失特征值的存在可能与目标变量相关。例如，个人病史中的数据反映了所进行的测试类型，而这又与对某些疾病风险因素的评估相关。</p><p>如果我们使用一个树模型，我们可以随机选择一个缺失的值，允许模型在其上分裂。然而，这不适用于线性模型。在这种情况下，我们需要通过<strong>插补</strong>的过程<a id="id447" class="indexterm"/>来填充缺失值。对于分类，我们可以简单地使用观察到的特征的平均值、中值和众数来估算缺失的<a id="id448" class="indexterm"/>值。如果我们想考虑特征相关性，我们可以为每个不完整的特征构建一个预测模型来预测缺失值。</p><p>因为 scikit-learn 估算器总是假设数组中的所有值都是数字，所以丢失的值(编码为空格、n an 或其他占位符)将会产生错误。此外，由于我们可能不想丢弃整个行或列，因为它们可能包含有价值的信息，我们需要使用插补策略来完成数据集。在下面的代码片段中，我们将使用<code class="literal">Imputer</code>类:</p><div><pre class="programlisting">
+<strong>from sklearn.preprocessing import Binarizer, Imputer, OneHotEncoder</strong>
+<strong>imp = Imputer(missing_values='NaN', strategy='mean', axis=0)</strong>
+<strong>print(imp.fit_transform([[1, 3], [4, np.nan], [5, 6]]))</strong>
+</pre></div><p>以下是输出:</p><div><img src="img/B05198_07_12.jpg" alt="Calibration"/></div><p>许多机器学习算法要求<a id="id449" class="indexterm"/>特征<strong>标准化</strong>。这意味着，当单个要素看起来或多或少像具有接近零的平均值和单位方差的正态分布数据时，它们将发挥最佳作用。最简单的方法是从每个特征中减去平均值，然后除以标准偏差进行缩放。这可以通过<code class="literal">sklearn.preprocessing()</code>功能中的<code class="literal">scale()</code>功能或<code class="literal">standardScaler()</code>功能来实现。尽管这些函数可以接受稀疏数据，但在这种情况下可能不应该使用它们，因为将稀疏数据居中可能会破坏其结构。在这些情况下，建议使用<code class="literal">MacAbsScaler()</code>或<code class="literal">maxabs_scale()</code>功能。前者根据每个特征的最大绝对值分别对其进行缩放和平移。后者将每个特征分别缩放到范围<em> [-1，1】</em>。另一个具体的例子是当数据中有异常值时。在这些<a id="id450" class="indexterm"/>情况下，建议使用<code class="literal">robust_scale()</code>或<code class="literal">RobustScaler()</code>功能。</p><p>通常，我们可能希望通过添加多项式项来增加模型的复杂性。这可以使用<code class="literal">PolynomialFeatures()</code>功能来完成:</p><div><pre class="programlisting">
+<strong>from sklearn.preprocessing import PolynomialFeatures</strong>
+<strong>X=np.arange(9).reshape(3,3)</strong>
+<strong>poly=PolynomialFeatures(degree=2)</strong>
+<strong>print(X)</strong>
+<strong>print(poly.fit_transform(X))</strong>
+</pre></div><p>我们将观察到以下输出:</p><div><img src="img/B05198_07_07.jpg" alt="Calibration"/></div></div></div>
+
+
+
+
+
+<title>Principle component analysis</title><meta name="generator" content="DocBook XSL Stylesheets V1.75.2"/><div><div><div><div><h1 class="title"><a id="ch07lvl1sec46"/>主成分分析</h1></div></div></div><p><strong>主成分分析</strong> ( <strong> PCA </strong>)是我们<a id="id451" class="indexterm"/>可以应用于特征的最常见的降维形式。考虑由两个要素组成的数据集的示例，我们希望将二维数据转换为一维数据。一种自然的方法是绘制一条最接近的直线，并将每个数据点投影到这条直线上，如下图所示:</p><div><img src="img/B05198_07_2.jpg" alt="Principle component analysis"/></div><p>PCA 试图通过最小化数据点和我们试图将数据投影到的线之间的距离来找到一个投影数据的表面。对于更一般的情况，我们有 n 个维度，我们想把这个空间减少到 k 个维度，我们找到 k 个向量。...，u(k) 将数据投影到其上，以便最小化投影误差。也就是说，我们试图找到一个 k 维表面来投影数据。</p><p>这表面上看起来像线性回归，但它在几个重要方面是不同的。利用线性回归，我们试图在给定一个输入变量的情况下预测某个输出变量的值。在 PCA 中，我们并不试图预测一个输出变量，而是试图找到一个子空间来投影我们的输入数据。如上图所示，误差距离不是点和线之间的垂直距离，这与线性回归的情况不同，而是点和线之间最近的正交距离。因此，误差线与轴成一定角度，并与我们的投影线成直角。</p><p>重要的一点是，在大多数情况下，PCA 要求对特征进行缩放和均值归一化，也就是说，特征的均值为零，并且具有可比较的值范围。我们可以使用以下公式计算平均值:</p><div><img src="img/B05198_07_23.jpg" alt="Principle component analysis"/></div><p>通过替换以下内容来计算总和:</p><div><img src="img/B05198_07_24.jpg" alt="Principle component analysis"/></div><p>如果特征具有明显不同的<a id="id453" class="indexterm"/>比例，我们可以使用以下方法重新调整比例:</p><div><img src="img/B05198_07_25.jpg" alt="Principle component analysis"/></div><p>这些功能在<code class="literal">sklearn.preprocessing</code>模块中可用。</p><p>计算低维向量和这些向量上我们投影原始数据的点的数学过程包括首先计算协方差矩阵，然后计算该矩阵的特征向量。从第一原理计算这些值是一个相当复杂的过程。幸运的是,<code class="literal">sklearn</code>包有一个库来做这件事:</p><div><pre class="programlisting">
+<strong>from sklearn.decomposition import PCA</strong>
+<strong>import numpy as np</strong>
+<strong>X = np.array([[-1, -1], [-2, -1], [-3, -2], [1, 1], [2, 1], [3, 2]])</strong>
+<strong>pca = PCA(n_components=1)</strong>
+<strong>pca.fit(X)</strong>
+<strong>print(pca.transform(X))</strong>
+</pre></div><p>我们将获得以下输出:</p><div><img src="img/B05198_07_08.jpg" alt="Principle component analysis"/></div></div>
+
+
+
+
+
+<title>Summary</title><meta name="generator" content="DocBook XSL Stylesheets V1.75.2"/><div><div><div><div><h1 class="title"><a id="ch07lvl1sec47"/>总结</h1></div></div></div><p>我们可以通过多种方式来转换和构建新的要素，以使我们的模型更有效地工作并给出更准确的结果。一般来说，没有硬性的规则来决定对特定模型使用哪种方法。这在很大程度上取决于您正在使用的要素类型(数量型、序数型或分类型)。第一个好的方法是标准化和缩放特征，如果模型需要，将特征转换为适当的类型，就像我们通过离散化所做的那样。如果模型表现不佳，可能需要应用进一步的预处理，如 PCA。在下一章中，我们将探讨如何通过使用集成来组合不同类型的模型，以提高性能并提供更强的预测能力。</p></div>
+</body></html>

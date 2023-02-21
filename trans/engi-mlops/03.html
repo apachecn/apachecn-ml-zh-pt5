@@ -1,0 +1,236 @@
+<html><head/><body>
+
+
+	
+		<title>B16572_02_Final_JM_ePub</title>
+		
+	
+	
+		<div><h1 id="_idParaDest-27">第 2 章:描述你的机器学习问题</h1>
+			<p>在这一章中，您将基本了解可用于生产的各种类型的<strong class="bold">机器学习</strong> ( <strong class="bold"> ML </strong>)解决方案，并将学习根据您组织的业务和技术需求对相关操作进行分类。您将学习如何策划实施 ML 解决方案的实施路线图，然后为任何给定的问题采购必要的工具和基础设施。在本章结束时，你将对如何构建健壮和可扩展的 ML 解决方案以及如何获得实施这些解决方案所需的数据和工具有一个坚实的理解。</p>
+			<p><strong class="bold">ML Operations</strong>(<strong class="bold">ML ops</strong>)旨在利用最先进的工程原理在学术界和工业界之间架起一座桥梁，我们将探索来自工业界和学术界的不同元素，以获得对可能性的整体理解和认识。在开始设计您的 MLOps 解决方案之前，了解各种可能性、设置、问题、解决方案和方法对于解决面向业务的问题非常重要。为了理解这一点，我们将在本章中讨论以下主要话题:<a id="_idTextAnchor029"/></p>
+			<ul>
+				<li>ML 解决方案开发流程</li>
+				<li>ML 模型的类型</li>
+				<li>描述您的 MLOps</li>
+				<li>您的解决方案的实施路线图</li>
+				<li>采购必要的数据、工具和基础设施</li>
+				<li>现实生活中商业问题的介绍</li>
+			</ul>
+			<p>事不宜迟，让我们通过深入研究 ML 解决方案开发过程和检查不同类型的 ML 模型来解决业务问题，从而开始探索 ML 能够实现的可能性。</p>
+			<h1 id="_idParaDest-28"><a id="_idTextAnchor030"/>ML 解决方案开发流程</h1>
+			<p>ML 提供了许多扩展和自动化业务的可能性。为了从 ML 中获得最佳效果，参与 ML 驱动的业务转换的团队和人员需要了解 ML 和业务本身。有效的业务转换始于对业务的粗略了解，包括价值链分析、用例识别、数据映射和业务模拟等方面，以验证业务转换。<em class="italic">图 2.1 </em>展示了开发 ML 解决方案以增强或自动化业务运营的流程:</p>
+			<div><div><img src="img/B16572_02_01.jpg" alt="Figure 2.1 – ML solution development process&#13;&#10;"/>
+				</div>
+			</div>
+			<p class="figure-caption">图 2.1–ML 解决方案开发流程</p>
+			<p>商业理解是开发 ML 解决方案的起源。在对业务有了适当的理解之后，我们继续进行数据分析，在数据分析中，正确的数据被获取、版本化和存储。使用数据管道为 ML 建模消耗数据，其中进行特征工程以获得正确的特征来训练模型。我们评估<a id="_idIndexMarker070"/>经过训练的模型，并将其打包以供部署。部署和监控通过利用<strong class="bold">持续集成/持续部署</strong> ( <strong class="bold"> CI/CD </strong>)特性的管道来完成，这些特性支持实时和持续部署，以便为用户提供训练有素的 ML 模型。这一流程确保了强大且可扩展的 ML 解决方案。</p>
+			<h1 id="_idParaDest-29"><a id="_idTextAnchor031"/>ML 模型的类型</h1>
+			<p>由于有一系列 ML 和深度学习模型可以解决相同的业务问题，因此有必要了解 ML 模型的前景，以便做出有效的算法选择。<a id="_idIndexMarker072"/>大约有 15 种类型的 ML 技术，这些技术<a id="_idIndexMarker073"/>分为 4 类，即<strong class="bold">学习模型</strong>、<strong class="bold">混合模型</strong>、<strong class="bold">统计模型</strong>和<strong class="bold">人在回路</strong> ( <strong class="bold"> HITL </strong>)模型，如下图<em class="italic">中的<a id="_idIndexMarker075"/>矩阵所示<a id="_idIndexMarker074"/>(其中<a id="_idIndexMarker076"/>每个方格<a id="_idIndexMarker077"/>反映这些类别中的一个)值得注意的是，有其他可能的方法对 ML 模型进行分类，但没有一种方法是完全完整的，因此，这些分类将适用于某些场景，而不适用于其他场景。以下是我们推荐的 ML 模型分类:</em></p>
+			<div><div><img src="img/B16572_02_02.jpg" alt="Figure 2.2 – Types of ML models&#13;&#10;"/>
+				</div>
+			</div>
+			<p class="figure-caption">图 2.2–ML 模型的类型</p>
+			<h2 id="_idParaDest-30"><a id="_idTextAnchor032"/>学习模型</h2>
+			<p>首先，我们将<a id="_idIndexMarker078"/>看看两种类型的标准学习模型，<strong class="bold">监督学习</strong>和<strong class="bold">非监督学习</strong>:</p>
+			<div><div><img src="img/B16572_02_03.jpg" alt="Figure 2.3 – Supervised versus unsupervised learning&#13;&#10;"/>
+				</div>
+			</div>
+			<p class="figure-caption">图 2.3–监督与非监督学习</p>
+			<h3>监督学习</h3>
+			<p>受监督的<a id="_idIndexMarker079"/>学习模型或算法基于标记的数据被训练<a id="_idIndexMarker080"/>。在训练数据中，输入的结果被标记或已知。因此，当给定一个输入时，模型被训练来根据它学习的标记数据预测结果，并且你告诉系统哪个输出对应于系统中的给定输入。</p>
+			<p>监督学习模型在狭窄的人工智能案例和明确定义的任务上非常有效，但只能在有足够和全面的标记数据的情况下利用。我们可以在<em class="italic">图 2.3 </em>中看到，在监督学习的情况下，模型已经学会预测和分类输入。</p>
+			<p>考虑用于分类猫和狗的图像的图像分类模型的例子。监督学习模型在由成千上万正确标记的猫和狗的图像组成的标记数据上训练。经训练的模型然后学习将给定的输入图像分类为包含狗或猫。</p>
+			<h3>无监督学习</h3>
+			<p>无监督学习与没有人类<a id="_idIndexMarker082"/>监督的机器跑来跑去做事情<a id="_idIndexMarker081"/>无关。无监督学习模型或算法从未标记的数据中学习。无监督学习可用于从未标记数据中挖掘见解和识别模式。无监督算法广泛用于聚类或异常检测，不依赖于任何标签。这些算法可以是模式发现算法；当数据被输入到这种算法中时，它会识别模式，并将这些模式转化为一个配方，以获取没有标签的新数据输入，并对其应用正确的标签。</p>
+			<p>无监督学习主要用于分析，尽管你也可以将其用于自动化和 ML。建议不要在生产中使用这些算法，因为它们的动态特性会在每个训练周期改变输出。但是，它们对于自动执行某些流程非常有用，例如对输入数据进行分段或实时识别异常。</p>
+			<p>让我们讨论一个将新闻文章分组到相关组的例子。让我们假设您有数千篇没有任何标签的新闻文章，并且您想要识别文章的类型或类别。要对这些文章进行无监督学习，我们可以把一堆文章输入到算法中，收敛到把相似的东西放在一起(也就是聚类)，分成四组。然后，我们查看聚类，发现相似的文章被分组在诸如政治、体育、科学和健康的类别中。这是一种在数据中挖掘模式的方法。</p>
+			<h2 id="_idParaDest-31"><a id="_idTextAnchor033"/>混合动力车型</h2>
+			<p>通过结合传统方法开发混合模型来解决不同的商业和研究问题，ML 得到了快速发展。让我们看看一些混合模型以及它们是如何工作的。<em class="italic">图 2.4 </em>显示了各种混合动力车型:</p>
+			<div><div><img src="img/B16572_02_04.jpg" alt="Figure 2.4 – Types of hybrid models&#13;&#10;"/>
+				</div>
+			</div>
+			<p class="figure-caption">图 2.4–混合模型的类型</p>
+			<h3>半监督学习</h3>
+			<p><strong class="bold">半监督学习</strong>是监督学习的混合，用于只有少数<a id="_idIndexMarker084"/>样本被标记而大量样本<a id="_idIndexMarker085"/>未被标记的情况。半监督学习能够有效地利用可用数据(尽管并非所有数据都被标记)，包括未标记的数据。例如，文本文档分类器是半监督学习程序的典型例子。在这种情况下，定位大量标记的文本文档将非常困难，因此半监督学习是理想的。这是因为让某人通读整个文本文档只是为了分配一个基本分类是低效的。因此，半监督学习使算法能够从有限数量的已标记文本文档中学习，同时对训练数据中存在的大量未标记文本文档进行分类。</p>
+			<h3>自我监督学习</h3>
+			<p><strong class="bold">自监督学习</strong>问题是数据没有标记的无监督学习问题；这些<a id="_idIndexMarker086"/>问题被转化为<a id="_idIndexMarker087"/>监督学习问题，以便应用监督学习的算法来可持续地解决它们。通常，自我监督算法用于解决一个替代任务，在这个任务中，它们自我监督来解决<a id="_idIndexMarker088"/>问题或生成一个输出。自我监督学习的一个例子是<strong class="bold">生成对抗网络</strong>(<strong class="bold">GANs</strong>)；这些通常用于通过对标记和/或未标记的数据进行训练来生成合成数据。通过适当的训练，GAN 模型可以以自我监督的方式生成相关的输出。例如，GAN 可以基于文本描述输入生成人脸，例如<em class="italic">性别:男性、年龄:30、颜色:棕色</em>等等。</p>
+			<h3>多示例学习</h3>
+			<p><strong class="bold">多示例学习</strong>是一个监督学习问题，其中数据不是由单个数据<a id="_idIndexMarker089"/>样本标记的，而是在<a id="_idIndexMarker090"/>类别或类中累积的。与典型的监督学习(其中对每个数据样本进行标记，例如在诸如政治、科学和体育等类别中标记的新闻文章)相比，多实例学习的标记是分类进行的。在这种情况下，单个样本在多个类别中被集体标记，通过使用监督学习算法，我们可以进行预测。</p>
+			<h3>多任务学习</h3>
+			<p><strong class="bold">多任务学习</strong>是监督<a id="_idIndexMarker092"/>学习的化身<a id="_idIndexMarker091"/>，涉及在一个数据集上训练一个模型，并使用该模型解决多个任务或问题。例如，对于自然语言处理，我们使用来自 Transformers(<strong class="bold">BERT</strong>)嵌入模型的单词嵌入或<strong class="bold">双向编码器表示，它们是在一个<a id="_idIndexMarker093"/>大型数据语料库上训练的。(BERT 是预先训练好的模型，在大型文本语料库上训练。该模型对给定的人类语言如何工作有着深刻的理解。)并且这些模型可以用于解决许多监督学习任务，例如文本分类、关键词提取、情感分析等等。</strong></p>
+			<h3>强化学习</h3>
+			<p><strong class="bold">强化学习</strong>是<a id="_idIndexMarker094"/>中的一种学习类型，一个智能体，如<a id="_idIndexMarker095"/>一个机器人系统，学习在一个定义的环境中操作，以执行顺序决策任务或实现一个预先定义的目标。同时，代理人根据不断评估的反馈和来自环境的奖励进行学习。反馈和奖励都用于塑造代理的学习，如图<em class="italic">图 2.5 </em>所示。一个例子是谷歌的 AlphaGo，它最近胜过了世界领先的围棋选手。经过 40 天使用反馈和奖励的自我训练，AlphaGo 击败了世界上最好的人类围棋选手:</p>
+			<div><div><img src="img/B16572_02_05.jpg" alt="Figure 2.5 – Reinforcement learning&#13;&#10;"/>
+				</div>
+			</div>
+			<p class="figure-caption">图 2.5–强化学习</p>
+			<h3>集成学习</h3>
+			<p><strong class="bold">集成学习</strong>是一种混合模型，它涉及两个或多个在相同数据上训练的模型。单独使用每个模型<a id="_idIndexMarker097"/>进行预测<a id="_idIndexMarker096"/>，通过组合所有输出并对其进行平均来确定最终结果或预测，从而进行集体预测。这方面的一个例子是随机森林算法，这是一种用于分类或回归任务的集成学习方法。它通过在训练时组合几个决策树来运行，并通过对所有决策树的预测进行平均来创建预测作为输出。</p>
+			<h3>迁移学习</h3>
+			<p>我们人类有一种与生俱来的相互传递知识的能力。这个相同的原理被转化为 ML，其中一个模型被训练来执行一个任务，并且它被转移到另一个模型，作为执行另一个任务的训练或微调的起点。这种类型的学习在深度学习中很流行，通过使用预训练的模型进行微调或训练，使用预训练的模型来解决计算机视觉或自然语言处理问题。从预先训练的模型中学习可以提供巨大的推动力，因为模型不需要从头开始训练，从而节省了大量的训练数据。例如，我们可以使用仅包含<a id="_idIndexMarker100"/>个标记数据样本的训练数据来训练情感分类器模型。这可以通过<a id="_idIndexMarker101"/>使用预训练的 BERT 模型进行迁移学习(该模型在一个大的标注数据语料库上进行训练)。这使得学习能够从一个模型转移到另一个模型。</p>
+			<h3>联合学习</h3>
+			<p><strong class="bold">联合学习</strong>是一种以协作方式执行 ML 的方式(云和边缘之间的协同)。<a id="_idIndexMarker102"/>训练过程分布在<a id="_idIndexMarker103"/>多个设备上，只存储数据的本地样本。设备或云之间既不交换也不传输数据，以维护数据隐私和安全。不是共享数据，而是共享本地训练的模型，以相互学习来训练全局模型。让我们讨论一个医院联合学习的例子(如图<em class="italic">图 2.6 </em>所示)，在这里，患者数据是保密的，不能与第三方共享。在这种情况下，ML 训练在医院本地完成(在边缘),全局模型在不共享数据的情况下集中训练(在云上)。本地训练的模型被微调以产生全局模型。不是在中央 ML 管道中摄取数据，而是摄取本地训练的模型。全局模型通过从局部模型调整它们的参数来学习，以收敛到最佳性能，连接局部模型的学习:</p>
+			<div><div><img src="img/B16572_02_06.jpg" alt="Figure 2.6 – Federated learning architecture &#13;&#10;"/>
+				</div>
+			</div>
+			<p class="figure-caption">图 2.6-联合学习架构</p>
+			<h2 id="_idParaDest-32"><a id="_idTextAnchor034"/>统计模型</h2>
+			<p>在某些情况下，统计<a id="_idIndexMarker104"/>模型在决策方面是高效的。了解统计模型可用于何处以获得最佳价值或决策至关重要。有三种类型的统计模型:归纳学习、演绎学习和直推学习。<em class="italic">图 2.7 </em>显示了这些类型的统计模型之间的关系:</p>
+			<div><div><img src="img/B16572_02_07.jpg" alt="Figure 2.7 – Relationship between the three types of statistical models &#13;&#10;"/>
+				</div>
+			</div>
+			<p class="figure-caption">图 2.7-三种统计模型之间的关系</p>
+			<p><strong class="bold">归纳学习</strong>是一种统计方法，它从<a id="_idIndexMarker105"/>训练数据中的特定示例中进行归纳，使用该证据来<a id="_idIndexMarker106"/>确定最可能的结果。它包括一个通过实例学习的过程，在这个过程中，系统试图从一组观察到的实例中归纳出一个通用的函数或规则。比如我们拟合一个 ML 模型，就是一个归纳的过程。ML 模型是训练数据集中特定示例的概括。例如，当将模型拟合到训练数据时，使用线性回归通过函数<em class="italic"> Y = a + bX </em>概括训练数据中的特定示例。这样的概括是在归纳学习中做出的。</p>
+			<p><strong class="bold">演绎学习</strong>是指利用一般的规则来决定特定的结果。演绎学习的<a id="_idIndexMarker107"/>结果<a id="_idIndexMarker108"/>是确定性的和特定的，而对于归纳推理，结论是概率性的或概括的。在某种程度上，演绎是归纳的逆过程。如果说归纳是从具体到一般，那么演绎是从一般到具体。</p>
+			<p><strong class="bold">直推式学习</strong>是一种基于特定训练<a id="_idIndexMarker109"/>数据样本(在训练数据集中)对结果进行推理的方法。这种<a id="_idIndexMarker110"/>方法不同于归纳学习，归纳学习是对训练数据进行归纳预测。在直推式学习中，来自训练数据的特定或相似的数据样本被比较，以推理或预测结果。例如，在<em class="italic">k</em>-最近邻算法的情况下，它使用特定的数据样本作为其结果的基础，而不是概括结果或用训练数据建模。</p>
+			<h2 id="_idParaDest-33"><a id="_idTextAnchor035"/> HITL 车型</h2>
+			<p><strong class="bold"> HITL </strong>模型有两种:<strong class="bold">以人为中心的强化学习</strong>莫<a id="_idTextAnchor036"/>德尔斯和<strong class="bold">主动学习</strong>模型。在<a id="_idIndexMarker111"/>这些模型中，人机协作使算法能够模仿类似人类的行为和结果。这些 ML 解决方案的关键驱动力是<em class="italic">环中人(因此是 HITL) </em>。人类验证、标记和重新训练模型，以保持模型的准确性:</p>
+			<div><div><img src="img/B16572_02_08.jpg" alt="Figure 2.8 – Workflow of human-centered reinforcement learning&#13;&#10;"/>
+				</div>
+			</div>
+			<p class="figure-caption">图 2.8-以人为中心的强化学习的工作流程</p>
+			<p><strong class="bold">以人为中心的强化学习</strong>是强化学习的一种混合，因为<a id="_idIndexMarker112"/>它让人类参与到监控代理学习的循环中，并提供评估性反馈来塑造代理的学习。以人为中心的强化学习<a id="_idIndexMarker113"/>也被称为<em class="italic">交互式强化学习</em>。每次代理采取行动时，进行观察的人类专家可以根据人类专家的知识提供评估性反馈，描述代理采取的选定行动的质量，如图<em class="italic">图 2.8 </em>所示。</p>
+			<p>基于从任务环境和人类专家接收的反馈，代理增加其行为和动作。人类强化学习在智能体必须学习或模仿人类行为的环境中非常有效。要了解更多，请阅读论文<em class="italic">以人为中心的强化学习:调查</em>(【https://ieeexplore.ieee.org/abstract/document/8708686】T2)。</p>
+			<p><strong class="bold">主动学习</strong>是一种<a id="_idIndexMarker114"/>方法，其中训练好的模型可以在推理过程中询问 HITL(人类用户)以解决学习过程中的不确定性。例如，这可能是一个问答聊天机器人，通过问是或否的问题来要求人类用户进行验证。</p>
+			<p>这些是 ML 解决方案的类型，可以为生产构建以解决现实世界中的问题。既然你已经意识到了打造 ML 解决方案的可能性，那么下一步，根据你的业务和技术需求对你的 MLOps 进行分类就变得至关重要了。对于您来说，能够确定支持您的业务和 MLOps 所需的正确要求、工具、方法和基础设施非常重要，因此我们将在下一部分探讨如何构建 MLOps。</p>
+			<h1 id="_idParaDest-34"><a id="_idTextAnchor037"/>构建您的 MLOps</h1>
+			<p>MLOps 的主要目标是<a id="_idIndexMarker117"/>让一个组织或一组个人高效地协作来构建数据和 ML 驱动的资产，以解决他们的业务问题。因此，整体性能和透明度都得到了提高。在孤岛中工作或重复开发功能会非常昂贵和耗时。</p>
+			<p>在本节中，我们将探讨如何在组织内构建 MLOps。正确处理 MLOps 流程至关重要。通过为您的 MLOps 选择正确的流程和工具，您和您的团队就可以实施一个健壮、可扩展、节俭和可持续的 MLOps 流程。例如，我最近帮助我在医疗保健行业的一个客户构建并优化了他们的 MLOps，与他们以前的传统运营相比，这实现了 76%的成本优化(针对存储和计算资源)。</p>
+			<p>客户的数据科学家团队见证了他们 30%的时间从平凡且重复的日常任务(例如，数据争论、ML 管道和超参数调优)中解放出来——这种<a id="_idIndexMarker118"/>可能是拥有高效 MLOps 流程的影响。通过实施高效的 MLOps，您的团队可以确保高效、高绩效以及在您的组织内可重复和可追踪的良好协作。</p>
+			<p>mlop 可以<a id="_idIndexMarker119"/>分类为<strong class="bold">小数据 op</strong>、<strong class="bold">大数据 op</strong>、<strong class="bold">大规模 mlop</strong>和<strong class="bold">混合 mlop</strong>(这种<a id="_idIndexMarker120"/>分类是基于<a id="_idIndexMarker122"/>作者的经验<a id="_idIndexMarker123"/>的<a id="_idIndexMarker121"/>，是团队和组织实现 mlop 的推荐方式):</p>
+			<div><div><img src="img/B16572_02_09.jpg" alt="Figure 2.9 – Categories of MLOps &#13;&#10;"/>
+				</div>
+			</div>
+			<p class="figure-caption">图 2.9–mlop 的类别</p>
+			<p>如<em class="italic">图 2.9 </em>所示，根据团队规模、ML 应用程序、业务模型、数据规模、工具和用于执行操作的<a id="_idIndexMarker124"/>基础设施，组织内的 MLOps 可以大致分为四个不同类别。在数据方面，许多场景不需要大数据(1 TB 以上的任何数据)操作，因为简单的操作对于小规模或中等规模的数据可能是有效的。数据标度之间的差异如下:</p>
+			<ul>
+				<li><strong class="bold">大数据</strong>:单个典型计算机的内存无法容纳的数据量<a id="_idIndexMarker125"/>；例如，&gt; 1 TB</li>
+				<li><strong class="bold">中规模数据</strong>:单个服务器内存能够容纳的数据量<a id="_idIndexMarker126"/>；例如，从 10 GB 到 1 TB</li>
+				<li><strong class="bold">小规模数据</strong>:可以轻松放入笔记本电脑或个人电脑内存的<a id="_idIndexMarker127"/>数据量；例如，&lt; 10 GB</li>
+			</ul>
+			<p>考虑到这些因素，我们来看看 MLOps 类别，以确定针对您的业务问题或组织实施 MLOps 的合适流程和规模。</p>
+			<h2 id="_idParaDest-35"><a id="_idTextAnchor038"/>小型数据运营</h2>
+			<p>一个小型初创公司，拥有一个数据科学家团队，寻求为狭窄和明确定义的问题建立 ML 模型<a id="_idIndexMarker128"/>，可以是敏捷和高度协作的<a id="_idIndexMarker129"/>。通常，在这种情况下，ML 模型在各自的数据科学家的计算机上进行本地训练，然后被遗忘，或者扩展并部署在云上进行推理。在这些场景中，可能会有一些常见的陷阱，比如团队缺少一个用于部署模型的简化的 CI/CD 方法。然而，他们可能设法拥有由团队仔细管理的中央或分布式数据源，并且培训代码可以在中央存储库中进行版本控制和维护。当运营开始规模化时，这样的团队容易出现以下情况:</p>
+			<ul>
+				<li>遇到许多工作由多人重复的情况，包括制作数据、ML 管道做相同的工作，或者训练相似类型的 ML 模型。</li>
+				<li>各自为政，对团队成员的并行工作知之甚少。这导致透明度降低。</li>
+				<li>由于平凡和重复的工作，导致巨大的成本，或比预期更高的成本。</li>
+				<li>代码和数据开始独立增长。</li>
+				<li>工件没有被审计，因此是不可重复的。</li>
+			</ul>
+			<p>任何这些都是昂贵的，而且对团队来说<a id="_idIndexMarker130"/>是不可持续的。如果您在团队中工作，或者有如下设置，您可以将您的运营归类为小型数据运营:</p>
+			<ul>
+				<li>该团队仅由数据科学家组成。</li>
+				<li>您只处理 Python 环境，并管理 Python 框架中的一切。选择 Python 可能是因为有许多 ML 库和工具可以即插即用，以快速原型化和构建解决方案。例如，与 Python 可用的 ML 库相比，Java 等语言的 ML 库数量要少得多。</li>
+				<li>几乎不需要大数据处理，因为数据科学家使用小数据(&lt;10 GB). </li>
+				<li>Quick ML model development starts with a local computer, then scales out to the cloud for massive computation resources.</li>
+				<li>High support requirements for open source technologies such as PyTorch, TensorFlow, and scikit-learn for any type of ML, from classical learning to deep, supervised, and unsupervised learning.</li>
+			</ul>
+			<h2 id="_idParaDest-36"><a id="_idTextAnchor039"/>大数据运营)</h2>
+			<p>这可能是一个由经验丰富的数据科学家和工程师组成的团队，他们在初创企业或中小型企业工作，需要大规模大数据处理来执行 ML 训练或推理。他们使用大数据工具，如<strong class="bold"> Kafka </strong>、<strong class="bold"> Spark </strong>或<strong class="bold"> Hadoop </strong>来构建和编排他们的数据管道。在这种情况下，使用高性能处理器(如 GPU 或 TPU)来加速数据处理和 ML 训练。ML 模型的开发由数据科学家领导，模型的部署由数据/软件工程师协调。重点放在开发模型上，而不太重视对模型的监控。随着他们继续运营，这种类型的团队容易出现以下情况:</p>
+			<ul>
+				<li>缺乏模型训练和监控的可追溯性</li>
+				<li>缺乏可复制的人工制品</li>
+				<li>由于平凡而重复的工作，导致巨大的成本，或者超出预期</li>
+				<li>代码和数据开始独立增长</li>
+			</ul>
+			<p>任何这些对团队来说都是昂贵的和不可持续的。</p>
+			<p>如果您在团队中工作或有以下几点所述的设置，您可以将您的运营归类为大数据运营:</p>
+			<ul>
+				<li>该团队由数据科学家/工程师组成。</li>
+				<li>对大数据处理能力要求很高。</li>
+				<li>Databricks 是团队内部和组织之间共享和协作的关键框架。</li>
+				<li>ML 模型开发发生在云中，利用许多 ML 工作流管理工具中的一个，例如<strong class="bold"> Spark MLlib </strong>。</li>
+				<li>对深度学习的 PyTorch、TensorFlow 等开源技术支持要求低。</li>
+			</ul>
+			<h2 id="_idParaDest-37"><a id="_idTextAnchor040"/>混合 MLOps</h2>
+			<p>混合团队与经验丰富的数据科学家、数据工程师和 DevOps 工程师一起工作，这些团队利用 ML 功能来支持他们的业务运营。与其他团队相比，他们在实施 MLOps 方面走在了前面。他们使用大数据和开源软件工具，如 PyTorch、TensorFlow 和 scikit-learn，因此需要高效的协作。他们通常通过实现健壮的和可伸缩的软件工程实践来解决定义明确的问题。然而，该团队仍然容易面临以下挑战:</p>
+			<ul>
+				<li>由于数据科学家要做的平凡而重复的工作，如重复的数据清理或功能工程，导致了巨大的成本，或超出预期。</li>
+				<li>低效的模型监控和再训练机制。</li>
+			</ul>
+			<p>任何这些对团队来说都是昂贵且不可持续的。</p>
+			<p>如果您在团队中工作或有以下几点所述的设置，您可以将您的操作归类为混合操作:</p>
+			<ul>
+				<li>该团队由数据科学家、数据工程师和 DevOps 工程师组成。</li>
+				<li>高效协作的高要求。</li>
+				<li>对大数据处理能力要求高。</li>
+				<li>对 PyTorch、TensorFlow 和 scikit 等开源技术的高支持要求——学习任何种类的 ML，从经典到深度学习，从有监督到无监督学习。</li>
+			</ul>
+			<h2 id="_idParaDest-38"><a id="_idTextAnchor041"/>大规模 MLOps</h2>
+			<p>大规模运营<a id="_idIndexMarker136"/>在大公司<a id="_idIndexMarker137"/>中很常见，大公司拥有由数据科学家、数据工程师和 DevOps 工程师组成的大中型工程团队。他们拥有大数据规模的数据操作，或者拥有各种规模、准确性和速度的各种类型的数据。通常，他们的团队需要管理多个遗留系统来支持他们的业务运营。这样的团队或组织容易出现以下情况:</p>
+			<ul>
+				<li>由于平凡而重复的工作，导致巨大的成本，或者超出预期。</li>
+				<li>代码和数据开始独立增长。</li>
+				<li>有官僚主义和高度管制的过程和质量检查。</li>
+				<li>高度纠缠的系统和过程——当一个东西坏了，一切都坏了。</li>
+			</ul>
+			<p>任何这些对团队来说都是昂贵且不可持续的。</p>
+			<p>如果你在一个团队中工作，或者有如下所述的设置，你可以将你的<a id="_idIndexMarker138"/>行动归类为大规模<a id="_idIndexMarker139"/>行动:</p>
+			<ul>
+				<li>该团队由数据科学家、数据工程师和 DevOps 工程师组成。</li>
+				<li>大规模推理和运算。</li>
+				<li>大数据运营。</li>
+				<li>多资源上的 ML 模型管理。</li>
+				<li>大型或多个团队。</li>
+				<li>多种用例及模型。</li>
+			</ul>
+			<p>一旦您根据您的业务和技术需求确定了 MLOps 的特征，一个可靠的实施路线图可确保为您的组织顺利开发和实施强大且可扩展的 MLOps 解决方案。例如，与需要大规模 MLOps 的大型金融机构相比，一家每天处理 0-1000 笔交易的金融科技初创公司需要小规模的数据 op。这种分类使团队或组织更加高效和健壮。</p>
+			<h1 id="_idParaDest-39"><a id="_idTextAnchor042"/>您的解决方案的实施路线图</h1>
+			<p>拥有明确定义的<a id="_idIndexMarker140"/>方法和里程碑可确保成功交付所需的 ML 解决方案(使用 MLOps 方法)。在这一节中，我们将详细讨论一个通用的实现路线图，它可以帮助 MLOps 解决任何 ML 问题。该路线图的目标是<a id="_idIndexMarker141"/>用正确的解决方案解决问题:</p>
+			<div><div><img src="img/B16572_02_10.jpg" alt="Figure 2.10 – Implementation roadmap for an MLOps-based solution &#13;&#10;"/>
+				</div>
+			</div>
+			<p class="figure-caption">图 2.10–基于 MLOps 的解决方案的实施路线图</p>
+			<p>使用前面的路线图，我们可以从 ML 开发过渡到具有明确里程碑的 MLOps，如 MLOps 实施的三个阶段所示。现在，让我们更详细地了解路线图的这三个阶段。值得注意的是，在接下来的理论部分之后，我们将进入路线图的实际实现，并处理一个真实的业务用例。</p>
+			<h2 id="_idParaDest-40"><a id="_idTextAnchor043"/>第 1 阶段–ML 开发</h2>
+			<p>这就是<a id="_idIndexMarker142"/>为您的问题实现 MLOps 框架的起源；在开始实现需求之前，问题和解决方案必须清晰生动。在此阶段，我们将考虑系统要求，以设计和实施稳健且可扩展的 MLOps 框架。我们首先选择实施 MLOps 所需的正确工具和基础架构(存储、计算等)。</p>
+			<p>当基础设施建立起来时，我们应该被提供必要的工作空间以及开发和测试环境来执行 ML 实验(训练和测试)。我们使用开发环境训练 ML 模型，并根据工作流或需求，使用开发或测试环境中的测试数据测试模型的性能和功能。当基础设施建立并且第一个 ML 模型被训练、测试、序列化和打包时，您的 MLOps 框架的第一阶段被建立并验证健壮性。序列化和容器化是标准化模型并为部署做好准备的重要过程。</p>
+			<p>接下来，我们开始实施第二阶段。</p>
+			<h2 id="_idParaDest-41"><a id="_idTextAnchor044"/>第 2 阶段–过渡到运营</h2>
+			<p>阶段 2 是关于<a id="_idIndexMarker143"/>过渡到运营，它涉及序列化和容器化阶段 1 中训练的模型，并使它们为部署做好准备。这实现了标准化、高效的部署。模型以 API 或独立工件的形式提供，用于批量推理。当一个模型被打包并准备好提供服务时，在通过质量保证检查后，它被部署到使用流线型 CI/CD 管道的生产环境中。在第 2 阶段结束时，您将在生产环境中提供和部署打包的模型，实时执行推理。</p>
+			<h2 id="_idParaDest-42"><a id="_idTextAnchor045"/>第三阶段——运营</h2>
+			<p>阶段 3 是阶段 2 中部署模型的核心操作阶段。在这个阶段，我们根据模型漂移、偏差或其他度量标准来监控已部署的<a id="_idIndexMarker144"/>模型性能(我们将在接下来的章节中深入研究这些术语和度量标准)。基于模型的性能，我们可以通过定期的模型再训练实现持续学习，并实现警报和操作。同时，我们监控生产环境遥测数据中的日志，以检测任何可能的错误并随时解决它们，从而确保生产系统的不间断运行。我们还管理数据管道、ML 平台和移动安全。随着这一阶段的成功实现，我们可以监控已部署的模型，并以健壮、可伸缩和安全的方式重新训练它们。</p>
+			<p>在大多数情况下，需要为您的 ML 解决方案实现所有三个阶段，但是在某些情况下，只需要阶段 1 和 2 就足够了；例如，当 ML 模型进行批量推理并且不需要实时进行推理时。通过实现这些里程碑和实施所有三个阶段，我们已经为我们的应用系统地和可持续地建立了一个健壮的和可扩展的 ML 生命周期。</p>
+			<h1 id="_idParaDest-43"><a id="_idTextAnchor046"/>获取数据、需求和工具</h1>
+			<p>实施成功的 MLOps 依赖于某些因素，如获得适当的培训数据、高标准、适当的要求、工具和基础设施。</p>
+			<p>在本节中，我们将深入研究这些使 MLOps 变得健壮和可伸缩的因素。</p>
+			<h2 id="_idParaDest-44"><a id="_idTextAnchor047"/>数据</h2>
+			<p>我曾经相信<a id="_idIndexMarker145"/>学习数据意味着掌握 Python、SQL 和回归等工具。工具的好坏取决于人和他们对周围环境的理解。从数据清理到建模再到解释，上下文和领域都很重要。世界上最好的工具不会修复一个糟糕的问题定义(或者缺少一个问题定义)。知道要解决什么问题是一个非常上下文驱动和业务相关的决策。一旦你意识到问题和背景，它使你能够辨别解决问题所需的正确的训练数据。</p>
+			<p>训练数据是 ML 系统的重要组成部分。与传统软件系统相比，它在开发 ML 系统中起着至关重要的作用。正如我们在前一章所看到的，代码和<a id="_idIndexMarker146"/>训练数据并行工作来开发和维护一个 ML 系统。不仅仅是算法的问题，还有数据的问题。有两个方面可以确保您拥有用于算法训练的正确数据，即提供正确数量和质量的数据:</p>
+			<ul>
+				<li><strong class="bold">Data quantity</strong>: Data scientists echo a common argument about their models, arguing that model performance is not good because the quantity of data they were given was not sufficient to produce good model performance. If they had more data, the performance would have been better – are you familiar with such arguments? In most cases, more data might not really help, as quality also is an important factor. For instance, your models can learn more insights and characteristics from your data if you have more samples for each class. For example, if you analyze anomalous financial transactions with many samples in your data, you will discover more types of anomalous transactions. If there is only one anomalous case, then ML is not useful. <p>ML 项目的数据要求不应只关注数据数量本身，还应关注数据质量，这意味着不应关注数据样本的数量，而应关注数据样本的多样性。然而，在某些情况下，解决某些问题的可用数据数量有限。例如，让我们假设我们致力于为一家保险公司预测客户流失率的模型。在这种情况下，由于某个时间段的数据的可用性，我们可以被限制为考虑有限时间段的数据或使用有限数量的样本；例如，5 年(而保险公司可能已经经营了 50 年)。目标是获取最大可能数量和质量的数据，以训练表现最佳的 ML 模型。</p></li>
+				<li><strong class="bold">Data quality</strong>: Data quality is an important factor for training ML models; it impacts model performance. The more comprehensive or higher the quality of the data, the better the ML model or application will work. Hence the process before the training is important: cleaning, augmenting, and scaling the data. There are some important dimensions of data quality to consider, such as consistency, correctness, and completeness. <p>数据一致性是指整个数据集中数据样本的一致性和连贯性。数据正确性是准确的程度，也是您可以依赖数据真实反映事件的程度。数据的正确性取决于数据是如何收集的。每个特征的数据稀疏性(例如，数据是否覆盖反映事件的可能值的综合范围)反映了数据的完整性。</p><p>有了适当数量的高质量数据，您就可以确保您的 ML 模型和应用程序的性能高于所需的标准。因此，拥有正确的标准对于应用程序以最有效的方式执行和解决业务问题至关重要。</p></li>
+			</ul>
+			<h2 id="_idParaDest-45"><a id="_idTextAnchor048"/>要求</h2>
+			<p><a id="_idIndexMarker148"/>产品或业务/技术问题负责人通过识别需求并根据数据范围、数据收集和所需的数据格式对其进行定制，在促进高效构建强大的 ML 系统方面发挥着关键作用。这些需求对于 ML 系统的开发人员(例如数据科学家或 ML 工程师)来说是至关重要的输入，通过基于需求分析和关联给定数据集来开始构建解决方案以解决问题。ML 解决方案需求应该包括全面的数据需求。数据需求规范包括关于数据质量和数量的信息。要求可以更广泛；例如，它们可以包含关于预期的或期望的预测性能的估计，这些预测性能用在需求分析和启发期间确定的性能度量来表示。</p>
+			<p>可以制定细致的规范，例如对训练数据的预期或预期性能的规范，因为这些规范可以在模型训练过程之后被快速验证。然而，基于训练表现，推理或运行时间(包括生产和操作)表现可以在操作期间进行评估。产品负责人或业务负责人提出的要求应该考虑重要的因素，如伦理和可解释性因素。歧视或偏见(例如谁或什么被预测或分类)对于应用程序以及哪些属性应该作为数据隐私的一部分被保留是至关重要的(例如，一些属性不应该用于预测或分类，例如种族、年龄或性别)。向系统用户解释 ML 解决方案或系统的情况和决策时，必须明确考虑可解释性需求。最后，要求必须规定关于数据使用和验证 ML 系统所做决定的规则和限制。下表显示了一些需要考虑的要求，以确保您构建一个健壮的、可伸缩的 ML 解决方案:</p>
+			<div><div><img src="img/B16572_02_11.jpg" alt="Figure 2.11 – Requirements mapping for ML solutions&#13;&#10;"/>
+				</div>
+			</div>
+			<p class="figure-caption">图 2.11–ML 解决方案的需求映射</p>
+			<p><em class="italic">图 2.11 </em>中的表格说明了需求表征过程的流程，从引出到分析到规格说明，再到系统的验证和确认。该流程确保获得最合适的资源来构建和部署高效的 ML 系统以解决您的问题。当需求被很好地定义时，选择正确的工具和基础设施来支持已建立的过程并确保满足标准是至关重要的。</p>
+			<h1 id="_idParaDest-46"><a id="_idTextAnchor049"/>工具和基础设施</h1>
+			<p>在过去的两年中，MLOps 的发展非常迅速；许多工具和框架已经发展成为基础设施产品的一部分。你可以访问<a href="https://landscape.lfai.foundation/">https://landscape.lfai.foundation/</a>看看已经开发了多少主流选项来<a id="_idIndexMarker151"/>编排 ML、深度学习、强化学习、开发环境、数据管道、模型管理、可解释 AI、安全和分布式计算。</p>
+			<p>由微软、AWS 和谷歌等热门云服务提供商提供的服务激增，这些服务得到了 Airflow、Databricks 和 Data Lake 等数据处理工具的补充。这些都是为了实现 ML 和深度学习而精心制作的，为此有很好的框架可用，如 scikit-learn、Spark MLlib、PyTorch、TensorFlow、MXNet 和 CNTK 等。工具和框架有很多，但是获得正确的工具是一个选择的问题，也是你的 ML 解决方案和操作设置的背景。拥有合适的工具将确保 MLOps 工作流程的高效率和自动化。选择有很多，天空是无限的，但是我们必须从某个地方开始到达天空。因此，从现在开始，我们将为您提供一些实践经验。从现实生活中的问题中学习总是更好的，我们将通过使用下一节中描述的现实生活中的业务问题来这样做。</p>
+			<h1 id="_idParaDest-47"><a id="_idTextAnchor050"/>讨论现实生活中的商业问题</h1>
+			<p>我们将实施下面的<a id="_idIndexMarker152"/>业务问题，以获得实践经验。我建议您多次阅读这一部分，以便很好地理解业务问题；这样更容易实现。</p>
+			<p class="callout-heading">重要说明</p>
+			<p class="callout">问题背景:</p>
+			<p class="callout">您在一个小型团队中担任数据科学家，与另外三名数据科学家一起为一家位于芬兰图尔库港的货运公司工作。芬兰 90%的进口货物都是通过全国港口的货船运输的。对于货运来说，港口的天气条件和物流有时会具有挑战性。多雨的条件会扭曲港口的运作和物流，从而影响供应链的运作。提前预测降雨条件可以优化资源，如人力资源、物流和运输资源，以实现港口供应链的高效运作。从业务角度来看，提前预测降雨条件可使港口有效规划和调度供应链运营的人力资源、物流和运输资源，从而将运营成本降低约 20%。</p>
+			<p class="callout">任务:</p>
+			<p class="callout">作为一名数据科学家，您的任务是开发一个 ML 驱动的解决方案，提前 4 小时预测芬兰图尔库港的天气情况。这将使港口能够优化其资源，从而节省高达 20%的成本。首先，我们为您提供了一个历史气象数据集，涵盖了从图尔库港开始的 10 年时间线(该数据集可在下一章中访问)。你的任务是建立一个持续学习驱动的 ML 解决方案来优化图尔库港的运营。</p>
+			<p>为了解决这个问题，我们将使用<a id="_idIndexMarker153"/>微软 Azure(使用最广泛的云服务之一)和 MLflow(一个开源的 ML 开发工具)来亲自使用资源。这样，我们将获得在云和开源软件上工作的经验。在开始下一章的实际实施之前，请确保完成以下工作:</p>
+			<ol>
+				<li>从 https://azure.microsoft.com/的<a href="https://azure.microsoft.com/">创建一个免费的 Azure 订阅(需要 5 分钟)。</a></li>
+				<li>创建一个名为<code>MLOps_WS</code>的 Azure 机器学习服务应用。这可以在你的 Azure 门户中通过点击搜索栏中的<code>Machine Learning</code>并选择<code>MLOps_WS</code>来完成。</li>
+			</ol>
+			<p>现在，有了这些，您就可以开始为前面的业务问题实施 MLOps 框架了。</p>
+			<h1 id="_idParaDest-48"><a id="_idTextAnchor051"/>总结</h1>
+			<p>在这一章中，我们学习了 ML 解决方案的开发过程，如何为一个问题确定一个合适的 ML 解决方案，以及如何对操作进行分类以实现合适的 MLOps。我们粗略地了解了一个通用的实现路线图，并看到了一些获取工具、数据和基础设施等基本要素以实现您的 ML 应用程序的技巧。最后，我们通过实施 MLOps 工作流(在第 1 章 、<em class="italic">MLOps 工作流的基础</em>中讨论)来处理下一章要解决的业务问题，在其中我们将获得一些 m lops 的实践经验。</p>
+			<p>在下一章中，我们将从理论到实际实施。当我们开始在 Azure 上设置 MLOps 工具并开始编码以清理<a id="_idTextAnchor052"/>数据来解决业务问题并获得大量实践经验时，这一章就开始了。</p>
+		</div>
+	
+
+</body></html>

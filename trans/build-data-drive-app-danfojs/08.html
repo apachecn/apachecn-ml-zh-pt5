@@ -1,0 +1,410 @@
+<html><head/><body>
+
+
+	
+		<title>B17076_06_ePub_RK</title>
+		
+	
+	
+		<div><h1 id="_idParaDest-114"><em class="italic"> <a id="_idTextAnchor117"/>第六章</em>:用 Danfo.js 实现数据可视化</h1>
+			<p>在前一章中，您学习了如何使用 Plotly.js 创建丰富的交互式绘图，这些绘图可以嵌入到任何 web 应用程序中。我们还提到了 Danfo.js 如何在内部使用 Plotly 直接在数据帧或系列上绘图。在本章中，我们将向您展示如何使用 Danfo.js 绘图 API 轻松创建这些图表。具体来说，在本章中，我们将讨论以下内容:</p>
+			<ul>
+				<li>为打印设置 Danfo.js</li>
+				<li>使用 Danfo.js 创建折线图</li>
+				<li>使用 Danfo.js 创建散点图</li>
+				<li>用 Danfo.js 创建盒子和小提琴图</li>
+				<li>使用 Danfo.js 创建直方图</li>
+				<li>用 Danfo.js 创建条形图</li>
+			</ul>
+			<h1 id="_idParaDest-115"><a id="_idTextAnchor118"/>技术要求</h1>
+			<p>为了理解本章内容，您应该具备以下条件:</p>
+			<ul>
+				<li>Chrome、Safari、Opera 或 Firefox 等现代浏览器</li>
+				<li>Node.js、Danfo.js 和可选的 Dnotebook</li>
+				<li>用于下载数据集的稳定互联网连接</li>
+			</ul>
+			<p>Danfo.js 的安装说明可以在<a href="B17076_03_ePub_RK.xhtml#_idTextAnchor066"> <em class="italic">第三章</em> </a>、<em class="italic">danfo . js 入门</em>中找到，而 Dnotebook 的安装步骤可以在<a href="B17076_02_ePub_RK.xhtml#_idTextAnchor045"> <em class="italic">第二章</em> </a>、<em class="italic">Dnotebook-JavaScript 的交互计算环境</em>中找到。</p>
+			<h1 id="_idParaDest-116"><a id="_idTextAnchor119"/>为绘图设置 Danfo.js</h1>
+			<p>默认情况下，Danfo.js 提供一些基本的图表类型。这些图表可以在任何数据帧或<a id="_idIndexMarker596"/>系列对象上调用，如果正确的参数<a id="_idIndexMarker597"/>被传递，它将显示相应的图表。</p>
+			<p>在撰写本文时，Danfo.js <a id="_idIndexMarker598"/>提供了以下图表:</p>
+			<ul>
+				<li>折线图</li>
+				<li>盒子和小提琴情节</li>
+				<li>桌子</li>
+				<li>饼图</li>
+				<li>散点图</li>
+				<li>条形图</li>
+				<li>直方图</li>
+			</ul>
+			<p>这些图表通过<code>plot</code>功能显示。也就是说，如果您有一个 DataFrame 或 Series 对象，对它们调用<code>plot</code>函数会显示这些图表。</p>
+			<p><code>plot</code>方法需要一个显示图形的<code>div</code> ID。例如，假设<code>df</code>是一个数据帧，我们可以调用<code>plot</code>函数，如下面的代码片段所示:</p>
+			<pre>const df = new DataFrame({...})
+df.plot("my_div_id").&lt;<strong class="bold">chart type</strong>&gt;</pre>
+			<p>图表类型可以是<code>line</code>、<code>bar</code>、<code>scatter</code>、<code>hist</code>、<code>pie</code>、<code>box</code>、<code>violin</code>或<code>table</code>。</p>
+			<p>每种绘图类型都将接受特定于绘图的参数，但它们都有一个名为<code>config</code>的公共参数。<code>config</code>对象用于自定义绘图和布局。将<code>config</code>参数视为我们在<a href="B17076_05_ePub_RK.xhtml#_idTextAnchor099"> <em class="italic">第 5 章</em> </a>、<em class="italic">使用 Plotly.js </em>进行数据可视化中使用的布局和配置属性的组合。</p>
+			<p><code>config</code>参数是一个具有以下格式的对象:</p>
+			<pre>config = {
+  layout: {…}, // plotly layout parameters like title, font, e.t.c.
+  ... // other Plotly configuration parameters like showLegend, displayModeBar, e.t.c.
+}</pre>
+			<p>在接下来的<a id="_idIndexMarker599"/>部分，我们将展示一些使用<a id="_idIndexMarker600"/>不同图表类型的例子，以及如何配置它们。</p>
+			<p class="callout-heading">注意</p>
+			<p class="callout">在接下来的几节中，我们将下载并使用两个真实世界的数据集。这意味着您需要互联网连接来下载数据集。</p>
+			<h2 id="_idParaDest-117"><a id="_idTextAnchor120"/>将 Danfo.js 添加到代码中</h2>
+			<p>要使用 Danfo.js 进行绘图，需要将其添加到项目中。如果您在 Dnotebook 中工作，我们将使用<a id="_idIndexMarker601"/>作为示例，那么使用<code>load_package</code>函数加载 Danfo.js 和 Plotly.js，如以下代码片段所示:</p>
+			<pre>load_package(["https://cdn.plot.ly/plotly-1.58.4.min.js","https://cdn.jsdelivr.net/npm/danfojs@0.2.3/lib/bundle.min.js"])</pre>
+			<p>前面的代码将在 Dnotebook 中安装 Danfo.js 和 Plotly.js。Danfo.js 使用安装的 Plotly.js 进行绘图。除非显式加载 Plotly，否则 Plotly 将不起作用。</p>
+			<p class="callout-heading">注意</p>
+			<p class="callout">Plotly.js 附带了 Danfo.js 的旧版本(0.2.3 之前的版本),在新版本中已被删除，如下所示的发行说明:<a href="https://danfo.jsdata.org/release-notes#latest-release-node-v-0-2-5-browser-0-2-4">https://danfo . jsdata . org/release-notes # latest-release-node-v-0-2-5-browser-0-2-4</a>。</p>
+			<p>如果您在 HTML 文件中制作绘图，请确保将<code>script</code>标记添加到您的标题中，如以下代码片段所示:</p>
+			<pre>...
+&lt;head&gt;
+&lt;script src="https://cdn.plot.ly/plotly-1.2.0.min.js"&gt;&lt;/script&gt; 
+&lt;script src="https://cdn.jsdelivr.net/npm/danfojs@0.2.3/lib/bundle.min.js"&gt;&lt;/script&gt;
+&lt;/head&gt;
+...</pre>
+			<p>最后，在 React 或 Vue 等<a id="_idIndexMarker602"/> UI 库中，确保通过 npm 或 yarn 等包管理器安装 Danfo.js 和 Plotly.js。</p>
+			<h2 id="_idParaDest-118"><a id="_idTextAnchor121"/>下载用于绘图的数据集</h2>
+			<p>在本节中，我们将下载一个真实世界的财务数据集，该数据集将用于我们所有的<a id="_idIndexMarker603"/>示例。在 Dnotebook 中，您可以<a id="_idIndexMarker604"/>在顶部单元格中下载一次数据集，并使其可用于其他单元格，如下所示:</p>
+			<pre>var financial_df;
+dfd.read_csv("https://raw.githubusercontent.com/plotly/datasets/master/finance-charts-apple.csv")
+    .then(data =&gt; {
+          financial_df  = data
+    })</pre>
+			<p class="callout-heading">注意</p>
+			<p class="callout">确保用<code>var</code>声明<code>financial_df</code>。这使得<code>financial_df</code>对你的笔记本中的每个单元格都可用。如果在 React 或普通 HTML 中工作，那么建议使用<code>let</code>或<code>const</code>。</p>
+			<p>我们可以使用下面的代码片段中的<code>head</code>函数和<code>table</code>作为 s <a id="_idIndexMarker605"/>来显示<code>financial_df</code>的前五行:</p>
+			<pre>table(financial_df.head())</pre>
+			<p>运行前面的<a id="_idIndexMarker606"/>代码会产生以下输出:</p>
+			<div><div><img src="img/B17076_6_1.jpg" alt="Figure 6.1 – Table showing the top five rows of the financial dataset&#13;&#10;"/>
+				</div>
+			</div>
+			<p class="figure-caption">图 6.1–显示财务数据集前五行的表格</p>
+			<p>现在我们有了数据集，我们可以开始制作一些有趣的图表。首先，我们从一个简单的折线图开始。</p>
+			<h1 id="_idParaDest-119"><a id="_idTextAnchor122"/>使用 Danfo.js 创建折线图</h1>
+			<p>折线图<a id="_idIndexMarker607"/>是简单的图表类型，主要用于系列数据或单列。他们可以显示数据点的趋势<a id="_idIndexMarker608"/>。要<a id="_idIndexMarker609"/>在单个列上制作折线图，比如说<code>financial_df</code>中的<code>AAPL.Open</code>，我们可以执行以下操作:</p>
+			<pre>var layout = {
+    yaxis: {
+      title: 'AAPL open points',
+    }
+}
+var config = {
+  displayModeBar: false,
+  layout
+}
+financial_df ['AAPL.Open'].plot(this_div()).line(config)</pre>
+			<p>运行<a id="_idIndexMarker610"/>之前的代码给出以下输出:</p>
+			<div><div><img src="img/B17076_6_2.jpg" alt="Figure 6.2 - Top five rows of the financial dataset&#13;&#10;"/>
+				</div>
+			</div>
+			<p class="figure-caption">图 6.2 -财务数据集的前五行</p>
+			<p>请注意，我们使用 DataFrame subsetting ( <code>financial_df["column name"]</code>)来获得一个列—<code>AAPl.Open</code>—作为一个系列。然后，我们调用<code>.line</code>图表类型并传入一个<code>config</code>对象。<code>config</code>对象接受<code>layout</code>属性<a id="_idIndexMarker611"/>以及 Danfo.js 和 Plotly 使用的其他参数。</p>
+			<p>如果您想要绘制特定的列，您可以将列名数组传递给<code>config</code>参数，如下面的代码片段所示:</p>
+			<pre>var layout = {
+    yaxis: {
+      title: 'AAPL open points',
+    }
+}
+var config = {
+  columns: ["AAPL.Open", "AAPL.Close"],
+  displayModeBar: true,
+  layout
+}
+financial_df.plot(this_div()).line(config)</pre>
+			<p>运行<a id="_idIndexMarker612"/>前面的<a id="_idIndexMarker613"/>代码会产生以下输出:</p>
+			<div><div><img src="img/B17076_6_3.jpg" alt="Figure 6.3 – Plotting two columns as a line chart&#13;&#10;"/>
+				</div>
+			</div>
+			<p class="figure-caption">图 6.3–将两列绘制成折线图</p>
+			<p>默认情况下，图表的<em class="italic"> x </em>轴是数据帧或系列的索引。对于<code>financial_df</code>数据框架，当我们用<code>read_csv</code>函数下载<a id="_idIndexMarker614"/>数据集时，索引是自动生成的。如果你想改变索引，你可以使用<code>set_index</code>函数，如下图所示:</p>
+			<pre>var new_df = financial_df.set_index({key: "Date"})
+table(new_df.head())</pre>
+			<p>输出如下所示:</p>
+			<div><div><img src="img/B17076_6_4.jpg" alt="Figure 6.4 – Table showing the top five rows with the index set to date&#13;&#10;"/>
+				</div>
+			</div>
+			<p class="figure-caption">图 6.4–显示索引设置为日期的前五行的表格</p>
+			<p>如果我们绘制与前面相同的图，我们会看到<em class="italic"> x </em>轴被自动格式化为日期:</p>
+			<div><div><img src="img/B17076_6_5.jpg" alt="Figure 6.5 – Chart of two columns (AAPL.open, AAPL.close) against the date index&#13;&#10;"/>
+				</div>
+			</div>
+			<p class="figure-caption">图 6.5-日期指数的两个柱形图(AAPL.open，AAPL.close)</p>
+			<p>通过将<a id="_idIndexMarker616"/>传递给<code>layout</code>属性或<a id="_idIndexMarker617"/>T21 对象的主体，你可以指定其他 Plotly 配置选项，如宽度、字体等。例如，要配置字体、文本大小、布局宽度等属性，甚至向绘图添加自定义按钮，您可以执行以下操作:</p>
+			<pre>var layout = {
+ 
+  ...  legend: {bgcolor: "#fcba03", 
+          bordercolor: "#444", 
+          borderwidth: 1, 
+          font: {family: "Arial", size: 10, color: "#fff"}
+  },
+  ...}
+var config = {
+  columns: ["AAPL.Open", "AAPL.Close"],
+  displayModeBar: true,
+  modeBarButtonsToAdd: [{ 
+      name: 'about', 
+      icon: Plotly.Icons.question, 
+      click: function (gd) { 
+        alert('An example of configuring Danfo.Js Plots') 
+      } 
+    }] ,
+  layout
+}
+new_df.plot(this_div()).line(config)</pre>
+			<p>运行<a id="_idIndexMarker618"/>之前的代码单元给出以下<a id="_idIndexMarker619"/>输出:</p>
+			<div><div><img src="img/B17076_6_6.jpg" alt="Figure 6.6 – A line plot with various configurations as well as layout properties specified&#13;&#10;"/>
+				</div>
+			</div>
+			<p class="figure-caption">图 6.6–指定了各种配置和布局属性的线图</p>
+			<p>有了前面的信息，您就可以开始从数据集制作精美的折线图了。在下一节中，我们将介绍 Danfo.js 中的另一种类型的图——散点图。</p>
+			<h1 id="_idParaDest-120"><a id="_idTextAnchor123"/>使用 Danfo.js 创建散点图</h1>
+			<p>我们可以通过将绘图类型指定为<code>scatter</code>来轻松制作散点图。例如，使用前面的<a id="_idIndexMarker621"/>部分中的<a id="_idIndexMarker620"/>代码，即<em class="italic">使用 Danfo.js </em>创建折线图，我们只需将绘图类型从<code>line</code>更改为<code>scatter</code>，就可以得到所选列的散点图，如下面的代码块所示:</p>
+			<pre>var layout = {
+  title: "Time series plot of AAPL open and close points",
+  width: 1000,
+  yaxis: {
+    title: 'AAPL open points',
+  },
+  xaxis: {
+    title: 'Date',
+  }
+}
+var config = {
+  columns: ["AAPL.Open", "AAPL.Close"],
+  layout
+}
+new_df.plot(this_div()).scatter(config)</pre>
+			<p>运行前面的代码单元会产生以下输出:</p>
+			<div><div><img src="img/B17076_6_7.jpg" alt="Figure 6.7 – A scatter plot on two columns&#13;&#10;"/>
+				</div>
+			</div>
+			<p class="figure-caption">图 6.7-两列散点图</p>
+			<p>如果您<a id="_idIndexMarker622"/>需要在 DataFrame 中的两个特定列之间绘制散点图，您可以在<code>config</code>对象<a id="_idIndexMarker623"/>中指定<code>x</code>和<code>y</code>的值，如下面的代码所示:</p>
+			<pre>var layout = {
+  title: "Time series plot of AAPL open and close points",
+  width: 1000,
+  yaxis: {
+    title: 'AAPL open points',
+  },
+  xaxis: {
+    title: 'Date',
+  }
+}
+var config = {
+  x: "AAPL.Low",
+  y: "AAPL.High",
+  layout
+}
+new_df.plot(this_div()).scatter(config)</pre>
+			<p>运行<a id="_idIndexMarker624"/>之前的代码单元给出<a id="_idIndexMarker625"/>以下输出:</p>
+			<div><div><img src="img/B17076_6_8.jpg" alt="Figure 6.8 – A scatter plot on explicitly specified x and y columns&#13;&#10;"/>
+				</div>
+			</div>
+			<p class="figure-caption">图 6.8-明确指定的 x 和 y 列上的散点图</p>
+			<p>要定制布局或设置<code>config</code>，您可以将相应的选项传递给<code>config</code>对象，就像我们在<em class="italic">使用 Danfo.js </em>创建折线图一节中所做的那样。</p>
+			<p>在下一节中，我们将简要介绍两种相似类型的图——盒图和小提琴图。</p>
+			<h1 id="_idParaDest-121"><a id="_idTextAnchor124"/>使用 Danfo.js 创建盒子和小提琴图</h1>
+			<p><a id="_idIndexMarker626"/>框和<a id="_idIndexMarker627"/>小提琴<a id="_idIndexMarker628"/>图相似，通常使用<a id="_idIndexMarker629"/>相同的参数。因此，我们将在本节中讨论这两个问题。</p>
+			<p>在以下示例中，我们将首先制作一个方框图，然后通过仅更改绘图类型选项将其更改为小提琴图。</p>
+			<h2 id="_idParaDest-122">为一个系列制作盒子和小提琴的情节</h2>
+			<p>要为 DataFrame 中的一个系列或一个列绘制一个 box <a id="_idIndexMarker630"/>图，首先，我们用子集<a id="_idIndexMarker631"/>来获取系列，然后我们将调用它的绘图类型，如下面的代码片段所示:</p>
+			<pre>var layout = {
+  title: "Box plot on a Series",
+}
+var config = {
+  layout
+}
+new_df["AAPL.Open"].plot(this_div()).box(config)</pre>
+			<p>运行前面的代码单元会产生以下输出:</p>
+			<div><div><img src="img/B17076_6_9.jpg" alt="Figure 6.9 – A box plot on a Series&#13;&#10;"/>
+				</div>
+			</div>
+			<p class="figure-caption">图 6.9–系列的盒状图</p>
+			<p>现在，为了<a id="_idIndexMarker632"/>将前面的情节更改为小提琴情节，您<a id="_idIndexMarker633"/>只需将情节类型更改为<code>violin</code>，如以下代码片段所示:</p>
+			<pre>...
+new_df["AAPL.Open"].plot(this_div()).<strong class="bold">violin</strong>(config)
+…</pre>
+			<p>运行前面的代码单元会产生以下输出:</p>
+			<div><div><img src="img/B17076_6_10.jpg" alt="Figure 6.10 – A violin plot on a Series&#13;&#10;"/>
+				</div>
+			</div>
+			<p class="figure-caption">图 6.10-一个系列的小提琴情节</p>
+			<p>当我们需要一次为多列绘制一个方框图时怎么办？在下一节中，我们将向您展示如何操作。</p>
+			<h2 id="_idParaDest-123"><a id="_idTextAnchor126"/>多栏的方框图和小提琴图</h2>
+			<p>为了<a id="_idIndexMarker634"/>为数据帧中的多个列绘制 box/violin 图，您可以将一个列名数组传递给绘图，正如我们<a id="_idIndexMarker635"/>在下面的代码片段中演示的:</p>
+			<pre>var layout = {
+  title: "Box plot on multiple columns",
+}
+var config = {
+  columns: ["AAPL.Open", "AAPL.Close", "AAPL.Low", "AAPL.High"],
+  layout
+}
+new_df.plot(this_div()).box(config)</pre>
+			<p>运行前面的代码单元会产生以下输出:</p>
+			<div><div><img src="img/B17076_6_11.jpg" alt="Figure 6.11 – Box plots of multiple columns at a time&#13;&#10;"/>
+				</div>
+			</div>
+			<p class="figure-caption">图 6.11–一次多列的箱线图</p>
+			<p>重用之前的<a id="_idIndexMarker636"/>代码，我们可以通过改变图类型轻松地将<a id="_idIndexMarker637"/>盒图改变为小提琴图，如下所示:</p>
+			<pre>…
+new_df.plot(this_div()).violin(config)
+...</pre>
+			<p>我们得到以下输出:</p>
+			<div><div><img src="img/B17076_6_12.jpg" alt="Figure 6.12 – Violin plots of multiple columns at a time&#13;&#10;"/>
+				</div>
+			</div>
+			<p class="figure-caption">图 6.12-一次多列的小提琴图</p>
+			<p>最后，如果我们想指定<code>x</code>和<code>y</code>的值呢？我们将在下一节展示这一点。</p>
+			<h2 id="_idParaDest-124"><a id="_idTextAnchor127"/>具有特定 x 和 y 值的盒图和小提琴图</h2>
+			<p>我们可以用特定的<code>x</code>和<code>y</code>值制作<a id="_idIndexMarker638"/>盒子和小提琴图。<code>x</code>和<code>y</code>值是必须出现在<a id="_idIndexMarker639"/>数据帧中的列名。</p>
+			<p class="callout-heading">注意</p>
+			<p class="callout">建议箱形图的<code>x</code>值是分类的，即具有固定数量的类。这确保了可解释性。</p>
+			<p>在下面的例子中，我们向您展示了如何明确地为绘图指定<code>x</code>和<code>y</code>值:</p>
+			<pre>var layout = {
+  title: "Box plot on x and y values",
+}
+var config = {
+  x: "direction",
+  y: "AAPL.Open",
+  layout
+}
+new_df.plot(this_div()).box(config)</pre>
+			<p>运行前面的代码单元会产生以下输出:</p>
+			<div><div><img src="img/B17076_6_13.jpg" alt="Figure 6.13 – Box plots from specific x and y values&#13;&#10;"/>
+				</div>
+			</div>
+			<p class="figure-caption">图 6.13-特定 x 和 y 值的箱线图</p>
+			<p>注意<a id="_idIndexMarker640"/>中的<code>x</code>值是一个名为<code>direction</code>的分类变量<a id="_idIndexMarker641"/>。该列有两个固定的类别—<code>Increasing</code>和<code>Decreasing</code>。</p>
+			<p>像往常一样，我们可以通过改变类型得到相应的小提琴情节:</p>
+			<pre>...
+new_df.plot(this_div()).violin(config)
+…</pre>
+			<p>运行前面的代码单元会产生以下输出:</p>
+			<div><div><img src="img/B17076_6_14.jpg" alt="Figure 6.14 – Violin plot from specific x and y values&#13;&#10;"/>
+				</div>
+			</div>
+			<p class="figure-caption">图 6.14-特定 x 和 y 值的小提琴图</p>
+			<p>现在，如果我们同时为<code>x</code>和<code>y</code>指定<a id="_idIndexMarker643"/>连续值，会发生什么情况？好吧，让我们在下面的例子中找出答案:</p>
+			<pre>var layout = {
+  title: "Box plot on two continuous variables",
+}
+var config = {
+  x: "AAPL.Low",
+  y: "AAPL.Open",
+  layout
+}
+new_df.plot(this_div()).box(config)</pre>
+			<p>运行前面的代码单元会产生以下输出:</p>
+			<div><div><img src="img/B17076_6_15.jpg" alt="Figure 6.15 – Box plot on two continuous variables&#13;&#10;"/>
+				</div>
+			</div>
+			<p class="figure-caption">图 6.15-两个连续变量的箱线图</p>
+			<p>从前面的输出中，您可以看到图表变得几乎无法理解，并且使用方框/小提琴图的目标没有实现。因此，建议对分类<code>x</code>值使用盒图/小提琴图。</p>
+			<p>在下一节中，我们将介绍用于制作直方图的<code>hist</code>绘图类型。</p>
+			<h1 id="_idParaDest-125"><a id="_idTextAnchor128"/>使用 Danfo.js 创建直方图</h1>
+			<p>正如我们前面解释的，直方图是数据分布的表示。由绘图命名空间<a id="_idIndexMarker645"/>公开的<code>hist</code>函数<a id="_idIndexMarker644"/>可用于从数据帧或系列制作直方图，我们将在下一节演示。</p>
+			<h2 id="_idParaDest-126"><a id="_idTextAnchor129"/>从系列图像创建直方图</h2>
+			<p>为了从系列中创建<a id="_idIndexMarker646"/>直方图，可以对系列调用<code>hist</code>函数，或者如果在数据帧上绘图，可以用列名对数据帧<a id="_idIndexMarker647"/>进行子集化，如下例所示:</p>
+			<pre>var layout = {
+   title: "Histogram on a Series data",
+}
+var config = { 
+  layout 
+} 
+new_df["AAPL.Open"].plot(this_div()).hist(config)</pre>
+			<p>运行前面的代码单元会产生以下输出:</p>
+			<div><div><img src="img/B17076_6_16.jpg" alt="Figure 6.16 – Histogram on Series data&#13;&#10;"/>
+				</div>
+			</div>
+			<p class="figure-caption">图 6.16–系列数据的直方图</p>
+			<p>接下来，我们将一次为数据帧中的多个列制作一个直方图。</p>
+			<h2 id="_idParaDest-127"><a id="_idTextAnchor130"/>从多列创建直方图</h2>
+			<p>如果您希望<a id="_idIndexMarker648"/>为数据帧中的多个列制作直方图，您可以将列名作为<a id="_idIndexMarker649"/>列名的数组进行传递，如下面的代码片段所示:</p>
+			<pre>var layout = {
+  title: "Histogram of two columns",
+}
+var config = { 
+  columns: ["dn", "AAPL.Adjusted"],
+  layout 
+} 
+new_df.plot(this_div()).hist(config)</pre>
+			<p>运行前面的代码单元会产生以下输出:</p>
+			<div><div><img src="img/B17076_6_17.jpg" alt="Figure 6.17 – Histogram on two columns&#13;&#10;"/>
+				</div>
+			</div>
+			<p class="figure-caption">图 6.17–两列直方图</p>
+			<p>如果您需要<a id="_idIndexMarker650"/>指定生成直方图的单个值<code>x</code>或<code>y</code>，您可以将<code>x</code>或<code>y</code>值传递给<code>config</code>对象。</p>
+			<p class="callout-heading">注意</p>
+			<p class="callout">一次只能指定<code>x</code>或<code>y</code>中的一个。这是因为直方图是一个单变量图表。因此，如果指定了<code>x</code>值，直方图将是垂直的，如果指定了<code>y</code>，直方图将是水平的。</p>
+			<p>在下面的<a id="_idIndexMarker651"/>示例中，我们通过指定<code>y</code>值来制作水平直方图:</p>
+			<pre>var layout = {
+  title: "A horizontal histogram",
+}
+var config = { 
+  y: "dn",
+  layout 
+} 
+new_df.plot(this_div()).hist(config)</pre>
+			<p>运行前面的代码单元会产生以下输出:</p>
+			<div><div><img src="img/B17076_6_18.jpg" alt="Figure 6.18 – A horizontal histogram&#13;&#10;"/>
+				</div>
+			</div>
+			<p class="figure-caption">图 6.18-水平直方图</p>
+			<p>默认情况下，直方图是垂直的，这相当于设置了<code>x</code>参数。</p>
+			<p>在下一节中，我们将介绍条形图。</p>
+			<h1 id="_idParaDest-128"><a id="_idTextAnchor131"/>使用 Danfo.js 创建条形图</h1>
+			<p>条形图<a id="_idIndexMarker652"/>用矩形条表示分类数据，矩形条的长度与它们所代表的值成比例。</p>
+			<p>还可以在<code>plot</code>名称空间上调用<code>bar</code>函数<a id="_idIndexMarker653"/>，并且还可以应用各种配置选项。在接下来的几节中，我们将演示如何从一个系列以及一个多列的数据框架中创建条形图。</p>
+			<h2 id="_idParaDest-129"><a id="_idTextAnchor132"/>根据系列创建条形图</h2>
+			<p>要从一个系列制作一个<a id="_idIndexMarker654"/>简单条形图，您可以<a id="_idIndexMarker655"/>执行以下操作:</p>
+			<pre>var layout = { 
+   title: "A simple bar chart on a series",
+} 
+var config = {  
+  layout  
+}  
+new_df["AAPL.Volume"].plot(this_div()).bar(config)</pre>
+			<p>运行<a id="_idIndexMarker656"/>前面的代码单元会产生以下输出:</p>
+			<div><div><img src="img/B17076_6_19.jpg" alt="Figure 6.19 – A bar chart on a Series&#13;&#10;"/>
+				</div>
+			</div>
+			<p class="figure-caption">图 6.19–系列的条形图</p>
+			<p>看前面的图，你会注意到我们有大量的酒吧。这是因为<a id="_idIndexMarker657"/><code>AAPL.Volume</code>列是一个连续变量，并且为每个点创建了一个条形。</p>
+			<p>为了避免这种无法解释的图表，建议对具有固定数量数值类的变量使用条形图。我们可以通过创建一个简单的序列来演示这一点，如下面的代码所示:</p>
+			<pre>custom_sf = new dfd.Series([1, 3, 2, 6, 10, 34, 40, 51, 90, 75])
+custom_sf.plot(this_div()).bar(config)</pre>
+			<p>运行前面的代码单元会产生以下输出:</p>
+			<div><div><img src="img/B17076_6_20.jpg" alt="Figure 6.20 – A bar chart on a Series with fixed values&#13;&#10;"/>
+				</div>
+			</div>
+			<p class="figure-caption">图 6.20–具有固定值的系列的条形图</p>
+			<p>在下一节中，我们将向您展示如何从指定的列名列表中制作分组条形图。</p>
+			<h2 id="_idParaDest-130"><a id="_idTextAnchor133"/>从多列创建条形图</h2>
+			<p>要从一列<a id="_idIndexMarker661"/>列名创建<a id="_idIndexMarker660"/>分组条形图，您可以将列名<a id="_idIndexMarker662"/>传递给<code>config</code>对象，如下例所示:</p>
+			<pre>var layout = { 
+  title: "A bar chart on two columns", 
+} 
+var config = {  
+  columns: ["price", "cost"],
+  layout  
+}   
+var df = new dfd.DataFrame({'price': [20, 18, 489, 675, 1776],
+                           'cost': [40, 22, 21, 60, 19],
+                           'count': [4, 25, 281, 600, 1900]},
+                        {index: [1990, 1997, 2003, 2009, 2014]})
+df.plot(this_div()).bar(config)</pre>
+			<p>运行<a id="_idIndexMarker663"/>之前的代码单元给出以下输出:</p>
+			<div><div><img src="img/B17076_6_21.jpg" alt="Figure 6.21 – A bar chart on two columns&#13;&#10;"/>
+				</div>
+			</div>
+			<p class="figure-caption">图 6.21-两列条形图</p>
+			<p>注意，在前面的例子中，我们创建了一个新的数据帧。这是因为财务数据集不包含我们前面说过的条形图所需的数据<a id="_idIndexMarker665"/>类型。</p>
+			<p>这就把我们带到了本章的结尾。恭喜你走到这一步！我们相信你已经学到了很多，并且可以在你的个人项目中使用这些知识。</p>
+			<h1 id="_idParaDest-131"><a id="_idTextAnchor134"/>总结</h1>
+			<p>在本章中，我们介绍了使用 Danfo.js 进行绘图和可视化。首先，我们向您展示了如何在新项目中设置 Danfo.js 和 Plotly，然后继续下载数据集，我们将数据集加载到 DataFrame 中。接下来，我们向您展示了如何创建基本的图表，如折线图、条形图和散点图，以及统计图，如直方图、盒图和小提琴图。最后，我们向您展示了如何配置用 Danfo.js 创建的图。</p>
+			<p>您在本课程和<a href="B17076_05_ePub_RK.xhtml#_idTextAnchor099"> <em class="italic">第 5 章</em></a><em class="italic">使用 Plotly.js </em>进行数据可视化中获得的知识，将在创建数据驱动的应用程序和自定义仪表板时发挥实际作用。</p>
+			<p>在下一章中，您将学习数据聚合和分组操作，从而理解如何执行数据转换，如合并、连接和串联。</p>
+		</div>
+	
+
+</body></html>

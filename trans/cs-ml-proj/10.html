@@ -1,0 +1,565 @@
+<html><head/><body>
+
+  
+    <title>Credit Card Fraud Detection</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+  
+
+
+  
+        
+
+                            
+                    <h1 class="header-title" id="calibre_pb_0">信用卡欺诈检测</h1>
+                
+            
+            
+                
+<p class="calibre2">在前一章中，我们使用<strong class="calibre4">主成分分析</strong> ( <strong class="calibre4"> PCA </strong>)构建了第一个异常检测模型，并了解了如何使用主成分检测网络攻击。与网络攻击或网络入侵问题类似，异常检测模型经常用于欺诈检测。许多行业中的各种组织，如金融服务、保险公司和政府机构，经常会遇到欺诈案件。特别是在金融领域，欺诈与金钱损失直接相关，这些欺诈案件可能以多种不同的形式出现，如被盗信用卡、伪造会计账目或伪造支票。因为这些事件相对很少发生，所以很难发现这些欺诈案件。</p>
+<p class="calibre2">在本章中，我们将讨论如何为信用卡欺诈检测建立一个异常检测模型。我们将使用一个匿名的信用卡数据集，其中包含大部分正常的信用卡交易和相对较少的欺诈性信用卡交易。我们将首先查看数据集的结构、目标类的分布以及各种匿名化特征的分布。然后，我们将开始应用 PCA 并构建标准化的主成分，这些主成分将用作我们欺诈检测模型的特征。在模型构建步骤中，我们将尝试两种不同的方法来构建欺诈检测模型——与我们在《T4》第九章、<em class="calibre13">网络攻击检测</em>中构建的方法类似的<strong class="calibre4">主成分分类器</strong> ( <strong class="calibre4"> PCC </strong>，以及从正常信用卡交易中学习并检测任何异常的单类<strong class="calibre4">支持向量机</strong> ( <strong class="calibre4"> SVM </strong>)。随着这些模型的建立，我们将评估它们的异常检测率，并比较它们对信用卡欺诈检测的性能。</p>
+<p class="calibre2">在本章中，我们将讨论以下主题:</p>
+<ul class="calibre10">
+<li class="calibre11">信用卡欺诈检测项目的问题定义</li>
+<li class="calibre11">匿名信用卡数据集的数据分析</li>
+<li class="calibre11">特征工程和 PCA</li>
+<li class="calibre11">一级 SVM 对 PCC</li>
+<li class="calibre11">评估异常检测模型</li>
+</ul>
+
+
+            
+
+            
+        
+    
+
+
+
+  
+    <title>Problem definition</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+  
+
+
+  
+        
+
+                            
+                    <h1 class="header-title" id="calibre_pb_0">问题定义</h1>
+                
+            
+            
+                
+<p class="calibre2">信用卡诈骗是其他诈骗事件中比较常见的，在我们的日常生活中也会发生。信用卡诈骗有多种方式。信用卡可能会丢失或被盗，然后被小偷使用。另一种可能发生信用卡欺诈的方式是，您的身份可能已经暴露给恶意的人，然后他们使用您的身份开设一个新的信用卡帐户，甚至接管您现有的信用卡帐户。骗子甚至可以利用电话钓鱼进行信用卡诈骗。由于信用卡欺诈有多种可能发生的方式，许多信用卡持有人都面临这种类型的欺诈风险，因此在我们的日常生活中，采取适当的方式来防止欺诈已经变得至关重要。许多信用卡公司采用各种措施来防止和检测这些类型的欺诈活动，使用各种<strong class="calibre4">机器学习</strong> ( <strong class="calibre4"> ML </strong>)和异常检测技术。</p>
+<p class="calibre2">在本章中，我们将通过使用和扩展我们关于构建异常检测模型的知识来构建一个信用卡欺诈检测模型。我们将使用匿名的信用卡数据集，可在以下链接找到:<a href="https://www.kaggle.com/mlg-ulb/creditcardfraud/data" target="_blank" class="calibre9">https://www.kaggle.com/mlg-ulb/creditcardfraud/data</a>。这个数据集有大约 285，000 笔信用卡交易，其中只有大约 0.17%的交易是欺诈交易，这很好地反映了现实生活中的一种情况。有了这些数据，我们将了解数据集的结构，然后开始了解目标和特征变量的分布。然后，我们将使用 PCA 构建特征，类似于我们在<a target="_blank" href="part0116.html#3EK180-5ebdf09927b7492888e31e8436526470" class="calibre9">第 9 章</a>、<em class="calibre13">网络攻击检测</em>中所做的。为了构建信用卡欺诈检测模型，我们将对 PCC(类似于我们在第 9 章、<em class="calibre13">网络攻击检测</em>中构建的 PCC)和单类 SVM 进行实验，后者从正常的信用卡交易中学习并决定新交易是否欺诈。最后，我们将考察误报率和欺诈检测率，以评估和比较这些模型的性能。</p>
+<p class="calibre2">总结一下我们对信用卡欺诈检测项目的问题定义:</p>
+<ul class="calibre10">
+<li class="calibre11">有什么问题？我们需要一个针对欺诈性信用卡交易的异常检测模型，它可以识别、预防和阻止潜在的欺诈性信用卡活动。</li>
+<li class="calibre11">为什么会有问题？每个信用卡持有人都面临着成为信用卡欺诈受害者的风险，如果没有为这种恶意企图做好准备，信用卡欺诈受害者的数量将会增加。通过信用卡欺诈检测模型，我们可以预防和阻止潜在的欺诈性信用卡交易的发生。</li>
+<li class="calibre11">解决这个问题的方法有哪些？我们将使用公开的匿名信用卡数据，这些数据包含大量正常的信用卡交易和少量欺诈交易。我们将对这些数据应用主成分分析，并用主成分分析和单类 SVM 模型进行欺诈检测实验。</li>
+<li class="calibre11">成功的标准是什么？因为任何信用卡欺诈事件都会导致金钱损失，所以我们需要高欺诈检测率。即使有一些假阳性或假警报，最好标记任何可疑的信用卡活动，以防止任何欺诈交易通过。</li>
+</ul>
+
+
+            
+
+            
+        
+    
+
+
+
+  
+    <title>Data analysis for anonymized credit card data</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+  
+
+
+  
+        
+
+                            
+                    <h1 class="header-title" id="calibre_pb_0">匿名信用卡数据的数据分析</h1>
+                
+            
+            
+                
+<p class="calibre2">现在让我们开始查看信用卡数据集。如前所述，我们将使用可从以下链接获得的数据集:<a href="https://www.kaggle.com/mlg-ulb/creditcardfraud/data" target="_blank" class="calibre9">https://www.kaggle.com/mlg-ulb/creditcardfraud/data</a>。这是一个包含大约 285，000 条信用卡交易记录的数据集，其中一些是欺诈交易，大多数记录是正常的信用卡交易。由于保密性问题，数据集中的要素名称被匿名化。我们将使用<kbd class="calibre12">creditcard.csv</kbd>文件，可以通过链接下载。</p>
+
+
+            
+
+            
+        
+    
+
+
+
+  
+    <title>Target variable distribution</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+  
+
+
+  
+        
+
+                            
+                    <h1 class="header-title" id="calibre_pb_0">目标变量分布</h1>
+                
+            
+            
+                
+<p class="calibre2">我们要检查的第一件事是欺诈性和非欺诈性信用卡交易在数据集中的分布。在数据集中，名为<kbd class="calibre12">Class</kbd>的列是目标变量，对于欺诈性信用卡交易用<kbd class="calibre12">1</kbd>编码，对于非欺诈性交易用<kbd class="calibre12">0</kbd>编码。您可以使用以下代码首先将数据加载到 Deedle 数据框中:</p>
+<pre class="calibre19">// Read in the Credit Card Fraud dataset<br class="title-page-name"/>// TODO: change the path to point to your data directory<br class="title-page-name"/>string dataDirPath = @"&lt;path-to-your-dir&gt;";<br class="title-page-name"/><br class="title-page-name"/>// Load the data into a data frame<br class="title-page-name"/>string dataPath = Path.Combine(dataDirPath, "creditcard.csv");<br class="title-page-name"/>Console.WriteLine("Loading {0}\n\n", dataPath);<br class="title-page-name"/>var df = Frame.ReadCsv(<br class="title-page-name"/>    dataPath,<br class="title-page-name"/>    hasHeaders: true,<br class="title-page-name"/>    inferTypes: true<br class="title-page-name"/>);</pre>
+<p class="calibre2">这个数据集有表示每个特性和目标类的头，所以我们用<kbd class="calibre12">hasHeaders: true</kbd>标志加载这个数据。现在我们已经加载了数据，您可以使用下面的代码来分析目标类的分布:</p>
+<pre class="calibre19">// Target variable distribution<br class="title-page-name"/>var targetVarCount = df.AggregateRowsBy&lt;string, int&gt;(<br class="title-page-name"/>    new string[] { "Class" },<br class="title-page-name"/>    new string[] { "V1" },<br class="title-page-name"/>    x =&gt; x.ValueCount<br class="title-page-name"/>).SortRows("V1");<br class="title-page-name"/>targetVarCount.RenameColumns(new string[] { "is_fraud", "count" });<br class="title-page-name"/><br class="title-page-name"/>targetVarCount.Print();<br class="title-page-name"/><br class="title-page-name"/>DataBarBox.Show(<br class="title-page-name"/>    targetVarCount.GetColumn&lt;string&gt;("is_fraud").Values.ToArray(),<br class="title-page-name"/>    targetVarCount["count"].Values.ToArray()<br class="title-page-name"/>).SetTitle(<br class="title-page-name"/>    "Counts by Target Class"<br class="title-page-name"/>);</pre>
+<p class="calibre2">您可能已经熟悉了这个函数，我们正在 Deedle 数据框中使用<kbd class="calibre12">AggregateRowsBy</kbd>函数按列<kbd class="calibre12">Class</kbd>对行进行分组，然后计算每个目标类中的记录数。由于列名<kbd class="calibre12">Class</kbd>不能很好地代表我们的目标类是什么以及它的含义，我们用另一个名称<kbd class="calibre12">is_fraud</kbd>对其进行了重命名。从这段代码中可以看出，可以使用带有新列名字符串数组的<kbd class="calibre12">RenameColumns</kbd>函数来重命名特征名。最后，我们使用 Accord.NET 框架中的<kbd class="calibre12">DataBarBox</kbd>类来显示条形图，直观地显示目标类的分布。</p>
+<p class="calibre2">以下输出显示了目标类的分布:</p>
+<div><img src="img/00163.jpeg" class="calibre116"/></div>
+<p class="calibre2">从这个输出可以看出，欺诈性信用卡交易的数量和非欺诈性信用卡交易的数量之间有很大的差距。我们只有 492 条欺诈记录和超过 284，000 条非欺诈记录。</p>
+<p class="calibre2">下面是代码生成的条形图，用于直观显示目标类的分布:</p>
+<div><img src="img/00164.jpeg" class="calibre117"/></div>
+<p class="calibre2">正如前面的输出所预期的，属于目标类的记录数<strong class="calibre4"> 1 </strong>代表欺诈，属于目标类的记录数<strong class="calibre4"> 0 </strong>代表非欺诈和正常的信用卡交易，两者之间有很大的差距。这种巨大的差距是意料之中的，因为与大量正常的日常信用卡交易相比，信用卡欺诈相对较少发生。这种巨大的类别不平衡使得大多数 ML 模型很难准确地学习如何识别欺诈和非欺诈。</p>
+
+
+            
+
+            
+        
+    
+
+
+
+  
+    <title>Feature distributions</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+  
+
+
+  
+        
+
+                            
+                    <h1 class="header-title" id="calibre_pb_0">特征分布</h1>
+                
+            
+            
+                
+<p class="calibre2">由于保密问题，除交易金额外，我们在该数据中的特征是匿名的。因为我们不知道每个特征代表什么，每个特征意味着什么，所以很难从特征分析中推导出任何直观的见解。但是，了解每个特性是如何分布的，每个特性的分布与其他特性的分布有何不同，以及我们是否可以从一组特性中得出任何值得注意的模式，仍然是很有帮助的。</p>
+<p class="calibre2">我们先来看看代码。以下代码显示了我们如何计算和可视化特征的分布:</p>
+<pre class="calibre19">// Feature distributions<br class="title-page-name"/>foreach (string col in df.ColumnKeys)<br class="title-page-name"/>{<br class="title-page-name"/>    if (col.Equals("Class") || col.Equals("Time"))<br class="title-page-name"/>    {<br class="title-page-name"/>        continue;<br class="title-page-name"/>    }<br class="title-page-name"/><br class="title-page-name"/>    double[] values = df[col].DropMissing().ValuesAll.ToArray();<br class="title-page-name"/>    <br class="title-page-name"/>    Console.WriteLine(String.Format("\n\n-- {0} Distribution -- ", col));<br class="title-page-name"/>    double[] quartiles = Accord.Statistics.Measures.Quantiles(<br class="title-page-name"/>        values,<br class="title-page-name"/>        new double[] { 0, 0.25, 0.5, 0.75, 1.0 }<br class="title-page-name"/>    );<br class="title-page-name"/>    Console.WriteLine(<br class="title-page-name"/>        "Min: \t\t\t{0:0.00}\nQ1 (25% Percentile): \t{1:0.00}\nQ2 (Median): \t\t{2:0.00}\nQ3 (75% Percentile): \t{3:0.00}\nMax: \t\t\t{4:0.00}",<br class="title-page-name"/>        quartiles[0], quartiles[1], quartiles[2], quartiles[3], quartiles[4]<br class="title-page-name"/>    );<br class="title-page-name"/><br class="title-page-name"/>    HistogramBox.Show(<br class="title-page-name"/>        values,<br class="title-page-name"/>        title: col<br class="title-page-name"/>    )<br class="title-page-name"/>    .SetNumberOfBins(50);<br class="title-page-name"/>}</pre>
+<p class="calibre2">正如您从这段代码中所看到的，我们正在计算四分位数。您可能还记得，四分位数是将数据分成四个不同部分的点。第一个四分位数是最小值和中位值之间的中点，第二个四分位数是中位值，第三个四分位数是中位值和最大值之间的中点。使用<kbd class="calibre12">Accord.Statistics.Measures.Quantiles</kbd>函数可以很容易地计算出四分位数。在计算四分位数之后，我们使用 Accord.NET 框架中的<kbd class="calibre12">HistogramBox</kbd>类，为每个特征构建直方图以可视化分布。让我们看看这段代码的一些输出。</p>
+<p class="calibre2">我们要看的第一个分布是针对<kbd class="calibre12">V1</kbd>特性的，而<kbd class="calibre12">V1</kbd>的四分位数如下所示:</p>
+<div><img src="img/00165.jpeg" class="calibre118"/></div>
+<p class="calibre2">看起来<kbd class="calibre12">V1</kbd>特征的分布向负方向倾斜。即使中位数约为 0，负值的范围也是从-56.41 到 0，而正值的范围只是从 0 到 2.45。以下是前面代码的直方图输出:</p>
+<div><img src="img/00166.jpeg" class="calibre26"/></div>
+<p class="calibre2">正如预期的那样，直方图显示了特征分布的左偏度，<kbd class="calibre12">V1</kbd>，而大多数值都在 0 左右。</p>
+<p class="calibre2">接下来，让我们看看第二个特性<kbd class="calibre12">V2</kbd>的分布，其输出如下所示:</p>
+<div><img src="img/00167.jpeg" class="calibre119"/></div>
+<p class="calibre2"><kbd class="calibre12">V2</kbd>的直方图如下所示:</p>
+<div><img src="img/00168.jpeg" class="calibre26"/></div>
+<p class="calibre2">这些值似乎以 0 为中心，尽管在负方向和正方向有一些极值。与前面的特征<kbd class="calibre12">V1</kbd>相比，偏斜不太明显。</p>
+<p class="calibre2">最后，让我们看看<kbd class="calibre12">amount</kbd>特性的分布，它可以告诉我们交易量的范围。以下是<kbd class="calibre12">amount</kbd>特征的四分位数:</p>
+<div><img src="img/00169.jpeg" class="calibre120"/></div>
+<p class="calibre2">似乎任何信用卡交易都可以将 0 到 25，691.16 之间的任何正数作为交易金额。以下是<kbd class="calibre12">amount</kbd>特征的直方图:</p>
+<div><img src="img/00170.jpeg" class="calibre26"/></div>
+<p class="calibre2">不出所料，我们可以看到右边有一条长尾巴。这在某种程度上是意料之中的，因为每个人的消费模式都不同于其他人。有些人可能通常会购买价格适中的商品，而有些人可能会购买非常昂贵的商品。</p>
+<p class="calibre2">最后，让我们简单地看一下当前的功能集如何区分欺诈性信用卡交易和非欺诈性交易。让我们先来看看下面的代码:</p>
+<pre class="calibre19">// Target Var Distributions on 2-dimensional feature space<br class="title-page-name"/>double[][] data = BuildJaggedArray(<br class="title-page-name"/>    df.ToArray2D&lt;double&gt;(), df.RowCount, df.ColumnCount<br class="title-page-name"/>);<br class="title-page-name"/>int[] labels = df.GetColumn&lt;int&gt;("Class").ValuesAll.ToArray();<br class="title-page-name"/><br class="title-page-name"/>double[][] first2Components = data.Select(<br class="title-page-name"/>    x =&gt; x.Where((y, i) =&gt; i &lt; 2<br class="title-page-name"/>).ToArray()).ToArray();<br class="title-page-name"/>ScatterplotBox.Show("Feature #1 vs. Feature #2", first2Components, labels);<br class="title-page-name"/><br class="title-page-name"/>double[][] next2Components = data.Select(<br class="title-page-name"/>    x =&gt; x.Where((y, i) =&gt; i &gt;= 1 &amp;&amp; i &lt;= 2).ToArray()<br class="title-page-name"/>).ToArray();<br class="title-page-name"/>ScatterplotBox.Show("Feature #2 vs. Feature #3", next2Components, labels);<br class="title-page-name"/><br class="title-page-name"/>next2Components = data.Select(<br class="title-page-name"/>    x =&gt; x.Where((y, i) =&gt; i &gt;= 2 &amp;&amp; i &lt;= 3).ToArray()<br class="title-page-name"/>).ToArray();<br class="title-page-name"/>ScatterplotBox.Show("Feature #3 vs. Feature #4", next2Components, labels);</pre>
+<p class="calibre2">从这段代码中可以看出，我们首先将 Deedle 数据帧变量<kbd class="calibre12">df</kbd>转换为二维数组变量<kbd class="calibre12">data</kbd>，以构建散点图。然后，我们采用前两个特性，并显示一个散点图，显示目标类在这两个特性中的分布。对于第二、第三和第四个特征，我们重复这个过程两次以上。</p>
+<p class="calibre2">以下散点图显示了目标类在数据集中第一个和第二个要素中的分布情况:</p>
+<div><img src="img/00171.jpeg" class="calibre93"/></div>
+<p class="calibre2">从这个散点图中，很难(如果不是不可能的话)将欺诈(编码为 1)与非欺诈(编码为 0)区分开来。让我们看看接下来两个特性之间的散点图:</p>
+<div><img src="img/00172.jpeg" class="calibre121"/></div>
+<p class="calibre2">与前两个特征的情况类似，似乎没有明确的界线来区分欺诈和非欺诈。最后，下面是第三和第四个特征之间的目标类的散点图:</p>
+<div><img src="img/00173.jpeg" class="calibre122"/></div>
+<p class="calibre2">从这个散点图来看，很难画出一条清晰的线来区分这两个目标类别。欺诈性交易似乎更多地位于散点图的右下方，但模式不明显。在下一节中，我们将尝试构建能够更好地分离两个目标类的特性。</p>
+<p class="calibre2">这个数据分析步骤的完整代码可以在以下链接找到:<a href="https://github.com/yoonhwang/c-sharp-machine-learning/blob/master/ch.10/DataAnalyzer.cs" target="_blank" class="calibre9">https://github . com/Yoon hwang/c-sharp-machine-learning/blob/master/ch . 10/data analyzer . cs</a>。</p>
+
+
+            
+
+            
+        
+    
+
+
+
+  
+    <title>Feature engineering and PCA</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+  
+
+
+  
+        
+
+                            
+                    <h1 class="header-title" id="calibre_pb_0">特征工程和 PCA</h1>
+                
+            
+            
+                
+<p class="calibre2">到目前为止，我们已经分析了目标和特征变量的分布情况。在这一章中，我们将重点放在使用主成分分析构建特征上。</p>
+
+
+            
+
+            
+        
+    
+
+
+
+  
+    <title>Preparation for feature engineering</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+  
+
+
+  
+        
+
+                            
+                    <h1 class="header-title" id="calibre_pb_0">特征工程的准备</h1>
+                
+            
+            
+                
+<p class="calibre2">为了适应主成分分析，我们必须首先准备我们的数据。让我们快速看一下下面的代码，将信用卡欺诈数据加载到 Deedle 的数据框中:</p>
+<pre class="calibre19">// Read in the Credit Card Fraud dataset<br class="title-page-name"/>// TODO: change the path to point to your data directory<br class="title-page-name"/>string dataDirPath = @"&lt;path-to-dir&gt;";<br class="title-page-name"/><br class="title-page-name"/>// Load the data into a data frame<br class="title-page-name"/>string dataPath = Path.Combine(dataDirPath, "creditcard.csv");<br class="title-page-name"/>Console.WriteLine("Loading {0}\n\n", dataPath);<br class="title-page-name"/>var df = Frame.ReadCsv(<br class="title-page-name"/>    dataPath,<br class="title-page-name"/>    hasHeaders: true,<br class="title-page-name"/>    inferTypes: true<br class="title-page-name"/>);<br class="title-page-name"/><br class="title-page-name"/>Console.WriteLine("* Shape: {0}, {1}\n\n", df.RowCount, df.ColumnCount);</pre>
+<p class="calibre2">现在我们已经将数据加载到一个名为<kbd class="calibre12">df</kbd>的变量中，我们将不得不将数据分成两组，一组用于正常的信用卡交易数据，另一组用于欺诈性交易数据，这样我们就可以将 PCA 仅用于正常交易。看看下面的代码，看看我们如何从原始数据集中分离出正常的事务:</p>
+<pre class="calibre19">string[] featureCols = df.ColumnKeys.Where(<br class="title-page-name"/>    x =&gt; !x.Equals("Time") &amp;&amp; !x.Equals("Class")<br class="title-page-name"/>).ToArray();<br class="title-page-name"/><br class="title-page-name"/>var noFraudData = df.Rows[<br class="title-page-name"/>    df["Class"].Where(x =&gt; x.Value == 0.0).Keys<br class="title-page-name"/>].Columns[featureCols];<br class="title-page-name"/>double[][] data = BuildJaggedArray(<br class="title-page-name"/>    noFraudData.ToArray2D&lt;double&gt;(), noFraudData.RowCount, featureCols.Length<br class="title-page-name"/>);</pre>
+<p class="calibre2">如果您回忆一下前面的数据分析步骤，目标变量<kbd class="calibre12">Class</kbd>对于欺诈性交易编码为 1，对于非欺诈性交易编码为 0。从代码中可以看出，我们创建了一个数据帧<kbd class="calibre12">noFraudData</kbd>，其中只有正常的信用卡交易记录。然后，我们使用辅助函数<kbd class="calibre12">BuildJaggedArray</kbd>，将这个数据帧转换成一个二维双数组，用于拟合 PCA。这个助手函数的代码如下所示:</p>
+<pre class="calibre19">private static double[][] BuildJaggedArray(double[,] ary2d, int rowCount, int colCount)<br class="title-page-name"/>{<br class="title-page-name"/>    double[][] matrix = new double[rowCount][];<br class="title-page-name"/>    for (int i = 0; i &lt; rowCount; i++)<br class="title-page-name"/>    {<br class="title-page-name"/>        matrix[i] = new double[colCount];<br class="title-page-name"/>        for (int j = 0; j &lt; colCount; j++)<br class="title-page-name"/>        {<br class="title-page-name"/>            matrix[i][j] = double.IsNaN(ary2d[i, j]) ? 0.0 : ary2d[i, j];<br class="title-page-name"/>        }<br class="title-page-name"/>    }<br class="title-page-name"/>    return matrix;<br class="title-page-name"/>}</pre>
+<p class="calibre2">这段代码看起来应该很熟悉，因为我们在前面几章中已经使用过它。</p>
+<p class="calibre2">我们需要做的下一件事是将整个数据帧(包括非欺诈记录和欺诈记录)转换成一个二维数组。使用经过训练的 PCA，我们将转换这个新创建的二维数组，该数组稍后将用于构建信用卡欺诈检测模型。让我们来看看下面的代码:</p>
+<pre class="calibre19">double[][] wholeData = BuildJaggedArray(<br class="title-page-name"/>    df.Columns[featureCols].ToArray2D&lt;double&gt;(), df.RowCount, featureCols.Length<br class="title-page-name"/>);<br class="title-page-name"/>int[] labels = df.GetColumn&lt;int&gt;("Class").ValuesAll.ToArray();
+df, into a two-dimensional array, <kbd class="calibre12">wholeData</kbd>, by using the <kbd class="calibre12">BuildJaggedArray</kbd> function.</pre>
+
+
+            
+
+            
+        
+    
+
+
+
+  
+    <title>Fitting a PCA</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+  
+
+
+  
+        
+
+                            
+                    <h1 class="header-title" id="calibre_pb_0">安装 PCA</h1>
+                
+            
+            
+                
+<p class="calibre2">我们现在准备使用非欺诈性信用卡数据来拟合 PCA。类似于我们在<a target="_blank" href="part0116.html#3EK180-5ebdf09927b7492888e31e8436526470" class="calibre9">第 9 章</a>、<em class="calibre13">网络攻击检测</em>中所做的，我们将使用以下代码来拟合 PCA:</p>
+<pre class="calibre19">var pca = new PrincipalComponentAnalysis(<br class="title-page-name"/>    PrincipalComponentMethod.Standardize<br class="title-page-name"/>);<br class="title-page-name"/>pca.Learn(data);</pre>
+<p class="calibre2">从这段代码中可以看出，我们正在使用 Accord.NET 框架中的<kbd class="calibre12">PrincipalComponentAnalysis</kbd>类来训练 PCA。这里还有一点需要注意的是我们如何使用<kbd class="calibre12">PrincipalComponentMethod.Standardize</kbd>。由于 PCA 对特征的尺度很敏感，我们首先标准化特征值，然后拟合 PCA。使用这种经过训练的 PCA，我们可以转换包含欺诈性和非欺诈性交易的全部数据。对数据集应用 PCA 变换的代码如下所示:</p>
+<pre class="calibre19">double[][] transformed = pca.Transform(wholeData);</pre>
+<p class="calibre2">现在，我们已经为下面的模型构建步骤准备好了所有的 PCA 特性。在我们移动一个之前，让我们看看是否可以找到任何明显的模式，这些模式可以用新的 PCA 特性来区分目标类。让我们先来看看下面的代码:</p>
+<pre class="calibre19">double[][] first2Components = transformed.Select(x =&gt; x.Where((y, i) =&gt; i &lt; 2).ToArray()).ToArray();<br class="title-page-name"/>ScatterplotBox.Show("Component #1 vs. Component #2", first2Components, labels);<br class="title-page-name"/><br class="title-page-name"/>double[][] next2Components = transformed.Select(<br class="title-page-name"/>    x =&gt; x.Where((y, i) =&gt; i &gt;= 1 &amp;&amp; i &lt;= 2).ToArray()<br class="title-page-name"/>).ToArray();<br class="title-page-name"/>ScatterplotBox.Show("Component #2 vs. Component #3", next2Components, labels);<br class="title-page-name"/><br class="title-page-name"/>next2Components = transformed.Select(<br class="title-page-name"/>    x =&gt; x.Where((y, i) =&gt; i &gt;= 2 &amp;&amp; i &lt;= 3).ToArray()<br class="title-page-name"/>).ToArray();<br class="title-page-name"/>ScatterplotBox.Show("Component #3 vs. Component #4", next2Components, labels);<br class="title-page-name"/><br class="title-page-name"/>next2Components = transformed.Select(<br class="title-page-name"/>    x =&gt; x.Where((y, i) =&gt; i &gt;= 3 &amp;&amp; i &lt;= 4).ToArray()<br class="title-page-name"/>).ToArray();<br class="title-page-name"/>ScatterplotBox.Show("Component #4 vs. Component #5", next2Components, labels);</pre>
+<p class="calibre2">与我们在数据分析步骤中所做的类似，我们获取两个要素，并跨所选要素创建目标类的散点图。从这些图中，我们可以看到 PCA 转换数据中的主成分是否更有效地将欺诈性信用卡交易与非欺诈性交易区分开来。</p>
+<p class="calibre2">以下散点图适用于第一和第二主成分之间:</p>
+<div><img src="img/00174.jpeg" class="calibre123"/></div>
+<p class="calibre2">欺诈(散点图中的红点)和非欺诈(散点图中的蓝点)之间有一个明显的分界点。从这个散点图来看，欺诈样本的 Y 值(第二主成分值)通常小于-5。</p>
+<p class="calibre2">下面是第二和第三主成分之间的散点图:</p>
+<div><img src="img/00175.jpeg" class="calibre124"/></div>
+<p class="calibre2">与之前的散点图相比，此图中的模式似乎较弱，但似乎仍有一条明显的线将许多欺诈案件与非欺诈案件区分开来。</p>
+<p class="calibre2">以下散点图位于第三和第四主成分之间:</p>
+<div><img src="img/00176.jpeg" class="calibre125"/></div>
+<p class="calibre2">最后，下面是第四个和第五个主成分之间的散点图:</p>
+<div><img src="img/00177.jpeg" class="calibre126"/></div>
+<p class="calibre2">在最后两个散点图中，我们找不到明显的模式来区分这两个目标类别。考虑到我们在查看前三个主成分及其散点图时可以找到一些可分离的线，我们用于信用卡欺诈检测的异常检测模型将能够学习如何对欺诈进行分类，当它从更高维度和多个主成分的数据中学习时。</p>
+<p class="calibre2">最后，让我们看看由主成分解释的方差的比例。先看看下面的代码:</p>
+<pre class="calibre19">DataSeriesBox.Show(<br class="title-page-name"/>    pca.Components.Select((x, i) =&gt; (double)i),<br class="title-page-name"/>    pca.Components.Select(x =&gt; x.CumulativeProportion)<br class="title-page-name"/>).SetTitle("Explained Variance");<br class="title-page-name"/>System.IO.File.WriteAllLines(<br class="title-page-name"/>    Path.Combine(dataDirPath, "explained-variance.csv"),<br class="title-page-name"/>    pca.Components.Select((x, i) =&gt; String.Format("{0},{1:0.0000}", i + 1, x.CumulativeProportion))<br class="title-page-name"/>);</pre>
+<p class="calibre2">正如我们在<a target="_blank" href="part0116.html#3EK180-5ebdf09927b7492888e31e8436526470" class="calibre9">第 9 章</a>、<em class="calibre13">网络攻击检测</em>中所讨论的，我们可以使用<kbd class="calibre12">PrincipalComponentAnalysis</kbd>对象中的<kbd class="calibre12">Components</kbd>属性来提取每个组件所解释的方差的累积比例。从代码的第三行可以看出，我们遍历了<kbd class="calibre12">Components</kbd>属性并提取了<kbd class="calibre12">CumulativeProportion</kbd>值。然后，我们使用<kbd class="calibre12">DataSeriesBox</kbd>类显示一个折线图。运行此代码时，您将看到下面的图表，其中显示了由主成分解释的累积方差比例:</p>
+<div><img src="img/00178.jpeg" class="calibre127"/></div>
+<p class="calibre2">从这个图表可以看出，通过第二十个主成分，解释了数据中大约 80%的方差。在下一节构建异常检测模型时，我们将使用此图表来决定使用多少个主要组件。</p>
+<p class="calibre2">最后，我们需要导出这些数据，因为我们刚刚在这个特征工程步骤中创建了一个新的 PCA 转换数据集，我们希望使用这些新数据来构建模型。您可以使用以下代码导出此数据:</p>
+<pre class="calibre19">Console.WriteLine("exporting train set...");<br class="title-page-name"/><br class="title-page-name"/>System.IO.File.WriteAllLines(<br class="title-page-name"/>    Path.Combine(dataDirPath, "pca-features.csv"),<br class="title-page-name"/>    transformed.Select((x, i) =&gt; String.Format("{0},{1}", String.Join(",", x), labels[i]))<br class="title-page-name"/>);
+pca-features.csv. We will use this data to build anomaly detection models for credit card fraud detection in the following step.</pre>
+<p class="calibre2">在这个功能工程步骤中使用的完整代码可以在以下链接中找到:<a href="https://github.com/yoonhwang/c-sharp-machine-learning/blob/master/ch.10/FeatureEngineering.cs" target="_blank" class="calibre9">https://github . com/Yoon hwang/c-sharp-machine-learning/blob/master/ch . 10/feature engineering . cs</a>。</p>
+
+
+            
+
+            
+        
+    
+
+
+
+  
+    <title>One-class SVM versus PCC</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+  
+
+
+  
+        
+
+                            
+                    <h1 class="header-title" id="calibre_pb_0">一级 SVM 对 PCC</h1>
+                
+            
+            
+                
+<p class="calibre2">我们现在准备为信用卡欺诈检测项目构建异常检测模型。在这一步中，我们将尝试两种不同的方法。我们将建立一个 PCC，类似于我们在<a target="_blank" href="part0116.html#3EK180-5ebdf09927b7492888e31e8436526470" class="calibre9">第 9 章</a>、<em class="calibre13">网络攻击检测</em>中所做的。此外，我们将引入一种新的学习算法，即单类 SVM，它从正常的信用卡交易数据中学习，并决定新的数据点是否与训练它的正常数据相似。</p>
+
+
+            
+
+            
+        
+    
+
+
+
+  
+    <title>Preparation for model training</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+  
+
+
+  
+        
+
+                            
+                    <h1 class="header-title" id="calibre_pb_0">模型训练的准备</h1>
+                
+            
+            
+                
+<p class="calibre2">首先，我们需要加载我们在前面的特征工程步骤中创建的数据。您可以使用以下代码来加载数据:</p>
+<pre class="calibre19">// Read in the Credit Card Fraud dataset<br class="title-page-name"/>// TODO: change the path to point to your data directory<br class="title-page-name"/>string dataDirPath = @"&lt;path-to-dir&gt;";<br class="title-page-name"/><br class="title-page-name"/>// Load the data into a data frame<br class="title-page-name"/>string dataPath = Path.Combine(dataDirPath, "pca-features.csv");<br class="title-page-name"/>Console.WriteLine("Loading {0}\n\n", dataPath);<br class="title-page-name"/>var featuresDF = Frame.ReadCsv(<br class="title-page-name"/>    dataPath,<br class="title-page-name"/>    hasHeaders: false,<br class="title-page-name"/>    inferTypes: true<br class="title-page-name"/>);<br class="title-page-name"/>featuresDF.RenameColumns(<br class="title-page-name"/>    featuresDF.ColumnKeys<br class="title-page-name"/>        .Select((x, i) =&gt; i == featuresDF.ColumnCount - 1 ? "is_fraud" : String.Format("component-{0}", i + 1))<br class="title-page-name"/>);</pre>
+<p class="calibre2">如果您还记得前面的特征工程步骤，我们没有导出带有列名的数据。因此，我们将数据加载到一个 Deedle 数据帧<kbd class="calibre12">featuresDF</kbd>，其中<kbd class="calibre12">hasHeaders</kbd>标志设置为<kbd class="calibre12">false</kbd>。然后，我们通过使用<kbd class="calibre12">RenameColumns</kbd>方法为每个特性给出正确的列名。让我们使用下面的代码快速检查这个数据集中的目标类分布:</p>
+<pre class="calibre19">Console.WriteLine("* Shape: ({0}, {1})", featuresDF.RowCount, featuresDF.ColumnCount);<br class="title-page-name"/><br class="title-page-name"/>var count = featuresDF.AggregateRowsBy&lt;string, int&gt;(<br class="title-page-name"/>    new string[] { "is_fraud" },<br class="title-page-name"/>    new string[] { "component-1" },<br class="title-page-name"/>    x =&gt; x.ValueCount<br class="title-page-name"/>).SortRows("component-1");<br class="title-page-name"/>count.RenameColumns(new string[] { "is_fraud", "count" });<br class="title-page-name"/>count.Print();</pre>
+<p class="calibre2">这段代码的输出如下所示:</p>
+<div><img src="img/00179.jpeg" class="calibre128"/></div>
+<p class="calibre2">如前所述，在数据分析步骤中，大多数样本属于非欺诈性交易，只有一小部分数据是欺诈性信用卡交易。</p>
+
+
+            
+
+            
+        
+    
+
+
+
+  
+    <title>Principal component classifier</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+  
+
+
+  
+        
+
+                            
+                    <h1 class="header-title" id="calibre_pb_0">主成分分类器</h1>
+                
+            
+            
+                
+<p class="calibre2">我们将首先尝试使用主成分建立一个异常检测模型，类似于我们在<a target="_blank" href="part0116.html#3EK180-5ebdf09927b7492888e31e8436526470" class="calibre9">第 9 章</a>、<em class="calibre13">网络攻击检测</em>中所做的。为了训练和测试 PCC 模型，我们编写了一个助手函数，名为<kbd class="calibre12">BuildPCAClassifier</kbd>。这个 helper 函数的详细代码可以在下面的 repo 中找到:<a href="https://github.com/yoonhwang/c-sharp-machine-learning/blob/master/ch.10/Modeling.cs" target="_blank" class="calibre9">https://github . com/Yoon hwang/c-sharp-machine-learning/blob/master/ch . 10/modeling . cs</a>。让我们一步一步来看看这个助手函数。</p>
+<p class="calibre2">当您查看<kbd class="calibre12">BuildPCAClassifier</kbd>方法的代码时，您会看到下面几行代码:</p>
+<pre class="calibre19">// First 13 components explain about 50% of the variance<br class="title-page-name"/>int numComponents = 13;<br class="title-page-name"/>string[] cols = featuresDF.ColumnKeys.Where((x, i) =&gt; i &lt; numComponents).ToArray();<br class="title-page-name"/><br class="title-page-name"/>// First, compute distances from the center/mean among normal events<br class="title-page-name"/>var normalDF = featuresDF.Rows[<br class="title-page-name"/>    featuresDF["is_fraud"].Where(x =&gt; x.Value == 0).Keys<br class="title-page-name"/>].Columns[cols];<br class="title-page-name"/><br class="title-page-name"/>double[][] normalData = BuildJaggedArray(<br class="title-page-name"/>    normalDF.ToArray2D&lt;double&gt;(), normalDF.RowCount, cols.Length<br class="title-page-name"/>);</pre>
+<p class="calibre2">首先，我们选择前 13 个主成分来解释 50%的方差。然后，我们创建一个非欺诈性的信用卡交易组，<kbd class="calibre12">normalDF</kbd>和<kbd class="calibre12">normalData</kbd>，这样我们就可以使用这个子集来构建一个异常检测模型。</p>
+<p class="calibre2">我们要做的下一件事是开始计算<strong class="calibre4"> Mahalanobis 距离</strong>指标，以测量数据点和非欺诈性信用卡交易分布之间的距离。如果您还记得，我们在<a target="_blank" href="part0116.html#3EK180-5ebdf09927b7492888e31e8436526470" class="calibre9">第 9 章</a>、<em class="calibre13">网络攻击检测</em>中使用了相同的距离度量，我们建议您查看<a target="_blank" href="part0116.html#3EK180-5ebdf09927b7492888e31e8436526470" class="calibre9">第 9 章</a>、<em class="calibre13">网络攻击检测</em>中的<em class="calibre13">模型构建</em>部分，以获得关于此距离度量的更详细解释。计算距离的代码如下所示:</p>
+<pre class="calibre19">double[] normalVariances = ComputeVariances(normalData);<br class="title-page-name"/>double[] rawDistances = ComputeDistances(normalData, normalVariances);<br class="title-page-name"/><br class="title-page-name"/>double[] distances = rawDistances.ToArray();<br class="title-page-name"/><br class="title-page-name"/>double meanDistance = distances.Average();<br class="title-page-name"/>double stdDistance = Math.Sqrt(<br class="title-page-name"/>    distances<br class="title-page-name"/>    .Select(x =&gt; Math.Pow(x - meanDistance, 2))<br class="title-page-name"/>    .Sum() / distances.Length<br class="title-page-name"/>);<br class="title-page-name"/><br class="title-page-name"/>Console.WriteLine(<br class="title-page-name"/>    "* Normal - mean: {0:0.0000}, std: {1:0.0000}",<br class="title-page-name"/>    meanDistance, stdDistance<br class="title-page-name"/>);
+ComputeVariances and <kbd class="calibre12">ComputeDistances</kbd>, to compute the variances of feature values and the distances. The following is the code for the <kbd class="calibre12">ComputeVariances</kbd> method:</pre>
+<pre class="calibre19">private static double[] ComputeVariances(double[][] data)<br class="title-page-name"/>{<br class="title-page-name"/>    double[] componentVariances = new double[data[0].Length];<br class="title-page-name"/><br class="title-page-name"/>    for (int j = 0; j &lt; data[0].Length; j++)<br class="title-page-name"/>    {<br class="title-page-name"/>        componentVariances[j] = data<br class="title-page-name"/>            .Select((x, i) =&gt; Math.Pow(data[i][j], 2))<br class="title-page-name"/>            .Sum() / data.Length;<br class="title-page-name"/>    }<br class="title-page-name"/><br class="title-page-name"/>    return componentVariances;<br class="title-page-name"/>}</pre>
+<p class="calibre2">这段代码看起来应该很熟悉，因为这与我们在第九章、<em class="calibre13">网络攻击检测</em>中使用的代码相同，用于构建网络攻击检测的 PCC 模型。此外，下面是<kbd class="calibre12">ComputeDistances</kbd>方法的代码:</p>
+<pre class="calibre19">private static double[] ComputeDistances(double[][] data, double[] componentVariances)<br class="title-page-name"/>{<br class="title-page-name"/><br class="title-page-name"/>    double[] distances = data.Select(<br class="title-page-name"/>        (row, i) =&gt; Math.Sqrt(<br class="title-page-name"/>            row.Select(<br class="title-page-name"/>                (x, j) =&gt; Math.Pow(x, 2) / componentVariances[j]<br class="title-page-name"/>            ).Sum()<br class="title-page-name"/>        )<br class="title-page-name"/>    ).ToArray();<br class="title-page-name"/><br class="title-page-name"/>    return distances;<br class="title-page-name"/>}</pre>
+<p class="calibre2">这段代码看起来应该也很熟悉，因为我们在第 9 章<a target="_blank" href="part0116.html#3EK180-5ebdf09927b7492888e31e8436526470" class="calibre9">、<em class="calibre13">网络攻击检测</em>中也使用了相同的代码。使用这两种方法，我们计算了非欺诈交易数据中距离度量的均值和标准差。输出如下所示:</a></p>
+<div><img src="img/00180.jpeg" class="calibre129"/></div>
+<p class="calibre2">计算了正常交易组内的距离度量后，我们现在计算欺诈性交易和非欺诈性交易分布之间的距离。以下是计算欺诈距离的部分<kbd class="calibre12">BuildPCAClassifier</kbd>代码:</p>
+<pre class="calibre19">// Detection<br class="title-page-name"/>var fraudDF = featuresDF.Rows[<br class="title-page-name"/>    featuresDF["is_fraud"].Where(x =&gt; x.Value &gt; 0).Keys<br class="title-page-name"/>].Columns[cols];<br class="title-page-name"/><br class="title-page-name"/>double[][] fraudData = BuildJaggedArray(<br class="title-page-name"/>    fraudDF.ToArray2D&lt;double&gt;(), fraudDF.RowCount, cols.Length<br class="title-page-name"/>);<br class="title-page-name"/>double[] fraudDistances = ComputeDistances(fraudData, normalVariances);
+fraudData, which we use for distance-measuring calculations. Then, using the <kbd class="calibre12">ComputeDistances</kbd> function that we wrote, we can compute the distances between the fraudulent credit card transactions and the distribution of non-fraudulent transactions. With these distances measures, we then start analyzing the fraud detection rates for each of the target false-alarm rates. Take a look at the following code snippet:</pre>
+<pre class="calibre19">// 5-10% false alarm rate<br class="title-page-name"/>for (int i = 0; i &lt; 4; i++)<br class="title-page-name"/>{<br class="title-page-name"/>    double targetFalseAlarmRate = 0.05 * (i + 1);<br class="title-page-name"/>    double threshold = Accord.Statistics.Measures.Quantile(<br class="title-page-name"/>        distances,<br class="title-page-name"/>        1 - targetFalseAlarmRate<br class="title-page-name"/>    );<br class="title-page-name"/><br class="title-page-name"/>    int[] detected = fraudDistances.Select(x =&gt; x &gt; threshold ? 1 : 0).ToArray();<br class="title-page-name"/><br class="title-page-name"/>    Console.WriteLine("\n\n---- {0:0.0}% False Alarm Rate ----", targetFalseAlarmRate * 100.0);<br class="title-page-name"/>    double overallRecall = (double)detected.Sum() / detected.Length;<br class="title-page-name"/>    Console.WriteLine("* Overall Fraud Detection: {0:0.00}%", overallRecall * 100.0);<br class="title-page-name"/>}
+Chapter 9, <em class="calibre13">Cyber Attack Detection</em>. One thing that is different here, however, is the fact that we only have two target classes (fraud versus non-fraud), whereas we had five target classes (normal versus four different types of cyber attack) in <a target="_blank" href="part0116.html#3EK180-5ebdf09927b7492888e31e8436526470" class="calibre9">Chapter 9</a>, <em class="calibre13">Cyber Attack Detection</em>. As you can see from this code, we experiment with five different target false alarm rates from 5% to 10%, and analyze the fraud detection rates for the given target false alarm rate. We will take a deeper look at this code in the following model evaluation step.</pre>
+
+
+            
+
+            
+        
+    
+
+
+
+  
+    <title>One-class SVM</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+  
+
+
+  
+        
+
+                            
+                    <h1 class="header-title" id="calibre_pb_0">一级 SVM</h1>
+                
+            
+            
+                
+<p class="calibre2">我们要探索的下一种信用卡欺诈检测方法是训练一个单级 SVM。一类 SVM 是 SVM 的一个特例，其中 SVM 模型首先使用一个数据进行训练，然后，当它看到一个新的数据点时，SVM 模型可以确定新的数据点是否足够接近它训练时使用的数据。为了训练一个一类的 SVM 模型，我们编写了一个 helper 函数，<kbd class="calibre12">BuildOneClassSVM</kbd>，这个函数的完整代码可以在下面的 repo 中找到:<a href="https://github.com/yoonhwang/c-sharp-machine-learning/blob/master/ch.10/Modeling.cs" target="_blank" class="calibre9">https://github . com/Yoon hwang/c-sharp-machine-learning/blob/master/ch . 10/modeling . cs</a>。让我们一步一步地来看这个助手函数。</p>
+<p class="calibre2">首先，让我们看一下子选择非欺诈性信用卡交易数据的代码部分，这些数据将用于训练一类 SVM。代码如下所示:</p>
+<pre class="calibre19">// First 13 components explain about 50% of the variance<br class="title-page-name"/>int numComponents = 13;<br class="title-page-name"/>string[] cols = featuresDF.ColumnKeys.Where((x, i) =&gt; i &lt; numComponents).ToArray();<br class="title-page-name"/><br class="title-page-name"/>var rnd = new Random(1);<br class="title-page-name"/>int[] trainIdx = featuresDF["is_fraud"]<br class="title-page-name"/>    .Where(x =&gt; x.Value == 0)<br class="title-page-name"/>    .Keys<br class="title-page-name"/>    .OrderBy(x =&gt; rnd.Next())<br class="title-page-name"/>    .Take(15000)<br class="title-page-name"/>    .ToArray();<br class="title-page-name"/>var normalDF = featuresDF.Rows[<br class="title-page-name"/>    trainIdx<br class="title-page-name"/>].Columns[cols];<br class="title-page-name"/><br class="title-page-name"/>double[][] normalData = BuildJaggedArray(<br class="title-page-name"/>    normalDF.ToArray2D&lt;double&gt;(), normalDF.RowCount, cols.Length<br class="title-page-name"/>);</pre>
+<p class="calibre2">与我们之前构建的 PCC 模型类似，我们使用前十三个主成分来解释大约 50%的总方差。接下来，我们将从非欺诈性交易样本中选择部分记录，并构建一个训练集。从这段代码中可以看出，我们随机选择了 15，000 个非欺诈样本作为训练集。</p>
+<p class="calibre2">现在我们有了一个训练集来训练一个一级 SVM 模型，让我们来看看下面的代码:</p>
+<pre class="calibre19">var teacher = new OneclassSupportVectorLearning&lt;Gaussian&gt;();<br class="title-page-name"/>var model = teacher.Learn(normalData);</pre>
+<p class="calibre2">我们正在使用 Accord.NET 框架中的<kbd class="calibre12">OneclassSupportVectorLearning</kbd>算法来训练一类 SVM 模型。正如你所看到的，在本章中我们用<kbd class="calibre12">Gaussian</kbd>内核构建了一个 SVM 模型，但是你可以用不同的内核进行实验。现在，剩下的唯一一步是测试我们刚刚训练的这个一级 SVM 模型。以下代码显示了我们如何构建测试集来评估该模型:</p>
+<pre class="calibre19">int[] testIdx = featuresDF["is_fraud"]<br class="title-page-name"/>    .Where(x =&gt; x.Value &gt; 0)<br class="title-page-name"/>    .Keys<br class="title-page-name"/>    .Concat(<br class="title-page-name"/>        featuresDF["is_fraud"]<br class="title-page-name"/>        .Where(x =&gt; x.Value == 0 &amp;&amp; !trainIdx.Contains(x.Key))<br class="title-page-name"/>        .Keys<br class="title-page-name"/>        .OrderBy(x =&gt; rnd.Next())<br class="title-page-name"/>        .Take(5000)<br class="title-page-name"/>        .ToArray()<br class="title-page-name"/>    ).ToArray();<br class="title-page-name"/><br class="title-page-name"/>var fraudDF = featuresDF.Rows[<br class="title-page-name"/>    testIdx<br class="title-page-name"/>].Columns[cols];<br class="title-page-name"/><br class="title-page-name"/>double[][] fraudData = BuildJaggedArray(<br class="title-page-name"/>    fraudDF.ToArray2D&lt;double&gt;(), fraudDF.RowCount, cols.Length<br class="title-page-name"/>);<br class="title-page-name"/><br class="title-page-name"/>int[] fraudLabels = featuresDF.Rows[<br class="title-page-name"/>    testIdx<br class="title-page-name"/>].GetColumn&lt;int&gt;("is_fraud").ValuesAll.ToArray();</pre>
+<p class="calibre2">从这段代码中可以看出，我们将所有欺诈样本和 5，000 个随机选择的非欺诈样本作为测试集。通过这个测试集，我们将评估这个单类 SVM 模型在检测信用卡欺诈方面的表现。</p>
+<p class="calibre2">我们将在下一节中更深入地研究评估代码，但让我们快速了解一下如何评估我们刚刚训练的单级 SVM 模型的性能。代码如下所示:</p>
+<pre class="calibre19">for(int j = 0; j &lt;= 10; j++)<br class="title-page-name"/>{<br class="title-page-name"/>    model.Threshold = -1 + j/10.0; <br class="title-page-name"/><br class="title-page-name"/>    int[] detected = new int[fraudData.Length];<br class="title-page-name"/>    double[] probs = new double[fraudData.Length];<br class="title-page-name"/>    for (int i = 0; i &lt; fraudData.Length; i++)<br class="title-page-name"/>    {<br class="title-page-name"/>        bool isNormal = model.Decide(fraudData[i]);<br class="title-page-name"/>        detected[i] = isNormal ? 0 : 1;<br class="title-page-name"/>    }<br class="title-page-name"/><br class="title-page-name"/>    Console.WriteLine("\n\n---- One-Class SVM Results ----");<br class="title-page-name"/>    Console.WriteLine("* Threshold: {0:0.00000}", model.Threshold);<br class="title-page-name"/>    double correctPreds = fraudLabels<br class="title-page-name"/>        .Select((x, i) =&gt; detected[i] == 1 &amp;&amp; x == 1 ? 1 : 0)<br class="title-page-name"/>        .Sum();<br class="title-page-name"/>    double precision = correctPreds / detected.Sum();<br class="title-page-name"/>    double overallRecall = correctPreds / fraudLabels.Sum();<br class="title-page-name"/>    Console.WriteLine("* Overall Fraud Detection: {0:0.00}%", overallRecall * 100.0);<br class="title-page-name"/>    Console.WriteLine("* False Alarm Rate: {0:0.00}%", (1 - precision) * 100.0);<br class="title-page-name"/>}</pre>
+<p class="calibre2">从这段代码中可以看出，我们迭代不同的阈值，类似于我们为前面的 PCC 模型设置不同的阈值。如代码的第三行所示，您可以使用模型的<kbd class="calibre12">Threshold</kbd>属性来获取或设置决定记录是正常还是异常的阈值。与我们评估 PCC 的方式类似，我们将考察欺诈检测率和模型验证的误报率。</p>
+<p class="calibre2">我们在模型构建步骤中使用的完整代码可以在以下链接找到:<a href="https://github.com/yoonhwang/c-sharp-machine-learning/edit/master/ch.10/Modeling.cs" target="_blank" class="calibre9">https://github . com/Yoon hwang/c-sharp-machine-learning/edit/master/ch . 10/modeling . cs</a>。</p>
+
+
+            
+
+            
+        
+    
+
+
+
+  
+    <title>Evaluating anomaly detection models</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+  
+
+
+  
+        
+
+                            
+                    <h1 class="header-title" id="calibre_pb_0">评估异常检测模型</h1>
+                
+            
+            
+                
+<p class="calibre2">我们已经训练了两个异常检测模型——一个使用主成分，另一个使用一类 SVM 算法。在这一节中，我们将进一步了解用于评估这些模型的性能指标和代码。</p>
+
+
+            
+
+            
+        
+    
+
+
+
+  
+    <title>Principal Component Classifier</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+  
+
+
+  
+        
+
+                            
+                    <h1 class="header-title" id="calibre_pb_0">主成分分类器</h1>
+                
+            
+            
+                
+<p class="calibre2">正如上一节中简要提到的，我们将查看每个目标误报率的信用卡欺诈检测率。评估 PCC 模型的代码如下所示:</p>
+<pre class="calibre19">// 5-10% false alarm rate<br class="title-page-name"/>for (int i = 0; i &lt; 4; i++)<br class="title-page-name"/>{<br class="title-page-name"/>    double targetFalseAlarmRate = 0.05 * (i + 1);<br class="title-page-name"/>    double threshold = Accord.Statistics.Measures.Quantile(<br class="title-page-name"/>        distances,<br class="title-page-name"/>        1 - targetFalseAlarmRate<br class="title-page-name"/>    );<br class="title-page-name"/><br class="title-page-name"/>    int[] detected = fraudDistances.Select(x =&gt; x &gt; threshold ? 1 : 0).ToArray();<br class="title-page-name"/><br class="title-page-name"/>    Console.WriteLine("\n\n---- {0:0.0}% False Alarm Rate ----", targetFalseAlarmRate * 100.0);<br class="title-page-name"/>    double overallRecall = (double)detected.Sum() / detected.Length;<br class="title-page-name"/>    Console.WriteLine("* Overall Fraud Detection: {0:0.00}%", overallRecall * 100.0);<br class="title-page-name"/>}</pre>
+<p class="calibre2">与<a target="_blank" href="part0116.html#3EK180-5ebdf09927b7492888e31e8436526470" class="calibre9">第 9 章</a>、<em class="calibre13">网络攻击检测</em>类似，我们从 5%到 10%迭代目标虚警率，并检查给定虚警率的检测率。使用目标虚警率变量<kbd class="calibre12">targetFalseAlarmRate</kbd>，我们使用<kbd class="calibre12">Accord.Statistics.Measures.Quantile</kbd>方法计算阈值。利用这个计算出的阈值，我们将距离大于该阈值的所有记录标记为欺诈，而将其他记录标记为非欺诈。再来看评测结果。</p>
+<p class="calibre2">以下是误报率为 5%时的欺诈检测率:</p>
+<div><img src="img/00181.jpeg" class="calibre130"/></div>
+<p class="calibre2">以下是 10%误报率下的欺诈检测率:</p>
+<div><img src="img/00182.jpeg" class="calibre131"/></div>
+<p class="calibre2">以下是 15%误报率下的欺诈检测率:</p>
+<div><img src="img/00183.jpeg" class="calibre132"/></div>
+<p class="calibre2">最后，以下是 20%误报率下的欺诈检测率:</p>
+<div><img src="img/00184.jpeg" class="calibre133"/></div>
+<p class="calibre2">从这些结果中可以看出，随着我们放宽和提高目标误报率，欺诈检测率会提高。在 5%的目标误报率下，我们只能检测到大约 59%的欺诈交易。然而，在 20%的目标错误警报率下，我们可以检测到超过 80%的欺诈性信用卡交易。</p>
+
+
+            
+
+            
+        
+    
+
+
+
+  
+    <title>One-class SVM</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+  
+
+
+  
+        
+
+                            
+                    <h1 class="header-title" id="calibre_pb_0">一级 SVM</h1>
+                
+            
+            
+                
+<p class="calibre2">现在让我们看看单类 SVM 模型在信用卡欺诈数据集上的表现。模型评估的代码如下所示:</p>
+<pre class="calibre19">for(int j = 0; j &lt;= 10; j++)<br class="title-page-name"/>{<br class="title-page-name"/>    model.Threshold = -1 + j/10.0; <br class="title-page-name"/><br class="title-page-name"/>    int[] detected = new int[fraudData.Length];<br class="title-page-name"/>    double[] probs = new double[fraudData.Length];<br class="title-page-name"/>    for (int i = 0; i &lt; fraudData.Length; i++)<br class="title-page-name"/>    {<br class="title-page-name"/>        bool isNormal = model.Decide(fraudData[i]);<br class="title-page-name"/>        detected[i] = isNormal ? 0 : 1;<br class="title-page-name"/>    }<br class="title-page-name"/><br class="title-page-name"/>    Console.WriteLine("\n\n---- One-Class SVM Results ----");<br class="title-page-name"/>    Console.WriteLine("* Threshold: {0:0.00000}", model.Threshold);<br class="title-page-name"/>    double correctPreds = fraudLabels<br class="title-page-name"/>        .Select((x, i) =&gt; detected[i] == 1 &amp;&amp; x == 1 ? 1 : 0)<br class="title-page-name"/>        .Sum();<br class="title-page-name"/>    double precision = correctPreds / detected.Sum();<br class="title-page-name"/>    double overallRecall = correctPreds / fraudLabels.Sum();<br class="title-page-name"/>    Console.WriteLine("* Overall Fraud Detection: {0:0.00}%", overallRecall * 100.0);<br class="title-page-name"/>    Console.WriteLine("* False Alarm Rate: {0:0.00}%", (1 - precision) * 100.0);<br class="title-page-name"/>}</pre>
+<p class="calibre2">从这段代码中可以看出，我们从-1.0 到 0.0 以 0.1 的增量迭代不同的阈值。您可以通过更新一类 SVM 模型对象的<kbd class="calibre12">Threshold</kbd>属性来设置模型的阈值。该阈值将指导模型如何确定哪些记录是欺诈性的，哪些不是。在决定最终的模型时，您需要试验不同的阈值值，以确定符合您要求的最佳阈值。让我们来看看一些性能结果。</p>
+<p class="calibre2">下面显示了阈值为-0.4 时的性能指标:</p>
+<div><img src="img/00185.jpeg" class="calibre134"/></div>
+<p class="calibre2">下面显示了阈值为-0.3 时的性能指标:</p>
+<div><img src="img/00186.jpeg" class="calibre135"/></div>
+<p class="calibre2">下面显示了阈值为-0.2 时的性能指标:</p>
+<div><img src="img/00187.jpeg" class="calibre136"/></div>
+<p class="calibre2">最后，下面显示了阈值为-0.1 时的性能指标:</p>
+<div><img src="img/00188.jpeg" class="calibre137"/></div>
+<p class="calibre2">从这些结果中可以看出，随着阈值的提高，误报率会降低，但欺诈检测率也会降低。很明显，在更高的精确度和更高的欺诈检测率之间存在权衡。在阈值为-0.4 的情况下，该模型能够检测到大约 70%的欺诈性信用卡交易，误报率大约为 40%。另一方面，在阈值为-0.1 时，该模型只能检测到大约 57%的欺诈性信用卡交易，但错误警报率仅为大约 33%。</p>
+
+
+            
+
+            
+        
+    
+
+
+
+  
+    <title>Summary</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+  
+
+
+  
+        
+
+                            
+                    <h1 class="header-title" id="calibre_pb_0">摘要</h1>
+                
+            
+            
+                
+<p class="calibre2">在这一章中，我们为信用卡欺诈检测建立了另一个异常检测模型。本章开始时，我们查看了匿名信用卡欺诈数据的结构，然后开始分析目标变量和特征变量的分布。当我们分析目标类的分布时，我们注意到欺诈类和非欺诈类之间存在很大的不平衡。当我们面对任何类型的异常检测项目时，这都是正常的，正常类远远超过了积极类。然后，我们开始分析匿名特征的分布。由于保密问题，这些特征被匿名化，我们无法从数据集中得出任何直觉。</p>
+<p class="calibre2">然而，我们能够更好地理解分布，以及我们如何不能使用原始特征轻易地将欺诈与非欺诈区分开来。然后，我们应用 PCA 并为模型构建步骤导出 PCA 特征。我们尝试了两种方法来构建信用卡欺诈检测模型——主成分分类器和单类 SVM。我们通过查看不同误报率下的欺诈检测率来评估这些模型的性能。很明显，在提高误报率和提高欺诈检测率之间存在权衡。</p>
+<p class="calibre2">这一章是关于用 C#构建 ML 模型的最后一章。在下一章中，我们将总结到目前为止我们在所有章节中所做的工作，以及在构建 ML 模型时还有哪些额外的现实挑战。此外，我们将讨论一些其他软件包，以及其他一些数据科学技术，它们可以用于您未来的 ML 项目。</p>
+
+
+            
+
+            
+        
+    
+</body></html>

@@ -1,0 +1,675 @@
+<html><head/><body>
+<html xmlns:epub="http://www.idpf.org/2007/ops">
+  <head>
+    <title>Heterogeneous Ensemble for Text Classification Using NLP</title>
+    <meta content="urn:uuid:64b74aae-7be0-4e73-89f3-687dd4470606" name="Adept.expected.resource"/>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+  
+
+</head>
+  <body class="calibre">
+        
+
+                            
+                    <h1 class="header-title">基于自然语言处理的异构文本分类集成</h1>
+                
+            
+            
+                
+<p class="calibre2">在本章中，我们将讨论以下主题:</p>
+<ul class="calibre10">
+<li class="calibre11">使用异构算法集成的垃圾邮件过滤</li>
+<li class="calibre11">基于集成模型的电影评论情感分析</li>
+</ul>
+
+
+            
+
+            
+        
+    </body>
+
+</html>
+
+
+<html xmlns:epub="http://www.idpf.org/2007/ops">
+  <head>
+    <title>Introduction</title>
+    <meta content="urn:uuid:64b74aae-7be0-4e73-89f3-687dd4470606" name="Adept.expected.resource"/>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+  
+
+</head>
+  <body class="calibre">
+        
+
+                            
+                    <h1 class="header-title">介绍</h1>
+                
+            
+            
+                
+<p class="calibre2">文本分类是语言处理和文本挖掘的一个广泛研究的领域。使用文本分类机制，我们可以根据内容将文档分类到预定义的类别中。</p>
+<p class="calibre2">在这一章中，我们将看看如何对发送到我们手机上的短信进行分类。虽然我们收到的一些信息很重要，但其他信息可能会对我们的隐私构成严重威胁。我们希望能够对文本消息进行正确的分类，以避免垃圾邮件和错过重要的消息。</p>
+
+
+            
+
+            
+        
+    </body>
+
+</html>
+
+
+<html xmlns:epub="http://www.idpf.org/2007/ops">
+  <head>
+    <title>Spam filtering using an ensemble of heterogeneous algorithms</title>
+    <meta content="urn:uuid:64b74aae-7be0-4e73-89f3-687dd4470606" name="Adept.expected.resource"/>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+  
+
+</head>
+  <body class="calibre">
+        
+
+                            
+                    <h1 class="header-title">使用异构算法集成的垃圾邮件过滤</h1>
+                
+            
+            
+                
+<p class="calibre2">我们将使用 UCI ML 存储库中的垃圾短信收集数据集来创建垃圾短信分类器。使用垃圾邮件分类器，我们可以估计这些邮件的极性。我们可以使用各种分类器将邮件分类为垃圾邮件或垃圾邮件。</p>
+<p class="calibre2">在本例中，我们选择了朴素贝叶斯、随机森林和支持向量机等算法来训练我们的模型。</p>
+<p class="calibre2">我们使用各种数据清理和准备机制来准备数据。为了预处理我们的数据，我们将执行以下序列:</p>
+<ol class="calibre14">
+<li class="calibre11">将所有文本转换为小写</li>
+<li class="calibre11">删除标点符号</li>
+<li class="calibre11">删除停用词</li>
+<li class="calibre11">执行词干分析</li>
+<li class="calibre11">将数据符号化</li>
+</ol>
+<p class="calibre2">我们还使用<strong xmlns:epub="http://www.idpf.org/2007/ops" class="calibre4">t</strong>T13】erm frequency-inverse data frequency(<strong xmlns:epub="http://www.idpf.org/2007/ops" class="calibre4">TF-IDF</strong>)来处理我们的数据，它告诉我们一个单词在消息或文档中出现的频率。TF 计算如下:</p>
+<p class="calibre2"><kbd class="calibre12">TF = No. of times a word appears in a document / Total No. of words in the document</kbd></p>
+<p class="calibre2">TF-IDF 根据一个单词在一个文档或一组文档中出现的频率，对该单词的重要性进行数字评分。简单来说，TF-IDF 评分越高的术语越稀有。分数越低，越普遍。TD-IDF 的数学表达式如下:</p>
+<p class="CDPAlignCenter"><kbd class="calibre12">tfidf(w,d,D)= tf(t,d) × idf(t,D)</kbd></p>
+<p class="calibre2">其中 w 代表单词，D 代表文档，D 代表文档集合。</p>
+<p class="calibre2">在本例中，我们将使用垃圾短信收集数据集，该数据集标记了为研究手机垃圾短信而收集的消息。这个数据集在 UCI ML 资源库中可用，也在 GitHub 资源库中提供。</p>
+
+
+            
+
+            
+        
+    </body>
+
+</html>
+
+
+<html xmlns:epub="http://www.idpf.org/2007/ops">
+  <head>
+    <title>Getting ready</title>
+    <meta content="urn:uuid:64b74aae-7be0-4e73-89f3-687dd4470606" name="Adept.expected.resource"/>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+  
+
+</head>
+  <body class="calibre">
+        
+
+                            
+                    <h1 class="header-title">做好准备</h1>
+                
+            
+            
+                
+<p class="calibre2">我们从导入所需的库开始:</p>
+<pre class="calibre15">import os
+import numpy as np
+import pandas as pd
+import itertools
+import warnings
+import string
+import matplotlib.pyplot as plt
+from nltk.corpus import stopwords
+from nltk.stem import WordNetLemmatizer
+from sklearn.feature_extraction.text import CountVectorizer
+from sklearn.feature_extraction.text import TfidfVectorizer
+from sklearn.model_selection import train_test_split
+from sklearn.naive_bayes import MultinomialNB
+from sklearn.metrics import confusion_matrix
+from sklearn.model_selection import GridSearchCV
+from sklearn.ensemble import RandomForestClassifier
+from sklearn.metrics import classification_report
+from sklearn.metrics import roc_auc_score as auc
+from sklearn.metrics import roc_curve
+from sklearn.metrics import accuracy_score
+from scipy.stats import mode</pre>
+<p class="calibre2">注意，对于这个例子，我们导入了像<kbd class="calibre12">nltk</kbd>这样的库来准备我们的数据。我们还从<kbd class="calibre12">sklearn.feature_extraction</kbd>引入了<kbd class="calibre12">CountVectorizer</kbd>和<kbd class="calibre12">TfidVectorizer</kbd>模块。这些模块用于 ML 算法中的特征提取。</p>
+<p class="calibre2">我们重用 scikit-learn 网站上的<kbd class="calibre12">plot_confusion_matrix</kbd>来绘制我们的混淆矩阵。这也是我们在前面章节中使用过的函数:</p>
+<pre class="calibre15">def plot_confusion_matrix(cm, classes,<br class="title-page-name"/>                          normalize=False,<br class="title-page-name"/>                          title='Confusion matrix',<br class="title-page-name"/>                          cmap=plt.cm.Blues):<br class="title-page-name"/><br class="title-page-name"/>    plt.imshow(cm, interpolation='nearest', cmap=cmap)<br class="title-page-name"/>    plt.title(title)<br class="title-page-name"/>    plt.colorbar()<br class="title-page-name"/>    tick_marks = np.arange(len(classes))<br class="title-page-name"/>    plt.xticks(tick_marks, classes, rotation=45)<br class="title-page-name"/>    plt.yticks(tick_marks, classes)<br class="title-page-name"/><br class="title-page-name"/>    fmt = '.2f' if normalize else 'd'<br class="title-page-name"/>    thresh = cm.max() / 2.<br class="title-page-name"/>    for i, j in itertools.product(range(cm.shape[0]), range(cm.shape[1])):<br class="title-page-name"/>        plt.text(j, i, format(cm[i, j], fmt),<br class="title-page-name"/>                 horizontalalignment="center",<br class="title-page-name"/>                 color="white" if cm[i, j] &gt; thresh else "black")<br class="title-page-name"/><br class="title-page-name"/>    plt.ylabel('True label')<br class="title-page-name"/>    plt.xlabel('Predicted label')<br class="title-page-name"/>    plt.tight_layout()</pre>
+<p class="calibre2">我们设置工作目录并读取数据集:</p>
+<pre class="calibre15">os.chdir("/.../Chapter 11/CS - SMS Classification")<br class="title-page-name"/>os.getcwd()<br class="title-page-name"/><br class="title-page-name"/>df_sms = pd.read_csv("sms_labeled_data.csv", encoding = 'utf8')</pre>
+<p>注意我们用的是<kbd class="calibre19">encoding='utf8'</kbd>。这是为了指示<kbd class="calibre19">read_csv()</kbd>方法使用 UTF 编码来读取文件。Python 附带了许多编解码器。详尽的列表可在<a href="https://docs.python.org/3/library/codecs.html#standard-encodings" class="calibre21">https://docs . python . org/3/library/codecs . html # standard-encodings</a>获得。</p>
+<p class="calibre2">读取数据后，我们检查它是否已正确加载:</p>
+<pre class="calibre15">df_sms.head()</pre>
+<p class="calibre2">我们还使用<kbd class="calibre12">dataframe.shape</kbd>检查数据集中的观察值和特征的数量:</p>
+<pre class="calibre15">df_sms.shape</pre>
+<p class="calibre2">我们来看看垃圾邮件和业余邮件的数量:</p>
+<pre class="calibre15"># Gives the count for ham messages<br class="title-page-name"/>print(df_sms["type"].value_counts()[0])<br class="title-page-name"/>no_of_ham_messages = df_sms["type"].value_counts()[0]<br class="title-page-name"/><br class="title-page-name"/># Gives the count for spam messages<br class="title-page-name"/>print(df_sms["type"].value_counts()[1])<br class="title-page-name"/>no_of_spam_messages = df_sms["type"].value_counts()[1]</pre>
+<p class="calibre2">我们还可以直观显示垃圾邮件和业余邮件的比例:</p>
+<pre class="calibre15">sms_count = pd.value_counts(df_sms["type"], sort= True)<br class="title-page-name"/>ax = sms_count.plot(kind='bar', figsize=(10,10), color= ["green", "orange"], fontsize=13)<br class="title-page-name"/><br class="title-page-name"/>ax.set_alpha(0.8)<br class="title-page-name"/>ax.set_title("Percentage Share of Spam and Ham Messages")<br class="title-page-name"/>ax.set_ylabel("Count of Spam &amp; Ham messages");<br class="title-page-name"/>ax.set_yticks([0, 500, 1000, 1500, 2000, 2500, 3000, 3500, 4000, 4500, 5000, 5500])<br class="title-page-name"/><br class="title-page-name"/>totals = []<br class="title-page-name"/>for i in ax.patches:<br class="title-page-name"/>totals.append(i.get_height())<br class="title-page-name"/> <br class="title-page-name"/>total = sum(totals)<br class="title-page-name"/><br class="title-page-name"/># set individual bar lables using above list<br class="title-page-name"/>for i in ax.patches:<br class="title-page-name"/>string = str(round((i.get_height()/total)*100, 2))+'%'<br class="title-page-name"/># get_x pulls left or right; get_height pushes up or down<br class="title-page-name"/>ax.text(i.get_x()+0.16, i.get_height(), string, fontsize=13, color='black')</pre>
+<p class="calibre2">通过前面的代码，我们可以看到下面的图:</p>
+<p class="CDPAlignCenter"><img class="aligncenter102" src="img/9d71f67d-1ed3-4372-a211-55d2e492354f.png"/></p>
+<p class="calibre2">我们还定义了一个函数来删除标点符号，将文本转换为小写，并删除停用词:</p>
+<pre class="calibre15">lemmatizer = WordNetLemmatizer()<br class="title-page-name"/><br class="title-page-name"/># Defining a function to remove punctuations, convert text to lowercase and remove stop words<br class="title-page-name"/>def process_text(text):<br class="title-page-name"/>    no_punctuations = [char for char in text if char not in string.punctuation]<br class="title-page-name"/>    no_punctuations = ''.join(no_punctuations)<br class="title-page-name"/><br class="title-page-name"/>    clean_words = [word.lower() for word in nopunc.split() if word.lower() not in stopwords.words('english')]<br class="title-page-name"/>    clean_words = [lemmatizer.lemmatize(lem) for lem in clean_words]<br class="title-page-name"/>    clean_words = " ".join(clean_words)<br class="title-page-name"/><br class="title-page-name"/>    return clean_words</pre>
+<p class="calibre2">我们将定义的<kbd class="calibre12">process_text()</kbd>函数应用于数据集中的文本变量:</p>
+<pre class="calibre15">df_sms['text'] = df_sms['text'].apply(text_processing)</pre>
+<p class="calibre2">我们分离特征和目标变量，并将数据分成<kbd class="calibre12">train</kbd>和<kbd class="calibre12">test</kbd>子集:</p>
+<pre class="calibre15">X = df_sms.loc[:,'text']<br class="title-page-name"/>Y = df_sms.loc[:,'type']<br class="title-page-name"/>Y = Y.astype('int')<br class="title-page-name"/><br class="title-page-name"/>X_train, X_test, Y_train, Y_test = train_test_split(X, Y, test_size=.3, random_state=1)</pre>
+<p class="calibre2">我们使用<kbd class="calibre12">CountVectorizer</kbd>模块将文本转换成向量:</p>
+<pre class="calibre15">count_vectorizer = CountVectorizer(stop_words='english')<br class="title-page-name"/><br class="title-page-name"/>count_train = count_vectorizer.fit_transform(X_train)<br class="title-page-name"/>count_test = count_vectorizer.transform(X_test)</pre>
+<p class="calibre2">我们还使用<kbd class="calibre12">TfidfVectorizer</kbd>模块将文本转换成 TF-IDF 向量:</p>
+<pre class="calibre15">tfidf = TfidfVectorizer(stop_words='english')<br class="title-page-name"/><br class="title-page-name"/>tfidf_train = tfidf.fit_transform(X_train)<br class="title-page-name"/>tfidf_test = tfidf.transform(X_test)</pre>
+<p class="calibre2">现在让我们继续训练我们的模型。我们对计数数据和 TF-IDF 数据使用以下算法，并观察各个模型的表现:</p>
+<ul class="calibre10">
+<li class="calibre11">朴素贝叶斯</li>
+<li class="calibre11">支持向量机</li>
+<li class="calibre11">随机森林</li>
+</ul>
+<p class="calibre2">我们也结合模型预测来看集合的结果。</p>
+
+
+            
+
+            
+        
+    </body>
+
+</html>
+
+
+<html xmlns:epub="http://www.idpf.org/2007/ops">
+  <head>
+    <title>How to do it...</title>
+    <meta content="urn:uuid:64b74aae-7be0-4e73-89f3-687dd4470606" name="Adept.expected.resource"/>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+  
+
+</head>
+  <body class="calibre">
+        
+
+                            
+                    <h1 class="header-title">怎么做...</h1>
+                
+            
+            
+                
+<p class="calibre2">让我们从训练我们的模型开始，看看它们在这一部分的表现如何:</p>
+<ol class="calibre14">
+<li class="calibre11">使用朴素贝叶斯算法为模型定型。将该算法应用于计数数据和 TF-IDF 数据。</li>
+</ol>
+<p class="calibre20">以下是对计数数据进行朴素贝叶斯定型的代码:</p>
+<pre class="calibre18">from sklearn.naive_bayes import MultinomialNB<br class="title-page-name"/>nb = MultinomialNB()<br class="title-page-name"/><br class="title-page-name"/>nb.fit(count_train, Y_train)<br class="title-page-name"/>nb_pred_train = nb.predict(count_train)<br class="title-page-name"/>nb_pred_test = nb.predict(count_test)<br class="title-page-name"/>nb_pred_train_proba = nb.predict_proba(count_train)<br class="title-page-name"/>nb_pred_test_proba = nb.predict_proba(count_test)<br class="title-page-name"/><br class="title-page-name"/>print('The accuracy for the training data is {}'.format(nb.score(count_train, Y_train)))<br class="title-page-name"/>print('The accuracy for the testing data is {}'.format(nb.score(count_test, Y_test)))</pre>
+<p class="calibre20">看看前面模型的<kbd class="calibre12">train</kbd>和<kbd class="calibre12">test</kbd>精度:</p>
+<p class="CDPAlignCenter"><img class="aligncenter103" src="img/2ffd5dab-de2d-49a5-927c-ab6c7608e50c.png"/></p>
+<ol start="2" class="calibre14">
+<li class="calibre11">使用<kbd class="calibre12">classification_report()</kbd>方法打印分类报告。将<kbd class="calibre12">Y_test</kbd>和<kbd class="calibre12">nb_pred_test</kbd>传递给<kbd class="calibre12">classification_report()</kbd>方法:</li>
+</ol>
+<pre class="calibre18">print(classification_report(Y_test, nb_pred_test))</pre>
+<p class="calibre20">这为我们提供了以下输出，它显示了目标变量中每个类的<kbd class="calibre12">precision</kbd>、<kbd class="calibre12">recall</kbd>、<kbd class="calibre12">f1-score</kbd>和<kbd class="calibre12">support</kbd>:</p>
+<p class="CDPAlignCenter"><img class="aligncenter104" src="img/0befb29a-c9bb-40fa-9f71-95dd23122c88.png"/></p>
+<ol start="3" class="calibre14">
+<li class="calibre11">将<kbd class="calibre12">Y_test</kbd>和<kbd class="calibre12">nb_pred_test</kbd>传递给<kbd class="calibre12">plot_confusion_matrix()</kbd>函数，以绘制混淆矩阵，如下所示:</li>
+</ol>
+<pre class="calibre18">target_names = ['Spam','Ham']<br class="title-page-name"/><br class="title-page-name"/># Pass actual &amp; predicted values to the confusion matrix()<br class="title-page-name"/>cm = confusion_matrix(Y_test, nb_pred_test)<br class="title-page-name"/>plt.figure()<br class="title-page-name"/>plot_confusion_matrix(cm, classes=target_names)<br class="title-page-name"/>plt.show()</pre>
+<p class="calibre20">下图显示了真负值、假正值、假负值和真正值:</p>
+<p class="CDPAlignCenter"><img class="aligncenter105" src="img/c2c7b305-a462-4611-8e53-6bfe868ce3d4.png"/></p>
+<p>注意，在前面的<em class="calibre23">准备</em>部分，我们使用了<kbd class="calibre19">TfidfVectorizer</kbd>模块将文本转换成 TF-IDF 向量。</p>
+<div><ol start="4" class="calibre60">
+<li class="calibre11">用朴素贝叶斯模型拟合 TF-IDF 训练数据:</li>
+</ol>
+</div>
+<pre class="calibre18">nb.fit(tfidf_train, Y_train)<br class="title-page-name"/>nb_pred_train_tfidf = nb.predict(tfidf_train)<br class="title-page-name"/>nb_pred_test_tfidf = nb.predict(tfidf_test)<br class="title-page-name"/><br class="title-page-name"/>nb_tfidf_pred_train_proba = nb.predict_proba(tfidf_train)<br class="title-page-name"/>nb_tfidf_pred_test_proba = nb.predict_proba(tfidf_test)<br class="title-page-name"/><br class="title-page-name"/>print('The accuracy for the training data is {}'.format(nb.score(count_train, Y_train)))<br class="title-page-name"/>print('The accuracy for the testing data is {}'.format(nb.score(count_test, Y_test)))</pre>
+<ol start="5" class="calibre14">
+<li class="calibre11">检查 TF-IDF 测试数据的性能统计数据:</li>
+</ol>
+<pre class="calibre18">print(classification_report(Y_test, nb_pred_test_tfidf))<br class="title-page-name"/><br class="title-page-name"/>target_names = ['Spam','Ham']<br class="title-page-name"/><br class="title-page-name"/># Pass actual &amp; predicted values to the confusion matrix()<br class="title-page-name"/>cm = confusion_matrix(Y_test, nb_pred_test_tfidf)<br class="title-page-name"/>plt.figure()<br class="title-page-name"/><br class="title-page-name"/>plot_confusion_matrix(cm, classes=target_names)<br class="title-page-name"/>plt.show()</pre>
+<p class="calibre20">在下面的屏幕截图中，我们可以看到前面代码块的输出:</p>
+<p class="CDPAlignCenter"><img class="aligncenter106" src="img/b77d827c-6163-446d-ad09-b4efab591e6d.png"/></p>
+<ol start="6" class="calibre14">
+<li class="calibre11">用具有计数数据的支持向量机分类器来拟合模型。使用<kbd class="calibre12">GridSearchCV</kbd>对估算器的指定参数值进行搜索:</li>
+</ol>
+<pre class="calibre18">from sklearn.svm import SVC<br class="title-page-name"/><br class="title-page-name"/>svc = SVC(kernel='rbf',probability=True)<br class="title-page-name"/>svc_params = {'C':[0.001, 0.01, 0.1, 1, 10]}<br class="title-page-name"/><br class="title-page-name"/>svc_gcv_rbf_count = GridSearchCV(svc, svc_params, cv=5)<br class="title-page-name"/>svc_gcv_rbf_count.fit(count_train, Y_train)<br class="title-page-name"/><br class="title-page-name"/># We use the grid model to predict the class <br class="title-page-name"/>svc_rbf_train_predicted_values = svc_gcv_rbf_count.predict(count_train)<br class="title-page-name"/>svc_rbf_test_predicted_values = svc_gcv_rbf_count.predict(count_test)<br class="title-page-name"/><br class="title-page-name"/># We use the grid model to predict the class probabilities<br class="title-page-name"/>svc_gcv_train_proba_rbf = svc_gcv_rbf_count.predict_proba(count_train)<br class="title-page-name"/>svc_gcv_test_proba_rbf = svc_gcv_rbf_count.predict_proba(count_test)<br class="title-page-name"/><br class="title-page-name"/>print('The best parameters {}'.format(svc_gcv_rbf_count.best_params_))<br class="title-page-name"/>print('The best score {}'.format(svc_gcv_rbf_count.best_score_))</pre>
+<p class="calibre20">网格搜索为我们提供了最佳模型。我们可以看到最佳模型的参数值和得分:</p>
+<p class="CDPAlignCenter"><img class="aligncenter107" src="img/ecdb5b29-7e5f-410e-94f2-3e40a8426650.png"/></p>
+<ol start="7" class="calibre14">
+<li class="calibre11">用下面的代码看看计数数据的<kbd class="calibre12">test</kbd>精度:</li>
+</ol>
+<pre class="calibre18">print(classification_report(Y_test, svc_rbf_test_predicted_values))<br class="title-page-name"/><br class="title-page-name"/>target_names = ['Spam','Ham']<br class="title-page-name"/><br class="title-page-name"/># Pass actual &amp; predicted values to the confusion matrix()<br class="title-page-name"/>cm = confusion_matrix(Y_test, svc_rbf_test_predicted_values)<br class="title-page-name"/>plt.figure()<br class="title-page-name"/>plot_confusion_matrix(cm,classes=target_names)<br class="title-page-name"/>plt.show()</pre>
+<p class="calibre20">下面是<kbd class="calibre12">classification_report()</kbd>和混淆矩阵的输出:</p>
+<p class="CDPAlignCenter"><img class="aligncenter108" src="img/9c07bc83-17ce-42e4-96df-7056ff7fe50d.png"/></p>
+<ol start="8" class="calibre14">
+<li class="calibre11">将 SVM 与 TF-IDF 数据一起使用:</li>
+</ol>
+<pre class="calibre18">svc = SVC(kernel='rbf',probability=True)<br class="title-page-name"/>svc_params = {'C':[0.001, 0.01, 0.1, 1, 10]}<br class="title-page-name"/><br class="title-page-name"/>svc_gcv = GridSearchCV(svc,svc_params,cv=5)<br class="title-page-name"/>svc_gcv.fit(tfidf_train, Y_train)<br class="title-page-name"/><br class="title-page-name"/># We use the grid model to predict the class <br class="title-page-name"/>svc_tfidf_rbf_train_predicted_values = svc_gcv.predict(tfidf_train)<br class="title-page-name"/>svc_tfidf_rbd_test_predicted_values = svc_gcv.predict(tfidf_test)<br class="title-page-name"/><br class="title-page-name"/># We use the grid model to predict the class probabilities<br class="title-page-name"/>svc_gcv_tfidf_train_proba_rbf = svc_gcv.predict_proba(tfidf_train)<br class="title-page-name"/>svc_gcv_tfidf_test_proba_rbf = svc_gcv.predict_proba(tfidf_test)<br class="title-page-name"/><br class="title-page-name"/>print('The best parameters {}'.format(svc_gcv.best_params_))<br class="title-page-name"/>print('The best score {}'.format(svc_gcv.best_score_))</pre>
+<p class="calibre20">以下输出显示了在 TF-IDF 数据上使用 SVM 和 RBF 核训练的模型的最佳得分:</p>
+<p class="CDPAlignCenter"><img class="aligncenter109" src="img/ece4a414-3e4f-4767-8574-665c1e7a94fd.png"/></p>
+<ol start="9" class="calibre14">
+<li class="calibre11">打印先前型号的分类报告和混淆矩阵:</li>
+</ol>
+<p class="CDPAlignCenter"><img class="aligncenter110" src="img/ba4c57e8-fb26-4d52-9d83-62b8d47b5bf9.png"/></p>
+<ol start="10" class="calibre14">
+<li class="calibre11">使用网格搜索交叉验证将随机森林模型与计数数据相匹配，就像我们在 SVM 所做的那样:</li>
+</ol>
+<pre class="calibre18"># Set the parameters for grid search<br class="title-page-name"/>rf_params = {"criterion":["gini","entropy"],"min_samples_split":[2,3],"max_depth":[None,2,3],"min_samples_leaf":[1,5],"max_leaf_nodes":[None],"oob_score":[True]}<br class="title-page-name"/><br class="title-page-name"/># Create an instance of the Random Forest Classifier()<br class="title-page-name"/>rf = RandomForestClassifier()<br class="title-page-name"/><br class="title-page-name"/># Use gridsearchCV(), pass the values you have set for grid search<br class="title-page-name"/>rf_gcv = GridSearchCV(rf, rf_params, cv=5)<br class="title-page-name"/><br class="title-page-name"/># Fit the model onto the train data<br class="title-page-name"/>rf_gcv.fit(count_train, Y_train)<br class="title-page-name"/><br class="title-page-name"/># We use the grid model to predict the class <br class="title-page-name"/>rf_train_predicted_values = rf_gcv.predict(count_train)<br class="title-page-name"/>rf_test_predicted_values = rf_gcv.predict(count_test)<br class="title-page-name"/><br class="title-page-name"/># We use the grid model to predict the class probabilities<br class="title-page-name"/>rf_gcv_pred_train_proba = rf_gcv.predict_proba(count_train)<br class="title-page-name"/>rf_gcv_pred_test_proba = rf_gcv.predict_proba(count_test)<br class="title-page-name"/><br class="title-page-name"/>print('The best parameters {}'.format(rf_gcv.best_params_))<br class="title-page-name"/>print('The best score {}'.format(rf_gcv.best_score_))</pre>
+<p class="calibre20">使用网格参数对随机森林进行网格搜索会返回最佳参数和最佳得分，如下图所示:</p>
+<p class="CDPAlignCenter"><img class="aligncenter111" src="img/c25f7a64-fd07-4365-92f9-5213bfc47fe8.png"/></p>
+<ol start="11" class="calibre14">
+<li class="calibre11">使用分类报告和混淆矩阵，看看随机森林模型的性能指标和我们测试数据中的计数数据:</li>
+</ol>
+<pre class="calibre18">print(classification_report(Y_test, rf_test_predicted_values))<br class="title-page-name"/><br class="title-page-name"/>target_names = ['Spam','Ham']<br class="title-page-name"/><br class="title-page-name"/># Pass actual &amp; predicted values to the confusion matrix()<br class="title-page-name"/>cm = confusion_matrix(Y_test, rf_test_predicted_values)<br class="title-page-name"/>plt.figure()<br class="title-page-name"/>plot_confusion_matrix(cm,classes=target_names)<br class="title-page-name"/>plt.show() </pre>
+<p class="calibre20">该报告如下面的屏幕截图所示:</p>
+<p class="CDPAlignCenter"><img class="aligncenter112" src="img/e81e861e-fe2f-4d73-80a0-abc8eae6df88.png"/></p>
+<ol start="12" class="calibre14">
+<li class="calibre11">通过对 TF-IDF 数据进行网格搜索，在随机森林上建立模型:</li>
+</ol>
+<pre class="calibre18"># Set the parameters for grid search<br class="title-page-name"/>rf_params = {"criterion":["gini","entropy"],"min_samples_split":[2,3],"max_depth":[None,2,3],"min_samples_leaf":[1,5],"max_leaf_nodes":[None],"oob_score":[True]}<br class="title-page-name"/><br class="title-page-name"/># Create an instance of the Random Forest Classifier()<br class="title-page-name"/>rf = RandomForestClassifier()<br class="title-page-name"/><br class="title-page-name"/># Use gridsearchCV(), pass the values you have set for grid search<br class="title-page-name"/>rf_gcv = GridSearchCV(rf, rf_params, cv=5)<br class="title-page-name"/><br class="title-page-name"/>rf_gcv.fit(tfidf_train, Y_train)<br class="title-page-name"/><br class="title-page-name"/>rf_tfidf_train_predicted_values = rf_gcv.predict(tfidf_train)<br class="title-page-name"/>rf_tfidf_test_predicted_values = rf_gcv.predict(tfidf_test)<br class="title-page-name"/><br class="title-page-name"/>rf_gcv_tfidf_pred_train_proba = rf_gcv.predict_proba(tfidf_train)<br class="title-page-name"/>rf_gcv_tfidf_pred_test_proba = rf_gcv.predict_proba(tfidf_test)<br class="title-page-name"/><br class="title-page-name"/>print('The best parameters {}'.format(rf_gcv.best_params_))<br class="title-page-name"/>print('The best score {}'.format(rf_gcv.best_score_))<br class="title-page-name"/><br class="title-page-name"/>print(classification_report(Y_test, rf_tfidf_test_predicted_values))<br class="title-page-name"/><br class="title-page-name"/>target_names = ['Spam','Ham']<br class="title-page-name"/># Pass actual &amp; predicted values to the confusion matrix()<br class="title-page-name"/>cm = confusion_matrix(Y_test, rf_tfidf_test_predicted_values)<br class="title-page-name"/>plt.figure()<br class="title-page-name"/>plot_confusion_matrix(cm, classes=target_names)<br class="title-page-name"/>plt.show()</pre>
+<ol start="13" class="calibre14">
+<li class="calibre11">利用<kbd class="calibre12">predict_proba()</kbd>方法的输出来收集每个模型的预测概率，以绘制 ROC 曲线。代码包中提供了完整的代码。</li>
+</ol>
+<p class="calibre20">下面是根据计数数据的朴素贝叶斯模型绘制 ROC 曲线的代码示例:</p>
+<pre class="calibre18">fpr, tpr, thresholds = roc_curve(Y_test, nb_pred_test_proba[:,1])<br class="title-page-name"/>roc_auc = auc(Y_test,nb_pred_test_proba[:,1])<br class="title-page-name"/><br class="title-page-name"/>plt.title('ROC Naive Bayes (Count)')<br class="title-page-name"/>plt.plot(fpr, tpr, 'b',label='AUC = %0.3f'% roc_auc)<br class="title-page-name"/>plt.legend(loc='lower right')<br class="title-page-name"/>plt.plot([0,1],[0,1],'r--')<br class="title-page-name"/>plt.xlim([-0.1,1.0])<br class="title-page-name"/>plt.ylim([-0.1,1.01])<br class="title-page-name"/>plt.ylabel('True Positive Rate')<br class="title-page-name"/>plt.xlabel('False Positive Rate')</pre>
+<p class="calibre20">使用代码包中提供的完整代码，我们可以查看所有模型的 ROC 图，并对它们进行比较:</p>
+<p class="CDPAlignCenter"><img class="aligncenter113" src="img/385bf4df-cbb8-4f7d-a2f4-552a662169c1.png"/></p>
+<ol start="14" class="calibre14">
+<li class="calibre11">平均所有模型的概率，并绘制 ROC 曲线:</li>
+</ol>
+<pre class="calibre18">plt.subplot(4,3,7)<br class="title-page-name"/><br class="title-page-name"/>### Test Count Data<br class="title-page-name"/>d = (nb_pred_test_proba + svc_gcv_test_proba_rbf + rf_gcv_pred_test_proba)/4<br class="title-page-name"/><br class="title-page-name"/>fpr, tpr, thresholds = roc_curve(Y_test,d[:,1])<br class="title-page-name"/>roc_auc = auc(Y_test,d[:,1])<br class="title-page-name"/><br class="title-page-name"/>plt.title('ROC Ensemble (Count)')<br class="title-page-name"/>plt.plot(fpr, tpr, 'b',label='AUC = %0.3f'% roc_auc)<br class="title-page-name"/>plt.legend(loc='lower right')<br class="title-page-name"/>plt.plot([0,1],[0,1],'r--')<br class="title-page-name"/>plt.xlim([-0.1,1.0])<br class="title-page-name"/>plt.ylim([-0.1,1.01])<br class="title-page-name"/>plt.ylabel('True Positive Rate')<br class="title-page-name"/>plt.xlabel('False Positive Rate')<br class="title-page-name"/><br class="title-page-name"/>plt.subplot(4,3,8)<br class="title-page-name"/><br class="title-page-name"/>### Test TF-IDF Data<br class="title-page-name"/>d = (nb_tfidf_pred_test_proba + svc_gcv_tfidf_test_proba_rbf + rf_gcv_tfidf_pred_test_proba)/4<br class="title-page-name"/><br class="title-page-name"/>fpr, tpr, thresholds = roc_curve(Y_test,d[:,1])<br class="title-page-name"/>roc_auc = auc(Y_test,d[:,1])<br class="title-page-name"/><br class="title-page-name"/>plt.title('ROC Ensemble (TF-IDF)')<br class="title-page-name"/>plt.plot(fpr, tpr, 'b',label='AUC = %0.3f'% roc_auc)<br class="title-page-name"/>plt.legend(loc='lower right')<br class="title-page-name"/>plt.plot([0,1],[0,1],'r--')<br class="title-page-name"/>plt.xlim([-0.1,1.0])<br class="title-page-name"/>plt.ylim([-0.1,1.01])<br class="title-page-name"/>plt.ylabel('True Positive Rate')<br class="title-page-name"/>plt.xlabel('False Positive Rate')<br class="title-page-name"/>#plt.show()<br class="title-page-name"/><br class="title-page-name"/>plt.tight_layout(pad=1,rect=(0, 0, 3.5, 4))<br class="title-page-name"/>plt.show()</pre>
+<p class="calibre20">我们可以在下面的截图中看到 ROC 和 AUC 得分的平均结果:</p>
+<p class="CDPAlignCenter"><img class="aligncenter114" src="img/9c5a656e-c8ec-432c-b6c1-352c8a384032.png"/></p>
+<ol start="15" class="calibre14">
+<li class="calibre11">检查集合结果的准确性。创建预测结果的数组，如下所示:</li>
+</ol>
+<pre class="calibre18">predicted_array = np.array([nb_pred_test_tfidf, svc_tfidf_rbd_test_predicted_values, rf_tfidf_test_predicted_values])<br class="title-page-name"/><br class="title-page-name"/>print("Each array is the prediction of the respective models")<br class="title-page-name"/>print(predicted_array)</pre>
+<ol start="16" class="calibre14">
+<li class="calibre11">计算各个观察值的预测值的模式，以执行最大投票，从而获得最终的预测结果:</li>
+</ol>
+<pre class="calibre18"># Using mode on the array, we get the max vote for each observation<br class="title-page-name"/>predicted_array = mode(predicted_array)<br class="title-page-name"/><br class="title-page-name"/># Check the array<br class="title-page-name"/>print(predicted_array)<br class="title-page-name"/><br class="title-page-name"/>print("The accuracy for test")<br class="title-page-name"/>accuracy_score(Y_test, predicted_array[0][0])</pre>
+<ol start="17" class="calibre14">
+<li class="calibre11">分别为根据计数数据和 TF-IDF 数据训练的模型绘制测试精度图:</li>
+</ol>
+<p class="CDPAlignCenter"><img class="aligncenter115" src="img/9c36b9ad-7304-436c-9e63-8f6ddd2f907f.png"/></p>
+
+
+            
+
+            
+        
+    </body>
+
+</html>
+
+
+<html xmlns:epub="http://www.idpf.org/2007/ops">
+  <head>
+    <title>How it works...</title>
+    <meta content="urn:uuid:64b74aae-7be0-4e73-89f3-687dd4470606" name="Adept.expected.resource"/>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+  
+
+</head>
+  <body class="calibre">
+        
+
+                            
+                    <h1 class="header-title">它是如何工作的...</h1>
+                
+            
+            
+                
+<p class="calibre2">在<em class="calibre13">准备好</em>部分，我们导入了所有需要的库，并定义了绘制混淆矩阵的函数。我们使用 UTF8 编码读取数据集。我们检查了垃圾邮件和垃圾邮件在我们的数据集中的比例，并使用<kbd class="calibre12">CountVectorizer</kbd>和<kbd class="calibre12">TfidfVectorizer</kbd>模块将文本分别转换为向量和 TF-IDF 向量。</p>
+<p class="calibre2">之后，我们使用各种算法建立了多个模型。我们还对计数数据和 TF-IDF 数据应用了每种算法。</p>
+<p class="calibre2">模型需要按照以下顺序构建:</p>
+<ol class="calibre14">
+<li class="calibre11">计数数据的朴素贝叶斯</li>
+<li class="calibre11">TF-IDF 数据上的朴素贝叶斯</li>
+<li class="calibre11">基于计数数据的 RBF 核 SVM</li>
+<li class="calibre11">基于 TF-IDF 数据的 RBF 核 SVM</li>
+<li class="calibre11">随机森林计数数据</li>
+<li class="calibre11">TF-IDF 数据上的随机森林</li>
+</ol>
+<p class="calibre2">朴素贝叶斯分类器广泛用于机器学习中的文本分类。朴素贝叶斯算法基于属于某个类的要素的条件概率。在<em class="calibre13">步骤 1 </em>中，我们使用朴素贝叶斯算法对计数数据构建了第一个模型。在<em class="calibre13">步骤 2 </em>中，我们使用<kbd class="calibre12">classification_report()</kbd>查看<kbd class="calibre12">precision</kbd>、<kbd class="calibre12">recall</kbd>、<kbd class="calibre12">f1-score</kbd>和<kbd class="calibre12">support</kbd>来检查性能指标。在<em class="calibre13">步骤 3 </em>中，我们调用<kbd class="calibre12">plot_confusion_matrix()</kbd>来绘制混淆矩阵。</p>
+<p class="calibre2">然后，在<em class="calibre13">步骤 4 </em>中，我们在 TF-IDF 数据上建立朴素贝叶斯模型，并在<em class="calibre13">步骤 5 </em>中评估性能。在<em class="calibre13">步骤 6 </em>和<em class="calibre13">步骤 7 </em>中，我们使用支持向量机对计数数据训练我们的模型，使用<kbd class="calibre12">classification_report</kbd>的输出评估其性能，并绘制混淆矩阵。我们使用 RBF 核来训练我们的 SVM 模型。我们还展示了一个使用<kbd class="calibre12">GridSearchCV</kbd>寻找最佳参数的例子。在<em class="calibre13">步骤 8 </em>和<em class="calibre13">步骤 9 </em>中，我们重复了在<em class="calibre13">步骤</em> 6 和<em class="calibre13">步骤</em> 7 中所做的事情，但是这一次，我们对 SVM 进行了 TF-IDF 数据的训练。</p>
+<p class="calibre2">在<em class="calibre13">步骤 10 </em>中，我们在计数数据上使用网格搜索训练了一个随机森林模型。我们为<kbd class="calibre12">criterion</kbd>超参数设置<strong class="calibre4">基尼</strong>和<strong class="calibre4">熵</strong>。我们还为参数设置了多个值，如<kbd class="calibre12">min_samples_split</kbd>、<kbd class="calibre12">max_depth</kbd>和<kbd class="calibre12">min_samples_leaf</kbd>。在<em class="calibre13">步骤 11 </em>中，我们评估了模型的性能。</p>
+<p class="calibre2">然后，我们在<em class="calibre13">步骤 12 </em>中根据 TF-IDF 数据训练了另一个随机森林模型。使用<kbd class="calibre12">predic_proba()</kbd>函数，我们得到了测试数据的类概率。我们在<em class="calibre13">步骤 13 </em>中使用相同的方法绘制 ROC 曲线，并在图上标注每个模型的 AUC 分数。这有助于我们比较模型的性能。</p>
+<p class="calibre2">在<em class="calibre13">步骤 14 </em>中，我们对概率进行了平均，这些概率是从计数和 TF-IDF 数据的模型中获得的。然后我们绘制总体结果的 ROC 曲线。从<em class="calibre13">步骤 15 </em>到<em class="calibre13">步骤 17 </em>，我们绘制了基于计数数据和 TF-IDF 数据的每个模型的测试精度。</p>
+
+
+            
+
+            
+        
+    </body>
+
+</html>
+
+
+<html xmlns:epub="http://www.idpf.org/2007/ops">
+  <head>
+    <title>Sentiment analysis of movie reviews using an ensemble model</title>
+    <meta content="urn:uuid:64b74aae-7be0-4e73-89f3-687dd4470606" name="Adept.expected.resource"/>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+  
+
+</head>
+  <body class="calibre">
+        
+
+                            
+                    <h1 class="header-title">基于集成模型的电影评论情感分析</h1>
+                
+            
+            
+                
+<p class="calibre2">情感分析是自然语言处理的另一个广泛研究的领域。这是对评论执行的一个流行任务，以确定评论者提供的评论的情绪。在这个例子中，我们将重点分析来自<strong class="calibre4">互联网电影数据库</strong> ( <strong class="calibre4"> IMDb </strong>)的电影评论数据，并根据它是正面还是负面进行分类。</p>
+<p class="calibre2">我们在<kbd class="calibre12">.txt</kbd>文件中有电影评论，它们被分成两个文件夹:负面的和正面的。正面评价 1000 个，负面评价 1000 个。这些文件可以从 GitHub 中检索到。</p>
+<p class="calibre2">我们将此案例研究分为两个部分:</p>
+<ul class="calibre10">
+<li class="calibre11">第一部分是准备数据集。我们将阅读以<kbd class="calibre12">.txt</kbd>格式提供的审查文件，附加它们，根据它们被放入的文件夹将它们标记为肯定或否定，并创建一个包含标签和文本的<kbd class="calibre12">.csv</kbd>文件。</li>
+<li class="calibre11">在第二部分中，我们将在计数数据和 TF-IDF 数据上构建多个基础学习器。我们将评估基础学习者的表现，然后评估所有的预测。</li>
+</ul>
+
+
+            
+
+            
+        
+    </body>
+
+</html>
+
+
+<html xmlns:epub="http://www.idpf.org/2007/ops">
+  <head>
+    <title>Getting ready</title>
+    <meta content="urn:uuid:64b74aae-7be0-4e73-89f3-687dd4470606" name="Adept.expected.resource"/>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+  
+
+</head>
+  <body class="calibre">
+        
+
+                            
+                    <h1 class="header-title">做好准备</h1>
+                
+            
+            
+                
+<p class="calibre2">我们从导入所需的库开始:</p>
+<pre class="calibre15">import os<br class="title-page-name"/>import glob<br class="title-page-name"/>import pandas as pd</pre>
+<p class="calibre2">我们将工作文件夹设置如下:</p>
+<pre class="calibre15">os.chdir("/.../Chapter 11/CS - IMDB Classification")<br class="title-page-name"/>os.getcwd()</pre>
+<p class="calibre2">我们设置 path 变量，并遍历文件夹中的<kbd class="calibre12">.txt</kbd>文件。</p>
+<p>请注意，我们有一个子文件夹<kbd class="calibre19">/txt_sentoken/pos</kbd>，其中保存了正面评论的 TXT 文件。同样，我们有一个子文件夹，<kbd class="calibre19">/txt_sentoken/neg</kbd>，保存了负面评论的 TXT 文件。</p>
+<p class="calibre2">读取正面评论的 TXT 文件，并将评论附加到数组中。我们使用数组创建一个数据帧，<kbd class="calibre12">df_pos</kbd>。</p>
+<pre class="calibre15">path="/.../Chapter 11/CS - IMDB Classification/txt_sentoken/pos/*.txt"<br class="title-page-name"/><br class="title-page-name"/>files = glob.glob(path)<br class="title-page-name"/>text_pos = []<br class="title-page-name"/><br class="title-page-name"/>for p in files:<br class="title-page-name"/> file_read = open(p, "r")<br class="title-page-name"/> to_append_pos = file_read.read()<br class="title-page-name"/> text_pos.append(to_append_pos)<br class="title-page-name"/> file_read.close()<br class="title-page-name"/><br class="title-page-name"/>df_pos = pd.DataFrame({'text':text_pos,'label':'positive'})<br class="title-page-name"/>df_pos.head()</pre>
+<p class="calibre2">用<kbd class="calibre12">head()</kbd>方法，我们来看看正面的评论。</p>
+<p class="calibre2">我们还遍历负面文件夹中的 TXT 文件来读取负面评论，并将它们附加到一个数组中。我们用数组创建一个数据帧，<kbd class="calibre12">df_neg</kbd>:</p>
+<pre class="calibre15">path="/Users/Dippies/CODE PACKT - EML/Chapter 11/CS - IMDB Classification/txt_sentoken/neg/*.txt"<br class="title-page-name"/><br class="title-page-name"/>files = glob.glob(path)<br class="title-page-name"/>text_neg = []<br class="title-page-name"/><br class="title-page-name"/>for n in files:<br class="title-page-name"/>    file_read = open(n, "r")<br class="title-page-name"/>    to_append_neg = file_read.read()<br class="title-page-name"/>    text_neg.append(to_append_neg)<br class="title-page-name"/>    file_read.close()<br class="title-page-name"/><br class="title-page-name"/>df_neg = pd.DataFrame({'text':text_neg,'label':'negative'})<br class="title-page-name"/>df_neg.head()</pre>
+<p class="calibre2">最后，我们使用<kbd class="calibre12">concat()</kbd>方法将正负数据帧合并成一个数据帧:</p>
+<pre class="calibre15">df_moviereviews=pd.concat([df_pos, df_neg])</pre>
+<p class="calibre2">我们可以用<kbd class="calibre12">head()</kbd>和<kbd class="calibre12">tail()</kbd>方法查看准备好的数据帧:</p>
+<pre class="calibre15">print(df_moviereviews.head())<br class="title-page-name"/>print(df_moviereviews.tail())</pre>
+<p class="calibre2">前面的代码给出了以下输出:</p>
+<p class="CDPAlignCenter"><img class="aligncenter116" src="img/d92dc9a6-754b-4c3f-ba5c-aec37b8ab46d.png"/></p>
+<p class="calibre2">从上图中，我们注意到正面和负面的评论是按顺序添加的。数据帧的前半部分包含正面评价，后半部分包含负面评价。</p>
+<p class="calibre2">让我们将数据打乱，使其不再按顺序排列:</p>
+<pre class="calibre15">from sklearn.utils import shuffle<br class="title-page-name"/><br class="title-page-name"/>df_moviereviews=shuffle(df_moviereviews)<br class="title-page-name"/>df_moviereviews.head(10)</pre>
+<p class="calibre2">我们现在可以看到数据帧中的数据被打乱了:</p>
+<p class="CDPAlignCenter"><img class="aligncenter117" src="img/5b4555d1-3c8c-4439-bff5-51dc0357469f.png"/></p>
+<p class="calibre2">我们验证合并数据帧的维度，以查看它是否包含 2，000 个观察值，这将是合并 1，000 个负面和 1，000 个正面评论的结果:</p>
+<pre class="calibre15">df_moviereviews.shape</pre>
+<p class="calibre2">从前面的代码中，我们注意到我们有 2，000 个观察值和 2 列。</p>
+<p class="calibre2">我们也可以将生成的数据帧写入另一个<kbd class="calibre12">.csv</kbd>文件，以避免像前面步骤那样从 TXT 文件重新创建 CSV 文件:</p>
+<pre class="calibre15">df_moviereviews.to_csv("/.../Chapter 11/CS - IMDB Classification/Data_IMDB.csv") </pre>
+<p class="calibre2">接下来，我们将定义我们之前使用过的<kbd class="calibre12">plot_confusion_matrix()</kbd>方法。</p>
+<p class="calibre2">我们现在可以看到数据中正面和负面评论的比例。在我们的例子中，比例正好是 50:50:</p>
+<pre class="calibre15">df_moviereviews["label"].value_counts().plot(kind='pie')<br class="title-page-name"/>plt.tight_layout(pad=1,rect=(0, 0, 0.7, 1))<br class="title-page-name"/><br class="title-page-name"/>plt.text(x=-0.9,y=0.1, \<br class="title-page-name"/>         s=(np.round(((df_moviereviews["label"].\<br class="title-page-name"/>                       value_counts()[0])/(df_moviereviews["label"].value_counts()[0] + \<br class="title-page-name"/>                       df_moviereviews["label"].value_counts()[1])),2)))<br class="title-page-name"/><br class="title-page-name"/>plt.text(x=0.4,y=-0.3, \<br class="title-page-name"/>         s=(np.round(((df_moviereviews["label"].\<br class="title-page-name"/>                       value_counts()[1])/(df_moviereviews["label"].value_counts()[0] + \<br class="title-page-name"/>                       df_moviereviews["label"].value_counts()[1])),2)))<br class="title-page-name"/><br class="title-page-name"/>plt.title("% Share of the Positive and Negative reviews in the dataset")</pre>
+<p class="calibre2">上述代码的输出可以在下面的屏幕截图中看到:</p>
+<p class="CDPAlignCenter"><img class="aligncenter118" src="img/b9162d18-91d9-4185-a16e-967abbd75d46.png"/></p>
+<p class="calibre2">我们现在将“阳性”标签替换为“1”，将“阴性”标签替换为“0”:</p>
+<pre class="calibre15">df_moviereviews.loc[df_moviereviews["label"]=='positive',"label",]=1<br class="title-page-name"/>df_moviereviews.loc[df_moviereviews["label"]=='negative',"label",]=0</pre>
+<p class="calibre2">我们使用各种数据清理和准备机制来准备数据。我们将按照与上一个方法相同的顺序来预处理数据:</p>
+<ol class="calibre14">
+<li class="calibre11">将所有文本转换为小写</li>
+<li class="calibre11">删除标点符号</li>
+<li class="calibre11">删除停用词</li>
+<li class="calibre11">执行词干分析</li>
+<li class="calibre11">将数据符号化</li>
+</ol>
+<p class="calibre2">接下来，我们将定义一个函数来执行前面的清理步骤:</p>
+<pre class="calibre15">lemmatizer = WordNetLemmatizer()<br class="title-page-name"/>def process_text(text):<br class="title-page-name"/>    nopunc = [char for char in text if char not in string.punctuation]<br class="title-page-name"/>    nopunc = ''.join(nopunc)<br class="title-page-name"/><br class="title-page-name"/>    clean_words = [word.lower() for word in nopunc.split() if word.lower() not in stopwords.words('english')]<br class="title-page-name"/>    clean_words = [lemmatizer.lemmatize(lem) for lem in clean_words]<br class="title-page-name"/>    clean_words = " ".join(clean_words)<br class="title-page-name"/><br class="title-page-name"/>    return clean_words</pre>
+<p class="calibre2">我们调用前面的函数来处理文本数据:</p>
+<pre class="calibre15">df_moviereviews['text'] = df_moviereviews['text'].apply(process_text)</pre>
+<p class="calibre2">我们现在将构建我们的基础学习者并评估集合结果。</p>
+
+
+            
+
+            
+        
+    </body>
+
+</html>
+
+
+<html xmlns:epub="http://www.idpf.org/2007/ops">
+  <head>
+    <title>How to do it...</title>
+    <meta content="urn:uuid:64b74aae-7be0-4e73-89f3-687dd4470606" name="Adept.expected.resource"/>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+  
+
+</head>
+  <body class="calibre">
+        
+
+                            
+                    <h1 class="header-title">怎么做...</h1>
+                
+            
+            
+                
+<p class="calibre2">我们从导入我们需要的剩余库开始:</p>
+<ol class="calibre14">
+<li class="calibre11">导入所需的库:</li>
+</ol>
+<pre class="calibre18">import os<br class="title-page-name"/>import numpy as np<br class="title-page-name"/>import pandas as pd<br class="title-page-name"/>import itertools<br class="title-page-name"/>import warnings<br class="title-page-name"/>import string<br class="title-page-name"/>import matplotlib.pyplot as plt<br class="title-page-name"/>from nltk.corpus import stopwords<br class="title-page-name"/>from nltk.stem import WordNetLemmatizer<br class="title-page-name"/>from sklearn.feature_extraction.text import CountVectorizer<br class="title-page-name"/>from sklearn.feature_extraction.text import TfidfVectorizer<br class="title-page-name"/>from sklearn.model_selection import train_test_split<br class="title-page-name"/>from sklearn.naive_bayes import MultinomialNB<br class="title-page-name"/>from sklearn.metrics import confusion_matrix<br class="title-page-name"/>from sklearn.model_selection import GridSearchCV<br class="title-page-name"/>from sklearn.ensemble import RandomForestClassifier<br class="title-page-name"/>from sklearn.metrics import classification_report<br class="title-page-name"/>from sklearn.metrics import roc_auc_score as auc<br class="title-page-name"/>from sklearn.metrics import roc_curve<br class="title-page-name"/>from sklearn.metrics import accuracy_score<br class="title-page-name"/>from scipy.stats import mode</pre>
+<ol start="2" class="calibre14">
+<li class="calibre11">分离目标变量和预测变量:</li>
+</ol>
+<pre class="calibre18">X = df_moviereviews.loc[:,'text']<br class="title-page-name"/>Y = df_moviereviews.loc[:,'label']<br class="title-page-name"/>Y = Y.astype('int')</pre>
+<ol start="3" class="calibre14">
+<li class="calibre11">执行数据的列车测试分割:</li>
+</ol>
+<pre class="calibre18">X_train,X_test,y_train,y_test = train_test_split(X, Y, test_size=.3, random_state=1)</pre>
+<ol start="4" class="calibre14">
+<li class="calibre11">使用<kbd class="calibre12">CountVectorizer()</kbd>将文本转换成矢量:</li>
+</ol>
+<pre class="calibre18">count_vectorizer = CountVectorizer()<br class="title-page-name"/>count_train = count_vectorizer.fit_transform(X_train)<br class="title-page-name"/>count_test = count_vectorizer.transform(X_test)</pre>
+<ol start="5" class="calibre14">
+<li class="calibre11">使用<kbd class="calibre12">TfidfVectorizer()</kbd>将文本转换成 TF-IDF 向量:</li>
+</ol>
+<pre class="calibre18">tfidf = TfidfVectorizer()<br class="title-page-name"/>tfidf_train = tfidf.fit_transform(X_train)<br class="title-page-name"/>tfidf_test = tfidf.transform(X_test)</pre>
+<p class="calibre20">我们通过在计数数据和 TF-IDF 数据上训练基础学习者来继续。我们用随机森林模型、朴素贝叶斯模型和支持向量分类器模型来训练基础学习器。</p>
+<ol start="6" class="calibre14">
+<li class="calibre11">对计数数据使用网格搜索来训练随机森林模型:</li>
+</ol>
+<pre class="calibre18"># Set the parameters for grid search<br class="title-page-name"/>rf_params = {"criterion":["gini","entropy"],\<br class="title-page-name"/>             "min_samples_split":[2,3],\<br class="title-page-name"/>             "max_depth":[None,2,3],\<br class="title-page-name"/>             "min_samples_leaf":[1,5],\<br class="title-page-name"/>             "max_leaf_nodes":[None],\<br class="title-page-name"/>             "oob_score":[True]}<br class="title-page-name"/><br class="title-page-name"/># Create an instance of the RandomForestClassifier()<br class="title-page-name"/>rf = RandomForestClassifier()<br class="title-page-name"/>warnings.filterwarnings("ignore")<br class="title-page-name"/><br class="title-page-name"/># Use gridsearchCV(), pass the values you have set for grid search<br class="title-page-name"/>rf_count = GridSearchCV(rf, rf_params, cv=5)<br class="title-page-name"/><br class="title-page-name"/>rf_count.fit(count_train, Y_train)<br class="title-page-name"/><br class="title-page-name"/># Predict class predictions &amp; class probabilities with test data<br class="title-page-name"/>rf_count_predicted_values = rf_count.predict(count_test)<br class="title-page-name"/>rf_count_probabilities = rf_count.predict_proba(count_test)<br class="title-page-name"/><br class="title-page-name"/>rf_count_train_accuracy = rf_count.score(count_train, Y_train)<br class="title-page-name"/>rf_count_test_accuracy = rf_count.score(count_test, Y_test)<br class="title-page-name"/><br class="title-page-name"/>print('The accuracy for the training data is {}'.\<br class="title-page-name"/>      format(rf_count_train_accuracy))<br class="title-page-name"/><br class="title-page-name"/>print('The accuracy for the testing data is {}'.\<br class="title-page-name"/>      format(rf_count_test_accuracy))</pre>
+<ol start="7" class="calibre14">
+<li class="calibre11">评估<kbd class="calibre12">precision</kbd>、<kbd class="calibre12">recall</kbd>、<kbd class="calibre12">f1-score</kbd>、<kbd class="calibre12">support</kbd>和<kbd class="calibre12">accuracy</kbd>:</li>
+</ol>
+<pre class="calibre18">print(classification_report(Y_test, rf_count_predicted_values))<br class="title-page-name"/><br class="title-page-name"/># Pass actual &amp; predicted values to the confusion_matrix()<br class="title-page-name"/>cm = confusion_matrix(Y_test, rf_count_predicted_values)<br class="title-page-name"/>plt.figure()<br class="title-page-name"/>plot_confusion_matrix(cm, classes=target_names,normalize=False)<br class="title-page-name"/>plt.show()</pre>
+<p class="calibre20">在下面的屏幕截图中，我们可以看到前面代码的输出:</p>
+<p class="CDPAlignCenter"><img class="aligncenter119" src="img/197e72d5-407a-4560-a910-694b77fdc3af.png"/></p>
+<ol start="8" class="calibre14">
+<li class="calibre11">使用网格搜索在 TF-IDF 数据上训练随机森林模型:</li>
+</ol>
+<pre class="calibre18"># Set the parameters for grid search<br class="title-page-name"/>rf_params = {"criterion":["gini","entropy"],"min_samples_split":[2,3],"max_depth":[None,2,3],"min_samples_leaf":[1,5],"max_leaf_nodes":[None],"oob_score":[True]}<br class="title-page-name"/><br class="title-page-name"/># Create an instance of the RandomForestClassifier()<br class="title-page-name"/>rf = RandomForestClassifier()<br class="title-page-name"/>warnings.filterwarnings("ignore")<br class="title-page-name"/><br class="title-page-name"/># Use gridsearchCV(), pass the values you have set for grid search<br class="title-page-name"/>rf_tfidf = GridSearchCV(rf, rf_params, cv=5)<br class="title-page-name"/><br class="title-page-name"/>rf_tfidf.fit(tfidf_train, Y_train)</pre>
+<ol start="9" class="calibre14">
+<li class="calibre11">评估模型的性能:</li>
+</ol>
+<pre class="calibre18">rf_tfidf_predicted_values = rf_tfidf.predict(tfidf_test)<br class="title-page-name"/>rf_tfidf_probabilities = rf_tfidf.predict_proba(tfidf_test)<br class="title-page-name"/><br class="title-page-name"/>rf_train_accuracy = rf_tfidf.score(tfidf_train, Y_train)<br class="title-page-name"/>rf_test_accuracy = rf_tfidf.score(tfidf_test, Y_test)<br class="title-page-name"/><br class="title-page-name"/>print('The accuracy for the training data is {}'.format(rf_train_accuracy))<br class="title-page-name"/>print('The accuracy for the testing data is {}'.format(rf_test_accuracy))<br class="title-page-name"/><br class="title-page-name"/>print(classification_report(Y_test, rf_tfidf_predicted_values))<br class="title-page-name"/><br class="title-page-name"/># Pass actual &amp; predicted values to the confusion_matrix()<br class="title-page-name"/>cm = confusion_matrix(Y_test, rf_tfidf_predicted_values)<br class="title-page-name"/>plt.figure()<br class="title-page-name"/>plot_confusion_matrix(cm, classes=target_names,normalize=False)<br class="title-page-name"/>plt.show()</pre>
+<ol start="10" class="calibre14">
+<li class="calibre11">对计数数据训练朴素贝叶斯模型并检查测试数据的准确性:</li>
+</ol>
+<pre class="calibre18">nb_count = MultinomialNB()<br class="title-page-name"/>nb_count.fit(count_train, Y_train)<br class="title-page-name"/><br class="title-page-name"/>nb_count_predicted_values = nb_count.predict(count_test)<br class="title-page-name"/>nb_count_probabilities = nb_count.predict_proba(count_test)<br class="title-page-name"/><br class="title-page-name"/>nb_train_accuracy = nb_count.score(count_train, Y_train)<br class="title-page-name"/>nb_test_accuracy = nb_count.score(count_test, Y_test)<br class="title-page-name"/><br class="title-page-name"/>print('The accuracy for the training data is {}'.format(nb_train_accuracy))<br class="title-page-name"/>print('The accuracy for the testing data is {}'.format(nb_test_accuracy))</pre>
+<ol start="11" class="calibre14">
+<li class="calibre11">用<kbd class="calibre12">classification_report()</kbd>和混淆矩阵评估其他模型的性能参数:</li>
+</ol>
+<pre class="calibre18">print(classification_report(Y_test, nb_predicted_values))<br class="title-page-name"/><br class="title-page-name"/># Pass actual &amp; predicted values to the confusion matrix()<br class="title-page-name"/>cm = confusion_matrix(Y_test, nb_predicted_values)<br class="title-page-name"/>plt.figure()<br class="title-page-name"/>plot_confusion_matrix(cm, classes=target_names,normalize=False)<br class="title-page-name"/>plt.show()</pre>
+<ol start="12" class="calibre14">
+<li class="calibre11">根据 TF-IDF 数据训练朴素贝叶斯模型，并按照我们对早期模型所做的相同方式评估其性能:</li>
+</ol>
+<pre class="calibre18">nb_tfidf = MultinomialNB()<br class="title-page-name"/>nb_tfidf.fit(count_train, Y_train)<br class="title-page-name"/><br class="title-page-name"/>nb_tfidf_predicted_values = nb_tfidf.predict(tfidf_test)<br class="title-page-name"/>nb_tfidf_probabilities = nb_tfidf.predict_proba(tfidf_test)<br class="title-page-name"/><br class="title-page-name"/>nb_train_accuracy = nb_tfidf.score(tfidf_train, Y_train)<br class="title-page-name"/>nb_test_accuracy = nb_tfidf.score(tfidf_test, Y_test)<br class="title-page-name"/><br class="title-page-name"/>print('The accuracy for the training data is {}'.format(nb_train_accuracy))<br class="title-page-name"/>print('The accuracy for the testing data is {}'.format(nb_test_accuracy))<br class="title-page-name"/><br class="title-page-name"/>print(classification_report(Y_test, nb_predicted_values))<br class="title-page-name"/><br class="title-page-name"/>#Pass actual &amp; predicted values to the confusion matrix()<br class="title-page-name"/>cm = confusion_matrix(Y_test, nb_predicted_values)<br class="title-page-name"/>plt.figure()<br class="title-page-name"/>plot_confusion_matrix(cm, classes=target_names,normalize=False)<br class="title-page-name"/>plt.show()</pre>
+<ol start="13" class="calibre14">
+<li class="calibre11">用支持向量分类器算法对计数数据训练具有线性核的模型。我们还对 SVC 的参数<kbd class="calibre12">C</kbd>进行网格搜索:</li>
+</ol>
+<pre class="calibre18">svc_count = SVC(kernel='linear',probability=True)<br class="title-page-name"/>svc_params = {'C':[0.001, 0.01, 0.1, 1, 10]}<br class="title-page-name"/><br class="title-page-name"/>svc_gcv_count = GridSearchCV(svc_count, svc_params, cv=5)<br class="title-page-name"/>svc_gcv_count.fit(count_train, Y_train)<br class="title-page-name"/><br class="title-page-name"/>svc_count_predicted_values = svc_gcv_count.predict(count_test)<br class="title-page-name"/>svc_count_probabilities = svc_gcv_count.predict_proba(count_test)<br class="title-page-name"/><br class="title-page-name"/>svc_count_train_accuracy = svc_gcv_count.score(count_train, Y_train)<br class="title-page-name"/>svc_count_test_accuracy = svc_gcv_count.score(count_test, Y_test)<br class="title-page-name"/><br class="title-page-name"/>print('The accuracy for the training data is {}'.format(svc_gcv_count.score(count_train, Y_train)))<br class="title-page-name"/>print('The accuracy for the testing data is {}'.format(svc_gcv_count.score(count_test, Y_test)))<br class="title-page-name"/><br class="title-page-name"/>print(classification_report(Y_test, svc_count_predicted_values))<br class="title-page-name"/># Pass actual &amp; predicted values to the confusion_matrix()<br class="title-page-name"/>cm = confusion_matrix(Y_test, svc_count_predicted_values)<br class="title-page-name"/>plt.figure()<br class="title-page-name"/>plot_confusion_matrix(cm, classes=target_names,normalize=False)<br class="title-page-name"/>plt.show()</pre>
+<ol start="14" class="calibre14">
+<li class="calibre11">在 TF-IDF 数据上用具有线性核的支持向量分类器算法训练模型。我们还对 SVC 的<kbd class="calibre12">C</kbd>参数进行网格搜索:</li>
+</ol>
+<pre class="calibre18">svc_tfidf = SVC(kernel='linear',probability=True)<br class="title-page-name"/>svc_params = {'C':[0.001, 0.01, 0.1, 1, 10]}<br class="title-page-name"/><br class="title-page-name"/>svc_gcv_tfidf = GridSearchCV(svc_tfidf, svc_params, cv=5)<br class="title-page-name"/>svc_gcv_tfidf.fit(tfidf_train, Y_train)<br class="title-page-name"/><br class="title-page-name"/>svc_tfidf_predicted_values = svc_gcv_tfidf.predict(tfidf_test)<br class="title-page-name"/>svc_tfidf_probabilities = svc_gcv_tfidf.predict_proba(tfidf_test)<br class="title-page-name"/><br class="title-page-name"/>svc_tfidf_train_accuracy = svc_gcv_count.score(tfidf_train, Y_train)<br class="title-page-name"/>svc_tfidf_test_accuracy = svc_gcv_count.score(tfidf_test, Y_test)<br class="title-page-name"/><br class="title-page-name"/>print('The accuracy for the training data is {}'.format(svc_gcv_tfidf.score(count_train, Y_train)))<br class="title-page-name"/>print('The accuracy for the testing data is {}'.format(svc_gcv_tfidf.score(count_test, Y_test)))<br class="title-page-name"/><br class="title-page-name"/>print(classification_report(Y_test, svc_tfidf_predicted_values))<br class="title-page-name"/># Pass actual &amp; predicted values to the confusion_matrix()<br class="title-page-name"/>cm = confusion_matrix(Y_test, svc_tfidf_predicted_values)<br class="title-page-name"/>plt.figure()<br class="title-page-name"/>plot_confusion_matrix(cm, classes=target_names)<br class="title-page-name"/>plt.show()</pre>
+<ol start="15" class="calibre14">
+<li class="calibre11">绘制每个模型的 ROC 曲线。这里显示了其中一个图的代码(本书的代码包中提供了完整的代码):</li>
+</ol>
+<pre class="calibre18">fpr, tpr, thresholds = roc_curve(Y_test, rf_count_probabilities[:,1])<br class="title-page-name"/>roc_auc = auc(Y_test, rf_count_probabilities[:,1])<br class="title-page-name"/><br class="title-page-name"/>plt.title('ROC Random Forest Count Data')<br class="title-page-name"/>plt.plot(fpr, tpr, 'b',label='AUC = %0.3f'% roc_auc)<br class="title-page-name"/>plt.legend(loc='lower right')<br class="title-page-name"/>plt.plot([0,1],[0,1],'r--')<br class="title-page-name"/>plt.xlim([-0.1,1.0])<br class="title-page-name"/>plt.ylim([-0.1,1.01])<br class="title-page-name"/>plt.ylabel('True Positive Rate')<br class="title-page-name"/>plt.xlabel('False Positive Rate')</pre>
+<p class="calibre20">在下面的屏幕截图中，我们可以比较我们训练的所有模型的 ROC 曲线:</p>
+<p class="CDPAlignCenter"><img class="aligncenter120" src="img/9041a0b7-65de-4953-8d62-d9f33d01c47a.png"/></p>
+<ol start="16" class="calibre14">
+<li class="calibre11">绘制计数和 TF-IDF 数据总体结果的 ROC 曲线:</li>
+</ol>
+<p class="CDPAlignCenter"><img class="aligncenter121" src="img/fc14287a-bf2c-4069-b5a0-5547aa7d1817.png"/></p>
+<ol start="17" class="calibre14">
+<li class="calibre11">使用最大投票计算集合的精确度:</li>
+</ol>
+<pre class="calibre18">predicted_values_count = np.array([rf_count_predicted_values, \<br class="title-page-name"/>                                   nb_count_predicted_values, \<br class="title-page-name"/>                                   svc_count_predicted_values])<br class="title-page-name"/><br class="title-page-name"/>predicted_values_tfidf = np.array([rf_tfidf_predicted_values, \<br class="title-page-name"/>                                   nb_tfidf_predicted_values, \<br class="title-page-name"/>                                   svc_tfidf_predicted_values])<br class="title-page-name"/><br class="title-page-name"/>predicted_values_count = mode(predicted_values_count)<br class="title-page-name"/>predicted_values_tfidf = mode(predicted_values_tfidf)</pre>
+<ol start="18" class="calibre14">
+<li class="calibre11">绘制根据计数数据和 TF-IDF 数据训练的每个模型的测试精度图:</li>
+</ol>
+<pre class="calibre18">count = np.array([rf_count_test_accuracy,\<br class="title-page-name"/>                  nb_count_test_accuracy,\<br class="title-page-name"/>                  svc_count_test_accuracy,\<br class="title-page-name"/>                  accuracy_score(Y_test, predicted_values_count[0][0])])<br class="title-page-name"/><br class="title-page-name"/>tfidf = np.array([rf_tfidf_test_accuracy,\<br class="title-page-name"/>                  nb_tfidf_test_accuracy,\<br class="title-page-name"/>                  svc_tfidf_test_accuracy,\<br class="title-page-name"/>                  accuracy_score(Y_test, predicted_values_tfidf[0][0])])<br class="title-page-name"/><br class="title-page-name"/>label_list = ["Random Forest", "Naive_Bayes", "SVM_Linear", "Ensemble"] <br class="title-page-name"/>plt.plot(count)<br class="title-page-name"/>plt.plot(tfidf)<br class="title-page-name"/>plt.xticks([0,1,2,3],label_list)<br class="title-page-name"/><br class="title-page-name"/>for i in range(4):<br class="title-page-name"/>    plt.text(x=i,y=(count[i]+0.001), s=np.round(count[i],4))<br class="title-page-name"/><br class="title-page-name"/>for i in range(4):<br class="title-page-name"/>    plt.text(x=i,y=tfidf[i]-0.003, s=np.round(tfidf[i],4))<br class="title-page-name"/><br class="title-page-name"/>    <br class="title-page-name"/>plt.legend(["Count","TFIDF"])<br class="title-page-name"/>plt.title("Test accuracy")<br class="title-page-name"/><br class="title-page-name"/>plt.tight_layout(pad=1,rect=(0, 0, 2.5, 2))<br class="title-page-name"/>plt.show()</pre>
+<p class="calibre20">下图显示了所有模型的计数数据和 TF-IDF 数据之间的准确性比较以及集合结果:</p>
+<p class="CDPAlignCenter"><img class="aligncenter122" src="img/145caddb-b65c-419c-a1d2-a5ab4350fe56.png"/></p>
+
+
+            
+
+            
+        
+    </body>
+
+</html>
+
+
+<html xmlns:epub="http://www.idpf.org/2007/ops">
+  <head>
+    <title>How it works...</title>
+    <meta content="urn:uuid:64b74aae-7be0-4e73-89f3-687dd4470606" name="Adept.expected.resource"/>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+  
+
+</head>
+  <body class="calibre">
+        
+
+                            
+                    <h1 class="header-title">它是如何工作的...</h1>
+                
+            
+            
+                
+<p class="calibre2">我们从导入所需的库开始。在本章中，我们使用了一个叫做<kbd class="calibre12">glob</kbd>的模块。<kbd class="calibre12">glob</kbd>模块用于定义将指定模式与路径、目录和文件名匹配的技术。我们使用 glob 模块来查找指定路径中的所有文件。之后，我们使用<kbd class="calibre12">open()</kbd>方法以读取模式打开每个文件。我们读取每个文件，并将其附加到包含所有评论的数据集上。我们还创建了一个标签列，用正面或负面标签标记每个评论。</p>
+<p class="calibre2">然而，在我们附加了所有正面和负面评价后，我们注意到它们是按顺序添加的，这意味着前半部分包含所有正面评价，后半部分包含负面评价。我们使用<kbd class="calibre12">shuffle()</kbd>方法打乱了数据。</p>
+<p class="calibre2">我们通过将数据转换为小写、删除标点符号和停用词、执行词干分析和对文本进行标记来创建特征向量，从而清理了数据。</p>
+<p class="calibre2"><em class="calibre13">怎么做...在</em>部分，我们从在<em class="calibre13">步骤 1 </em>中导入库开始。在<em class="calibre13">步骤 2 </em>中，我们将目标和特征变量分成<em class="calibre13"> X </em>和<em class="calibre13"> Y </em>。</p>
+<p class="calibre2">在步骤 3 中，我们将数据分成训练和测试子集。我们使用<kbd class="calibre12">test_size=.3</kbd>将数据分成训练和测试子集。</p>
+<p class="calibre2">在 S <em class="calibre13">第 4 步</em>和 S <em class="calibre13">第 5 步</em>中，我们分别使用<kbd class="calibre12">CountVectorizer()</kbd>和<kbd class="calibre12">TfidfVectorizer()</kbd>将文本转换为向量，将文本转换为 TF-IDF 向量。注意，使用<kbd class="calibre12">CountVectorizer()</kbd>，我们生成了<kbd class="calibre12">count_train</kbd>和<kbd class="calibre12">count_test</kbd>数据集。使用<kbd class="calibre12">TfidfVectorizer()</kbd>，我们生成了<kbd class="calibre12">tfidf_train</kbd>和<kbd class="calibre12">tfidf_test</kbd>数据集。</p>
+<p class="calibre2">在<em class="calibre13">步骤 6 </em>中，我们设置网格搜索的超参数来训练随机森林模型。我们根据计数数据训练随机森林模型，并检查训练和测试的准确性。</p>
+<p>我们对我们建立的所有模型的测试数据使用了<kbd class="calibre19">predict()</kbd>和<kbd class="calibre19">predict_proba()</kbd>方法来预测类别以及类别概率。</p>
+<p class="calibre2">在<em class="calibre13">步骤 7 </em>中，我们生成了混淆矩阵来评估我们在上一步中构建的随机森林模型的性能。在<em class="calibre13">步骤 8 </em>和<em class="calibre13">步骤 9 </em>中，我们对 TF-IDF 数据上的另一个随机森林模型重复了训练，并评估了性能。我们在从<em class="calibre13">步骤 10 </em>到<em class="calibre13">步骤 12 </em>的计数数据和 TF-IDF 数据上训练朴素贝叶斯模型。</p>
+<p class="calibre2">在<em class="calibre13">步骤 13 </em>和<em class="calibre13">步骤 14 </em>中，我们分别在计数数据和 TF-IDF 数据上训练具有线性核的支持向量分类器算法。在<em class="calibre13">步骤 15 </em>中，我们绘制了我们构建的每个基础学习者的 ROC 曲线和 AUC 分数。我们还在<em class="calibre13">步骤 16 </em>中绘制了集合的 RUC 曲线，以比较基础学习者的表现。最后，在<em class="calibre13">步骤 17 </em>中，我们绘制了每个模型对 count 和 TF-IDF 数据的测试精度。</p>
+
+
+            
+
+            
+        
+    </body>
+
+</html>
+
+
+<html xmlns:epub="http://www.idpf.org/2007/ops">
+  <head>
+    <title>There's more...</title>
+    <meta content="urn:uuid:64b74aae-7be0-4e73-89f3-687dd4470606" name="Adept.expected.resource"/>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+  
+
+</head>
+  <body class="calibre">
+        
+
+                            
+                    <h1 class="header-title">还有更多...</h1>
+                
+            
+            
+                
+<p class="calibre2">在当今世界，文本信息的可用性和流动性是无限的。这意味着我们需要各种技术来处理这些文本问题，以提取有意义的信息。例如，<strong class="calibre4">词性标注</strong>是 NLP 空间中的基本任务之一。<strong class="calibre4">词性标注</strong>用于标注文本中单词各自的词性。然后，这些标签可以用于更复杂的任务，例如语法和语义解析、<strong class="calibre4">机器翻译</strong> ( <strong class="calibre4"> MT </strong>)和问题回答。</p>
+<p class="calibre2">有八个主要的词类:</p>
+<ul class="calibre10">
+<li class="calibre11">名词</li>
+<li class="calibre11">代词</li>
+<li class="calibre11">形容词</li>
+<li class="calibre11">动词</li>
+<li class="calibre11">副词</li>
+<li class="calibre11">介词</li>
+<li class="calibre11">连词</li>
+<li class="calibre11">感叹词:</li>
+</ul>
+<p class="CDPAlignCenter"><img class="aligncenter123" src="img/6ab29f62-59f4-4509-99e2-976ee50b21b6.png"/></p>
+<p class="calibre2">NLTK 库具有获取 POS 标记的函数，这些标记可以在标记化之后应用于文本。让我们导入所需的库:</p>
+<pre class="calibre15">import os
+import pandas as pd
+import nltk
+from nltk.tag import pos_tag
+from nltk.corpus import stopwords</pre>
+<p class="calibre2">我们采用之前创建的数据帧<kbd class="calibre12">df_moviereviews</kbd>。我们将文本转换成小写:</p>
+<pre class="calibre15">df_moviereviews['text'] =df_moviereviews['text'].apply(lambda x: " ".join(x.lower() for x in x.split()))<br class="title-page-name"/>df_moviereviews['text'].head()</pre>
+<p class="calibre2">我们通过删除停用词、标点符号、词条化和标记化对文本进行预处理:</p>
+<pre class="calibre15">from nltk.stem.wordnet import WordNetLemmatizer<br class="title-page-name"/>import string<br class="title-page-name"/>stop = set(stopwords.words('english'))<br class="title-page-name"/>exclude = set(string.punctuation) <br class="title-page-name"/>lemma = WordNetLemmatizer()<br class="title-page-name"/>def clean(doc):<br class="title-page-name"/>    stop_free = " ".join([i for i in doc.lower().split() if i not in stop])<br class="title-page-name"/>    stop_free = ''.join(ch for ch in stop_free if ch not in exclude)<br class="title-page-name"/>    normalized = " ".join(lemma.lemmatize(word) for word in stop_free.split())<br class="title-page-name"/>    return normalized<br class="title-page-name"/><br class="title-page-name"/>tokenized_sent = [clean(doc).split() for doc in df_moviereviews["text"]]</pre>
+<p class="calibre2">我们来看看第一篇电影评论中的前 10 个标志:</p>
+<pre class="calibre15">tokenized_sent[0][0:10]</pre>
+<p class="calibre2">这将生成以下输出:</p>
+<p class="CDPAlignCenter"><img src="img/5c975229-a885-4037-afc2-c6d12b525fbd.png" class="calibre61"/></p>
+<p class="calibre2">我们执行位置标记:</p>
+<pre class="calibre15">postag=[nltk.pos_tag(token) for token in tokenized_sent]</pre>
+<p class="calibre2">我们打印第一篇电影评论的前 10 个位置标签:</p>
+<pre class="calibre15">postag[0][0:10]</pre>
+<p class="calibre2">我们看到了词性标注词:</p>
+<p class="CDPAlignCenter"><img src="img/089f0a97-2f31-4b4b-8e9a-c4f8d5165df3.png" class="calibre62"/></p>
+<p class="calibre2"><strong class="calibre4">组块</strong>是另一个可以给词性标注增加更多结构的过程。分块用于实体检测；它标记多个令牌，将它们识别为有意义的实体。有各种可用的分块器；<kbd class="calibre12">NLTK</kbd>提供<kbd class="calibre12">ne_chunk</kbd>，识别人物(姓名)、地点、组织。其他常用的切块还有<kbd class="calibre12">OpenNLP</kbd>、<kbd class="calibre12">Yamcha</kbd>和<kbd class="calibre12">Lingpipe</kbd>。还可以使用分块器的组合并对结果应用最大投票来提高分类的性能。</p>
+
+
+            
+
+            
+        
+    </body>
+
+</html>
+</body></html>

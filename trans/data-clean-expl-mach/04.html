@@ -1,0 +1,324 @@
+<html><head/><body>
+
+
+
+
+
+
+
+
+
+<title>Chapter 3: Identifying and Fixing Missing Values</title>
+
+
+
+
+
+
+
+<div><div><h1 id="_idParaDest-35"><em class="italic"> <a id="_idTextAnchor034"/>第 3 章</em>:识别并修复缺失值</h1>
+
+<p>我认为我代表了许多数据科学家的意见，我认为很少有看似微不足道的事情会像丢失的值一样重要。我们花费大量时间担心丢失的值，因为它们会对我们的分析产生戏剧性的、令人惊讶的影响。当缺失值不是随机的时，也就是说，当它们与要素或目标相关联时，最有可能发生这种情况。例如，假设我们正在对收入进行纵向研究，但受教育程度较低的人每年更有可能跳过收入问题。这很有可能会使我们对教育的参数估计产生偏差。</p>
+
+<p>当然，识别缺失的价值观还不算成功的一半。然后我们需要决定如何处理它们。我们是否删除一个或多个特征的任何缺失值的观测值？我们是否根据样本范围的统计数据(如平均值)估算一个值？或者，我们是根据更有针对性的统计数据来赋值，比如某个阶层的平均值？对于时间序列或纵向数据来说，最近的时间值可能最有意义，我们会有不同的想法吗？或者我们应该使用更复杂的多元技术来输入值，也许是基于线性回归或<strong class="bold"> k 近邻</strong> ( <strong class="bold"> KNN </strong>)？</p>
+
+<p>所有这些问题的答案都是肯定的。在某些时候，我们会想要使用这些技术中的每一种。在对缺失值插补做出最终选择时，我们希望能够回答所有这些可能性的原因。每一个都有意义，视情况而定。</p>
+
+<p>在这一章中，我们将研究识别每个特征或目标的缺失值的技术，以及在大量特征的值缺失的情况下进行观察的技术。然后，我们将探索输入值的策略，例如将值设置为总体平均值、给定类别的平均值或向前填充。我们还将研究为缺失值输入值的多变量技术，并讨论它们何时适用。</p>
+
+<p>具体来说，在本章中，我们将讨论以下主题:</p>
+
+<ul>
+
+<li>识别缺失值</li>
+
+<li>清除丢失的值</li>
+
+<li>用回归法输入值</li>
+
+<li>使用 KNN 插补</li>
+
+<li>使用随机森林进行插补</li>
+
+</ul>
+
+<h1 id="_idParaDest-36"><a id="_idTextAnchor035"/>技术要求</h1>
+
+<p>这一章很大程度上依赖于 pandas 和 NumPy 库，但是你不需要任何关于它们的先验知识。如果您已经从科学发行版安装了 Python，比如 Anaconda 或 WinPython，那么这些库可能已经安装了。我们还将使用<code>statsmodels</code>库进行线性回归，以及来自<code>sklearn</code>和<code>missingpy</code>的机器学习算法。如果您需要安装这些包中的任何一个，您可以通过从终端窗口或 Windows PowerShell 运行<code>pip install [package name]</code>来完成。</p>
+
+<h1 id="_idParaDest-37"><a id="_idTextAnchor036"/>识别缺失值</h1>
+
+<p>由于识别缺失值是分析师工作流程中如此重要的一部分，我们使用的任何工具都需要<a id="_idIndexMarker260"/>方便定期检查这些值。幸运的是，pandas 使得识别缺失值变得非常简单。</p>
+
+<p>我们将分别在 2016 年和 2017 年与<code>weeksworked16</code>和<code>weeksworked17</code>合作数周。</p>
+
+<p class="callout-heading">注意</p>
+
+<p class="callout">我们也将再次使用新冠肺炎的数据。该数据集对每个国家都有一个观察值，它指定了新冠肺炎病例和死亡总数，以及每个国家的一些人口统计数据。</p>
+
+<p>遵循以下步骤来确定我们缺失的价值观:</p>
+
+<ol>
+
+<li>让我们从加载 NLS 和新冠肺炎的数据开始:<pre>import pandas as pd import numpy as np nls97 = pd.read_csv("data/nls97b.csv") nls97.set_index("personid", inplace=True) covidtotals = pd.read_csv("data/covidtotals.csv") covidtotals.set_index("iso_code", inplace=True)</pre></li>
+
+<li>接下来，我们<a id="_idIndexMarker262"/>计算可能用作特性的列的缺失值的数量。我们可以用<code>isnull</code>的方法来测试每个特征值是否缺失。如果缺少值，它将返回<code>True</code>，如果没有，它将返回<code>False</code>。然后，我们可以使用<code>sum</code>来计算<code>True</code>值的数量，因为<code>sum</code>会将每个<code>True</code>值视为 1，将每个<code>False</code>值视为 0。我们使用<code>axis=0</code>对每列的行求和:<pre>covidtotals.shape <strong class="bold">(221, 16)</strong> demovars = ['population_density','aged_65_older',   'gdp_per_capita', 'life_expectancy',    'diabetes_prevalence'] covidtotals[demovars].isnull().sum(axis=0) <strong class="bold">population_density        15</strong> <strong class="bold">aged_65_older             33</strong> <strong class="bold">gdp_per_capita            28</strong> <strong class="bold">life_expectancy            4</strong> <strong class="bold">diabetes_prevalence       21</strong></pre></li>
+
+</ol>
+
+<p>如我们所见，221 个国家中有 33 个国家的<code>aged_65_older</code>为空值。几乎所有国家都有<code>life_expectancy</code>。</p>
+
+<ol>
+
+<li value="3">如果我们想知道每行缺失值的数量，我们可以在求和时指定<code>axis=1</code>。以下代码创建一个序列<code>demovarsmisscnt</code>，其中包含每个国家人口统计特征的缺失值数量。181 个国家/地区具有所有特性的值，11 个国家/地区缺少五个特性中的四个特性的值，三个国家/地区缺少所有特性的值:<pre>demovarsmisscnt = covidtotals[demovars].isnull().sum(axis=1) demovarsmisscnt.value_counts().sort_index() <strong class="bold">0        181</strong> <strong class="bold">1        15</strong> <strong class="bold">2         6</strong> <strong class="bold">3         5</strong> <strong class="bold">4        11</strong> <strong class="bold">5         3</strong> <strong class="bold">dtype: int64</strong></pre></li>
+
+<li>让我们来看看几个缺少四个或更多值的国家。这些国家的人口数据非常少:<pre>covidtotals.loc[demovarsmisscnt &gt; = 4, ['location'] +   demovars].sample(6, random_state=1).T <strong class="bold">iso_code                         FLK   NIU        MSR\</strong> <strong class="bold">location            Falkland Islands  Niue  Montserrat</strong> <strong class="bold">population_density               NaN   NaN         NaN</strong> <strong class="bold">aged_65_older                    NaN   NaN         NaN</strong> <strong class="bold">gdp_per_capita                   NaN   NaN         NaN</strong> <strong class="bold">life_expectancy                   81    74          74</strong> <strong class="bold">diabetes_prevalence              NaN   NaN         NaN</strong> <strong class="bold">iso_code                         COK    SYR        GGY</strong> <strong class="bold">location                Cook Islands  Syria   Guernsey</strong> <strong class="bold">population_density               NaN    NaN        NaN</strong> <strong class="bold">aged_65_older                    NaN    NaN        NaN</strong> <strong class="bold">gdp_per_capita                   NaN    NaN        NaN</strong> <strong class="bold">life_expectancy                   76      7        NaN</strong> <strong class="bold">diabetes_prevalence              NaN    NaN        NaN</strong></pre></li>
+
+<li>让我们也检查总病例数和死亡数的缺失值。29 个国家有每百万人口病例数的缺失值，36 个国家有每百万人口死亡数的缺失值:<pre>totvars =    ['location','total_cases_mill','total_deaths_mill'] covidtotals[totvars].isnull().sum(axis=0) <strong class="bold">location                0</strong> <strong class="bold">total_cases_mill       29</strong> <strong class="bold">total_deaths_mill      36</strong> <strong class="bold">dtype: int64</strong></pre></li>
+
+<li>我们还应该了解哪些国家两者都没有。29 个国家既缺病例又缺死亡，而我们只有 185 个国家缺病例和死亡:<pre>totvarsmisscnt =    covidtotals[totvars].isnull().sum(axis=1) totvarsmisscnt.value_counts().sort_index() <strong class="bold">0        185</strong> <strong class="bold">1        7</strong> <strong class="bold">2        29</strong> <strong class="bold">dtype: int64</strong></pre></li>
+
+</ol>
+
+<p>有时，我们需要将逻辑缺失值转换为实际缺失值。当数据集设计者将有效值用作缺失值的代码时，就会发生这种情况。根据变量允许的位数，这些值通常是 9、99 或 999。或者它可能是一个更复杂的编码方案，其中由于不同的原因存在缺失的代码。例如，在 NLS 数据集中，代码揭示了为什么回答者没有提供问题的答案:<code>-3</code>是无效跳过，<code>-4</code>是有效跳过，<code>-5</code>是非面试。</p>
+
+<ol>
+
+<li value="7">NLS 数据框架中的最后四列是最高等级的数据，填写了受访者的父母、父母收入和母亲出生时的年龄。让我们检查这些列的逻辑缺失，从回答者母亲的最高分数开始:<pre>nlsparents = nls97.iloc[:,-4:] nlsparents.shape <strong class="bold">(8984, 4)</strong> nlsparents.loc[nlsparents.motherhighgrade.between(-5,    -1), 'motherhighgrade'].value_counts() <strong class="bold">-3        523</strong> <strong class="bold">-4        165</strong> <strong class="bold">Name: motherhighgrade, dtype: int64</strong></pre></li>
+
+<li>有 523 个无效跳过和 165 个有效跳过。让我们来看看几个人，他们在这四个特征上至少有一个无反应值:<pre>nlsparents.loc[nlsparents.apply(lambda x: x.between(   -5,-1)).any(axis=1)] <strong class="bold">        motherage  parentincome  fatherhighgrade  motherhighgrade</strong> <strong class="bold">personid  </strong> <strong class="bold">100284    22            50000            12         -3</strong> <strong class="bold">100931    23            60200            -3         13</strong> <strong class="bold">101122    25               -4            -3         -3</strong> <strong class="bold">101414    27            24656            10         -3</strong> <strong class="bold">101526    -3            79500            -4         -4</strong> <strong class="bold">         ...              ...            ...       ...</strong> <strong class="bold">999087    -3           121000            -4         16</strong> <strong class="bold">999103    -3            73180            12         -4</strong> <strong class="bold">999406    19               -4            17         15</strong> <strong class="bold">999698    -3            13000            -4         -4</strong> <strong class="bold">999963    29               -4            12         13</strong> <strong class="bold">[3831 rows x 4 columns]</strong></pre></li>
+
+<li>对于我们的<a id="_idIndexMarker266"/>分析，不响应的原因并不重要。让我们只计算每个特性的无响应数量，而不考虑无响应的原因:<pre>nlsparents.apply(lambda x: x.between(-5,-1).sum()) <strong class="bold">motherage              608</strong> <strong class="bold">parentincome          2396</strong> <strong class="bold">fatherhighgrade       1856</strong> <strong class="bold">motherhighgrade        688</strong> <strong class="bold">dtype: int64</strong></pre></li>
+
+<li>在我们的分析中使用这些特性之前，我们应该将这些值设置为<code>missing</code>。我们可以使用<code>replace</code>将-5 和-1 之间的所有值设置为<code>missing</code>。当我们检查实际缺失时，我们得到预期的计数:<pre>nlsparents.replace(list(range(-5,0)),    np.nan, inplace=True) nlsparents.isnull().sum() <strong class="bold">motherage            608</strong> <strong class="bold">parentincome        2396</strong> <strong class="bold">fatherhighgrade     1856</strong> <strong class="bold">motherhighgrade      688</strong> <strong class="bold">dtype: int64</strong></pre></li>
+
+</ol>
+
+<p>本节<a id="_idIndexMarker267"/>展示了一些非常方便的 pandas 技术，用于识别每个要素的缺失值数量，以及具有大量缺失值的观测值。我们还学习了如何找到逻辑缺失值，并将它们转换成实际缺失值。接下来，我们首先来看看如何清理丢失的值。</p>
+
+<h1 id="_idParaDest-38"><a id="_idTextAnchor037"/>清除缺失值</h1>
+
+<p>在这一节中，我们将介绍一些处理缺失值的最简单的方法。这包括<a id="_idIndexMarker268"/>删除有缺失值的观察值；将样本范围内的汇总统计值(如平均值)分配给缺失值；以及基于数据的适当子集的平均值来赋值:</p>
+
+<ol>
+
+<li value="1">让我们加载 NLS 数据，并选择一些教育数据:<pre>import pandas as pd nls97 = pd.read_csv("data/nls97b.csv") nls97.set_index("personid", inplace=True) schoolrecordlist =    ['satverbal','satmath','gpaoverall','gpaenglish',   'gpamath','gpascience','highestdegree',   'highestgradecompleted'] schoolrecord = nls97[schoolrecordlist] schoolrecord.shape <strong class="bold">(8984, 8)</strong></pre></li>
+
+<li>我们可以使用我们在上一节中探索的技术来识别丢失的值。<code>schoolrecord.isnull().sum(axis=0)</code>给出了每个特征的缺失值的数量<a id="_idIndexMarker269"/>。绝大多数观察值都缺少<code>satverbal</code>的值，8984 个中有 7578 个。只有 31 个观察值缺少<code>highestdegree</code> : <pre>schoolrecord.isnull().sum(axis=0) <strong class="bold">satverbal                        7578</strong> <strong class="bold">satmath                          7577</strong> <strong class="bold">gpaoverall                       2980</strong> <strong class="bold">gpaenglish                       3186</strong> <strong class="bold">gpamath                          3218</strong> <strong class="bold">gpascience                       3300</strong> <strong class="bold">highestdegree                      31</strong> <strong class="bold">highestgradecompleted            2321</strong> <strong class="bold">dtype: int64</strong></pre></li>
+
+<li>我们可以创建一个序列<code>misscnt</code>，它用<code>misscnt = schoolrecord.isnull().sum(axis=1)</code>指定每个观察的缺失特征的数量。946 个观察值对于教育数据有 7 个缺失值，而对于所有 8 个特征有 11 个缺失值:<pre>misscnt = schoolrecord.isnull().sum(axis=1) misscnt.value_counts().sort_index() <strong class="bold">0         1087</strong> <strong class="bold">1          312</strong> <strong class="bold">2         3210</strong> <strong class="bold">3         1102</strong> <strong class="bold">4          176</strong> <strong class="bold">5          101</strong> <strong class="bold">6         2039</strong> <strong class="bold">7          946</strong> <strong class="bold">8           11</strong> <strong class="bold">dtype: int64</strong></pre></li>
+
+<li>让我们也来看看一些有七个或更多缺失值的观察结果。看起来<code>highestdegree</code>是经常出现的一个特性，这并不奇怪，因为我们已经发现<code>highestdegree</code>很少被遗漏:<pre>schoolrecord.loc[misscnt&gt;=7].head(4).T <strong class="bold">personid              101705  102061  102648  104627</strong> <strong class="bold">satverbal                NaN     NaN     NaN     NaN</strong> <strong class="bold">satmath                  NaN     NaN     NaN     NaN</strong> <strong class="bold">gpaoverall               NaN     NaN     NaN     NaN</strong> <strong class="bold">gpaenglish               NaN     </strong><strong class="bold">NaN     NaN     NaN</strong> <strong class="bold">gpamath                  NaN     NaN     NaN     NaN</strong> <strong class="bold">gpascience               NaN     NaN     NaN     NaN</strong> <strong class="bold">highestdegree          1.GED  0.None   </strong><strong class="bold">1.GED  0.None</strong> <strong class="bold">highestgradecompleted    NaN     NaN     NaN     NaN</strong></pre></li>
+
+<li>让我们删除八个特征中七个或更多特征的缺失值。我们可以通过将<code>dropna</code>的<code>thresh</code>参数设置为<code>2</code>来实现。此<a id="_idIndexMarker271"/>将删除少于两个非缺失值的观察值；即 0 或 1 个非缺失值。使用<code>dropna</code>后，我们得到预期的观察次数；即 8984-946-11 = 8027:<pre>schoolrecord = schoolrecord.dropna(thresh=2) schoolrecord.shape <strong class="bold">(8027, 8)</strong> schoolrecord.isnull().sum(axis=1).value_counts().sort_index() <strong class="bold">0      1087</strong> <strong class="bold">1       312</strong> <strong class="bold">2      3210</strong> <strong class="bold">3      1102</strong> <strong class="bold">4       176</strong> <strong class="bold">5       101</strong> <strong class="bold">6      2039</strong> <strong class="bold">dtype: int64</strong></pre></li>
+
+</ol>
+
+<p><code>gpaoverall</code>有相当数量的缺失值，即 2，980，尽管我们有三分之二的观察值的有效值((8，984–2，980)/8，984)。如果我们在输入丢失的值方面做得很好，我们也许能够挽救这个特性。这可能比仅仅删除这些观察更可取。如果可以的话，我们不希望丢失这些数据，特别是如果缺失<code>gpaoverall</code>的个体在某些方面与其他人不同，这将对我们的预测产生影响。</p>
+
+<ol>
+
+<li value="6">最直接的方法是将<code>gpaoverall</code>的总体平均值分配给缺失值。下面的代码使用熊猫系列<code>fillna</code>方法将<code>gpaoverall</code>的所有缺失值赋给<a id="_idIndexMarker272"/>系列的平均值。<code>fillna</code>的第一个参数是所有缺失值的值——在本例中是<code>schoolrecord.gpaoverall.mean()</code>。注意，我们需要记住将<code>inplace</code>参数设置为<code>True</code>来覆盖现有的值:<pre>schoolrecord.gpaoverall.agg(['mean','std','count']) <strong class="bold">mean         281.84</strong> <strong class="bold">std           61.64</strong> <strong class="bold">count</strong><strong class="bold">      6,004.00</strong> <strong class="bold">Name: gpaoverall, dtype: float64</strong> schoolrecord.gpaoverall.fillna(   schoolrecord.gpaoverall.mean(), inplace=True) schoolrecord.gpaoverall.isnull().sum() <strong class="bold">0</strong> schoolrecord.gpaoverall.agg(['mean','std','count']) <strong class="bold">mean      281.84</strong> <strong class="bold">std        53.30</strong> <strong class="bold">count   8,027.00</strong> <strong class="bold">Name: gpaoverall, dtype: float64</strong></pre></li>
+
+</ol>
+
+<p>意思没有变。然而，标准偏差大幅降低，从 61.6 降至 53.3。这是对所有缺失值使用数据集平均值的缺点之一。</p>
+
+<ol>
+
+<li value="7">NLS <a id="_idIndexMarker273"/>数据也有相当数量的<code>wageincome</code>缺失值。下面的代码显示 3893 个观察值有缺失值:<pre>wageincome = nls97.wageincome.copy(deep=True) wageincome.isnull().sum() <code>copy</code> method, setting <code>deep</code> to <code>True</code>. We wouldn't normally do this but, in this case, we don't want to change the values of <code>wageincome</code> in the underlying DataFrame. We have avoided this here because we will demonstrate a different method of imputing values in the next couple of code blocks.</pre></li>
+
+<li>我们可以<a id="_idIndexMarker274"/>使用另一种常用的技术来输入值，而不是将<code>wageincome</code>的平均值分配给缺失值:我们可以分配前一次观察的最接近的非缺失值。<code>fillna</code>的<code>ffill</code>选项将为我们做这件事:<pre>wageincome.fillna(method='ffill', inplace=True) wageincome.head().T personid <strong class="bold">100061       12,500</strong> <strong class="bold">100139      120,000</strong> <strong class="bold">100284       58,000</strong> <strong class="bold">100292       58,000</strong> <strong class="bold">100583       30,000</strong> <strong class="bold">Name: wageincome, dtype: float64</strong> wageincome.isnull().sum() <strong class="bold">0</strong> wageincome.agg(['mean','std','count']) <strong class="bold">mean      49,549.33</strong> <strong class="bold">std       40,014.34</strong> <strong class="bold">count      8,984.00</strong> <strong class="bold">Name: wageincome, dtype: float64</strong></pre></li>
+
+<li>我们可以通过将<code>fillna</code>的<code>method</code>参数设置为<code>bfill</code>来进行反向填充。这会将缺失值设置为最接近的后续值。这会产生以下输出:<pre>wageincome = nls97.wageincome.copy(deep=True) wageincome.std() <strong class="bold">40677.69679818673</strong> wageincome.fillna(method='bfill', inplace=True) wageincome.head().T <strong class="bold">personid</strong> <strong class="bold">100061       12,500</strong> <strong class="bold">100139      120,000</strong> <strong class="bold">100284       58,000</strong> <strong class="bold">100292       30,000</strong> <strong class="bold">100583       30,000</strong> <strong class="bold">Name: wageincome, dtype: float64</strong> wageincome.agg(['mean','std','count']) <strong class="bold">mean    49,419.05</strong> <strong class="bold">std     41,111.54</strong> <strong class="bold">count    8,984.00</strong> <strong class="bold">Name: wageincome, dtype: float64</strong></pre></li>
+
+</ol>
+
+<p>如果缺失值是随机分布的，那么向前或向后填充比使用平均值有一个优势:它更有可能接近要素的非缺失值的分布<a id="_idIndexMarker275"/>。请注意，标准偏差并没有显著下降。</p>
+
+<p>有些时候，根据相似观察值的平均值或中间值来估算值是有意义的；比如说，对于相关特征具有相同值的那些。如果我们要估算要素 X1 的值，并且 X1 与 X2 相关，我们可以使用 X1 和 X2 之间的关系来估算 X1 的值，这可能比数据集的平均值更有意义。当 X2 是绝对的时候，这是非常简单的。在这种情况下，我们可以估算 X2 的相关值 X1 的平均值。</p>
+
+<ol>
+
+<li value="10">在 NLS 的数据框架中，2017 年工作的周数与获得的最高学位相关。下面的代码显示了工作周的平均值是如何随学位程度而变化的。平均工作周数为 39 周，但没有学位的人要低得多(28.72 周)，有专业学位的人要高得多(47.20 周)。在这种情况下，对于没有获得学位的个人，将工作周数的缺失值指定为 28.72 可能是更好的选择，而不是 39: <pre>nls97.weeksworked17.mean() <strong class="bold">39.01664167916042</strong> nls97.groupby(['highestdegree'])['weeksworked17'   ].mean() <strong class="bold">highestdegree</strong> <strong class="bold">0. None                  28.72</strong> <strong class="bold">1. GED                   34.59</strong> <strong class="bold">2. High School</strong><strong class="bold">           38.15</strong> <strong class="bold">3. Associates            40.44</strong> <strong class="bold">4. Bachelors             43.57</strong> <strong class="bold">5. Masters               45.14</strong> <strong class="bold">6. PhD                   44.31</strong> <strong class="bold">7. Professional          47.20</strong> <strong class="bold">Name: weeksworked17, dtype: float64</strong></pre></li>
+
+<li>以下代码为那些缺少工作周数的观察分配具有相同学位达到程度的观察的工作周数平均值。我们通过使用<code>groupby</code>创建一个 groupby 数据帧<code>groupby(['highestdegree'])['weeksworked17']</code>来实现这一点。然后，我们使用<code>apply</code>中的<code>fillna</code>用最高<a id="_idIndexMarker277"/>度组的平均值填充那些缺失值。请注意，我们确保只对最高等级未缺失的观察值进行插补，<code>~nls97.highestdegree.isnull()</code>。我们仍然会有缺失最高学位和工作周的观察值:<pre>nls97.loc[~nls97.highestdegree.isnull(),   'weeksworked17imp'] =    nls97.loc[ ~nls97.highestdegree.isnull() ].   groupby(['highestdegree'])['weeksworked17'].   apply(lambda group: group.fillna(np.mean(group))) nls97[['weeksworked17imp','weeksworked17',   'highestdegree']].head(10) <strong class="bold">       weeksworked17imp  weeksworked17   highestdegree</strong> <strong class="bold">personid                                              </strong> <strong class="bold">100061            48.00         48.00   2. High School</strong> <strong class="bold">100139            52.00         52.00   2. High School</strong> <strong class="bold">100284       </strong><strong class="bold">      0.00          0.00          0. None</strong> <strong class="bold">100292            43.57           NaN     4. Bachelors</strong> <strong class="bold">100583            52.00         52.00   2. High School</strong> <strong class="bold">100833            47.00</strong><strong class="bold">         47.00   2. High School</strong> <strong class="bold">100931            52.00         52.00    3. Associates</strong> <strong class="bold">101089            52.00         52.00   2. High School</strong> <strong class="bold">101122            38.15           NaN</strong><strong class="bold">   2. High School</strong> <strong class="bold">101132            44.00         44.00          0. None</strong> nls97[['weeksworked17imp','weeksworked17']].\   agg(['mean','count']) <strong class="bold">       weeksworked17imp  weeksworked17</strong> <strong class="bold">mean          38.52         39.02</strong> <strong class="bold">count</strong><strong class="bold">      8,953.00      6,670.00</strong></pre></li>
+
+</ol>
+
+<p>这些插补策略——去除缺失值的观察值、分配数据集的平均值或中值、使用向前或向后填充，或者使用相关特征的组平均值——对许多预测分析项目来说都是很好的。当缺失值与目标值不相关时，它们工作得最好。当这是真的时，估算值允许我们保留来自那些观察的其他信息，而不会使我们的估计有偏差。</p>
+
+<p>然而，有时情况并非如此，需要更复杂的估算策略。接下来的几节将探讨清理缺失数据的多元技术。</p>
+
+<h1 id="_idParaDest-39"><a id="_idTextAnchor038"/>用回归法输入值</h1>
+
+<p>我们通过为缺失值分配组平均值而不是总的<a id="_idIndexMarker279"/>样本平均值来结束上一节。正如我们所讨论的，当<a id="_idIndexMarker280"/>确定分组的特征与具有缺失值的特征相关时，这很有用。使用回归来估算值在概念上与此类似，但我们通常在估算基于两个或更多特征时使用它。</p>
+
+<p>回归插补用相关要素的回归模型预测的值替换要素的缺失值。这种特殊的插补称为确定性回归插补，因为插补值都位于回归线上，不会引入误差或随机性。</p>
+
+<p>这种方法的一个潜在缺点是，它会显著降低缺失值特征的方差。我们可以使用随机回归插补来解决这个缺点。我们将在本节中探讨这两种方法。</p>
+
+<p>NLS 数据集中的<code>wageincome</code>要素<a id="_idIndexMarker281"/>有几个<a id="_idIndexMarker282"/>缺失值。我们可以用线性回归来估算数值。工资收入值是 2016 年报告的收入:</p>
+
+<ol>
+
+<li value="1">让我们从再次加载 NLS 数据开始，检查<code>wageincome</code>的缺失值和可能与<code>wageincome</code>相关的特性。我们还加载了<code>statsmodels</code>库。</li>
+
+</ol>
+
+<p><code>info</code>方法告诉我们，在近 3000 次观察中，我们缺少<code>wageincome</code>的值。其他功能缺少的值较少:</p>
+
+<pre>import pandas as pd
+import numpy as np
+import statsmodels.api as sm
+nls97 = pd.read_csv("data/nls97b.csv")
+nls97.set_index("personid", inplace=True)
+nls97[['wageincome','highestdegree','weeksworked16',
+  'parentincome']].info()
+<strong class="bold">&lt;class 'pandas.core.frame.DataFrame'&gt;</strong>
+<strong class="bold">Int64Index: 8984 entries, 100061 to 999963</strong>
+<strong class="bold">Data columns (total 4 columns):</strong>
+<strong class="bold"> #  Column               Non-Null Count       Dtype</strong>
+<strong class="bold">--  -------               --------------      -----  </strong>
+<strong class="bold"> 0  </strong><strong class="bold">wageincome            5091 non-null       float64</strong>
+<strong class="bold"> 1  highestdegree         8953 non-null       object </strong>
+<strong class="bold"> 2  weeksworked16         7068 non-null       float64</strong>
+<strong class="bold"> 3  parentincome          </strong><strong class="bold">8984 non-null       int64</strong>
+<strong class="bold">dtypes: float64(2), int64(1), object(1)</strong>
+<strong class="bold">memory usage: 350.9+ KB</strong></pre>
+
+<ol>
+
+<li value="2">让我们将<code>highestdegree</code>特征转换成一个数值。这将使我们在本节剩余部分所做的分析更加容易:<pre>nls97['hdegnum'] =   nls97.highestdegree.str[0:1].astype('float') nls97.groupby(['highestdegree','hdegnum']).size()  <strong class="bold">highestdegree    hdegnum</strong> <strong class="bold">0. None                0            953</strong> <strong class="bold">1. GED                 1           1146</strong> <strong class="bold">2. High School         2           3667</strong> <strong class="bold">3. Associates</strong><strong class="bold">          3            737</strong> <strong class="bold">4. Bachelors           4           1673</strong> <strong class="bold">5. Masters             5            603</strong> <strong class="bold">6. PhD                 6             54</strong> <strong class="bold">7. Professional        7            120</strong></pre></li>
+
+<li>正如我们已经<a id="_idIndexMarker283"/>发现的，我们需要用实际缺失值替换<code>parentincome</code>的逻辑<a id="_idIndexMarker284"/>缺失值。之后，我们可以进行一些关联。每个特征都与<code>wageincome</code>有一些关联，特别是<code>hdegnum</code> : <pre>nls97.parentincome.replace(list(range(-5,0)), np.nan,   inplace=True) nls97[['wageincome','hdegnum','weeksworked16',    'parentincome']].corr() <strong class="bold">            wageincome  hdegnum  weeksworked16  parentincome</strong> <strong class="bold">wageincome     1.00      0.40         0.18        0.27</strong> <strong class="bold">hdegnum        0.40</strong><strong class="bold">      1.00         0.24        0.33</strong> <strong class="bold">weeksworked16  0.18      0.24         1.00        0.10</strong> <strong class="bold">parentincome   0.27      0.33         0.10        1.00</strong></pre></li>
+
+<li>我们应该检查带有工资收入缺失值的观察值是否在某些重要方面与带有非缺失值的观察值不同。下面的代码显示，这些观察值具有明显较低的学位获得水平、父母收入和工作周数。这是一个明显的例子，在这种情况下，分配总体平均值不是最佳选择:<pre>nls97['missingwageincome'] =   np.where(nls97.wageincome.isnull(),1,0) nls97.groupby(['missingwageincome'])[['hdegnum',    'parentincome', 'weeksworked16']].agg(['mean',    'count']) <strong class="bold">                 hdegnum    parentincome weeksworked16</strong> <strong class="bold">                 mean count mean   count  mean   count</strong> <strong class="bold">missingwageincome                                    </strong> <strong class="bold">0</strong><strong class="bold">                2.76 5072  48,409.13 3803 48.21  5052</strong> <strong class="bold">1                1.95 3881  43,565.87 2785</strong><strong class="bold"> 16.36  2016</strong></pre></li>
+
+<li>Let's try regression imputation instead. Let's start by cleaning up the data a little bit more. We can replace the missing <code>weeksworked16</code> and <code>parentincome</code> values with their means. We should also collapse <code>hdegnum</code> into those attaining less than a college degree, those with a college degree, and those with a post-graduate degree. We can set those up as dummy variables, with 0 or 1 values when they're <code>False</code> or <code>True</code>, respectively. This is a tried and true method for treating categorical data in regression analysis as it allows us to estimate different <em class="italic">y</em> intercepts based on group membership:<pre>nls97.weeksworked16.fillna(nls97.weeksworked16.mean(),
+  inplace=True)
+nls97.parentincome.fillna(nls97.parentincome.mean(),
+  inplace=True)
+nls97['degltcol'] = np.where(nls97.hdegnum&lt;=2,1,0)
+nls97['degcol'] = np.where(nls97.hdegnum.between(3,4),
+  1,0)
+nls97['degadv'] = np.where(nls97.hdegnum&gt;4,1,0)</pre><p class="callout-heading">注意</p><p class="callout">scikit-learn 具有预处理特性，可以帮助我们完成这样的任务。我们将在下一章讨论其中的一些。</p></li>
+
+<li>接下来，我们定义一个函数<code>getlm</code>，使用<code>statsmodels</code>模块运行一个线性模型。该函数有目标或<a id="_idIndexMarker287"/>因变量名称的参数<code>ycolname</code>，和<a id="_idIndexMarker288"/>特征或自变量名称的参数<code>xcolnames</code>。大部分工作是通过<code>statsmodels</code>的<code>fit</code>方法完成的；即<code>OLS(y, X).fit()</code> : <pre>def getlm(df, ycolname, xcolnames):   df = df[[ycolname] + xcolnames].dropna()   y = df[ycolname]   X = df[xcolnames]   X = sm.add_constant(X)   lm = sm.OLS(y, X).fit()   coefficients = pd.DataFrame(zip(['constant'] +     xcolnames,lm.params, lm.pvalues), columns = [     'features' , 'params','pvalues'])   return coefficients, lm</pre></li>
+
+<li>现在，我们可以使用<code>getlm</code>函数来获得参数估计和模型摘要。由于<a id="_idIndexMarker289"/>的<code>pvalues</code>小于 0.05，所有系数在 95%水平下都是正的和显著的。正如所料，工资收入随着工作周数和父母收入的增加而增加。与没有大学文凭相比，拥有大学文凭能让收入增加近 1.6 万美元。研究生学位会进一步提高收入预测——比没有大学学位的人高出近 3.7 万美元</li>
+
+<li>我们可以用这个模型来估算工资收入的缺失值。我们需要为预测添加一个常数，因为我们的模型包含了一个常数。我们可以将预测转换成一个数据框架，然后将它与 NLS 数据的其余部分结合起来。然后，我们可以创建<a id="_idIndexMarker292"/>一个新的工资收入特征<code>wageincomeimp</code>，当缺少工资收入时，它将获得预测值，否则将获得原始工资收入值。让我们也来看看一些预测，看看它们是否有意义:<pre>pred = lm.predict(sm.add_constant(nls97[xvars])).   to_frame().rename(columns= {0: 'pred'}) nls97 = nls97.join(pred) nls97['wageincomeimp'] =    np.where(nls97.wageincome.isnull(),   nls97.pred, nls97.wageincome) pd.options.display.float_format = '{:,.0f}'.format nls97[['wageincomeimp','wageincome'] + xvars].head(10) <strong class="bold">wageincomeimp  wageincome  weeksworked16  parentincome  degcol  degadv</strong> <strong class="bold">personid                                          </strong> <strong class="bold">100061     12,500     12,500    48</strong><strong class="bold">     7,400    0    0</strong> <strong class="bold">100139    120,000    120,000    53    57,000    0    0</strong> <strong class="bold">100284     58,000</strong><strong class="bold">     58,000    47    50,000    0    0</strong> <strong class="bold">100292     36,547        NaN     4    62,760    1</strong><strong class="bold">    0</strong> <strong class="bold">100583     30,000     30,000    53    18,500    0    0</strong> <strong class="bold">100833     39,000     39,000    45</strong><strong class="bold">    37,000    0    0</strong> <strong class="bold">100931     56,000     56,000    53    60,200    1    0</strong> <strong class="bold">101089     36,000</strong><strong class="bold">     36,000    53    32,307    0    0</strong> <strong class="bold">101122     35,151        NaN    39    46,362    0</strong><strong class="bold">    0</strong> <strong class="bold">101132          0          0    22     2,470    0    0</strong></pre></li>
+
+<li>为了我们的预测，我们应该查看一些汇总统计数据，并将它们与实际工资收入值进行比较。估算工资收入<a id="_idIndexMarker293"/>特征的平均值低于原始<a id="_idIndexMarker294"/>工资收入平均值。这并不奇怪，因为正如我们所看到的，缺少工资收入的个体对正相关特征的价值较低。令人惊讶的是标准差的急剧下降。这是确定性回归插补的缺点之一:<pre>nls97[['wageincomeimp','wageincome']].   agg(['count','mean','std']) <strong class="bold">       wageincomeimp  wageincome</strong> <strong class="bold">count        8,984        5,091</strong> <strong class="bold">mean        42,559       49,477</strong> <strong class="bold">std         33,406       40,678</strong></pre></li>
+
+<li>随机回归插补将正态分布误差添加到基于模型残差的预测中。我们希望这个误差的均值为 0，标准差与残差相同。我们可以用 NumPy 的普通函数来处理<code>np.random.normal(0, lm.resid.std(), nls97.shape[0])</code>的问题。<code>lm.resid.std()</code>参数从我们的模型中获得残差的标准偏差。最后一个参数值<code>nls97.shape[0]</code>，表示要创建多少个值；在这种情况下，我们希望数据中的每一行都有一个值。</li>
+
+</ol>
+
+<p>我们可以将这些值与我们的数据结合起来，然后将误差<code>randomadd</code>添加到我们的预测中:</p>
+
+<pre>randomadd = np.random.normal(0, lm.resid.std(),
+  nls97.shape[0])
+randomadddf = pd.DataFrame(randomadd, 
+  columns=['randomadd'], index=nls97.index)
+nls97 = nls97.join(randomadddf)
+nls97['stochasticpred'] = nls97.pred + nls97.randomadd
+nls97['wageincomeimpstoc'] =
+  np.where(nls97.wageincome.isnull(),
+  nls97.stochasticpred, nls97.wageincome)</pre>
+
+<ol>
+
+<li value="11">这应该会<a id="_idIndexMarker295"/>增加方差，但不会<a id="_idIndexMarker296"/>对平均值产生太大影响。我们来确认一下:<pre>nls97[['wageincomeimpstoc','wageincome']].agg([   'count','mean','std'])   <strong class="bold">       wageincomeimpstoc  wageincome</strong> <strong class="bold">count        8,984           5,091</strong> <strong class="bold">mean        42,517          49,477</strong> <strong class="bold">std         41,381</strong><strong class="bold">          40,678</strong></pre></li>
+
+</ol>
+
+<p>这似乎奏效了。我们的随机预测与最初的工资收入特征具有几乎相同的标准差。</p>
+
+<p>回归插补是一种很好的方法，可以利用我们拥有的所有数据来插补某个特性的值。它通常优于我们在上一节中研究的插补方法，特别是当缺失值不是随机的时。如果我们使用随机回归插补，我们不会人为地减少我们的方差。</p>
+
+<p>在我们开始使用机器学习进行这项工作之前，这是我们进行<a id="_idIndexMarker297"/>插补的多变量方法。我们现在可以选择使用算法<a id="_idIndexMarker298"/>来完成这项任务，比如 KNN，在某些情况下，它比回归插补更有优势。与回归插补法不同，KNN 插补法不假定特征之间存在线性关系，也不假定这些特征呈正态分布。我们将在下一节探讨 KNN 插补。</p>
+
+<h1 id="_idParaDest-40"><a id="_idTextAnchor039"/>使用 KNN 插补</h1>
+
+<p>KNN 是一种流行的机器学习技术，因为它直观、易于运行，并且在没有大量特征和观察时产生良好的结果。出于同样的原因，它通常用于估算缺失值。顾名思义，KNN 识别特征与每个观察值最相似的 k 个观察值。当用于估算缺失值时，KNN 使用最近邻来确定要使用的填充值。</p>
+
+<p>我们可以使用 KNN 插补法进行<a id="_idIndexMarker299"/>与上一节回归插补法相同的插补法:</p>
+
+<ol>
+
+<li value="1">让我们首先从 scikit-learn 导入<code>KNNImputer</code>并再次加载 NLS 数据:<pre>import pandas as pd import numpy as np from sklearn.impute import KNNImputer nls97 = pd.read_csv("data/nls97b.csv") nls97.set_index("personid", inplace=True)</pre></li>
+
+<li>接下来，我们必须准备功能。我们将学位程度分为三类——不到大学、大学和大学后学位——每一类用不同的虚拟变量表示。我们还必须将父收入的逻辑缺失值转换为实际缺失值:<pre>nls97['hdegnum'] =   nls97.highestdegree.str[0:1].astype('float') nls97['degltcol'] = np.where(nls97.hdegnum&lt;=2,1,0) nls97['degcol'] =    np.where(nls97.hdegnum.between(3,4),1,0) nls97['degadv'] = np.where(nls97.hdegnum&gt;4,1,0) nls97.parentincome.replace(list(range(-5,0)), np.nan,    inplace=True)</pre></li>
+
+<li>让我们创建一个只包含工资收入和一些相关特征的数据框架:<pre>wagedatalist = ['wageincome','weeksworked16',    'parentincome','degltcol','degcol','degadv'] wagedata = nls97[wagedatalist]</pre></li>
+
+<li>We <a id="_idIndexMarker300"/>are now ready to use the <code>fit_transform</code> method of the KNN imputer to get values for all the missing values in the passed DataFrame, <code>wagedata</code>. <code>fit_transform</code> returns a NumPy array that contains all the non-missing values from <code>wagedata</code>, plus the imputed ones. We can convert this array into a DataFrame using the same index as <code>wagedata</code>. This will make it easy to join the data in the next step.<p class="callout-heading">注意</p><p class="callout">当我们使用 scikit-learn 的<code>transform</code>和<code>fit_transform</code>方法返回 NumPy 数组时，我们将在整本书中使用这种技术。</p></li>
+
+</ol>
+
+<p>我们需要指定用于 k 的最近邻数量的值。我们使用一般的经验法则来确定 k——观察数量除以 2 的平方根(<em class="italic"> sqrt(N)/2 </em>)。在这种情况下，k 的值为 47:</p>
+
+<pre>impKNN = KNNImputer(n_neighbors=47)
+newvalues = impKNN.fit_transform(wagedata)
+wagedatalistimp = ['wageincomeimp','weeksworked16imp',
+  'parentincomeimp','degltcol','degcol','degadv']
+wagedataimp = pd.DataFrame(newvalues,
+  columns=wagedatalistimp, index=wagedata.index)</pre>
+
+<ol>
+
+<li value="5">现在，我们必须将估算工资收入和工作周数列与原始 NLS 工资数据连接起来，并进行一些观察。请注意，使用 KNN 插补，我们不需要对相关<a id="_idIndexMarker301"/>特征的缺失值进行任何预先插补(使用回归插补，我们将工作周数和父母收入设为其数据集均值)。然而，这确实意味着 KNN 插补将返回一个插补值，即使信息不多，例如在下面的代码块<pre>wagedata = wagedata.join(wagedataimp[['wageincomeimp',    'weeksworked16imp']]) wagedata[['wageincome','weeksworked16','parentincome',   'degcol','degadv','wageincomeimp']].head(10) <strong class="bold">wageincome  weeksworked16  parentincome degcol  degadv wageincomeimp</strong> <strong class="bold">personid         </strong> <strong class="bold">100061     12,500    48     7,400    0    </strong><strong class="bold">0     12,500</strong> <strong class="bold">100139    120,000    53    57,000    0    0    120,000</strong> <strong class="bold">100284     58,000    47    50,000    0    0     58,000</strong> <strong class="bold">100292        </strong><strong class="bold">NaN     4    62,760    1    0     28,029</strong> <strong class="bold">100583     30,000    53    18,500    0    0     30,000</strong> <strong class="bold">100833     39,000    45    37,000    0    </strong><strong class="bold">0     39,000</strong> <strong class="bold">100931     56,000    53    60,200    1    0     56,000</strong> <strong class="bold">101089     36,000    53    32,307    0    0     36,000</strong> <strong class="bold">101122        </strong><strong class="bold">NaN   NaN       NaN    0    0     33,977</strong> <strong class="bold">101132          0     22    2,470    0    0          0</strong></pre>中用<code>101122</code>代替<code>personid</code></li>
+
+<li>让我们来看看原始特征和估算特征的汇总统计数据。不足为奇的是，估算工资收入的平均值低于原始平均值。正如我们在上一节中发现的，缺少工资收入的观察结果具有较低的学位获得程度、工作周数和父母收入。我们也失去了一些工资收入的方差:<pre>wagedata[['wageincome','wageincomeimp']].agg(['count',   'mean','std']) <strong class="bold">           </strong><strong class="bold">wageincome  wageincomeimp </strong> <strong class="bold">count          5,091        8,984</strong> <strong class="bold">mean          49,477        44,781</strong> <strong class="bold">std           40,678        32,034</strong></pre></li>
+
+</ol>
+
+<p>KNN 做估算时没有对基础数据的分布做任何假设。对于回归插补，适用线性回归的标准假设，即要素之间存在线性关系，且呈正态分布。如果不是这样，KNN 可能是一个更好的估算方法。</p>
+
+<p>尽管有这些优点，KNN 插补也有局限性。首先，我们必须用一个关于 k 的良好值的初始假设来调整模型，有时我们只知道数据集的大小。KNN 的计算量也很大，对于非常大的数据集可能不切实际。最后，当待插补特征和预测特征之间的相关性较弱时，KNN 插补可能表现不佳。随机森林插补是 KNN 插补的替代方案，可以帮助我们避免 KNN 插补和回归插补的缺点。我们将在下一节探讨随机森林插补。</p>
+
+<h1 id="_idParaDest-41"><a id="_idTextAnchor040"/>使用随机森林进行插补</h1>
+
+<p>随机森林是一种集成学习<a id="_idIndexMarker304"/>方法。它使用 bootstrap 聚合，也称为 bagging，来提高模型的准确性。它通过反复取多棵树的平均值来进行预测，从而产生越来越好的估计值。在本节中，我们将使用<code>MissForest</code>算法，这是随机森林算法的一个应用，用于查找<a id="_idIndexMarker306"/>缺失值插补。</p>
+
+<p><code>MissForest</code>首先填充缺失值的中位数或众数(分别用于连续或分类特征),然后使用随机森林来预测值。使用这个变换的数据集，用初始预测替换缺失值，<code>MissForest</code>生成新的预测，也许用更好的预测替换初始预测。<code>MissForest</code>通常会经历这个过程的至少四次迭代。</p>
+
+<p>运行<code>MissForest</code>甚至比使用我们在上一节中使用的 KNN 估算器更容易。我们将估算之前处理过的相同工资收入数据的值:</p>
+
+<ol>
+
+<li value="1">Let's start by importing the <code>MissForest</code> module and loading the NLS data:<pre>import pandas as pd
+import numpy as np
+import sys
+import sklearn.neighbors._base
+sys.modules['sklearn.neighbors.base'] =
+  sklearn.neighbors._base
+from missingpy import MissForest
+nls97 = pd.read_csv("data/nls97b.csv")
+nls97.set_index("personid", inplace=True)</pre><p class="callout-heading">注意</p><p class="callout">我们需要以<code>sklearn.neighbors._base</code>的名义解决一个冲突，它可以是<code>sklearn.neighbors._base</code>或<code>sklearn.neighbors.base</code>，这取决于你的 scikit-learn 版本。在撰写本文时，<code>MissForest</code>使用了较旧的名称。</p></li>
+
+<li>让我们进行与上一节相同的数据清理:<pre>nls97['hdegnum'] =    nls97.highestdegree.str[0:1].astype('float') nls97.parentincome.replace(list(range(-5,0)), np.nan,   inplace=True) nls97['degltcol'] = np.where(nls97.hdegnum&lt;=2,1,0) nls97['degcol'] = np.where(nls97.hdegnum.between(3,4),    1,0) nls97['degadv'] = np.where(nls97.hdegnum&gt;4,1,0) wagedatalist = ['wageincome','weeksworked16',   'parentincome','degltcol','degcol','degadv'] wagedata = nls97[wagedatalist]</pre></li>
+
+<li>现在，我们<a id="_idIndexMarker307"/>准备运行<code>MissForest</code>。注意，这个过程与我们使用 KNN 估算器的过程非常相似:<pre>imputer = MissForest() newvalues = imputer.fit_transform(wagedata) wagedatalistimp = ['wageincomeimp','weeksworked16imp',    'parentincomeimp','degltcol','degcol','degadv'] wagedataimp = pd.DataFrame(newvalues,    columns=wagedatalistimp , index=wagedata.index) Iteration: 0 Iteration: 1 Iteration: 2 Iteration: 3</pre></li>
+
+<li>让我们来看看一些估算值和一些汇总统计数据。估算值具有较低的平均值。这并不奇怪，因为我们已经知道<a id="_idIndexMarker308"/>缺失值不是随机分布的，学历和工作周数较低的个人更有可能出现工资收入缺失值:<pre>wagedata = wagedata.join(wagedataimp[['wageincomeimp',    'weeksworked16imp']]) wagedata[['wageincome','weeksworked16','parentincome',   'degcol','degadv','wageincomeimp']].head(10) <strong class="bold">     wageincome  weeksworked16  parentincome  degcol  degadv  wageincomeimp</strong> <strong class="bold">personid                                         </strong> <strong class="bold">100061     12,500    48     7,400    0</strong><strong class="bold">    0     12,500</strong> <strong class="bold">100139    120,000    53    57,000    0    0    120,000</strong> <strong class="bold">100284     58,000    47    50,000    0</strong><strong class="bold">    0     58,000</strong> <strong class="bold">100292        NaN     4    62,760    1    0     42,065</strong> <strong class="bold">100583     30,000    53    18,500    0    0     30,000</strong> <strong class="bold">100833</strong><strong class="bold">     39,000    45    37,000    0    0     39,000</strong> <strong class="bold">100931     56,000    53    60,200    1    0     56,000</strong> <strong class="bold">101089     36,000     5    32,307    0</strong><strong class="bold">    0     36,000</strong> <strong class="bold">101122        NaN   NaN       NaN    0    0     32,384</strong> <strong class="bold">101132          0    22     2,470    0    0</strong><strong class="bold">          0</strong> wagedata[['wageincome','wageincomeimp',    'weeksworked16','weeksworked16imp']].agg(['count',    'mean','std']) <strong class="bold">    wageincome  wageincomeimp  weeksworked16  weeksworked16imp</strong> <strong class="bold">count    5,091        8,984        7,068         8,984</strong> <strong class="bold">mean    49,477       43,140           39            37</strong> <strong class="bold">std     40,678       34,725           21            21</strong></pre></li>
+
+</ol>
+
+<p><code>MissForest</code>使用随机森林算法生成高度准确的预测。与 KNN 不同，它不需要用 k 的初始值来调整。它在计算上也比 KNN 便宜。也许最重要的是，随机森林插补对特征间的低或非常高的相关性不太敏感，尽管这在本例中不是问题。</p>
+
+<h1 id="_idParaDest-42"><a id="_idTextAnchor041"/>摘要</h1>
+
+<p>在这一章中，我们探讨了缺失值插补最流行的方法，并讨论了每种方法的优缺点。指定总体样本平均值通常不是一个好方法，尤其是当缺失值的观察值在重要方面不同于其他观察值时。我们也可以大幅降低方差。向前或向后填充允许我们保持数据中的方差，但是当观察值的接近度有意义时，例如时间序列或纵向数据，它工作得最好。在大多数重要的情况下，我们会希望使用多变量技术，如回归、KNN 或随机森林插补。</p>
+
+<p>到目前为止，我们还没有触及数据泄漏的重要问题，以及如何创建单独的训练和测试数据集。为了避免数据泄露，一旦我们开始特征工程，我们就需要独立于测试数据来处理训练数据。我们将在下一章更详细地研究特征工程。在这里，我们将对特征进行编码、转换和缩放，同时还要小心地将训练数据和测试数据分开。</p>
+
+</div>
+
+</div>
+
+
+
+</body></html>

@@ -1,0 +1,801 @@
+<html><head/><body>
+<html xmlns:epub="http://www.idpf.org/2007/ops">
+  <head>
+    <title>Object Detection – Transfer Learning with CNNs</title>
+    <meta content="urn:uuid:b6d6a510-8f2b-40e4-8a30-e199afd87745" name="Adept.expected.resource"/>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+  
+
+</head>
+  <body class="calibre">
+        
+
+                            
+                    <h1 class="header-title">对象检测–使用 CNN 进行迁移学习</h1>
+                
+            
+            
+                
+<p>“个人如何从一种情境转移到另一种具有相似特征的情境”</p>
+<p>–<em class="calibre25">e . l .桑代克</em>，<em class="calibre25"> R. S .伍德沃斯(1991) </em></p>
+<p class="calibre2"><strong class="calibre13">迁移学习</strong> ( <strong class="calibre13"> TL </strong>)是数据科学中的一个研究问题，主要关注的是将在解决一个特定任务过程中获得的知识持久化，并使用这些获得的知识来解决另一个不同但相似的任务。在这一章中，我们将使用 TL 演示数据科学领域中使用的一种现代实践和常见主题。这里的想法是如何从具有非常大的数据集的域到具有较小数据集的域获得帮助。最后，我们将重温 CIFAR-10 的对象检测示例，并尝试通过 TL 减少训练时间和性能误差。</p>
+<p class="calibre2">本章将涵盖以下主题:</p>
+<ul class="calibre7">
+<li class="calibre8">迁移学习</li>
+<li class="calibre8">CIFAR-10 目标探测再探</li>
+</ul>
+
+
+            
+
+            
+        
+    </body>
+
+</html>
+
+
+<html xmlns:epub="http://www.idpf.org/2007/ops">
+  <head>
+    <title>Transfer learning</title>
+    <meta content="urn:uuid:b6d6a510-8f2b-40e4-8a30-e199afd87745" name="Adept.expected.resource"/>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+  
+
+</head>
+  <body class="calibre">
+        
+
+                            
+                    <h1 class="header-title">迁移学习</h1>
+                
+            
+            
+                
+<p class="calibre2">深度学习架构是数据贪婪的，在训练集中有几个样本不会让我们从中获得最佳效果。TL 通过将从解决大数据集任务中学到或获得的知识/表示转移到另一个不同但相似的小数据集任务来解决这个问题。</p>
+<p class="calibre2">TL 不仅在小训练集的情况下有用，而且我们可以使用它来使训练过程更快。从零开始训练大型深度学习架构有时会非常慢，因为我们在这些架构中有数百万个权重需要学习。取而代之的是，某人可以通过微调一个他/她试图解决的类似问题的学习权重来利用 TL。</p>
+
+
+            
+
+            
+        
+    </body>
+
+</html>
+
+
+<html xmlns:epub="http://www.idpf.org/2007/ops">
+  <head>
+    <title>The intuition behind TL</title>
+    <meta content="urn:uuid:b6d6a510-8f2b-40e4-8a30-e199afd87745" name="Adept.expected.resource"/>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+  
+
+</head>
+  <body class="calibre">
+        
+
+                            
+                    <h1 class="header-title">TL 背后的直觉</h1>
+                
+            
+            
+                
+<p class="calibre2">让我们用下面的师生类比来建立 TL 背后的直觉。教师在他/她所教的模块方面有多年的经验。另一方面，学生可以从老师的讲课中获得这个主题的概要。所以你可以说老师是在用一种简洁紧凑的方式把他们的知识传递给学生。</p>
+<p class="calibre2">教师和学生的相同类比可以应用于我们在深度学习或一般神经网络中转移知识的情况。因此，我们的模型从数据中学习一些表示法，这由网络的<em class="calibre19">权重</em>来表示。这些习得的表征/特征(权重)可以转移到另一个不同但相似的任务中。这种将学习到的权重转移到另一个任务的过程将减少深度学习架构收敛的巨大数据集的需求，与从头开始训练模型相比，它还将减少使模型适应新数据集所需的时间。</p>
+<p class="calibre2">深度学习现在应用广泛，但是通常大多数人在训练深度学习架构的时候都在用 TL；他们很少从零开始训练深度学习架构，因为大多数时候很少有足够大的数据集可供深度学习收敛。所以在像<kbd class="calibre12">ImageNet</kbd>这样拥有大约 120 万张图片的大型数据集上使用预先训练好的模型，并将其应用到你的新任务中是非常常见的。我们可以使用预训练模型的权重作为特征提取器，或者我们可以用它来初始化我们的架构，然后根据您的新任务对它们进行微调。使用 TL 有三种主要场景:</p>
+<ul class="calibre7">
+<li class="calibre8">
+<p class="calibre9"><strong class="calibre13">使用卷积网络作为固定的特征提取器</strong> : <strong class="calibre13"> </strong>在这种情况下，您可以在大型数据集(如 ImageNet)上使用预训练的卷积模型，并将其用于解决您的问题。例如，ImageNet 上预先训练的卷积模型将具有完全连接的层，该层具有 ImageNet 的 1，000 个类别的输出分数。所以您需要删除这一层，因为您对 ImageNet 的类不再感兴趣。然后，将所有其他图层视为特征提取器。使用预训练模型提取特征后，您可以将这些特征提供给任何线性分类器，如 softmax 分类器，甚至线性 SVM。</p>
+</li>
+<li class="calibre8">
+<p class="calibre9"><strong class="calibre13">微调卷积神经网络</strong>:第二个场景涉及第一个场景，但需要额外的努力，使用反向传播来微调新任务的预训练权重。通常，人们保持大多数层固定不变，只对网络的顶端进行微调。试图微调整个网络或甚至大部分层可能会导致过度拟合。因此，您可能只对那些与图像的语义级特征相关的层感兴趣。让早期层保持固定的直觉是，它们包含大多数成像任务中常见的通用或低级特征，如角、边等。如果要引入模型预训练的原始数据集中不存在的新类，则对网络的较高级别或顶端层进行微调将非常有用。</p>
+<div><img src="img/7b634245-e286-449f-8f6a-5b7fee31ffef.png" class="calibre112"/></div>
+</li>
+</ul>
+<p>图 10.1:为新任务微调预训练的 CNN</p>
+<ul class="calibre7">
+<li class="calibre8">
+<p class="calibre9"><strong class="calibre13">预先训练的模型</strong>:第三种广泛使用的场景是下载人们在互联网上提供的检查点。如果您没有强大的计算能力来从零开始训练模型，那么您可能会选择这种场景，因此您只需使用发布的检查点来初始化模型，然后进行一些微调。</p>
+</li>
+</ul>
+
+
+            
+
+            
+        
+    </body>
+
+</html>
+
+
+<html xmlns:epub="http://www.idpf.org/2007/ops">
+  <head>
+    <title>Differences between traditional machine learning and TL</title>
+    <meta content="urn:uuid:b6d6a510-8f2b-40e4-8a30-e199afd87745" name="Adept.expected.resource"/>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+  
+
+</head>
+  <body class="calibre">
+        
+
+                            
+                    <h1 class="header-title">传统机器学习和目标语言的区别</h1>
+                
+            
+            
+                
+<p class="calibre2">正如你从上一节中注意到的，我们应用机器学习的传统方式和涉及 TL 的机器学习之间有着明显的区别(如下图<em class="calibre19"> ) </em>。在传统的机器学习中，你不会将任何知识或表示转移到任何其他任务，而在 TL 中则不是这样。有时，人们会以错误的方式使用 TL，所以我们要提到几种情况，在这些情况下，你只能使用 TL 来最大化收益。</p>
+<p class="calibre2">以下是应用 TL 的条件:</p>
+<ul class="calibre7">
+<li class="calibre8">与传统的机器学习不同，源和目标任务或域不必来自相同的分布，但它们必须相似</li>
+<li class="calibre8">如果训练样本较少或者没有必要的计算能力，也可以使用 TL</li>
+</ul>
+<div><img src="img/ba7e27f6-a962-4f30-8c43-f6798ad21fe0.png" class="calibre113"/></div>
+<p>图 10.2:传统机器学习与使用 TL 的机器学习</p>
+
+
+            
+
+            
+        
+    </body>
+
+</html>
+
+
+<html xmlns:epub="http://www.idpf.org/2007/ops">
+  <head>
+    <title>CIFAR-10 object detection – revisited</title>
+    <meta content="urn:uuid:b6d6a510-8f2b-40e4-8a30-e199afd87745" name="Adept.expected.resource"/>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+  
+
+</head>
+  <body class="calibre">
+        
+
+                            
+                    <h1 class="header-title">CIFAR-10 目标探测-重访</h1>
+                
+            
+            
+                
+<p class="calibre2">在前一章中，我们在 CIFAR-10 数据集上训练了一个简单的<strong class="calibre13">卷积神经网络</strong> ( <strong class="calibre13"> CNN </strong>)模型。这里，我们将演示使用预训练模型作为特征提取器的情况，同时移除预训练模型的全连接层，然后我们将这些提取的特征或传输的值馈送到 softmax 层。</p>
+<p class="calibre2">此实施中的预训练模型将是初始模型，它将在 ImageNet 上进行预训练。但是请记住，这个实现是建立在前两章介绍 CNN 的基础上的。</p>
+
+
+            
+
+            
+        
+    </body>
+
+</html>
+
+
+<html xmlns:epub="http://www.idpf.org/2007/ops">
+  <head>
+    <title>Solution outline</title>
+    <meta content="urn:uuid:b6d6a510-8f2b-40e4-8a30-e199afd87745" name="Adept.expected.resource"/>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+  
+
+</head>
+  <body class="calibre">
+        
+
+                            
+                    <h1 class="header-title">解决方案大纲</h1>
+                
+            
+            
+                
+<div><div><div><p class="calibre2">同样，我们将替换预训练的先启模型的最终完全连接层，然后使用先启模型的其余部分作为特征提取器。所以，我们首先在初始模型中输入我们的原始图像，它将从中提取特征，然后输出我们所谓的转移值。</p>
+<p class="calibre2">在从 inception 模型中获得提取的特性的转移值之后，您可能需要将它们保存到您的桌面上，因为如果您是在运行中完成的话，这将会花费一些时间，因此将它们保存到您的桌面上以节省您的时间是很有用的。在 TensorFlow 教程中，他们使用术语瓶颈值而不是转移值，但这只是完全相同的东西的不同名称。</p>
+</div>
+<p class="calibre2">在获得转移值或从桌面加载它们之后，我们可以将它们提供给为我们的新任务定制的任何线性分类器。这里，我们将把提取的转移值输入到另一个神经网络，然后为 CIFAR-10 的新类别进行训练。</p>
+<p class="innercell">下图显示了我们将遵循的一般解决方案大纲:</p>
+</div>
+</div>
+<div><img src="img/389af43d-d01c-4193-b267-df995b4124a1.png" class="calibre114"/></div>
+<p>图 10.3:使用带有 TL 的 CIFAR-10 数据集的对象检测任务的解决方案概要</p>
+
+
+            
+
+            
+        
+    </body>
+
+</html>
+
+
+<html xmlns:epub="http://www.idpf.org/2007/ops">
+  <head>
+    <title>Loading and exploring CIFAR-10</title>
+    <meta content="urn:uuid:b6d6a510-8f2b-40e4-8a30-e199afd87745" name="Adept.expected.resource"/>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+  
+
+</head>
+  <body class="calibre">
+        
+
+                            
+                    <h1 class="header-title">装载和探索 CIFAR-10</h1>
+                
+            
+            
+                
+<div><p class="calibre2">让我们从导入该实现所需的包开始:</p>
+</div>
+<div><div><div><pre class="calibre21">%matplotlib inline<br class="title-page-name"/>import matplotlib.pyplot as plt<br class="title-page-name"/>import tensorflow as tf<br class="title-page-name"/>import numpy as np<br class="title-page-name"/>import time<br class="title-page-name"/>from datetime import timedelta<br class="title-page-name"/>import os<br class="title-page-name"/><br class="title-page-name"/># Importing a helper module for the functions of the Inception model.<br class="title-page-name"/>import inception</pre>
+<div><div><p class="calibre2">接下来，我们需要加载另一个助手脚本，用于下载正在处理的 CIFAR-10 数据集:</p>
+<pre class="calibre21">import cifar10<br class="title-page-name"/>#importing number of classes of CIFAR-10<br class="title-page-name"/>from cifar10 import num_classes</pre>
+<p class="calibre2">如果您还没有这样做，您需要为 CIFAR-10 设置路径。这个路径将被<kbd class="calibre12">cifar-10.py</kbd>脚本用来保存数据集:</p>
+<pre class="calibre21">cifar10.data_path = "data/CIFAR-10/"<br class="title-page-name"/><br class="title-page-name"/>The CIFAR-10 dataset is about 170 MB, the next line checks if the dataset is already downloaded if not it downloads the dataset and store in the previous <kbd class="calibre115">data_path</kbd>:<br class="title-page-name"/><br class="title-page-name"/>cifar10.maybe_download_and_extract&lt;/span&gt;()<br class="title-page-name"/><br class="title-page-name"/>Output:<br class="title-page-name"/><br class="title-page-name"/>- Download progress: 100.0%<br class="title-page-name"/>Download finished. Extracting files.<br class="title-page-name"/>Done.</pre>
+<div><div><div><div><p class="calibre2">让我们看看 CIFAR-10 数据集中的类别:</p>
+</div>
+</div>
+</div>
+<pre class="calibre21">#Loading the class names of CIFAR-10 dataset<br class="title-page-name"/>class_names = cifar10.load_class_names()
+class_names</pre>
+<p class="calibre2">输出:</p>
+<div><div><div><div><pre class="calibre21">Loading data: data/CIFAR-10/cifar-10-batches-py/batches.meta<br class="title-page-name"/>['airplane',<br class="title-page-name"/> 'automobile',<br class="title-page-name"/> 'bird',<br class="title-page-name"/> 'cat',<br class="title-page-name"/> 'deer',<br class="title-page-name"/> 'dog',<br class="title-page-name"/> 'frog',<br class="title-page-name"/> 'horse', <br class="title-page-name"/> 'ship',<br class="title-page-name"/> 'truck']<br class="title-page-name"/>Load the training-set. </pre></div>
+</div>
+<div><div><div><p class="calibre2">这将返回<kbd class="calibre12">images</kbd>，类别号为<kbd class="calibre12">integers</kbd>，类别号为称为<kbd class="calibre12">labels</kbd>的独热编码数组:</p>
+<pre class="calibre21">training_images, training_cls_integers, trainig_one_hot_labels = cifar10.load_training_data()</pre>
+<p class="calibre2">输出:</p>
+<div><div><div><div><pre class="calibre21">Loading data: data/CIFAR-10/cifar-10-batches-py/data_batch_1
+Loading data: data/CIFAR-10/cifar-10-batches-py/data_batch_2
+Loading data: data/CIFAR-10/cifar-10-batches-py/data_batch_3
+Loading data: data/CIFAR-10/cifar-10-batches-py/data_batch_4
+Loading data: data/CIFAR-10/cifar-10-batches-py/data_batch_5
+Load the test-set.</pre></div>
+<p class="calibre2">现在，让我们对测试集做同样的事情，加载图像和它们对应的目标类的整数表示，以及它们的独热编码:</p>
+<pre class="calibre21">#Loading the test images, their class integer, and their corresponding one-hot encoding<br class="title-page-name"/>testing_images, testing_cls_integers, testing_one_hot_labels = cifar10.load_test_data()<br class="title-page-name"/><br class="title-page-name"/>Output:<br class="title-page-name"/><br class="title-page-name"/>Loading data: data/CIFAR-10/cifar-10-batches-py/test_batch</pre>
+<div><div><p class="calibre2">让我们看看 CIFAR-10 中训练集和测试集的分布情况:</p>
+<div><div><div><pre class="calibre21">print("-Number of images in the training set:\t\t{}".format(len(training_images)))<br class="title-page-name"/>print("-Number of images in the testing set:\t\t{}".format(len(testing_images)))</pre>
+<div><div><div><p class="calibre2">输出:</p>
+<div><pre class="calibre21">-Number of images in the training set:          50000
+-Number of images in the testing set:           10000</pre></div>
+<div><div><div><p class="calibre2">让我们定义一些帮助器函数，它们将使我们能够探索数据集。以下辅助函数在网格中绘制一组九个图像:</p>
+<div><div><div><div><div><pre class="calibre21">def plot_imgs(imgs, true_class, predicted_class=None):<br class="title-page-name"/><br class="title-page-name"/>    assert len(imgs) == len(true_class)<br class="title-page-name"/><br class="title-page-name"/>    # Creating a placeholders for 9 subplots<br class="title-page-name"/>    fig, axes = plt.subplots(3, 3)<br class="title-page-name"/><br class="title-page-name"/>    # Adjustting spacing.<br class="title-page-name"/>    if predicted_class is None:<br class="title-page-name"/>        hspace = 0.3<br class="title-page-name"/>    else:<br class="title-page-name"/>        hspace = 0.6<br class="title-page-name"/>    fig.subplots_adjust(hspace=hspace, wspace=0.3)<br class="title-page-name"/><br class="title-page-name"/><br class="title-page-name"/>    for i, ax in enumerate(axes.flat):<br class="title-page-name"/>        # There may be less than 9 images, ensure it doesn't crash.<br class="title-page-name"/>        if i &lt; len(imgs):<br class="title-page-name"/>            # Plot image.<br class="title-page-name"/>            ax.imshow(imgs[i],<br class="title-page-name"/>                      interpolation='nearest')<br class="title-page-name"/><br class="title-page-name"/>            # Get the actual name of the true class from the class_names array<br class="title-page-name"/>            true_class_name = class_names[true_class[i]]<br class="title-page-name"/><br class="title-page-name"/>            # Showing labels for the predicted and true classes<br class="title-page-name"/>            if predicted_class is None:<br class="title-page-name"/>                xlabel = "True: {0}".format(true_class_name)<br class="title-page-name"/>            else:<br class="title-page-name"/>                # Name of the predicted class.<br class="title-page-name"/>                predicted_class_name = class_names[predicted_class[i]]<br class="title-page-name"/><br class="title-page-name"/>                xlabel = "True: {0}\nPred: {1}".format(true_class_name, predicted_class_name)<br class="title-page-name"/><br class="title-page-name"/>        <br class="title-page-name"/>            ax.set_xlabel(xlabel)<br class="title-page-name"/>        <br class="title-page-name"/>        # Remove ticks from the plot.<br class="title-page-name"/>        ax.set_xticks([])<br class="title-page-name"/>        ax.set_yticks([])<br class="title-page-name"/>    <br class="title-page-name"/>    plt.show()</pre>
+<div><p class="calibre2">让我们继续想象测试集中的一些图像以及它们对应的实际类:</p>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div><div><div><div><div><div><pre class="calibre21"># get the first 9 images in the test set<br class="title-page-name"/>imgs = testing_images[0:9]<br class="title-page-name"/><br class="title-page-name"/># Get the integer representation of the true class.<br class="title-page-name"/>true_class = testing_cls_integers[0:9]<br class="title-page-name"/><br class="title-page-name"/># Plotting the images<br class="title-page-name"/>plot_imgs(imgs=imgs, true_class=true_class)</pre>
+<p class="innercell">输出:</p>
+<div><img src="img/94ffc181-5c5d-4376-b599-6ecef7f9cf86.png" class="calibre116"/></div>
+<p>图 10.4:测试集的前九幅图像</p>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+
+
+            
+
+            
+        
+    </body>
+
+</html>
+
+
+<html xmlns:epub="http://www.idpf.org/2007/ops">
+  <head>
+    <title>Inception model transfer values</title>
+    <meta content="urn:uuid:b6d6a510-8f2b-40e4-8a30-e199afd87745" name="Adept.expected.resource"/>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+  
+
+</head>
+  <body class="calibre">
+        
+
+                            
+                    <h1 class="header-title">初始模型转移值</h1>
+                
+            
+            
+                
+<div><div><p class="calibre2">正如我们前面提到的，我们将在 ImageNet 数据集上使用预训练的 inception 模型。所以，我们需要从网上下载这个预先训练好的模型。</p>
+<p class="calibre2">让我们从定义初始模型的<kbd class="calibre12">data_dir</kbd>开始:</p>
+<pre class="calibre21">inception.data_dir = 'inception/'</pre></div>
+</div>
+<p class="calibre2">预训练的初始模型的权重大约是 85 MB。如果它不在先前定义的<kbd class="calibre12">data_dir</kbd>中，下面一行代码将下载它:</p>
+<pre class="calibre21">inception.maybe_download()<br class="title-page-name"/><br class="title-page-name"/>Downloading Inception v3 Model ...<br class="title-page-name"/>- Download progress: 100%</pre>
+<div><div><div><div><div><div><div><div><p class="calibre2">我们将加载 inception 模型，以便我们可以将其用作 CIFAR-10 图像的特征提取器:</p>
+<pre class="calibre21"># Loading the inception model so that we can inialized it with the pre-trained weights and customize for our model<br class="title-page-name"/>inception_model = inception.Inception()</pre></div>
+</div>
+<div><p class="calibre2">正如我们前面提到的，计算 CIFAR-10 数据集的传输值需要一些时间，因此我们需要缓存它们以供将来使用。幸运的是，<kbd class="calibre12">inception</kbd>模块中有一个助手函数可以帮助我们做到这一点:</p>
+<div><div><pre class="calibre21">from inception import transfer_values_cache</pre>
+<div><div><p class="calibre2">接下来，我们需要为缓存的训练和测试文件设置文件路径:</p>
+<pre class="calibre21">file_path_train = os.path.join(cifar10.data_path, 'inception_cifar10_train.pkl')<br class="title-page-name"/>file_path_test = os.path.join(cifar10.data_path, 'inception_cifar10_test.pkl')<br class="title-page-name"/>print("Processing Inception transfer-values for the training images of Cifar-10 ...")<br class="title-page-name"/># First we need to scale the imgs to fit the Inception model requirements as it requires all pixels to be from 0 to 255,<br class="title-page-name"/># while our training examples of the CIFAR-10 pixels are between 0.0 and 1.0<br class="title-page-name"/>imgs_scaled = training_images * 255.0<br class="title-page-name"/><br class="title-page-name"/># Checking if the transfer-values for our training images are already calculated and loading them, if not calculate and save them.<br class="title-page-name"/>transfer_values_training = transfer_values_cache(cache_path=file_path_train,<br class="title-page-name"/>                                              images=imgs_scaled,<br class="title-page-name"/>                                              model=inception_model)<br class="title-page-name"/>print("Processing Inception transfer-values for the testing images of Cifar-10 ...")<br class="title-page-name"/># First we need to scale the imgs to fit the Inception model requirements as it requires all pixels to be from 0 to 255,<br class="title-page-name"/># while our training examples of the CIFAR-10 pixels are between 0.0 and 1.0<br class="title-page-name"/>imgs_scaled = testing_images * 255.0<br class="title-page-name"/># Checking if the transfer-values for our training images are already calculated and loading them, if not calcaulate and save them.<br class="title-page-name"/>transfer_values_testing = transfer_values_cache(cache_path=file_path_test,<br class="title-page-name"/>                                     images=imgs_scaled,<br class="title-page-name"/>                                     model=inception_model)<br class="title-page-name"/></pre>
+<div><div><div><div><div><div><div><div><div><p class="calibre2">如前所述，在 CIFAR-10 数据集的训练集中，我们有 50，000 张图像。所以让我们检查这些图像的传递值的形状。对于该训练集中的每个图像，应该是 2，048:</p>
+<pre class="calibre21">transfer_values_training.shape</pre>
+<p class="calibre2">输出:</p>
+<pre class="calibre21">(50000, 2048)</pre>
+<div><div><p class="calibre2">我们需要对测试集做同样的事情:</p>
+<pre class="calibre21">transfer_values_testing.shape</pre>
+<p class="calibre2">输出:</p>
+<div><div><div><div><pre class="calibre21">(10000, 2048)</pre></div>
+<div><div><div><p class="calibre2">为了直观地理解传递值的样子，我们将定义一个帮助函数，使我们能够使用来自训练集或测试集的特定图像的传递值绘图:</p>
+<pre class="calibre21">def plot_transferValues(ind):<br class="title-page-name"/>    print("Original input image:")<br class="title-page-name"/>    <br class="title-page-name"/>    # Plot the image at index ind of the test set.<br class="title-page-name"/>    plt.imshow(testing_images[ind], interpolation='nearest')<br class="title-page-name"/>    plt.show()<br class="title-page-name"/><br class="title-page-name"/>    print("Transfer values using Inception model:")<br class="title-page-name"/>    <br class="title-page-name"/>    # Visualize the transfer values as an image.<br class="title-page-name"/>    transferValues_img = transfer_values_testing[ind]<br class="title-page-name"/>    transferValues_img = transferValues_img.reshape((32, 64))<br class="title-page-name"/><br class="title-page-name"/>    # Plotting the transfer values image.<br class="title-page-name"/>    plt.imshow(transferValues_img, interpolation='nearest', cmap='Reds')<br class="title-page-name"/>    plt.show()<br class="title-page-name"/>plot_transferValues(i=16)<br class="title-page-name"/><br class="title-page-name"/>Input image:</pre></div>
+</div>
+<div><img src="img/b7e00c35-26ef-40ae-95aa-8aed2b82d9ea.png" class="calibre117"/></div>
+<div><br class="title-page-name"/>
+Figure 10.5: Input image</div>
+<div><p class="calibre2">使用 inception 模型转移图像的值:</p>
+<img src="img/77a148f8-97e1-4f21-9498-5968fdbdbfce.png" class="calibre118"/></div>
+<p>图 10.6:图 10.3 中输入图像的传递值</p>
+</div>
+<div><pre class="calibre21">plot_transferValues(i=17)</pre></div>
+<div><br class="title-page-name"/>
+<img src="img/a7e0afb5-7e8e-4566-bfd8-1e8259915cff.png" class="calibre119"/><br class="title-page-name"/></div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+<p>图 10.7:输入图像</p>
+</div>
+</div>
+</div>
+</div>
+<p class="calibre2">使用 inception 模型转移图像的值:</p>
+<div><div><div><div><div><div><div><div><div><div><div><div><div><div><div><div><div><div><div><div><br class="title-page-name"/>
+<img src="img/190cc356-b9bd-40b0-b453-b2edde09a99c.png" class="calibre120"/></div>
+<p>图 10.8:图 10.5 中输入图像的传递值</p>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+
+
+            
+
+            
+        
+    </body>
+
+</html>
+
+
+<html xmlns:epub="http://www.idpf.org/2007/ops">
+  <head>
+    <title>Analysis of transfer values</title>
+    <meta content="urn:uuid:b6d6a510-8f2b-40e4-8a30-e199afd87745" name="Adept.expected.resource"/>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+  
+
+</head>
+  <body class="calibre">
+        
+
+                            
+                    <h1 class="header-title">转移价值分析</h1>
+                
+            
+            
+                
+<div><div><p class="calibre2">在这一节中，我们将对刚刚从训练图像中获得的传递值进行一些分析。此分析的目的是看这些转移值是否足以对 CIFAR-10 中的图像进行分类。</p>
+<p class="calibre2">对于每个输入图像，我们有 2048 个传递值。为了绘制这些转移值并对其进行进一步分析，我们可以使用 scikit-learn 的<strong class="calibre13">主成分分析</strong> ( <strong class="calibre13"> PCA </strong>)等降维技术。我们将把传递值从 2，048 减少到 2，以便能够可视化，并查看它们是否是区分不同类别 CIFAR-10 的良好特征:</p>
+<pre class="calibre21">from sklearn.decomposition import PCA</pre>
+<div><div><p class="calibre2">接下来，我们需要创建一个 PCA 对象，其中组件的数量只有<kbd class="calibre12">2</kbd>:</p>
+<pre class="calibre21">pca_obj = PCA(n_components=2)</pre>
+<div><div><p class="calibre2">将传递值从 2，048 减少到 2 需要很多时间，因此我们将从 5，000 个具有传递值的图像中选择 3，000 个作为子集:</p>
+<pre class="calibre21">subset_transferValues = transfer_values_training[0:3000]</pre>
+<div><div><p class="calibre2">我们还需要获得这些图像的类别号:</p>
+</div>
+</div>
+<pre class="calibre21">cls_integers = testing_cls_integers[0:3000]</pre>
+<div><p class="calibre2">我们可以通过打印传输值的形状来仔细检查我们的子集设置:</p>
+<pre class="calibre21">subset_transferValues.shape</pre>
+<p class="calibre2">输出:</p>
+<div><pre class="calibre21">(3000, 2048)</pre>
+<div><div><p class="calibre2">接下来，我们使用 PCA 对象将传递值从 2，048 减少到 2:</p>
+<pre class="calibre21">reduced_transferValues = pca_obj.fit_transform(subset_transferValues)</pre>
+<div><div><p class="calibre2">现在，让我们看看 PCA 减少过程的输出:</p>
+<div><div><div><div><pre class="calibre21">reduced_transferValues.shape</pre>
+Output:</div>
+</div>
+</div>
+</div>
+<div><div><div><div><pre class="calibre21">(3000, 2)</pre>
+<div><div><p class="calibre2">将传递值的维数减少到只有 2 后，让我们绘制这些值:</p>
+<pre class="calibre21">#Importing the color map for plotting each class with different color.<br class="title-page-name"/>import matplotlib.cm as color_map<br class="title-page-name"/><br class="title-page-name"/>def plot_reduced_transferValues(transferValues, cls_integers):<br class="title-page-name"/>    <br class="title-page-name"/>    # Create a color-map with a different color for each class.<br class="title-page-name"/>    c_map = color_map.rainbow(np.linspace(0.0, 1.0, num_classes))<br class="title-page-name"/><br class="title-page-name"/>    # Getting the color for each sample.<br class="title-page-name"/>    colors = c_map[cls_integers]<br class="title-page-name"/><br class="title-page-name"/>    # Getting the x and y values.<br class="title-page-name"/>    x_val = transferValues[:, 0]<br class="title-page-name"/>    y_val = transferValues[:, 1]<br class="title-page-name"/><br class="title-page-name"/>    # Plot the transfer values in a scatter plot<br class="title-page-name"/>    plt.scatter(x_val, y_val, color=colors)<br class="title-page-name"/>    plt.show()<br class="title-page-name"/><br class="title-page-name"/></pre>
+<p class="calibre2">这里，我们绘制了来自训练集的子集的减少的转移值。我们在 CIFAR-10 中有 10 个类，所以我们要用不同的颜色来绘制它们对应的传递值。从下图中可以看出，转移值是根据相应的类进行分组的。组之间的重叠是因为 PCA 的减少过程不能适当地分离转移值:</p>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div><div><div><div><div><pre class="calibre21">plot_reduced_transferValues(reduced_transferValues, cls_integers)</pre>
+<div><div><p class="calibre121"><img src="img/665d1102-3dcb-4584-9292-f80f1af46526.png" class="calibre122"/></p>
+Figure 10.9: Transfer values reduced using PCA</div>
+</div>
+<div><div><div><p class="calibre2">我们可以使用称为<strong class="calibre13"> t-SNE </strong>的不同降维方法对我们的转移值做进一步分析:</p>
+<pre class="calibre21">from sklearn.manifold import TSNE<br class="title-page-name"/></pre></div>
+</div>
+</div>
+<div><div><p class="calibre2">同样，我们将减少传输值的维数，即 2，048，但这次减少到 50 个值，而不是 2:</p>
+<div><div><div><pre class="calibre21">pca_obj = PCA(n_components=50)<br class="title-page-name"/>transferValues_50d = pca_obj.fit_transform(subset_transferValues)</pre>
+<div><div><p class="calibre2">接下来，我们将第二种降维技术进行叠加，并将 PCA 过程的输出提供给它:</p>
+<pre class="calibre21">tsne_obj = TSNE(n_components=2)</pre>
+<div><div><p class="calibre2">最后，我们使用 PCA 方法的缩减值，并对其应用 t-SNE 方法:</p>
+</div>
+<pre class="calibre21">reduced_transferValues = tsne_obj.fit_transform(transferValues_50d) </pre>
+<div><div><p class="calibre2">并仔细检查它的形状是否正确:</p>
+</div>
+<div><div><div><pre class="calibre21">reduced_transferValues.shape</pre>
+<p class="calibre2">输出:</p>
+</div>
+</div>
+</div>
+<div><div><div><div><pre class="calibre21">(3000, 2)</pre>
+<p class="calibre2">让我们用 t-SNE 方法画出减少的传递值。正如您在下图中看到的，t-SNE 比 PCA 能够更好地分离分组传递值。</p>
+<p class="calibre2">从该分析中得出的结论是，我们通过将输入图像馈送到预训练的初始模型而获得的提取的转移值可以用于将训练图像分成 10 个类别。由于下图中的小重叠，这种分离不会 100%准确，但我们可以通过对预训练模型进行一些微调来消除这种重叠:</p>
+<pre class="calibre21">plot_reduced_transferValues(reduced_transferValues, cls_integers)</pre>
+<div><img src="img/35bdf697-4c8f-4a3d-a228-586343632d6c.png" class="calibre123"/></div>
+<p>图 10.10:使用 t-SNE 减少转移值</p>
+<p class="calibre2">现在，我们有了从训练图像中提取的传递值，我们知道这些值将能够在某种程度上区分 CIFAR-10 的不同类别。接下来，我们需要构建一个线性分类器，并将这些传递值提供给它来进行实际的分类。</p>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+
+
+            
+
+            
+        
+    </body>
+
+</html>
+
+
+<html xmlns:epub="http://www.idpf.org/2007/ops">
+  <head>
+    <title>Model building and training</title>
+    <meta content="urn:uuid:b6d6a510-8f2b-40e4-8a30-e199afd87745" name="Adept.expected.resource"/>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+  
+
+</head>
+  <body class="calibre">
+        
+
+                            
+                    <h1 class="header-title">模型构建和培训</h1>
+                
+            
+            
+                
+<div><div><div><p class="calibre2">因此，让我们从指定输入占位符变量开始，这些变量将被输入到我们的神经网络模型中。第一个输入变量(将包含提取的传递值)的形状将是<kbd class="calibre12">[None, transfer_len]</kbd>。第二个占位符变量将以独热向量格式保存训练集的实际类标签:</p>
+<pre class="calibre21">transferValues_arrLength = inception_model.transfer_len<br class="title-page-name"/>input_values = tf.placeholder(tf.float32, shape=[None, transferValues_arrLength], name='input_values')<br class="title-page-name"/>y_actual = tf.placeholder(tf.float32, shape=[None, num_classes], name='y_actual')</pre></div>
+</div>
+</div>
+<p class="calibre2">我们还可以通过定义另一个占位符变量来获得从 1 到 10 的每个类的相应整数值:</p>
+<pre class="calibre21">y_actual_cls = tf.argmax(y_actual, axis=1)</pre>
+<p class="calibre2">接下来，我们需要构建实际的分类神经网络，它将接受这些输入占位符并生成预测的类:</p>
+<pre class="calibre21">def new_weights(shape):<br class="title-page-name"/>    return tf.Variable(tf.truncated_normal(shape, stddev=0.05))<br class="title-page-name"/><br class="title-page-name"/>def new_biases(length):<br class="title-page-name"/>    return tf.Variable(tf.constant(0.05, shape=[length]))<br class="title-page-name"/><br class="title-page-name"/>def new_fc_layer(input,          # The previous layer.<br class="title-page-name"/>                 num_inputs,     # Num. inputs from prev. layer.<br class="title-page-name"/>                 num_outputs,    # Num. outputs.<br class="title-page-name"/>                 use_relu=True): # Use Rectified Linear Unit (ReLU)?<br class="title-page-name"/><br class="title-page-name"/>    # Create new weights and biases.<br class="title-page-name"/>    weights = new_weights(shape=[num_inputs, num_outputs])<br class="title-page-name"/>    biases = new_biases(length=num_outputs)<br class="title-page-name"/><br class="title-page-name"/>    # Calculate the layer as the matrix multiplication of<br class="title-page-name"/>    # the input and weights, and then add the bias-values.<br class="title-page-name"/>    layer = tf.matmul(input, weights) + biases<br class="title-page-name"/><br class="title-page-name"/>    # Use ReLU?<br class="title-page-name"/>    if use_relu:<br class="title-page-name"/>        layer = tf.nn.relu(layer)<br class="title-page-name"/><br class="title-page-name"/>    return layer<br class="title-page-name"/><br class="title-page-name"/># First fully-connected layer.<br class="title-page-name"/>layer_fc1 = new_fc_layer(input=input_values,<br class="title-page-name"/>                             num_inputs=2048,<br class="title-page-name"/>                             num_outputs=1024,<br class="title-page-name"/>                             use_relu=True)<br class="title-page-name"/><br class="title-page-name"/># Second fully-connected layer.<br class="title-page-name"/>layer_fc2 = new_fc_layer(input=layer_fc1,<br class="title-page-name"/>                             num_inputs=1024,<br class="title-page-name"/>                             num_outputs=num_classes,<br class="title-page-name"/>                             use_relu=False)<br class="title-page-name"/><br class="title-page-name"/># Predicted class-label.<br class="title-page-name"/>y_predicted = tf.nn.softmax(layer_fc2)<br class="title-page-name"/><br class="title-page-name"/># Cross-entropy for the classification of each image.<br class="title-page-name"/>cross_entropy = \<br class="title-page-name"/>    tf.nn.softmax_cross_entropy_with_logits(logits=layer_fc2,<br class="title-page-name"/>                                                labels=y_actual)<br class="title-page-name"/><br class="title-page-name"/># Loss aka. cost-measure.<br class="title-page-name"/># This is the scalar value that must be minimized.<br class="title-page-name"/>loss = tf.reduce_mean(cross_entropy)<br class="title-page-name"/></pre>
+<div><p class="calibre2">然后，我们需要定义一个将在分类器训练期间使用的优化标准。在这个实现中，我们将使用<kbd class="calibre12">AdamOptimizer</kbd>。这个分类器的输出将是 10 个概率分数的数组，对应于我们在 CIFAR-10 数据集中的类的数量。然后，我们将对这个数组应用<kbd class="calibre12">argmax</kbd>操作，将得分最高的类分配给这个输入样本:</p>
+<div><div><pre class="calibre21">step = tf.Variable(initial_value=0,<br class="title-page-name"/>                          name='step', trainable=False)<br class="title-page-name"/>optimizer = tf.train.AdamOptimizer(learning_rate=1e-4).minimize(loss, step)<br class="title-page-name"/>y_predicted_cls = tf.argmax(y_predicted, axis=1)<br class="title-page-name"/>#compare the predicted and true classes<br class="title-page-name"/>correct_prediction = tf.equal(y_predicted_cls, y_actual_cls)<br class="title-page-name"/>#cast the boolean values to fload<br class="title-page-name"/>model_accuracy = tf.reduce_mean(tf.cast(correct_prediction, tf.float32))</pre>
+<div><div><div><div><div><div><div><div><div><div><div><div><div><div><p class="calibre2">接下来，我们需要定义一个 TensorFlow 会话，该会话将实际执行图形，然后初始化我们在该实现中前面定义的变量:</p>
+<pre class="calibre21">session = tf.Session()<br class="title-page-name"/>session.run(tf.global_variables_initializer())<br class="title-page-name"/></pre>
+<div><div><div><div><div><div><div><div><div><p class="calibre2">在这个实现中，我们将使用<strong class="calibre13">随机梯度下降</strong> ( <strong class="calibre13"> SGD </strong>)，因此我们需要定义一个函数来从我们的 50，000 幅图像的训练集中随机生成特定大小的批次。</p>
+<p class="calibre2">因此，我们将定义一个帮助函数，用于从传递值的输入训练集生成一个随机批次:</p>
+</div>
+<div><div><pre class="calibre21">#defining the size of the train batch<br class="title-page-name"/>train_batch_size = 64<br class="title-page-name"/><br class="title-page-name"/>#defining a function for randomly selecting a batch of images from the dataset<br class="title-page-name"/>def select_random_batch():<br class="title-page-name"/>    # Number of images (transfer-values) in the training-set.<br class="title-page-name"/>    num_imgs = len(transfer_values_training)<br class="title-page-name"/><br class="title-page-name"/>    # Create a random index.<br class="title-page-name"/>    ind = np.random.choice(num_imgs,<br class="title-page-name"/>                           size=training_batch_size,<br class="title-page-name"/>                           replace=False)<br class="title-page-name"/><br class="title-page-name"/>    # Use the random index to select random x and y-values.<br class="title-page-name"/>    # We use the transfer-values instead of images as x-values.<br class="title-page-name"/>    x_batch = transfer_values_training[ind]<br class="title-page-name"/>    y_batch = trainig_one_hot_labels[ind]<br class="title-page-name"/><br class="title-page-name"/>    return x_batch, y_batch</pre>
+<div><div><div><p class="calibre2">接下来，我们需要定义一个辅助函数来执行实际的优化过程，这将细化网络的权重。它将在每次迭代中生成一个批次，并基于该批次优化网络:</p>
+</div>
+<pre class="calibre21">def optimize(num_iterations):<br class="title-page-name"/><br class="title-page-name"/>    for i in range(num_iterations):<br class="title-page-name"/>        # Selectin a random batch of images for training<br class="title-page-name"/>        # where the transfer values of the images will be stored in input_batch<br class="title-page-name"/>        # and the actual labels of those batch of images will be stored in y_actual_batch<br class="title-page-name"/>        input_batch, y_actual_batch = select_random_batch()<br class="title-page-name"/><br class="title-page-name"/>        # storing the batch in a dict with the proper names<br class="title-page-name"/>        # such as the input placeholder variables that we define above.<br class="title-page-name"/>        feed_dict = {input_values: input_batch,<br class="title-page-name"/>                           y_actual: y_actual_batch}<br class="title-page-name"/><br class="title-page-name"/>        # Now we call the optimizer of this batch of images<br class="title-page-name"/>        # TensorFlow will automatically feed the values of the dict we created above<br class="title-page-name"/>        # to the model input placeholder variables that we defined above.<br class="title-page-name"/>        i_global, _ = session.run([step, optimizer],<br class="title-page-name"/>                                  feed_dict=feed_dict)<br class="title-page-name"/><br class="title-page-name"/>        # print the accuracy every 100 steps.<br class="title-page-name"/>        if (i_global % 100 == 0) or (i == num_iterations - 1):<br class="title-page-name"/>            # Calculate the accuracy on the training-batch.<br class="title-page-name"/>            batch_accuracy = session.run(model_accuracy,<br class="title-page-name"/>                                    feed_dict=feed_dict)<br class="title-page-name"/><br class="title-page-name"/>            <br class="title-page-name"/>            msg = "Step: {0:&gt;6}, Training Accuracy: {1:&gt;6.1%}"<br class="title-page-name"/>            print(msg.format(i_global, batch_accuracy))</pre>
+<div><p class="calibre2">我们将定义一些辅助函数来显示之前神经网络的结果，并显示预测结果的混淆矩阵:</p>
+<div><div><pre class="calibre21">def plot_errors(cls_predicted, cls_correct):<br class="title-page-name"/>    <br class="title-page-name"/>    # cls_predicted is an array of the predicted class-number for<br class="title-page-name"/>    # all images in the test-set.<br class="title-page-name"/><br class="title-page-name"/>    # cls_correct is an array with boolean values to indicate<br class="title-page-name"/>    # whether is the model predicted the correct class or not.<br class="title-page-name"/><br class="title-page-name"/>    # Negate the boolean array.<br class="title-page-name"/>    incorrect = (cls_correct == False)<br class="title-page-name"/>    <br class="title-page-name"/>    # Get the images from the test-set that have been<br class="title-page-name"/>    # incorrectly classified. <br class="title-page-name"/>    incorrectly_classified_images = testing_images[incorrect]<br class="title-page-name"/>    <br class="title-page-name"/>    # Get the predicted classes for those images.<br class="title-page-name"/>    cls_predicted = cls_predicted[incorrect]<br class="title-page-name"/><br class="title-page-name"/>    # Get the true classes for those images.<br class="title-page-name"/>    true_class = testing_cls_integers[incorrect]<br class="title-page-name"/><br class="title-page-name"/>    n = min(9, len(incorrectly_classified_images))<br class="title-page-name"/>    <br class="title-page-name"/>    <br class="title-page-name"/>    # Plot the first n images.<br class="title-page-name"/>    plot_imgs(imgs=incorrectly_classified_images[0:n],<br class="title-page-name"/>                true_class=true_class[0:n],<br class="title-page-name"/>                predicted_class=cls_predicted[0:n])</pre>
+<p class="calibre2">接下来，我们需要定义绘制混淆矩阵的辅助函数:</p>
+<pre class="calibre21">from sklearn.metrics import confusion_matrix<br class="title-page-name"/><br class="title-page-name"/>def plot_confusionMatrix(cls_predicted):<br class="title-page-name"/><br class="title-page-name"/>    # cls_predicted array of all the predicted <br class="title-page-name"/>    # classes numbers in the test.<br class="title-page-name"/><br class="title-page-name"/>    # Call the confucion matrix of sklearn<br class="title-page-name"/>    cm = confusion_matrix(y_true=testing_cls_integers,<br class="title-page-name"/>                          y_pred=cls_predicted)<br class="title-page-name"/><br class="title-page-name"/>    # Printing the confusion matrix<br class="title-page-name"/>    for i in range(num_classes):<br class="title-page-name"/>        # Append the class-name to each line.<br class="title-page-name"/>        class_name = "({}) {}".format(i, class_names[i])<br class="title-page-name"/>        print(cm[i, :], class_name)<br class="title-page-name"/><br class="title-page-name"/>    # labeling each column of the confusion matrix with the class number<br class="title-page-name"/>    cls_numbers = [" ({0})".format(i) for i in range(num_classes)]<br class="title-page-name"/>    print("".join(cls_numbers))</pre>
+<p class="calibre2">此外，我们将定义另一个帮助器函数来在测试集上运行已训练的分类器，并测量已训练的模型在测试集上的准确性:</p>
+<pre class="calibre21"># Split the data-set in batches of this size to limit RAM usage.<br class="title-page-name"/>batch_size = 128<br class="title-page-name"/><br class="title-page-name"/>def predict_class(transferValues, labels, cls_true):<br class="title-page-name"/>    <br class="title-page-name"/>    # Number of images.<br class="title-page-name"/>    num_imgs = len(transferValues)<br class="title-page-name"/><br class="title-page-name"/>    # Allocate an array for the predicted classes which<br class="title-page-name"/>    # will be calculated in batches and filled into this array.<br class="title-page-name"/>    cls_predicted = np.zeros(shape=num_imgs, dtype=np.int)<br class="title-page-name"/><br class="title-page-name"/>    # Now calculate the predicted classes for the batches.<br class="title-page-name"/>    # We will just iterate through all the batches.<br class="title-page-name"/>    # There might be a more clever and Pythonic way of doing this.<br class="title-page-name"/><br class="title-page-name"/>    # The starting index for the next batch is denoted i.<br class="title-page-name"/>    i = 0<br class="title-page-name"/><br class="title-page-name"/>    while i &lt; num_imgs:<br class="title-page-name"/>        # The ending index for the next batch is denoted j.<br class="title-page-name"/>        j = min(i + batch_size, num_imgs)<br class="title-page-name"/><br class="title-page-name"/>        # Create a feed-dict with the images and labels<br class="title-page-name"/>        # between index i and j.<br class="title-page-name"/>        feed_dict = {input_values: transferValues[i:j],<br class="title-page-name"/>                     y_actual: labels[i:j]}<br class="title-page-name"/><br class="title-page-name"/>        # Calculate the predicted class using TensorFlow.<br class="title-page-name"/>        cls_predicted[i:j] = session.run(y_predicted_cls, feed_dict=feed_dict)<br class="title-page-name"/><br class="title-page-name"/>        # Set the start-index for the next batch to the<br class="title-page-name"/>        # end-index of the current batch.<br class="title-page-name"/>        i = j<br class="title-page-name"/>        <br class="title-page-name"/>    # Create a boolean array whether each image is correctly classified.<br class="title-page-name"/>    correct = [a == p for a, p in zip(cls_true, cls_predicted)]<br class="title-page-name"/><br class="title-page-name"/>    return correct, cls_predicted<br class="title-page-name"/><br class="title-page-name"/>#Calling the above function making the predictions for the test<br class="title-page-name"/><br class="title-page-name"/>def predict_cls_test():<br class="title-page-name"/>    return predict_class(transferValues = transfer_values_test,<br class="title-page-name"/>                       labels = labels_test,<br class="title-page-name"/>                       cls_true = cls_test)<br class="title-page-name"/><br class="title-page-name"/>def classification_accuracy(correct):<br class="title-page-name"/>    # When averaging a boolean array, False means 0 and True means 1.<br class="title-page-name"/>    # So we are calculating: number of True / len(correct) which is<br class="title-page-name"/>    # the same as the classification accuracy.<br class="title-page-name"/><br class="title-page-name"/>    # Return the classification accuracy<br class="title-page-name"/>    # and the number of correct classifications.<br class="title-page-name"/>    return np.mean(correct), np.sum(correct)<br class="title-page-name"/><br class="title-page-name"/>def test_accuracy(show_example_errors=False,<br class="title-page-name"/>                        show_confusion_matrix=False):<br class="title-page-name"/><br class="title-page-name"/>    # For all the images in the test-set,<br class="title-page-name"/>    # calculate the predicted classes and whether they are correct.<br class="title-page-name"/>    correct, cls_pred = predict_class_test()<br class="title-page-name"/>    <br class="title-page-name"/>    # Classification accuracypredict_class_test and the number of correct classifications.<br class="title-page-name"/>    accuracy, num_correct = classification_accuracy(correct)<br class="title-page-name"/>    <br class="title-page-name"/>    # Number of images being classified.<br class="title-page-name"/>    num_images = len(correct)<br class="title-page-name"/><br class="title-page-name"/>    # Print the accuracy.<br class="title-page-name"/>    msg = "Test set accuracy: {0:.1%} ({1} / {2})"<br class="title-page-name"/>    print(msg.format(accuracy, num_correct, num_images))<br class="title-page-name"/><br class="title-page-name"/>    # Plot some examples of mis-classifications, if desired.<br class="title-page-name"/>    if show_example_errors:<br class="title-page-name"/>        print("Example errors:")<br class="title-page-name"/>        plot_errors(cls_predicted=cls_pred, cls_correct=correct)<br class="title-page-name"/><br class="title-page-name"/>    # Plot the confusion matrix, if desired.<br class="title-page-name"/>    if show_confusion_matrix:<br class="title-page-name"/>        print("Confusion Matrix:")<br class="title-page-name"/>        plot_confusionMatrix(cls_predicted=cls_pred)</pre>
+<div><div><div><div><div><div><div><div><div><div><div><div><div><div><p class="calibre2">在进行任何优化之前，让我们先看看前面的神经网络模型的性能:</p>
+<div><div><div><div><div><div><div><div><pre class="calibre21">test_accuracy(show_example_errors=True,<br class="title-page-name"/>                    show_confusion_matrix=True)<br class="title-page-name"/><br class="title-page-name"/>Accuracy on Test-Set: 9.4% (939 / 10000)</pre>
+<div><div><p class="calibre2">正如你所看到的，网络的性能很低，但在根据我们已经定义的优化标准进行一些优化后，它会变得更好。因此，我们将运行优化器 10，000 次迭代，然后测试模型准确性:</p>
+<div><div><pre class="calibre21">optimize(num_iterations=10000)<br class="title-page-name"/>test_accuracy(show_example_errors=True,<br class="title-page-name"/>                           show_confusion_matrix=True)<br class="title-page-name"/>Accuracy on Test-Set: 90.7% (9069 / 10000)<br class="title-page-name"/>Example errors:</pre></div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div><div><div><div><div><div><div><div><div><div><div><div><div><div><div><div><div><div><div><div><div><div><div><div><div><div><div><div><div><div><div><div><div><div><div><div><div><div><div><div><div><div><div><div><div><div><div><div><div><div><div><div><div><div><div><div><div><div><div><div><div><div><div><div><div><div><div><div><div><div><div><div><div><div><div><div><div><div><div><img src="img/125c29c9-437c-4a01-be7d-f3769cc2940e.png" class="calibre124"/></div>
+<p>图 10.11:测试集中一些错误分类的图像</p>
+<div><div><div><div><div><div><pre class="calibre21">Confusion Matrix:
+[926   6  13   2   3   0   1   1  29  19] (0) airplane
+[  9 921   2   5   0   1   1   1   2  58] (1) automobile
+[ 18   1 883  31  32   4  22   5   1   3] (2) bird
+[  7   2  19 855  23  57  24   9   2   2] (3) cat
+[  5   0  21  25 896   4  24  22   2   1] (4) deer
+[  2   0  12  97  18 843  10  15   1   2] (5) dog
+[  2   1  16  17  17   4 940   1   2   0] (6) frog
+[  8   0  10  19  28  14   1 914   2   4] (7) horse
+[ 42   6   1   4   1   0   2   0 932  12] (8) ship
+[  6  19   2   2   1   0   1   1   9 959] (9) truck
+ (0) (1) (2) (3) (4) (5) (6) (7) (8) (9)</pre>
+<div><div><p class="calibre2">最后，我们将关闭已打开的会话:</p>
+<div><div><div><div><div><pre class="calibre21">model.close()
+session.close()</pre></div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+
+
+            
+
+            
+        
+    </body>
+
+</html>
+
+
+<html xmlns:epub="http://www.idpf.org/2007/ops">
+  <head>
+    <title>Summary</title>
+    <meta content="urn:uuid:b6d6a510-8f2b-40e4-8a30-e199afd87745" name="Adept.expected.resource"/>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+  
+
+</head>
+  <body class="calibre">
+        
+
+                            
+                    <h1 class="header-title">摘要</h1>
+                
+            
+            
+                
+<p class="calibre2">在这一章中，我们介绍了深度学习最广泛使用的最佳实践之一。TL 是一个非常令人兴奋的工具，可以用来让深度学习架构从你的小数据集学习，但要确保你以正确的方式使用它。</p>
+<p class="calibre2">接下来，我们将介绍一种广泛用于自然语言处理的深度学习架构。这些递归类型的架构已经在大多数 NLP 领域实现了突破:机器翻译、语音识别、语言建模和情感分析。</p>
+
+
+            
+
+            
+        
+    </body>
+
+</html>
+</body></html>

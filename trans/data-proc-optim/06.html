@@ -1,0 +1,473 @@
+<html><head/><body>
+
+
+
+
+
+<style type="text/css">body{margin:1em;background-color:transparent!important;}#sbo-rt-content *{text-indent:0pt!important;}#sbo-rt-content .bq{margin-right:1em!important;}#sbo-rt-content *{word-wrap:break-word!important;word-break:break-word!important;}#sbo-rt-content table,#sbo-rt-content pre{overflow-x:unset!important;overflow:unset!important;overflow-y:unset!important;white-space:pre-wrap!important;}</style>
+<div><div><h1 id="_idParaDest-84"><em class="italic"> <a id="_idTextAnchor085"/>第 4 章</em>:合并、整形、聚合数据</h1>
+			<p>当我们必须同时处理多个数据集时，重要的是要有合适的工具，允许我们将所述数据集组合成同质和统一的数据集。正如我们在前面章节中看到的，Optimus 为我们提供了转换操作，允许我们准备一个格式与另一个不一致的数据集，以便我们可以在以后正确地组合它们。一旦转换完成，就有可能以各种方式将它们组合起来，比如通过连接或联合。</p>
+			<p>在本章中，我们将学习如何使用 Optimus 连接和合并多个数据集，并回顾更复杂的变换，如整形和旋转。最后，我们将学习如何聚合数据，以及如何对一组特定的数据应用聚合。</p>
+			<p>其中一些概念可能已经为那些来自关系数据库世界的人所熟知。如果你是一个新手，那么不要担心——我们将尝试使用一些图形支持来解释这个概念，让你尽可能快和容易地步入正轨。</p>
+			<p>我们将在本章中讨论的主题如下:</p>
+			<ul>
+				<li>串联数据</li>
+				<li>连接数据</li>
+				<li>重塑和旋转</li>
+				<li>聚集和分组</li>
+			</ul>
+			<h1 id="_idParaDest-85"><a id="_idTextAnchor086"/>技术要求</h1>
+			<p>Optimus 可以与多种后端技术一起处理数据，包括 GPU。对于 GPU，Optimus 用的是<strong class="bold"> RAPIDS </strong>，需要 NVIDIA 卡。更多关于这方面的要求，请到<a href="B17166_01_Final_SB_epub.xhtml#_idTextAnchor015"> <em class="italic">第一章</em> </a> <em class="italic">的<em class="italic"> GPU 配置</em>部分，嗨擎天柱！</em>。</p>
+			<p>你可以在 https://github . com/packt publishing/Data-Processing-with-Optimus 找到本章的所有代码。</p>
+			<h1 id="_idParaDest-86"><a id="_idTextAnchor087"/>连接数据</h1>
+			<p>我们称之为<a id="_idIndexMarker232"/>连接两个数据集的过程，无论我们是获取它们的列并将其包含在另一个中，还是合并它们的行，结果得到的数据集的行数等于要连接的数据集的行数之和。</p>
+			<p>让我们看一个行连接的例子:</p>
+			<pre>df_a = op.create.dataframe({
+    "id": [143, 225, 545],
+    "name": ["Alice", "Bob", "Charlie"],
+    "city": ["Plymouth", "Bradford", "Norwich"]
+})
+df_b = op.create.dataframe({
+    "id": [765, 329, 152],
+    "name": ["Dan", "Erin", "Frank"],
+    "city": ["Bath", "Manchester", "Ripon"]
+})</pre>
+			<p><code>df_a</code>和<code>df_b</code>可以连接如下:</p>
+			<pre>df_a.rows.append(df_b).print()</pre>
+			<p>这会产生以下输出:</p>
+			<pre>id        name       city
+(int64)   (object)   (object)
+---------  ----------  ----------
+143       Alice      Plymouth
+225       Bob        Bradford
+545       Charlie    Norwich
+765       Dan        Bath
+329       Erin       Manchester
+152       Frank      Ripon</pre>
+			<p>在前面的<a id="_idIndexMarker233"/>示例中，我们可以看到数据集是如何组合的，从而产生第三个数据帧，该数据帧具有更多的行，但列数相同。这是因为输入数据集的列是重合的。</p>
+			<p>但是如果我们从<code>df_b</code>中省略一个专栏会怎么样呢？</p>
+			<pre>df_b = df_b.cols.drop("city")
+df_a.rows.append(df_b).print()</pre>
+			<p>我们将得到以下结果:</p>
+			<pre>id        name       city
+(int64)   (object)   (object)
+--------- ---------- ----------
+143       Alice      Plymouth
+225       Bob        Bradford
+545       Charlie    Norwich
+765       Dan        nan
+329       Erin       nan
+152       Frank      nan</pre>
+			<p>可以看到，所有缺失的值都用<code>nan</code>填充。如果数据集具有不同的列名，也会出现类似的结果:</p>
+			<pre>df_b = df_b.cols.rename("city", "city_b")
+df_a.rows.append(df_b).print()</pre>
+			<p>我们会得到<a id="_idIndexMarker234"/>下面的结果:</p>
+			<pre>id        name       city       city_b
+(int64)   (object)   (object)   (object)
+--------- ---------- ---------- ----------
+143       Alice      Plymouth   nan
+225       Bob        Bradford   nan
+545       Charlie    Norwich    nan
+765       Dan        nan        Bath
+329       Erin       nan        Manchester
+152       Frank      nan        Ripon</pre>
+			<p>现在我们已经知道了如何连接两个具有相同列名的数据帧的基础知识，我们将学习如何映射两个不同数据帧的列，以便我们可以连接它们而无需重命名。</p>
+			<h2 id="_idParaDest-87"><a id="_idTextAnchor088"/>映射</h2>
+			<p>当我们有两个列名不同的相同数据集时，我们可以传递第二个名为<code>map</code>的<a id="_idIndexMarker236"/>参数，它允许我们将每个输入数据帧的列映射到一组输出列。</p>
+			<p>让我们看一个例子:</p>
+			<pre>df_a = op.create.dataframe({
+    "id": [143, 225, 545],
+    "name": ["Alice", "Bob", "Charlie"],
+    "city": ["Plymouth", "Bradford", "Norwich"]
+}) 
+df_b = op.create.dataframe({
+    "id_number": [765, 329, 152],
+    "name": ["Dan", "Erin", "Frank"],
+    "title": ["Bath", "Manchester", "Ripon"]
+})</pre>
+			<p><code>df_a</code>和<code>df_b</code>可以连接如下:</p>
+			<pre>names_map = {
+    "id_number": ("id", "id_number"),
+    "name": ("name", "name"),
+    "city": ("city", "title")
+}
+df_a.rows.append(df_b, names_map=names_map).print()</pre>
+			<p>这给了我们<a id="_idIndexMarker237"/>以下结果:</p>
+			<pre>id_number   name       city
+(int64)     (object)   (object)
+-----------  ----------  ----------
+143         Alice      Plymouth
+225         Bob        Bradford
+545         Charlie    Norwich
+765         Dan        Bath
+329         Erin       Manchester
+152         Frank      Ripon</pre>
+			<p>在前面的示例中，我们在连接之前声明了一个自定义映射，将来自<code>df_a</code>的<code>id</code>列和<code>df_b</code>的<code>title</code>列的所有值设置为结果 dataframe 中具有不同名称的列。</p>
+			<p>但是如果我们想在列轴上连接呢？我们接下来会看这个。</p>
+			<h2 id="_idParaDest-88"><a id="_idTextAnchor089"/>连接列</h2>
+			<p>通过连接<a id="_idIndexMarker238"/>列，我们可以获得一个数据帧的列，并将它们放入另一个数据帧。这只是将一个数据集中的列放入另一个数据集中，为两个数据集的值保持相同的索引。</p>
+			<p>要将一个数据集中的列连接到另一个数据集中，只需调用<code>df.cols.concat(df_other)</code>，如下所示:</p>
+			<pre>df_a = op.create.dataframe({
+    "id": [143, 225, 545],
+    "name": ["Alice", "Bob", "Charlie"],
+    "city": ["Plymouth", "Bradford", "Norwich"]
+})
+df_b = op.create.dataframe({
+    "age": [25, 35, 45],
+    "placeholder": ["foo", "bar", "baz"]
+})
+df_a.cols.concat(df_b).print()</pre>
+			<p>这会产生以下输出:</p>
+			<pre>id        name       city       age       placeholder
+(int64)   (object)   (object)   (int64)   (object) 
+--------- ---------- ---------- --------- ------------- 
+143       Alice      Plymouth   25        foo 
+225       Bob        Bradford   35        bar 
+545       Charlie    Norwich    45        baz</pre>
+			<p>您可以使用<code>cols.select</code>过滤每个数据集的列，如下所示:</p>
+			<pre>df_a.cols.select(["id", "name"]).cols.concat(df_b.cols.select([
+"age"])) .print()</pre>
+			<p>这会产生以下输出:</p>
+			<pre>id        name       age       
+(int64)   (object)   (int64)   
+--------- ---------- --------- 
+143       Alice      25        
+225       Bob        35        
+545       Charlie    45        </pre>
+			<p>当我们的数据<a id="_idIndexMarker239"/>没有被正确组织时，它会创建错误配对值的行。在这种情况下，我们可以在两个数据集中使用一个公共列，告诉我们什么值对应于什么行。在这种情况下，我们可以使用名为 join 的操作。</p>
+			<h1 id="_idParaDest-89"><a id="_idTextAnchor090"/>加入数据</h1>
+			<p>join 操作<a id="_idIndexMarker240"/>用于将条目从一个数据源合并到另一个数据源，使用一个公共列作为正确配对数据的键。联接的概念在数据库技术中很常见，在数据库技术中，我们还可以看到不同类型的联接，如内部联接、外部联接、左联接和右联接。下图更好地展示了这些连接:</p>
+			<div><div><img src="img/B17166_04_1.jpg" alt="Figure 4.1 – Inner, outer, left, and right joins&#13;&#10;" width="1087" height="695"/>
+				</div>
+			</div>
+			<p class="figure-caption">图 4.1–内部、外部、左侧和右侧连接</p>
+			<p>当连接<a id="_idIndexMarker241"/>数据时，我们必须识别两个数据帧的关键列。让我们看一个例子:</p>
+			<pre>df_a = op.create.dataframe({
+    "id": [143, 225, 545, 765, 152],
+    "name": ["Alice", "Bob", "Charlie", "Dan", "Frank"] 
+}) 
+df_b = op.create.dataframe({
+    "id": [225, 545, 765, 152, 329],
+    "city": ["Bradford", "Norwich", "Bath", "Ripon", "Manchester"],
+    "placeholder": ["BRA", "NOR", "BAT", "RIP", "MAN"]
+})</pre>
+			<p>在两个数据集中，我们都有一个名为<code>"id"</code>的列，其值相等，但顺序不同。调用<code>df.cols.join</code>需要我们输入带有列标题的<code>on</code>参数，如下<a id="_idIndexMarker242"/>:</p>
+			<pre>df_a.cols.join(df_b, how="outer", on="id").print()</pre>
+			<p>我们将得到以下结果:</p>
+			<pre>id         name       city        placeholder 
+(object)   (object)   (object)    (object) 
+---------- ---------- ----------- ------------- 
+143        Alice      nan         
+225        Bob        Bradford    BRA 
+545        Charlie    Norwich     NOR 
+765        Dan        Bath        BAT 
+152        Frank      Ripon       RIP 
+329        nan        Manchester  MAN</pre>
+			<p>如我们所见，即使两个数据集都没有排序，结果也包含正确的数据。至于<code>nan</code>。正如我们所看到的，我们向<code>how</code>提供了“外部”，这意味着它将包括来自两个数据集的所有值。</p>
+			<p>默认情况下，<code>join</code>函数在<code>how</code>参数中使用<code>"left"</code>。让我们看一个左连接的例子(不包括该参数的值),这样我们可以省略最后一行中对应于<code>"name"</code>的<code>nan</code>值:</p>
+			<pre>df_a.cols.join(df_b, on="id").print()</pre>
+			<p>我们将得到以下结果:</p>
+			<pre>id         name       city        placeholder 
+(object)   (object)   (object)    (object) 
+---------- ---------- ----------- ------------- 
+143        Alice      nan        
+225        Bob        Bradford    BRA 
+545        Charlie    Norwich     NOR 
+765        Dan        Bath        BAT 
+152        Frank      Ripon       RIP</pre>
+			<p>但是，<code>city</code>和<code>placeholder</code>列上仍然有<code>nan</code>值。为了省略它们，我们可以在<code>how</code>上使用<code>inner</code>，这是另一种连接操作，将省略两个数据集中所有缺失的行:</p>
+			<pre>df_a.cols.join(df_b, on="id", how="inner").print()</pre>
+			<p>我们将得到下面的<a id="_idIndexMarker244"/>结果:</p>
+			<pre>id         name       city        placeholder 
+(object)   (object)   (object)    (object) 
+---------- ---------- ----------- ------------- 
+225        Bob        Bradford    BRA 
+545        Charlie    Norwich     NOR 
+765        Dan        Bath        BAT 
+152        Frank      Ripon       RIP</pre>
+			<p>当每个数据帧的键列有不同的名称时，可以使用<code>left_on</code>和<code>right_on</code>代替<code>on</code>参数，如下所示:</p>
+			<pre>df_a.cols.join(df_b, left_on="id_a", right_on="id_b")</pre>
+			<p>默认情况下，结果将被排序；也就是说，首先放置键列，然后是左边的列，最后是右边的列，如第一个示例所示。如果想要将键列放在左数据集中的列和右数据集中的列之间，您需要将<code>True</code>传递给<code>key_middle</code>:</p>
+			<pre>df_a.cols.join(df_b, left_on="id_a", key_middle=True).cols.names()</pre>
+			<p>在前面的示例中，我们正在连接数据集并获取结果数据集中的列名，这将产生以下结果:</p>
+			<pre>["name", "city", "id", "placeholder"]</pre>
+			<p>默认情况下，结果数据集中列的顺序将改为<code>["id", "name", "city", "placeholder"]</code>。</p>
+			<p>既然我们已经知道了如何以各种方式合并两个数据集，那么让我们来学习如何对需要这种转换的数据框架进行整形和透视。</p>
+			<h1 id="_idParaDest-90"><a id="_idTextAnchor091"/>重塑和旋转</h1>
+			<p>在某些情况下，你会想对你的数据集做一些更彻底的转换。在这一节中，我们将学习如何以各种方式重塑 Optimus 数据框架，包括旋转、锁定和熔化。</p>
+			<h2 id="_idParaDest-91"><a id="_idTextAnchor092"/>旋转</h2>
+			<p>旋转是将堆叠的数据改造成具有更简单和更不详细数据的新数据框架的<a id="_idIndexMarker248"/>过程。它包括使用所选列的数据，并将其用作列标签。然后，您必须使用一个或多个列对数据进行分组，并使用首选的汇总或聚合对其余数据进行计算。以下是这方面的一个例子:</p>
+			<div><div><img src="img/B17166_04_2.jpg" alt="Figure 4.2 – How pivoting works&#13;&#10;" width="915" height="437"/>
+				</div>
+			</div>
+			<p class="figure-caption">图 4.2-旋转如何工作</p>
+			<p>让我们来看一个<a id="_idIndexMarker249"/>例子，它是一个在很短的时间内制作的销售数据集:</p>
+			<pre>df = op.create.dataframe({
+    "date": ["1/1/21", "1/1/21", "1/2/21", "1/2/21", "1/3/21", "1/3/21", "1/3/21", "1/3/21", "1/3/21"], 
+    "product": ["Coffee", "Coffee", "Tea", "Coffee", "Tea", "Coffee", "Tea", "Tea", "Coffee"],
+    "size": ["big", "big", "big", "big", "big", "small", "small", "small", "small"],
+    "price": [1.5, 1.5, 2, 1.5, 2, 1, 1.25, 1.25, 1]
+})</pre>
+			<p>我们的数据集看起来像这样:</p>
+			<pre>date        product     size              price
+(object)    (object)    (object)      (float64)
+----------  ----------  ----------  -----------
+1/1/21      Coffee      big                1.5
+1/1/21      Coffee      big                1.5
+1/2/21      Tea         big                2
+1/2/21      Coffee      big                1.5
+1/3/21      Tea         big                2
+1/3/21      Coffee      small              1
+1/3/21      Tea         small              1.25
+1/3/21      Tea         small              1.25
+1/3/21      Coffee      small              1</pre>
+			<p>现在，让我们<a id="_idIndexMarker250"/>统计一下每件产品每天的销售额:</p>
+			<pre>df.pivot("date", groupby="product").print()</pre>
+			<p>我们将得到以下输出:</p>
+			<pre>product        1/1/21     1/2/21     1/3/21
+(object)      (int64)    (int64)    (int64)
+----------  ---------  ---------  ---------
+Coffee              2          1          2
+Tea                 0          1          3</pre>
+			<p>如我们所见，默认的聚合是计数。我们可以使用<code>agg</code>参数显式调用它，这需要一个具有聚合名称和要计算的列的元组，如下所示:</p>
+			<pre>df.pivot("date", groupby="product", agg=("count", "date")).print()</pre>
+			<p>前面的代码将得到与之前相同的输出。</p>
+			<p>现在，让我们将<code>agg</code>参数用于其他目的:</p>
+			<pre>df.pivot("date", groupby="product", agg=("common", "size")).print()</pre>
+			<p>我们将得到以下输出:</p>
+			<pre>product     1/1/21      1/2/21      1/3/21
+(object)    (object)    (object)    (object)
+----------  ----------  ----------  ----------------
+Coffee      big                 small
+Tea         nan         big         ['big', 'small']</pre>
+			<p>在前面的<a id="_idIndexMarker251"/>示例中，我们从每个日期的销售额中获取每个产品的最常见尺寸。</p>
+			<p>在下面的例子中，我们看的是每种产品的平均价格:</p>
+			<pre>df.pivot("date", groupby="product", agg=("mean", "price")).print()</pre>
+			<p>我们将得到以下输出:</p>
+			<pre>product          1/1/21       1/2/21       1/3/21
+(object)      (float64)    (float64)    (float64)
+----------  -----------  -----------  -----------
+Coffee              1.5          2            1
+Tea                 nan          1.5          1.5</pre>
+			<p>也可以按不同的列而不是一个列进行分组，如下所示:</p>
+			<pre>df.pivot("date", groupby=["product", "size"]).print()</pre>
+			<p>我们将得到以下输出:</p>
+			<pre>product     size           1/1/21     1/2/21     1/3/21
+(object)    (object)      (int64)    (int64)    (int64)
+----------  ----------  ---------  ---------  ---------
+Coffee      big                 2          1          0
+Coffee      small               0          0          2
+Tea         big                 0          1          1
+Tea         small               0          0          2</pre>
+			<p>旋转是堆叠逆过程的特殊情况。让我们来学习什么是堆叠以及如何使用它。</p>
+			<h2 id="_idParaDest-92"><a id="_idTextAnchor093"/>堆叠</h2>
+			<p>堆叠<a id="_idIndexMarker253"/>数据集时，列标签将被传递给虚拟列中的值，并被移动以匹配列值，如下所示:</p>
+			<div><div><img src="img/B17166_04_3.jpg" alt="Figure 4.3 – How stacking works&#13;&#10;" width="917" height="445"/>
+				</div>
+			</div>
+			<p class="figure-caption">图 4.3–堆叠的工作原理</p>
+			<p>要使用堆栈，我们必须知道哪一列或哪些列代表数据帧中的索引。使用该函数的结果将为我们提供一个带有新索引的数据帧，该索引包含其余列的名称。</p>
+			<p>让我们看一个类似于上一个示例的库存示例:</p>
+			<pre>df = op.create.dataframe({
+    "product": ["Coffee", "Coffee", "Tea", "Tea"],
+    "size": ["big", "small", "big", "small"],
+    "price": [1.5, 1, 2, 1.25],
+    "cost": [0.24, 0.2, 0.32, 0.3]
+})</pre>
+			<p>这就是我们的数据集的样子:</p>
+			<pre>product     size              price         cost
+(object)    (object)      (float64)    (float64)
+----------  ----------  -----------  -----------
+Coffee      big                1.5          0.24
+Coffee      small              1            0.2
+Tea         big                2            0.32
+Tea         small              1.25         0.3</pre>
+			<p>为了堆叠它，我们需要调用<code>df.stack</code>，如下所示:</p>
+			<pre>df.stack(index=["product", "size"]).print()</pre>
+			<p>这将把前两列标识为数据集的索引。我们将看到以下输出:</p>
+			<pre>product     size        variable          value
+(object)    (object)    (object)      (float64)
+----------  ----------  ----------  -----------
+Coffee      big         price              1.5
+Coffee      big         cost               0.24
+Coffee      small       price              1
+Coffee      small       cost               0.2
+Tea         big         price              2
+Tea         big         cost               0.32
+Tea         small       price              1.25
+Tea         small       cost               0.3</pre>
+			<p>产生的<a id="_idIndexMarker255"/>数据集将需要每个新列的名称。默认情况下，它会指定<code>"variable"</code>和<code>"value"</code>，但是这些名称可以传递给函数，如下所示:</p>
+			<pre>df.stack(index=["product", "size"], col_name="foo", value_name="bar").print()</pre>
+			<p>这将把前两列标识为数据集的索引。我们将看到以下输出:</p>
+			<pre>product     size        foo                 bar
+(object)    (object)    (object)      (float64)
+----------  ----------  ----------  -----------
+Coffee      big         price              1.5
+Coffee      big         cost               0.24
+Coffee      small       price              1
+Coffee      small       cost               0.2
+Tea         big         price              2
+Tea         big         cost               0.32
+Tea         small       price              1.25
+Tea         small       cost               0.3</pre>
+			<p>到目前为止，我们已经了解了旋转和堆叠，并阐明了旋转是堆叠的逆<a id="_idIndexMarker256"/>过程的一种特殊情况，该过程称为拆分。我们接下来会了解这一点。</p>
+			<h2 id="_idParaDest-93"><a id="_idTextAnchor094"/>拆垛</h2>
+			<p>拆垛与堆垛相反。因此，在这种情况下，我们必须找出哪个或哪些列代表数据帧中的索引。基于这个和传递给<code>df.unstack</code>的级别，索引列将被转换成列:</p>
+			<div><div><img src="img/B17166_04_4.jpg" alt="Figure 4.4 – How unstacking works&#13;&#10;" width="916" height="461"/>
+				</div>
+			</div>
+			<p class="figure-caption">图 4.4–拆垛的工作原理</p>
+			<p>让我们来看看拆分之前堆叠的数据帧的结果:</p>
+			<pre>df.unstack(index=["product", "size", "variable"]).print()</pre>
+			<p>我们将得到以下输出:</p>
+			<pre>product     size               cost        price
+(object)    (object)      (float64)    (float64)
+----------  ----------  -----------  -----------
+Coffee      big                0.24         1.5
+Coffee      small              0.2          1
+Tea         big                0.32         2
+Tea         small              0.3          1.25</pre>
+			<p>要通过您想要拆分的级别，请使用<code>level</code>参数，如下所示:</p>
+			<pre>df.unstack(index=["product", "size", "variable"], level=1).print()</pre>
+			<p>负数<a id="_idIndexMarker258"/>也可以:</p>
+			<pre>df.unstack(index=["product", "size", "variable"], level=-2).print()</pre>
+			<p>在前面的代码中，我们对多索引中的倒数第二列进行了拆分。</p>
+			<p>同样，列的名称也可以传递给<code>level</code>:</p>
+			<pre>df.unstack(index=["product", "size", "variable"], level="size").print()</pre>
+			<p>前面的三个例子将分解<code>"size"</code>索引列，给出如下结果:</p>
+			<pre>product     variable            big        small
+(object)    (object)      (float64)    (float64)
+----------  ----------  -----------  -----------
+Coffee      cost               0.24         0.2
+Coffee      price              1.5          1
+Tea         cost               0.32         0.3
+Tea         price              2            1.25</pre>
+			<p>在本节中，我们学习了拆分以及它与旋转和堆叠的关系。现在，让我们深入研究一个类似的转换，它不依赖于显式索引，而是依赖于我们可以设置为标识符的列。</p>
+			<h2 id="_idParaDest-94"><a id="_idTextAnchor095"/>融化</h2>
+			<p>熔化用于<a id="_idIndexMarker259"/>将数据帧格式从宽变为长，类似于堆栈，但没有索引。在生成的数据帧中，一个或多个列将作为标识符。剩下的将是前一列的值(默认情况下名为<code>"values"</code>)和这些值的标识符(名为<code>"variable"</code>)。您可以在此函数中排除列。您可以在下图中看到熔化的工作原理:</p>
+			<div><div><img src="img/B17166_04_5.jpg" alt="Figure 4.5 – How melting works&#13;&#10;" width="899" height="407"/>
+				</div>
+			</div>
+			<p class="figure-caption">图 4.5–熔化的工作原理</p>
+			<p>要使用它，所需的最少参数只是标识符列:</p>
+			<pre>df.melt(id_cols=["product","size"]).print()</pre>
+			<p>在前面的代码中，我们只是传递了标识符列，但是您也可以显式地传递您想要获取的值，如下所示:</p>
+			<pre>df.melt(id_cols=["product","size"], value_cols=["price", "cost"]).print()</pre>
+			<p>上述代码将返回以下输出:</p>
+			<pre>product     size        variable          value
+(object)    (object)    (object)      (float64)
+----------  ----------  ----------  -----------
+Coffee      big         price              1.5
+Coffee      small       price              1
+Tea         big         price              2
+Tea         small       price              1.25
+Coffee      big         cost               0.24
+Coffee      small       cost               0.2
+Tea         big         cost               0.32
+Tea         small       cost               0.3</pre>
+			<p>要定义结果列的名称<a id="_idIndexMarker260"/>，可以使用<code>var_name</code>和<code>value_name</code>:</p>
+			<pre>df.melt(id_cols=["product", "size"], var_name="foo", value_name="bar").print()</pre>
+			<p>这将导致以下输出:</p>
+			<pre>product     size        foo                 bar
+(object)    (object)    (object)      (float64)
+----------  ----------  ----------  -----------
+Coffee      big         price              1.5
+Coffee      small       price              1
+Tea         big         price              2
+Tea         small       price              1.25
+Coffee      big         cost               0.24
+Coffee      small       cost               0.2
+Tea         big         cost               0.32
+Tea         small       cost               0.3</pre>
+			<p>正如我们所看到的，我们可以通过使用我们刚刚学会如何应用的一些转换来减小数据集的大小，但如果您来自关系数据库世界，那么您已经了解聚合，它可以大幅减小数据集的大小，但<a id="_idIndexMarker261"/>会导致它们失去分辨率。</p>
+			<h2 id="_idParaDest-95"><a id="_idTextAnchor096"/>聚合</h2>
+			<p>聚合<a id="_idIndexMarker262"/>是将多行的值组合成一个值的函数。</p>
+			<p>Optimus 提供了两种应用聚合的方法。</p>
+			<ul>
+				<li>使用<code>cols</code>访问器</li>
+				<li>使用<code>agg</code>功能</li>
+			</ul>
+			<p>让我们两个都看看。</p>
+			<h3>cols 访问器</h3>
+			<p>对于<a id="_idIndexMarker264"/>例子，让我们<a id="_idIndexMarker265"/>说你要计算一列的最小值。在 Optimus 中，您可以这样做:</p>
+			<pre>from optimus import Optimus 
+op = Optimus("pandas")
+df = op.load.file("foo.csv")
+df.print()</pre>
+			<p>这将打印以下输出:</p>
+			<pre>name        job                id
+(object)    (object)      (int64)
+----------  ----------  ---------
+optimus     Leader              1
+optimus     Espionage           2
+bumblebee   1                   3
+bumblebee   3                   4</pre>
+			<p>为了得到最小值，我们可以使用下面的代码:</p>
+			<pre>df.cols.min("id")</pre>
+			<p>您将得到数字<code>1</code>作为输出:</p>
+			<pre>1</pre>
+			<p>您还可以传递一个列列表，如下所示:</p>
+			<pre>df.cols.min(["id","name"])</pre>
+			<p>您将收到以下输出:</p>
+			<pre>{'id': 1, 'name': 'bumblebee'}</pre>
+			<p>这里，发生了三件事:</p>
+			<ul>
+				<li>相比之下，当在这里传递一个列时，您不仅仅得到值——您还会得到一个 Python <a id="_idIndexMarker266"/>字典，其中包含该列的<a id="_idIndexMarker267"/>名称及其值。</li>
+				<li>与返回 dataframe 对象的传统 dataframe 技术不同，Optimus 返回一个 Python 字典。</li>
+			</ul>
+			<p>这对于从我们的数据帧中获取单个聚合非常有用，但是如果您想要获取一组聚合，您可以使用不同的方法，我们将在下面看到。</p>
+			<h3>agg 方法</h3>
+			<p>现在，让我们<a id="_idIndexMarker268"/>探索一下<code>agg</code> dataframe 方法。使用此方法，您可以同时计算一个或多个聚合。</p>
+			<p>例如，如果要计算最小聚合，可以在传递<code>{"id": "min"}</code>的同时调用<code>min</code>方法，如下所示:</p>
+			<pre>df.agg({"id": "min"})</pre>
+			<p>这将返回以下输出:</p>
+			<pre>1</pre>
+			<p>现在，假设您想要应用多个聚合，比如<code>min</code>和<code>max</code>:</p>
+			<pre>df.agg({"name": "min", "id": "max"})</pre>
+			<p>这将返回<code>name</code>列的<code>min</code>值和<code>id</code>列的<code>max</code>值:</p>
+			<pre>{'name': 'bumblebee', 'id': 4}</pre>
+			<p>现在您已经知道了如何应用聚合，下面是 Optimus 支持的聚合的完整列表。考虑到有些引擎可以并行进行一些聚合，这一点非常重要。例如，您不能使用<code>cols</code>计算两个聚合，如下所示:</p>
+			<pre>print(df.cols.std("id"))
+print(df.cols.min("id"))</pre>
+			<p>但是，您可以使用<code>agg</code>函数同时传递两个参数，如下所示:</p>
+			<pre>df.agg({"id":"std","name":min})</pre>
+			<p>Dataframe <a id="_idIndexMarker270"/>引擎每天都在进化。如果您想深入了解哪些功能可以并行化，请查阅相关文档。</p>
+			<p>为了结束这一节，下面是 Optimus 支持的所有聚合的完整列表:</p>
+			<div><div><img src="img/B17166_04_table_4.1.jpg" alt="Table 4.1 – Aggregation supported by Optimus&#13;&#10;" width="1047" height="1084"/>
+				</div>
+			</div>
+			<p class="figure-caption">表 4.1–Optimus 支持的聚合</p>
+			<p>这些<a id="_idIndexMarker272"/>聚合将在<a id="_idIndexMarker273"/>整个数据集上执行，不考虑任何组。现在，让我们了解一下，如果我们想将结果限制在某些组中，应该怎么做。</p>
+			<h1 id="_idParaDest-96"><a id="_idTextAnchor097"/>聚集和分组</h1>
+			<p>在考虑另一列中的一组公共值时，希望计算数据集中的最小值、最大值或任何其他聚合，这是一种常见的情况。在这里，我们可以使用一种称为分组的做法。让我们尝试使用下图来解释这个概念:</p>
+			<div><div><img src="img/B17166_04_6.jpg" alt="Figure 4.6 – Sum values applying grouping&#13;&#10;" width="1295" height="599"/>
+				</div>
+			</div>
+			<p class="figure-caption">图 4.6–应用分组对值求和</p>
+			<p>在前面的<a id="_idIndexMarker276"/>示例中，我们对来自相同物种的<code>sepal_lenght</code>值求和。现在，让我们学习如何在 Optimus 中使用分组和聚合。</p>
+			<p>例如，我们有以下数据框架:</p>
+			<pre>df = op.load.file("foo.csv")
+df.print()</pre>
+			<p>数据帧包含以下数据:</p>
+			<pre>name        job                id
+(object)    (object)      (int64)
+----------  ----------  ---------
+optimus     Leader              1
+optimus     Espionage           2
+bumblebee   1                   3
+bumblebee   3                   4</pre>
+			<p>也许您想计算列<code>name</code>中<code>optimus</code>和<code>bumblebee</code>值的最小值<code>id</code>。为此，<code>agg()</code>函数支持<code>groupby</code>参数，该参数将使用<code>name</code>列中的公共值来计算<code>id</code>列中的最小值。让我们看看它是如何工作的:</p>
+			<pre>A = df.agg({"id":min}, groupby="name")</pre>
+			<p>这将返回一个 Python 字典，其中包含组名的键和组的最小值<a id="_idIndexMarker279"/>的值<a id="_idIndexMarker278"/>:</p>
+			<pre>{'bumblebee': 3, 'optimus': 1}</pre>
+			<p>获得 Python 字典后，只需使用以下命令就可以访问 Bumblebee 值:</p>
+			<pre>A["bumblebee"]</pre>
+			<p>这将返回一个表示<code>"bumblebee"</code>组最小值的整数:</p>
+			<pre>3</pre>
+			<p>如您所见，结果在一个 Python 字典中。根据数据集的大小，此结果的大小可能会有所不同，因此在获得任何结果之前请注意这一点。您可能希望在 dataframe 中请求该调用的输出，这可以通过将<code>dataframe</code>传递到输出参数中来实现。</p>
+			<h1 id="_idParaDest-97"><a id="_idTextAnchor098"/>总结</h1>
+			<p>在本章中，我们学习了很多可以用来连接、合并、连接、聚合和分组数据的函数。所有这些函数都将为您提供强大的功能，让您可以根据需要来处理数据和塑造数据，以便从数据中获得洞察力，针对不同的用途重新格式化数据集，以及组合多个数据集以在同一数据集中获得更高的数据分辨率。</p>
+			<p>在下一章中，我们将学习 Optimus 提供的分析数据的功能，这样我们可以更好地了解它。</p>
+		</div>
+	</div>
+</body></html>

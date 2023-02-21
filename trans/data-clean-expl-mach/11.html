@@ -1,0 +1,385 @@
+<html><head/><body>
+
+
+
+
+
+
+
+
+
+<title>Chapter 8: Support Vector Regression</title>
+
+
+
+
+
+
+
+<div><div><h1 id="_idParaDest-107"><em class="italic"> <a id="_idTextAnchor106"/>第八章</em>:支持向量回归</h1>
+
+<p><strong class="bold">支持向量回归</strong> ( <strong class="bold"> SVR </strong>)在线性回归模型的假设不成立时<a id="_idIndexMarker688"/>可能是一个极好的选择，例如当我们的特征和我们的目标之间的关系过于复杂，无法用权重的线性组合来描述时。更好的是，SVR 允许我们在不扩展特征空间的情况下对复杂性进行建模。</p>
+
+<p>支持向量机识别使两个类之间的间隔最大化的超平面。支持向量是最接近边缘的数据点，如果你愿意的话，<em class="italic">支持</em>它。这被证明对回归建模和分类一样有用。SVR 找到包含最多数据点的超平面。我们将在本章的第一节讨论它是如何工作的。</p>
+
+<p>SVR 不是像普通最小二乘回归那样最小化残差平方和，而是在可接受的误差范围内最小化系数。像岭和套索回归一样，这可以减少模型方差和过度拟合的风险。当我们处理中小型数据集时，SVR 的效果最好。</p>
+
+<p>该算法也非常灵活，允许我们指定可接受的误差范围，使用核来模拟非线性关系，并调整超参数以获得最佳的偏差-方差权衡。我们将在本章中演示这一点。</p>
+
+<p>在本章中，我们将讨论以下主题:</p>
+
+<ul>
+
+<li>支持向量回归的关键概念</li>
+
+<li>线性模型支持向量回归机</li>
+
+<li>使用核函数进行非线性支持向量回归</li>
+
+</ul>
+
+<h1 id="_idParaDest-108"><a id="_idTextAnchor107"/>技术要求</h1>
+
+<p>在本章中，我们将使用 scikit-learn 和<code>matplotlib</code>库。你可以使用<code>pip</code>来安装这些包。</p>
+
+<h1 id="_idParaDest-109"><a id="_idTextAnchor108"/>支持向量回归的关键概念</h1>
+
+<p>我们将<a id="_idIndexMarker689"/>从讨论支持向量机如何用于分类开始这一部分。这里我们就不赘述了，把支持向量机分类的详细讨论留给第十三章<a href="B17978_13_ePub.xhtml#_idTextAnchor152"><em class="italic"/></a>，<em class="italic">支持向量机分类</em>。但是从支持向量机分类开始将很好地解释 SVR。</p>
+
+<p>正如我在本章开始时所讨论的，支持向量机找到了最大化类间间隔的超平面。当只有两个特征时，超平面只是一条线。考虑以下示例图:</p>
+
+<div><div><img alt="Figure 8.1 – Support vector machine classification based on two features&#10;&#10;" height="580" src="img/B17978_08_001.jpg" width="845"/>
+
+</div>
+
+</div>
+
+<p class="figure-caption">图 8.1–基于两个特征的支持向量机分类</p>
+
+<p>该图中由红色圆圈和蓝色方块表示的两个类是使用两个特征 x1 和 x2 的<a id="_idIndexMarker690"/>线性可分的<strong class="bold">。粗线是决策边界。它是距离每个类的边界数据点最远的线，或最大边距。这些点被称为支持向量。</strong></p>
+
+<p>由于上图中的数据是线性可分的，我们可以使用所谓的<strong class="bold">硬边界分类</strong>而没有<a id="_idIndexMarker691"/>问题；也就是说，我们可以严格要求每个类的所有观察都在决策边界的正确一侧。但是如果我们的数据点看起来像下面的图中所示的那样呢？</p>
+
+<div><div><img alt="Figure 8.2 – Support vector machine classification with soft margins&#10;&#10;" height="584" src="img/B17978_08_002.jpg" width="845"/>
+
+</div>
+
+</div>
+
+<p class="figure-caption">图 8.2–具有软边界的支持向量机分类</p>
+
+<p>这些数据点<a id="_idIndexMarker693"/>不是线性可分的。在这种情况下，我们可以选择<strong class="bold">软边缘分类</strong>和<a id="_idIndexMarker694"/>忽略离群的红色圆圈。</p>
+
+<p>我们将在第 13 章 、<em class="italic">支持向量机分类</em>中更详细地讨论支持向量机分类，但这说明了一些关键的支持向量机概念。这些概念可以很好地应用于涉及连续目标的模型。这就是<a id="_idIndexMarker695"/>所谓的<strong class="bold">支持向量回归</strong>或<strong class="bold"> SVR </strong>。</p>
+
+<p>当建立一个 SVR 模型时，我们决定可接受的预测误差量，ɛ.在单特征模型中，我们的预测<img alt="" height="46" src="img/B17978_08_001.png" width="173"/>在ɛ范围内的误差不会受到惩罚。这有时被称为ε不敏感管。SVR 最小化与落在该范围内的所有数据点一致的系数。下图对此进行了说明:</p>
+
+<p> </p>
+
+<div><div><img alt="Figure 8.3 – SVR with an acceptable error range&#10;&#10;" height="584" src="img/B17978_08_003.jpg" width="768"/>
+
+</div>
+
+</div>
+
+<p class="figure-caption">图 8.3–具有可接受误差范围的 SVR</p>
+
+<p>更准确地说，SVR 使系数的平方最小化，服从误差ε不超过给定量的约束。</p>
+
+<p>它以<img alt="" height="49" src="img/B17978_08_003.png" width="255"/>为约束最小化<img alt="" height="96" src="img/B17978_08_002.png" width="130"/>，其中<img alt="" height="27" src="img/B17978_08_004.png" width="35"/>是权重(或系数)的向量，<img alt="" height="45" src="img/B17978_08_005.png" width="132"/>是实际目标值减去预测值，<img alt="" height="26" src="img/B17978_08_006.png" width="23"/>是可接受的误差量。</p>
+
+<p>当然，期望所有的数据点都落在期望的范围内是不合理的。但是我们仍然可以寻求最小化这种偏差。让我们把任意点离边缘的距离记为ξ。这给了我们一个新的目标函数。</p>
+
+<p>我们使用约束条件<img alt="" height="48" src="img/B17978_08_008.png" width="383"/>最小化<img alt="" height="100" src="img/B17978_08_007.png" width="375"/>，其中<em class="italic"> C </em>是一个超参数，表示模型对超出容限的误差的容忍度。<em class="italic"> C </em>的值为 0 意味着它根本不能容忍这些大误差。这相当于原始的目标函数:</p>
+
+<p class="figure-caption"> </p>
+
+<div><div><img alt="Figure 8.4 – SVR with data points outside the acceptable range&#10;&#10;" height="583" src="img/B17978_08_004.jpg" width="766"/>
+
+</div>
+
+</div>
+
+<p class="figure-caption">图 8.4–数据点超出可接受范围的 SVR</p>
+
+<p>在这里，我们可以<a id="_idIndexMarker698"/>看到 SVR 的几个优势。有时，我们的误差不超过一定的量比选择绝对误差最低的模型更重要。如果我们经常偏离一点点，但很少偏离很多，这可能比我们经常准确但偶尔偏离更重要。由于这种方法也最小化了我们的权重，它具有与正则化相同的优点，并且我们减少了过度拟合的可能性。</p>
+
+<h2 id="_idParaDest-110"><a id="_idTextAnchor109"/>非线性支持向量回归和核技巧</h2>
+
+<p>我们还没有完全解决 SVR 的线性可分性问题。为了简单起见，我们将回到涉及两个特征的分类问题。让我们来看看两个特征相对于一个分类目标的图。目标有两个可能的值，用点和方块表示。x1 和 x2 是数值，具有负值:</p>
+
+<div><div><img alt="Figure 8.5 – Class labels not linearly separable with two features&#10;&#10;" height="540" src="img/B17978_08_005.jpg" width="545"/>
+
+</div>
+
+</div>
+
+<p class="figure-caption">图 8.5–两个特征不可线性分离的分类标签</p>
+
+<p>在这种情况下，我们能做什么来确定类之间的边界？通常情况下，可以在更高的维度上识别边缘。在本例中，我们可以使用多项式变换，如下图所示:</p>
+
+<div><div><img alt="Figure 8.6 – Using polynomial transformation to establish the margin&#10;&#10;" height="715" src="img/B17978_08_006.jpg" width="911"/>
+
+</div>
+
+</div>
+
+<p class="figure-caption">图 8.6–使用多项式变换建立余量</p>
+
+<p>现在有了第三维度，也就是 x1 和 x2 的平方和。圆点都比正方形高。这类似于我们在上一章中如何使用多项式变换来指定非线性回归模型。</p>
+
+<p>这种<a id="_idIndexMarker701"/>方法的一个缺点是，我们可能很快就会因为太多的特性而使我们的模型表现不佳。这就是<a id="_idIndexMarker702"/>内核技巧派上用场的地方。SVR 可以使用一个核函数来隐式地扩展特征空间，而无需实际创建更多的特征。这是通过创建可用于拟合非线性余量的值的向量来实现的。</p>
+
+<p>虽然这允许我们拟合多项式变换，例如上图中所示的假设变换，但 SVR 最常用的核函数是<strong class="bold">径向基函数</strong> ( <strong class="bold"> RBF </strong>)。RBF 很流行，因为它比其他常见的内核函数更快，也因为它的 gamma 参数使它非常灵活。我们将在本章的最后一节探讨如何使用它。</p>
+
+<p>但是现在，让我们从一个相对简单的线性模型开始，看看 SVR 的作用。</p>
+
+<h1 id="_idParaDest-111"><a id="_idTextAnchor110"/>支持向量回归与线性模型</h1>
+
+<p>我们通常有足够的领域知识来采取比简单地最小化训练数据中的预测误差更细致入微的方法。使用这一知识可以让我们在模型中接受更多的偏差，当少量的偏差实质上无关紧要时，以减少方差。通过 SVR，我们可以调整超参数，如 epsilon(可接受的误差范围)和<em class="italic"> C </em>(调整超出该范围的误差容差)，以提高模型的性能。</p>
+
+<p>如果线性模型可以很好地处理您的数据，线性 SVR 可能是一个不错的选择。我们可以用 scikit-learn 的<code>LinearSVR</code>类建立一个线性 SVR 模型。让我们尝试使用我们在上一章中使用的汽油税数据创建一个线性 SVR 模型:</p>
+
+<ol>
+
+<li>我们需要许多与前一章相同的库来创建训练和测试数据帧并预处理数据。我们还需要分别从 scikit-learn 和 scipy 导入<code>LinearSVR</code>和<code>uniform</code>模块:<pre>import pandas as pd import numpy as np from sklearn.model_selection import train_test_split from sklearn.preprocessing import StandardScaler from sklearn.svm import LinearSVR from scipy.stats import uniform from sklearn.impute import SimpleImputer from sklearn.pipeline import make_pipeline from sklearn.compose import ColumnTransformer from sklearn.compose import TransformedTargetRegressor from sklearn.impute import KNNImputer from sklearn.model_selection import cross_validate, \   KFold, GridSearchCV, RandomizedSearchCV import sklearn.metrics as skmet import matplotlib.pyplot as plt</pre></li>
+
+<li>我们还<a id="_idIndexMarker705"/>需要导入<code>OutlierTrans</code>类，我们在第 7 章<em class="italic">线性回归模型</em>中首先讨论了这个类，以处理异常值:<pre>import os import sys sys.path.append(os.getcwd() + "/helperfunctions") from preprocfunc import OutlierTrans</pre></li>
+
+<li>接下来，我们加载汽油税数据，并创建训练和测试数据框架。我们为数字和二进制特性创建列表，并为<code>motorization_rate</code>创建单独的列表。正如我们在前一章查看数据时看到的，我们需要用<code>motorization_rate</code>做更多的预处理。</li>
+
+</ol>
+
+<p>这个<a id="_idIndexMarker706"/>数据集包含 2014 年每个国家的汽油税数据，以及燃料收入依赖和民主制度力量的衡量指标:<code>polity</code>、<code>democracy_polity</code>和<code>autocracy_polity</code>。<code>democracy_polity</code>是一个二进制化的<code>polity</code>变量，对于具有高<code>polity</code>分数的国家，取值为 1。<code>autocracy_polity</code>的值为 1，代表<code>polity</code>分数低的国家。<code>polity</code>特征是衡量一个国家民主程度的指标:</p>
+
+<pre>fftaxrate14 = pd.read_csv("data/fossilfueltaxrate14.csv")
+fftaxrate14.set_index('countrycode', inplace=True)
+num_cols = ['fuel_income_dependence',
+  'national_income_per_cap', 'VAT_Rate',  
+  'gov_debt_per_gdp', 'polity','goveffect',
+  'democracy_index']
+dummy_cols = 'democracy_polity','autocracy_polity',
+  'democracy', 'nat_oil_comp','nat_oil_comp_state']
+spec_cols = ['motorization_rate']
+target = fftaxrate14[['gas_tax_imp']]
+features = fftaxrate14[num_cols + dummy_cols + spec_cols]
+X_train, X_test, y_train, y_test =  \
+  train_test_split(features,\
+    target, test_size=0.2, random_state=0)</pre>
+
+<ol>
+
+<li value="4">让我们看看训练数据的汇总统计。我们将需要标准化数据，因为存在显著不同的范围，并且 SVR 在标准化数据上表现得更好。另外，请注意<code>motorization_rate</code>有很多缺失值。我们可能希望利用该特征做得比简单的插补更好。对于虚拟列，我们有相当不错的非缺失计数:<pre>X_train.shape (123, 13) X_train[num_cols + spec_cols].\   agg(['count','min','median','max']).T <strong class="bold">                      count min    median   max</strong> <strong class="bold">fuel_income_dependence  121 0.00   0.10     34.23</strong> <strong class="bold">national_income_per_cap 121 260.00 6,110.00 104,540.00</strong> <strong class="bold">VAT_Rate                121 0.00   16.00    27.00</strong> <strong class="bold">gov_debt_per_gdp        112 1.56   38.45    194.76</strong> <strong class="bold">polity                  121 -10.00 6.00     10.00</strong> <strong class="bold">goveffect               123 -2.04  -0.10    2.18</strong> <strong class="bold">democracy_index         121 0.03   0.54     0.93</strong> <strong class="bold">motorization_rate       100 0.00   0.20     0.81</strong> X_train[dummy_cols].apply(pd.value_counts, normalize=True).T                                     <strong class="bold">0.00         1.00</strong> <strong class="bold">democracy_polity                    0.42         0.58</strong> <strong class="bold">autocracy_polity                    0.88         0.12</strong> <strong class="bold">democracy                           0.41         0.59</strong> <strong class="bold">nat_oil_comp                        0.54         0.46</strong> <strong class="bold">nat_oil_comp_state                  0.76         0.24</strong> X_train[dummy_cols].count() <strong class="bold">democracy_polity           121</strong> <strong class="bold">autocracy_polity           121</strong> <strong class="bold">democracy                  123</strong> <strong class="bold">nat_oil_comp               121</strong> <strong class="bold">nat_oil_comp_state         121</strong></pre></li>
+
+<li>我们需要构建一个列转换器来处理不同的数据类型。我们可以用<code>SimpleImputer</code>来表示类别特征和数值特征，除了<code>motorization_rate</code>。我们将在后面对<code>motorization_rate</code>特征使用 KNN 插补:<pre>standtrans = make_pipeline(OutlierTrans(2),   SimpleImputer(strategy="median"), StandardScaler()) cattrans = make_pipeline(SimpleImputer(strategy="most_frequent")) spectrans = make_pipeline(OutlierTrans(2), StandardScaler()) coltrans = ColumnTransformer(   transformers=[     ("stand", standtrans, num_cols),     ("cat", cattrans, dummy_cols),     ("spec", spectrans, spec_cols)   ] )</pre></li>
+
+<li>现在，我们准备好拟合我们的线性 SVR 模型。我们将为<code>epsilon</code>选择一个值<code>0.2</code>。这意味着我们可以接受实际值 0.2 个标准偏差内的任何误差(我们使用<code>TransformedTargetRegressor</code>来标准化目标)。我们将让<em class="italic">C</em>——决定我们的模型对 epsilon 之外的值的容差的超参数——保持其默认值 1.0。</li>
+
+</ol>
+
+<p>在拟合我们的模型之前，我们仍然需要处理<code>motorization_rate</code>的缺失值。我们将在列转换后将 KNN 估算器添加到管道中。由于<code>motorization_rate</code>将是列转换后唯一缺少值的特征，KNN 估算器仅更改该特征的值。</p>
+
+<p>我们需要使用目标转换器，因为列转换器只会改变特征，而不会改变目标。我们将把刚刚创建的管道传递给目标转换器的<code>regressor</code>参数来进行特性转换，并指出我们只想对目标进行标准缩放。</p>
+
+<p>注意，线性 SVR 的默认损失函数是 L1，但我们也可以选择 L2:</p>
+
+<pre>svr = LinearSVR(epsilon=0.2, max_iter=10000, 
+  random_state=0)
+pipe1 = make_pipeline(coltrans, 
+  KNNImputer(n_neighbors=5), svr)
+ttr=TransformedTargetRegressor(regressor=pipe1,
+  transformer=StandardScaler())
+ttr.fit(X_train, y_train)</pre>
+
+<ol>
+
+<li value="7">我们<a id="_idIndexMarker710"/>可以使用<code>ttr.regressor_</code>来访问管道的所有元素，包括<code>linearsvr</code>对象。这就是我们获得<code>coef_</code>属性的方法。与 0 实质上不同的系数是<code>VAT_Rate</code>和专制和国家石油公司假人。我们的模型估计，在其他条件相同的情况下，增值税率和汽油税之间存在正相关关系。它估计了独裁政府或国有石油公司与汽油税之间的负面关系:<pre>coefs = ttr.regressor_['linearsvr'].coef_ np.column_stack((coefs.ravel(), num_cols + dummy_cols + spec_cols)) <strong class="bold">array([['-0.03040694175014407', 'fuel_income_dependence'],</strong> <strong class="bold">       ['0.10549935644031803', 'national_income_per_cap'],</strong> <strong class="bold">       ['0.49519936241642026', 'VAT_Rate'],</strong> <strong class="bold">       ['0.0857845735264331', 'gov_debt_per_gdp'],</strong> <strong class="bold">       ['0.018198547504343885', 'polity'],</strong> <strong class="bold">       ['0.12656984468734492', 'goveffect'],</strong> <strong class="bold">       ['-0.09889163752261303', 'democracy_index'],</strong> <strong class="bold">       ['-0.036584519840546594', 'democracy_polity'],</strong> <strong class="bold">       ['-0.5446613604546718', 'autocracy_polity'],</strong> <strong class="bold">       ['0.033234557366924815', 'democracy'],</strong> <strong class="bold">       ['-0.2048732386478349', 'nat_oil_comp'],</strong> <strong class="bold">       ['-0.6142887840649164', 'nat_oil_comp_state'],</strong> <strong class="bold">       ['0.14488410358761755', 'motorization_rate']], dtype='&lt;U32')</strong></pre></li>
+
+</ol>
+
+<p>注意<a id="_idIndexMarker711"/>我们在这里没有做任何特性选择。相反，我们依靠 L1 正则化将特征系数推到接近 0。如果我们有更多的特性，或者我们更关心计算时间，更仔细地考虑我们的特性选择策略将是很重要的。</p>
+
+<ol>
+
+<li value="8">让我们对这个模型做一些交叉验证。平均绝对误差和 r 平方并不大，尽管这肯定会受到小样本量的影响:<pre>kf = KFold(n_splits=3, shuffle=True, random_state=0) ttr.fit(X_train, y_train) scores = cross_validate(ttr, X=X_train, y=y_train,   cv=kf, scoring=('r2', 'neg_mean_absolute_error'),     n_jobs=1) print("Mean Absolute Error: %.2f, R-squared: %.2f" %   (scores['test_neg_mean_absolute_error'].mean(),   scores['test_r2'].mean())) Mean Absolute Error: -0.26, R-squared: 0.57</pre></li>
+
+</ol>
+
+<p>我们还没有做任何超参数调整。我们不知道<code>epsilon</code>和<em class="italic"> C </em>的值是否是我们模型的最佳值。因此，我们需要进行网格搜索，用不同的超参数值进行实验。我们将从彻底的网格搜索开始，这通常是不实际的(我建议不要在您的机器上运行接下来的几个步骤，除非您有一个相当高性能的机器)。在彻底的网格搜索之后，我们将进行随机网格搜索，这通常在系统资源上更容易。</p>
+
+<ol>
+
+<li value="9">我们将从创建一个没有指定<code>epsilon</code>超参数的<code>LinearSVR</code>对象开始，我们将重新创建管道。然后，我们将创建一个字典<code>svr_params</code>，其中包含用于检查<code>epsilon</code>和<em class="italic"> C </em>的值，分别称为<code>regressor_linearsvr_epsilon</code>和<code>regressor_linearsvr_C</code>。</li>
+
+</ol>
+
+<p>请记住，根据上一章的网格搜索，键的名称必须与我们的管道步骤相对应。我们的管道(在这种情况下可以作为转换后的目标的<code>regressor</code>对象来访问)有一个<code>linearsvr</code>对象，该对象具有<code>epsilon</code>和<em class="italic"> C </em>的属性。</p>
+
+<p>我们将把<code>svr_params</code>字典传递给一个<code>GridSearchCV</code>对象，并指出我们希望评分基于 r 平方(如果我们希望评分基于平均绝对误差，我们也可以这样做)。</p>
+
+<p>然后，我们将运行网格搜索对象的<code>fit</code>方法。我应该重复前面提到的警告，除非您使用高性能的机器，或者您不介意在去喝咖啡的时候让它运行，否则您可能不想运行彻底的网格搜索。请注意，在我的机器上每次运行大约需要 26 秒:</p>
+
+<pre>svr = LinearSVR(max_iter=100000, random_state=0)
+pipe1 = make_pipeline(coltrans, 
+  KNNImputer(n_neighbors=5), svr)
+ttr=TransformedTargetRegressor(regressor=pipe1,
+  transformer=StandardScaler())
+svr_params = {
+  'regressor__linearsvr__epsilon': np.arange(0.1, 1.6, 0.1),
+  'regressor__linearsvr__C': np.arange(0.1, 1.6, 0.1)
+}
+gs = GridSearchCV(ttr,param_grid=svr_params, cv=3, 
+  scoring='r2')
+%timeit gs.fit(X_train, y_train)
+<strong class="bold">26.2 s ± 50.7 ms per loop (mean ± std. dev. of 7 runs, 1 loop each)</strong></pre>
+
+<ol>
+
+<li value="10">现在，我们可以使用网格搜索的<code>best_params_</code>属性来获得与最高分数相关联的超参数<a id="_idIndexMarker713"/>。我们可以看到带有<code>best_scores_</code>属性的那些参数的分数。这告诉我们，我们得到了最高的 r 平方，即 0.6，其中<em class="italic"> C </em>为 0.1，<code>epsilon</code>值为 0.2: <pre>gs.best_params_ <strong class="bold">{'regressor__linearsvr__C': 0.1, 'regressor__linearsvr__epsilon': 0.2}</strong> gs.best_score_ <strong class="bold">0.599751107082899</strong></pre></li>
+
+</ol>
+
+<p>知道为我们的超参数选择哪些值是有益的。然而，穷举网格搜索在计算上是相当昂贵的。让我们试试随机搜索。</p>
+
+<ol>
+
+<li value="11">我们将<a id="_idIndexMarker714"/>指出<code>epsilon</code>和<em class="italic"> C </em>的随机值应该来自 0 到 1.5 之间的均匀分布。然后，我们将把字典传递给一个<code>RandomizedSearchCV</code>对象。这比穷举网格搜索要快得多——每次迭代 1 秒多一点。这给了我们比穷举网格搜索更高的<code>epsilon</code>和<em class="italic"> C </em>值，即分别为 0.23 和 0.7。然而，r 平方值稍低:<pre>svr_params = {  'regressor__linearsvr__epsilon': uniform(loc=0, scale=1.5),  'regressor__linearsvr__C': uniform(loc=0, scale=1.5) } rs = RandomizedSearchCV(ttr, svr_params, cv=3, scoring='r2') <strong class="bold">%timeit rs.fit(X_train, y_train)</strong> <strong class="bold">1.21 s ± 24.5 ms per loop (mean ± std. dev. of 7 runs, 1 loop each)</strong> rs.best_params_ <strong class="bold">{'regressor__linearsvr__C': 0.23062453444814285,</strong> <strong class="bold"> 'regressor__linearsvr__epsilon': 0.6976844872643301}</strong> rs.best_score_ <strong class="bold">0.5785452537781279</strong></pre></li>
+
+<li>让我们来看看基于随机网格搜索的最佳模型的预测。随机网格搜索对象的<code>predict</code>方法可以为我们生成那些预测:<pre>pred = rs.predict(X_test) preddf = pd.DataFrame(pred, columns=['prediction'],   index=X_test.index).join(X_test).join(y_test) preddf['resid'] = preddf.gas_tax_imp-preddf.prediction</pre></li>
+
+<li>现在，让我们看看残差的分布:<pre>plt.hist(preddf.resid, color="blue", bins=np.arange(-0.5,1.0,0.25)) plt.axvline(preddf.resid.mean(), color='red', linestyle='dashed', linewidth=1) plt.title("Histogram of Residuals for Gas Tax Model") plt.xlabel("Residuals") plt.ylabel("Frequency") plt.xlim() plt.show()</pre></li>
+
+</ol>
+
+<p>这会产生以下情节:</p>
+
+<div><div><img alt="Figure 8.7 – Residual distribution for the gasoline tax linear SVR model&#10;&#10;" height="446" src="img/B17978_08_007.jpg" width="563"/>
+
+</div>
+
+</div>
+
+<p class="figure-caption">图 8.7-汽油税线性 SVR 模型的残差分布</p>
+
+<p>这里，这里<a id="_idIndexMarker716"/>有一点偏差(总体上有些预测过度)和一些正偏差。</p>
+
+<ol>
+
+<li value="14">让我们来看看预测值与残差的散点图:<pre>plt.scatter(preddf.prediction, preddf.resid, color="blue") plt.axhline(0, color='red', linestyle='dashed', linewidth=1) plt.title("Scatterplot of Predictions and Residuals") plt.xlabel("Predicted Gas Tax") plt.ylabel("Residuals") plt.show()</pre></li>
+
+</ol>
+
+<p>这会产生以下情节:</p>
+
+<div><div><img alt="Figure 8.8 – Scatterplot of predictions and residuals for the gasoline tax linear SVR model&#10;&#10;" height="449" src="img/B17978_08_008.jpg" width="577"/>
+
+</div>
+
+</div>
+
+<p class="figure-caption">图 8.8-汽油税线性 SVR 模型的预测和残差散点图</p>
+
+<p>这些残差是有问题的。我们总是在预测值的下限和上限过度预测(预测值高于实际值)。这个<a id="_idIndexMarker717"/>不是我们想要的，也许是在警告我们一种无法解释的非线性关系。</p>
+
+<p>当我们的数据是线性可分的，线性 SVR 可能是一个有效的选择。它可用于许多与我们使用线性回归或带正则化的线性回归相同的情况。它的相对效率意味着我们不像使用非线性 SVR 那样关心将它用于包含超过 10，000 个观察值的数据集。然而，当线性可分性不可行时，我们应该探索非线性模型。</p>
+
+<h1 id="_idParaDest-112"><a id="_idTextAnchor111"/>使用核函数进行非线性支持向量回归</h1>
+
+<p>回想一下我们在本章开始时的讨论，我们可以使用核函数来拟合非线性ε不敏感管。在本节中，我们<a id="_idIndexMarker719"/>将使用我们在前一章中使用的陆地温度数据运行非线性 SVR。但首先，我们将使用相同的数据构建一个线性 SVR 进行比较。</p>
+
+<p>我们将气象站的平均温度建模为纬度和海拔的函数。请遵循以下步骤:</p>
+
+<ol>
+
+<li value="1">我们将从加载熟悉的库开始。唯一的新类是来自 scikit-learn 的<code>SVR</code>:<pre>import pandas as pd import numpy as np from sklearn.model_selection import train_test_split from sklearn.preprocessing import StandardScaler from sklearn.svm import LinearSVR, SVR from scipy.stats import uniform from sklearn.impute import SimpleImputer from sklearn.pipeline import make_pipeline from sklearn.compose import TransformedTargetRegressor from sklearn.impute import KNNImputer from sklearn.model_selection import RandomizedSearchCV import sklearn.metrics as skmet import matplotlib.pyplot as plt import os import sys sys.path.append(os.getcwd() + "/helperfunctions") from preprocfunc import OutlierTrans</pre></li>
+
+<li>接下来，我们<a id="_idIndexMarker720"/>将加载陆地温度数据，并创建<a id="_idIndexMarker721"/>训练和测试数据帧。我们还将看看一些描述性的统计数据。高程有几个缺失值，并且这两个要素的范围非常不同。也有一些非常低的平均温度:<pre>landtemps = pd.read_csv("data/landtempsb2019avgs.csv") landtemps.set_index('locationid', inplace=True) feature_cols = ['latabs','elevation'] landtemps[['avgtemp'] + feature_cols].\ <strong class="bold">  agg(['count','min','median','max']).T</strong> <strong class="bold">               count       min     median     max</strong> <strong class="bold">avgtemp        12,095     -61      10         34</strong> <strong class="bold">latabs         12,095      0       41         90</strong> <strong class="bold">elevation      12,088     -350     271        4,701</strong> X_train, X_test, y_train, y_test =  \   train_test_split(landtemps[feature_cols],\   landtemps[['avgtemp']], test_size=0.1, random_state=0)</pre></li>
+
+<li>让我们从平均温度的线性 SVR 模型开始。我们可以相当保守地处理异常值，仅当四分位数范围高于或低于四分位数范围三倍以上时，才将其设置为缺失。(我们在第七章<a href="B17978_07_ePub.xhtml#_idTextAnchor091"> <em class="italic">中创建了<code>OutlierTrans</code>类</em> </a>，<em class="italic">线性回归模型</em>。)我们将对缺失的高程值使用 KNN 插补，并对数据进行缩放。请记住，我们需要使用目标转换器来缩放目标变量。</li>
+
+</ol>
+
+<p>正如<a id="_idIndexMarker722"/>我们<a id="_idIndexMarker723"/>在上一节中所做的那样，我们将使用一个字典<code>svr_params</code>来表示我们想要从我们的超参数的均匀分布中采样值——即<code>epsilon</code>和<em class="italic"> C </em>。我们将把这个字典传递给<code>RandomizedSearchCV</code>对象。</p>
+
+<p>运行<code>fit</code>后，我们可以得到<code>epsilon</code>和<em class="italic"> C </em>的最佳参数，以及最佳模型的平均绝对误差。平均绝对误差相当可观，约为 2.8 度:</p>
+
+<pre>svr = LinearSVR(epsilon=1.0, max_iter=100000)
+knnimp = KNNImputer(n_neighbors=45)
+pipe1 = make_pipeline(OutlierTrans(3), knnimp, StandardScaler(), svr)
+ttr=TransformedTargetRegressor(regressor=pipe1,
+  transformer=StandardScaler())
+svr_params = {
+ 'regressor__linearsvr__epsilon': uniform(loc=0, scale=1.5),
+ 'regressor__linearsvr__C': uniform(loc=0, scale=20)
+}
+rs = RandomizedSearchCV(ttr, svr_params, cv=10, scoring='neg_mean_absolute_error')
+rs.fit(X_train, y_train)
+rs.best_params_
+<strong class="bold">{'regressor__linearsvr__C': 15.07662849482442,</strong>
+<strong class="bold"> 'regressor__linearsvr__epsilon': 0.06750238486004034}</strong>
+rs.best_score_
+<strong class="bold">-2.769283402595076</strong></pre>
+
+<ol>
+
+<li value="4">让我们<a id="_idIndexMarker724"/>看看<a id="_idIndexMarker725"/>的预测:<pre>pred = rs.predict(X_test) preddf = pd.DataFrame(pred, columns=['prediction'],   index=X_test.index).join(X_test).join(y_test) preddf['resid'] = preddf.avgtemp-preddf.prediction plt.scatter(preddf.prediction, preddf.resid, color="blue") plt.axhline(0, color='red', linestyle='dashed', linewidth=1) plt.title("Scatterplot of Predictions and Residuals") plt.xlabel("Predicted Gas Tax") plt.ylabel("Residuals") plt.show()</pre></li>
+
+</ol>
+
+<p>这个<a id="_idIndexMarker726"/>产生了以下情节:</p>
+
+<div><div><img alt="Figure 8.9 – Scatterplot of predictions and residuals for the land temperatures linear SVR model&#10;&#10;" height="449" src="img/B17978_08_009.jpg" width="573"/>
+
+</div>
+
+</div>
+
+<p class="figure-caption">图 8.9–土地温度线性 SVR 模型的预测和残差散点图</p>
+
+<p>在预测值的上限范围内有一个<a id="_idIndexMarker727"/>良好的过度预测量。我们通常会低估这个数值，介于 15 到 25 度的汽油税预测值之间。也许我们可以用非线性模型来提高拟合度。</p>
+
+<ol>
+
+<li value="5">我们不需要做太多的改变来运行非线性 SVR。我们只需要创建一个<code>SVR</code>对象并选择一个内核函数。<code>rbf</code>是典型的选择。(你可能不想在你的机器上安装这个模型，除非你正在使用好的硬件，或者不介意暂时做点别的事情，然后回来取你的结果。)拿个<a id="_idIndexMarker729"/>看看下面的代码:<pre>svr = SVR(kernel='rbf') pipe1 = make_pipeline(OutlierTrans(3), knnimp, StandardScaler(), svr) ttr=TransformedTargetRegressor(regressor=pipe1,   transformer=StandardScaler()) svr_params = {  'regressor__svr__epsilon': uniform(loc=0, scale=5),  'regressor__svr__C': uniform(loc=0, scale=20),  'regressor__svr__gamma': uniform(loc=0, scale=100)  } rs = RandomizedSearchCV(ttr, svr_params, cv=10, scoring='neg_mean_absolute_error') rs.fit(X_train, y_train) rs.best_params_ <strong class="bold">{'regressor__svr__C': 5.3715128489311255,</strong> <strong class="bold"> 'regressor__svr__epsilon': 0.03997496426101643,</strong> <strong class="bold"> 'regressor__svr__gamma': 53.867632383007994}</strong> rs.best_score_ <strong class="bold">-2.1319240416548775</strong></pre></li>
+
+</ol>
+
+<p>在平均绝对误差方面有显著的改进。这里，我们可以看到<code>gamma</code>和 C 超参数为我们做了相当多的工作。如果我们可以平均偏离 2 度，这个模型就能让我们达到这个水平。</p>
+
+<p>我们将在第 13 章  <em class="italic">【支持向量机分类】的<a href="B17978_13_ePub.xhtml#_idTextAnchor152"> <em class="italic">中详细讨论γ和 C 超参数。除了 rbf 内核，我们还探索了其他内核。</em></a></em></p>
+
+<ol>
+
+<li value="6">让我们再次查看残差的<a id="_idIndexMarker730"/>，看看我们的误差分布是否有<a id="_idIndexMarker731"/>的问题，就像我们的线性模型一样:<pre>pred = rs.predict(X_test) preddf = pd.DataFrame(pred, columns=['prediction'],   index=X_test.index).join(X_test).join(y_test) preddf['resid'] = preddf.avgtemp-preddf.prediction plt.scatter(preddf.prediction, preddf.resid, color="blue") plt.axhline(0, color='red', linestyle='dashed', linewidth=1) plt.title("Scatterplot of Predictions and Residuals") plt.xlabel("Predicted Gas Tax") plt.ylabel("Residuals") plt.show()</pre></li>
+
+</ol>
+
+<p>这会产生以下情节:</p>
+
+<div><div><img alt="Figure 8.10 – Scatterplot of predictions and residuals for the land temperatures nonlinear SVR model&#10;&#10;" height="445" src="img/B17978_08_010.jpg" width="572"/>
+
+</div>
+
+</div>
+
+<p class="figure-caption">图 8.10–陆地温度非线性 SVR 模型的预测和残差散点图</p>
+
+<p>这些残差看起来比线性模型好得多。</p>
+
+<p>这个<a id="_idIndexMarker732"/>说明了<a id="_idIndexMarker733"/>如何使用核函数来增加我们模型的复杂性，而不需要我们增加特征空间。通过使用<code>rbf</code>内核并调整 C 和<code>gamma</code>超参数，我们解决了线性模型中的一些欠拟合问题。这是非线性 SVR 的一大优点。正如我们也看到的，缺点是对系统资源的消耗很大。包含 12，000 个观察值的数据集已经达到了使用非线性 SVR 可以轻松处理的上限，特别是使用网格搜索最佳超参数。</p>
+
+<h1 id="_idParaDest-113"><a id="_idTextAnchor112"/>总结</h1>
+
+<p>本章中的例子展示了 SVR 的一些优点。该算法允许我们调整超参数来解决欠拟合或过拟合。这可以在不增加特征数量的情况下完成。与线性回归等方法相比，SVR 对异常值也不太敏感。</p>
+
+<p>当我们可以用线性 SVR 建立一个好的模型时，这是一个非常合理的选择。它的训练速度比非线性模型快得多。然而，正如我们在本章最后一节所看到的，我们通常可以通过非线性 SVR 来提高性能。</p>
+
+<p>这个讨论引导我们到下一章要探讨的内容，我们将会看到两个流行的非参数回归算法:k-最近邻和决策树回归。这两种算法对我们的特征和目标的分布几乎不做任何假设。与 SVR 类似，它们可以在不增加特征空间的情况下捕捉数据中的复杂关系。</p>
+
+</div>
+
+</div>
+
+
+
+</body></html>

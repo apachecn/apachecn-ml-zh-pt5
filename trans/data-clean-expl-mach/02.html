@@ -1,0 +1,471 @@
+<html><head/><body>
+
+
+
+
+
+
+
+
+
+<title>Chapter 1: Examining the Distribution of Features and Targets</title>
+
+
+
+
+
+
+
+<div><div><h1 id="_idParaDest-15"><em class="italic"> <a id="_idTextAnchor014"/>第 1 章</em>:检查特征和目标的分布</h1>
+
+<p>机器学习的写作和指导通常以算法为中心。有时，这给人的印象是，我们所要做的就是选择正确的模型，然后改变组织的洞察力就会随之而来。但是，开始机器学习项目的最佳地方是理解我们将使用的功能和目标是如何分布的。</p>
+
+<p>即使我们越来越关注预测的准确性，也必须为从数据中进行同样的学习留出空间，这几十年来一直是我们作为分析师的核心工作——研究变量的分布、识别异常和检验双变量关系。</p>
+
+<p>我们将在本书的前三章中探索这样做的工具，同时也考虑模型构建的含义。</p>
+
+<p>在本章中，我们将使用常见的 NumPy 和 pandas 技术来更好地理解数据的属性。在进行任何预测分析之前，我们想知道关键特征是如何分布的。我们还想知道每个连续特征的集中趋势、形状和分布，并对分类特征的每个值进行计数。我们将利用非常方便的 NumPy 和 pandas 工具来生成汇总统计数据，例如平均值、最小值和最大值，以及标准偏差。</p>
+
+<p>之后，我们将创建关键特性的可视化，包括直方图和箱线图，以便让我们更好地了解每个特性的分布情况，而不仅仅是查看汇总统计数据。我们将暗示特征分布对数据转换、编码和缩放的影响，以及我们将在后续章节中使用相同数据进行的建模。</p>
+
+<p>具体来说，在本章中，我们将讨论以下主题:</p>
+
+<ul>
+
+<li>子集数据</li>
+
+<li>为分类特征生成频率</li>
+
+<li>生成连续要素的汇总统计数据</li>
+
+<li>识别单变量分析中的极值和异常值</li>
+
+<li>使用直方图、箱线图和小提琴图检查连续特征的分布</li>
+
+</ul>
+
+<h1 id="_idParaDest-16"><a id="_idTextAnchor015"/>技术要求</h1>
+
+<p>本章很大程度上依赖于 pandas、NumPy 和 Matplotlib 库，但是你不需要这些库的任何先验知识。如果您已经从科学发行版安装了 Python，比如 Anaconda 或 WinPython，那么这些库可能已经安装了。如果需要安装其中一个来运行本章的代码，可以从终端运行<code>pip install [package name]</code>。</p>
+
+<h1 id="_idParaDest-17"><a id="_idTextAnchor016"/>子集化数据</h1>
+
+<p>几乎我参与的每个统计建模项目都需要从分析中移除一些数据。通常，这是因为缺少值或异常值。有时，将我们的分析限制在数据的一个子集是有理论原因的。例如，我们有追溯到 1600 年的天气数据，但我们的分析目标只涉及 1900 年以来的天气变化。幸运的是，熊猫中的子集化工具非常强大和灵活。我们将在这一部分使用来自美国<strong class="bold">全国青年纵向调查</strong> ( <strong class="bold"> NLS </strong>)的数据。</p>
+
+<p class="callout-heading">注意</p>
+
+<p class="callout">青年 NLS 是由美国劳工统计局进行的。这项调查始于 1997 年的一群人，他们出生于 1980 年至 1985 年之间，每年都进行年度随访，直到 2017 年。为了这个食谱，我从调查的数百个数据项中提取了 89 个变量，包括分数、就业、收入和对政府的态度。可以从存储库中下载 SPSS、Stata 和 SAS 的单独文件。https://www.nlsinfo.org/investigator/pages/search 的 NLS 数据可供公众使用。</p>
+
+<p>让我们开始使用 pandas 对<a id="_idIndexMarker003"/>数据进行<a id="_idIndexMarker002"/>子集化:</p>
+
+<ol>
+
+<li>我们将从加载 NLS 数据开始。我们还设置了一个指标:<pre>import pandas as pd import numpy as np nls97 = pd.read_csv("data/nls97.csv") nls97.set_index("personid", inplace=True)</pre></li>
+
+<li>让我们从 NLS 数据中选择几列。以下代码创建了一个新的 DataFrame，其中包含一些人口统计和就业数据。pandas 的一个有用特性是新数据帧保留了旧数据帧的索引，如下所示:<pre>democols = ['gender','birthyear','maritalstatus',  'weeksworked16','wageincome','highestdegree'] nls97demo = nls97[democols] nls97demo.index.name <strong class="bold">'personid'</strong></pre></li>
+
+<li>我们可以使用切片来按位置选择行。<code>nls97demo[1000:1004]</code>选择每一行，从冒号左边的整数指示的行(<code>1000</code>，在本例中)开始，直到冒号右边的整数指示的行(<code>1004</code>)，但不包括该行。由于从零开始的索引，<code>1000</code>处的行是第 1001 行。每行在输出中显示为一列，因为我们已经转置了结果数据帧:<pre>nls97demo[1000:1004].T <strong class="bold">personid      195884       195891        195970\</strong> <strong class="bold">gender        Male         Male          Female</strong> <strong class="bold">birthyear     1981         1980          1982</strong> <strong class="bold">maritalstatus NaN          Never-married Never-married</strong> <strong class="bold">weeksworked16 NaN          53            53</strong> <strong class="bold">wageincome    NaN          14,000        52,000   </strong> <strong class="bold">highestdegree 4.Bachelors  2.High School 4.Bachelors</strong> <strong class="bold">personid       195996  </strong> <strong class="bold">gender         Female  </strong> <strong class="bold">birthyear      1980  </strong> <strong class="bold">maritalstatus  NaN  </strong> <strong class="bold">weeksworked16  NaN  </strong> <strong class="bold">wageincome     NaN</strong> <strong class="bold">highestdegree  3.Associates</strong>    </pre></li>
+
+<li>我们还可以通过为第二个冒号后的步骤<a id="_idIndexMarker005"/>设置一个值来<a id="_idIndexMarker004"/>跳过间隔中的行。步长的默认值为 1。下一步的值为 2，这意味着将选择<code>1000</code>和<code>1004</code>之间的每隔一行:<pre>nls97demo[1000:1004:2].T <strong class="bold">personid        195884       195970</strong> <strong class="bold">gender          Male         Female</strong> <strong class="bold">birthyear       1981         1982</strong> <strong class="bold">maritalstatus   NaN          Never-married</strong> <strong class="bold">weeksworked16   NaN          53</strong> <strong class="bold">wageincome      NaN          52,000</strong> <strong class="bold">highestdegree   4.Bachelors  4. Bachelors</strong></pre></li>
+
+<li>如果我们<a id="_idIndexMarker006"/>不包括冒号左边的值，行<a id="_idIndexMarker007"/>选择将从第一行开始。注意，这将返回与<code>head</code>方法相同的数据帧:<pre>nls97demo[:3].T <strong class="bold">personid       100061         100139          100284</strong> <strong class="bold">gender         Female         Male            Male</strong> <strong class="bold">birthyear      1980           1983            1984</strong> <strong class="bold">maritalstatus  Married        Married         Never-married</strong> <strong class="bold">weeksworked16  48             53              47</strong> <strong class="bold">wageincome     12,500         120,000         58,000</strong> <strong class="bold">highestdegree  2.High School  2. High School  0.None</strong> nls97demo.head(3).T <strong class="bold">personid       100061         100139         100284</strong> <strong class="bold">gender         Female         Male           Male</strong> <strong class="bold">birthyear      1980           1983           1984</strong> <strong class="bold">maritalstatus  Married        Married        Never-married</strong> <strong class="bold">weeksworked16  48             53             47</strong> <strong class="bold">wageincome     12,500         120,000        58,000</strong> <strong class="bold">highestdegree  2.High School  2.High School  0. None</strong></pre></li>
+
+<li>如果我们在冒号左边使用一个负数-n，将返回数据帧的最后 n 行。这将返回与<code>tail</code>方法相同的数据帧:<pre> nls97demo[-3:].T <strong class="bold">personid       999543          999698        999963</strong> <strong class="bold">gender         Female         Female         Female</strong> <strong class="bold">birthyear      1984           1983           1982</strong> <strong class="bold">maritalstatus  Divorced       Never-married  Married</strong> <strong class="bold">weeksworked16  0              0              53</strong> <strong class="bold">wageincome     NaN            NaN            50,000</strong> <strong class="bold">highestdegree  2.High School  2.High School  4. Bachelors</strong>  nls97demo.tail(3).T <strong class="bold">personid       999543         999698         999963</strong> <strong class="bold">gender         Female         Female         Female</strong> <strong class="bold">birthyear      1984           1983           1982</strong> <strong class="bold">maritalstatus  Divorced       Never-married  Married</strong> <strong class="bold">weeksworked16  0              0              53</strong> <strong class="bold">wageincome     NaN            NaN            50,000</strong> <strong class="bold">highestdegree  2.High School  2.High School  4. Bachelors</strong></pre></li>
+
+<li>我们可以使用<code>loc</code>访问器通过索引值选择行。回想一下，对于<code>nls97demo</code>数据帧，索引是<code>personid</code>。我们可以将索引标签的列表传递给<code>loc</code>访问器，比如<code>loc[[195884,195891,195970]]</code>，以获取与这些标签相关联的行。我们还可以传递索引标签的上下限，比如<code>loc[195884:195970]</code>，以检索指示的行:<pre> nls97demo.loc[[195884,195891,195970]].T <strong class="bold">personid       195884       195891         195970</strong> <strong class="bold">gender         Male         Male           Female</strong> <strong class="bold">birthyear      1981         1980           1982</strong> <strong class="bold">maritalstatus  NaN          Never-married  Never-married</strong> <strong class="bold">weeksworked16  NaN          53             53</strong> <strong class="bold">wageincome     NaN          14,000         52,000</strong> <strong class="bold">highestdegree  4.Bachelors  2.High School  4.Bachelors</strong>  nls97demo.loc[195884:195970].T <strong class="bold">personid       195884       195891         195970</strong> <strong class="bold">gender         Male         Male           Female</strong> <strong class="bold">birthyear      1981         1980           1982</strong> <strong class="bold">maritalstatus  NaN          Never-married  Never-married</strong> <strong class="bold">weeksworked16  NaN          53             53</strong> <strong class="bold">wageincome     NaN          14,000         52,000</strong> <strong class="bold">highestdegree  4.Bachelors  2.High School  4.Bachelors</strong></pre></li>
+
+<li>为了通过位置而不是索引标签来选择行<a id="_idIndexMarker010"/>，我们<a id="_idIndexMarker011"/>可以使用<code>iloc</code>访问器。我们可以向访问器传递一个位置编号列表，比如<code>iloc[[0,1,2]]</code>，以获取这些位置的行。我们可以传递一个范围，比如<code>iloc[0:3]</code>，来获取下限和上限之间的行，不包括上限的行。我们<a id="_idIndexMarker012"/>也可以使用<code>iloc</code>访问器来选择<a id="_idIndexMarker013"/>最后 n 行。<code>iloc[-3:]</code>选择最后三行:<pre> nls97demo.iloc[[0,1,2]].T <strong class="bold">personid       100061         100139         100284</strong> <strong class="bold">gender         Female         Male           Male</strong> <strong class="bold">birthyear      1980           1983           1984</strong> <strong class="bold">maritalstatus  Married        Married        Never-married</strong> <strong class="bold">weeksworked16  48             53             47</strong> <strong class="bold">wageincome     12,500         120,000        58,000</strong> <strong class="bold">highestdegree  2.High School  2.High School  0. None</strong>  nls97demo.iloc[0:3].T <strong class="bold">personid       100061         100139         100284</strong> <strong class="bold">gender         Female         Male           Male</strong> <strong class="bold">birthyear      1980           1983           1984</strong> <strong class="bold">maritalstatus  Married        Married        Never-married</strong> <strong class="bold">weeksworked16  48             53             47</strong> <strong class="bold">wageincome     12,500         120,000        58,000</strong> <strong class="bold">highestdegree  2.High School  2.High School  0. None</strong>  nls97demo.iloc[-3:].T <strong class="bold">personid       999543         999698         999963</strong> <strong class="bold">gender         Female         Female         Female</strong> <strong class="bold">birthyear      1984           1983           1982</strong> <strong class="bold">maritalstatus  Divorced       Never-married  Married</strong> <strong class="bold">weeksworked16  0              0              53</strong> <strong class="bold">wageincome     NaN            NaN            50,000</strong> <strong class="bold">highestdegree  2.High School  2.High School  4. Bachelors</strong></pre></li>
+
+</ol>
+
+<p>通常，我们需要<a id="_idIndexMarker014"/>基于一个列值或几个列的<a id="_idIndexMarker015"/>值来选择行。我们可以通过使用布尔索引在 pandas 中实现这一点。这里，我们将一个布尔值向量(可以是一个序列)传递给<code>loc</code>访问器或括号操作符。布尔向量需要与数据帧具有相同的索引。</p>
+
+<ol>
+
+<li value="9">让我们使用 NLS 数据框架上的<code>nightlyhrssleep</code>列来尝试一下。我们想要一个布尔序列，对于每晚睡眠 6 小时或更少的人来说是<code>True</code>(第 33 百分位)，如果<code>nightlyhrssleep</code>大于 6 或缺失，则是<code>False</code>。<code>sleepcheckbool = nls97.nightlyhrssleep&lt;=lowsleepthreshold</code>创建布尔序列。如果我们显示<code>sleepcheckbool</code>的前几个值，我们会看到我们得到了预期的值。我们还可以确认<code>sleepcheckbool</code>指标等于<code>nls97</code>指标:<pre>nls97.nightlyhrssleep.head() <strong class="bold">personid</strong> <strong class="bold">100061     6</strong> <strong class="bold">100139     8</strong> <strong class="bold">100284     7</strong> <strong class="bold">100292     nan</strong> <strong class="bold">100583     6</strong> <strong class="bold">Name: nightlyhrssleep, dtype: float64</strong> lowsleepthreshold = nls97.nightlyhrssleep.quantile(0.33) lowsleepthreshold <strong class="bold">6.0</strong> sleepcheckbool = nls97.nightlyhrssleep&lt;=lowsleepthreshold sleepcheckbool.head() <strong class="bold">personid</strong> <strong class="bold">100061    True</strong> <strong class="bold">100139    False</strong> <strong class="bold">100284    False</strong> <strong class="bold">100292    False</strong> <strong class="bold">100583    True</strong> <strong class="bold">Name: nightlyhrssleep, dtype: bool</strong> sleepcheckbool.index.equals(nls97.index) <strong class="bold">True</strong></pre></li>
+
+</ol>
+
+<p>由于<code>sleepcheckbool</code>系列与<code>nls97</code>具有相同的索引，我们可以将它传递给<code>loc</code>访问器<a id="_idIndexMarker016"/>来创建一个包含每晚睡眠时间不超过 6 小时的人的数据帧<a id="_idIndexMarker017"/>。这是一只神奇的小熊猫。它为我们处理索引对齐:</p>
+
+<pre>lowsleep = nls97.loc[sleepcheckbool]
+lowsleep.shape
+<strong class="bold">(3067, 88)</strong></pre>
+
+<ol>
+
+<li value="10">我们可以在一个步骤中创建数据的<code>lowsleep</code>子集，这是我们通常会做的，除非我们出于其他目的需要布尔序列:<pre>lowsleep = nls97.loc[nls97.nightlyhrssleep&lt;=lowsleepthreshold] lowsleep.shape <strong class="bold">(3067, 88)</strong></pre></li>
+
+<li>我们可以将更多复杂的条件传递给<code>loc</code>访问器<a id="_idIndexMarker019"/>并评估多个列的值。例如，我们可以选择<code>nightlyhrssleep</code>小于或等于阈值且<code>childathome</code>(在家居住的儿童数量)大于或等于<code>3</code> : <pre>lowsleep3pluschildren = \   nls97.loc[(nls97.nightlyhrssleep&lt;=lowsleepthreshold)     &amp; (nls97.childathome&gt;=3)] lowsleep3pluschildren.shape <strong class="bold">(623, 88)</strong></pre>的行</li>
+
+</ol>
+
+<p><code>nls97.loc[(nls97.nightlyhrssleep&lt;=lowsleepthreshold) &amp; (nls97.childathome&gt;3)]</code>中的每个条件都放在括号中。如果括号被排除，将产生一个错误。<code>&amp;</code>操作符相当于标准 Python 中的<code>and</code>，这意味着对于要选择的行来说，两个条件都必须是<code>True</code>。如果<em class="italic">或</em>条件为<code>True</code>，我们可以用<code>|</code>代替<code>or</code>来选择行。</p>
+
+<ol>
+
+<li value="12">最后，我们可以同时选择行和列。逗号左边的表达式选择行，而逗号右边的列表选择列:<pre>lowsleep3pluschildren = \   nls97.loc[(nls97.nightlyhrssleep&lt;=lowsleepthreshold)     &amp; (nls97.childathome&gt;=3),     ['nightlyhrssleep','childathome']] lowsleep3pluschildren.shape <strong class="bold">(623, 2)</strong></pre></li>
+
+</ol>
+
+<p>在最后两节中，我们使用了三种不同的工具从 pandas 数据帧中选择列和行:括号操作符<code>[]</code>和两个 pandas 特有的访问器<code>loc</code>和<code>iloc</code>。如果你是熊猫新手，这可能会有点困惑，但是几个月后，在什么情况下使用什么工具就变得很清楚了。如果您对 pandas 有相当多的 Python 和 NumPy 经验，您可能会发现最熟悉的是<code>[]</code>操作符。然而，pandas 文档建议不要在生产代码中使用<code>[]</code>操作符。<code>loc</code>访问器<a id="_idIndexMarker020"/>用于通过布尔索引或索引标签选择行，而<code>iloc</code>访问器用于通过行<a id="_idIndexMarker021"/>号选择行。</p>
+
+<p>这部分是关于选择熊猫的行列的简单介绍。虽然我们没有对此进行过多的详细讨论，但是你需要知道的关于子集数据的大部分内容都已经涵盖了，还有你需要知道的理解本书剩余部分中关于熊猫的材料的所有内容。在接下来的两节中，我们将通过为我们的特性创建频率和汇总统计数据来开始将其中的一些内容付诸实践。</p>
+
+<h1 id="_idParaDest-18"><a id="_idTextAnchor017"/>为分类特征生成频率</h1>
+
+<p>分类特征<a id="_idIndexMarker022"/>可以是名词性的，也可以是序数的<a id="_idIndexMarker023"/>。<strong class="bold">名义上的</strong>特征，如性别、物种名称或国家，有有限的<a id="_idIndexMarker024"/>个可能值，或者是字符串，或者是没有任何内在数字意义的数字。例如，如果国家用 1 表示阿富汗，用 2 表示阿尔巴尼亚，依此类推，那么数据就是数字，但是对这些值执行算术运算是没有意义的。</p>
+
+<p><strong class="bold">序数</strong>特征<a id="_idIndexMarker025"/>也有有限数量的可能值，但不同于名义特征，因为值的顺序很重要。一个<strong class="bold">李克特量表</strong>评级(从 1 表示非常不可能到 5 表示非常可能)是一个有序<a id="_idIndexMarker026"/>特征的例子。尽管如此，算术运算通常没有意义，因为值之间没有统一且有意义的距离。</p>
+
+<p>在我们开始<a id="_idIndexMarker027"/>建模之前，我们希望对我们可能使用的分类特征的所有可能值进行<a id="_idIndexMarker028"/>计数。这通常被称为单向频率分布。幸运的是，熊猫让这变得非常容易。我们可以从 pandas 数据框架中快速选择列，并使用<code>value_counts</code>方法为每个分类值生成计数:</p>
+
+<ol>
+
+<li value="1">让我们加载 NLS 数据，创建一个只包含前 20 列数据的 DataFrame，并查看数据类型:<pre>nls97 = pd.read_csv("data/nls97.csv") nls97.set_index("personid", inplace=True) nls97abb = nls97.iloc[:,:20] nls97abb.dtypes <code>loc</code> and <code>iloc</code> accessors. The colon to the left of the comma indicates that we want all the rows, while <code>:20</code> to the right of the comma gets us the first 20 columns.</pre></li>
+
+<li>在前面的<a id="_idIndexMarker030"/>代码中的所有<a id="_idIndexMarker029"/>对象类型列都是分类的。我们可以使用<code>value_counts</code>来查看<code>maritalstatus</code>的每个值的计数。我们还可以使用<code>dropna=False</code>让<code>value_counts</code>显示缺失的值(<code>NaN</code> ): <pre>nls97abb.maritalstatus.value_counts(dropna=False) <strong class="bold">Married          3066</strong> <strong class="bold">Never-married    2766</strong> <strong class="bold">NaN              2312</strong> <strong class="bold">Divorced         663</strong> <strong class="bold">Separated        154</strong> <strong class="bold">Widowed          23</strong> <strong class="bold">Name: maritalstatus, dtype: int64</strong></pre></li>
+
+<li>如果我们只想知道缺失值的数量，我们可以链接<code>isnull</code>和<code>sum</code>方法。当<code>maritalstatus</code>丢失时<code>isnull</code>返回包含<code>True</code>值的布尔序列，否则<code>False</code>返回。<code>sum</code>然后计算<code>True</code>值的数量，因为它会将<code>True</code>值解释为 1，将<code>False</code>值解释为 0: <pre>nls97abb.maritalstatus.isnull().sum() <strong class="bold">2312</strong></pre></li>
+
+<li>你可能已经注意到<a id="_idIndexMarker031"/>默认情况下<code>maritalstatus</code>值是按频率排序的。通过对索引进行排序，可以按值的字母顺序对它们进行排序。我们可以通过利用<code>value_counts</code>返回一个以值为索引的序列:<pre>marstatcnt = nls97abb.maritalstatus.value_counts(dropna=False) type(marstatcnt) <strong class="bold">&lt;class 'pandas.core.series.Series'&gt;</strong> <strong class="bold">marstatcnt.index</strong> <strong class="bold">Index(['Married', 'Never-married', nan, 'Divorced', 'Separated', 'Widowed'], dtype='object')</strong></pre>来做到这一点</li>
+
+<li>要对指数进行排序，我们只需要调用<code>sort_index</code> : <pre>marstatcnt.sort_index() <strong class="bold">Divorced         663</strong> <strong class="bold">Married          3066</strong> <strong class="bold">Never-married    2766</strong> <strong class="bold">Separated        154</strong> <strong class="bold">Widowed          23</strong> <strong class="bold">NaN              2312</strong> <strong class="bold">Name: maritalstatus, dtype: int64</strong></pre></li>
+
+<li>当然，我们可以用<code>nls97.maritalstatus.value_counts(dropna=False).sort_index()</code>一步得到同样的结果。我们也可以通过将<code>normalize</code>设置为<code>True</code>来显示比率，而不是计数。在下面的代码中，我们可以看到 34%的响应是<code>Married</code>(注意，我们没有将<code>dropna</code>设置为<code>True</code>，因此已经排除了缺失的值):<pre>nls97.maritalstatus.\   value_counts(normalize=True, dropna=False).\      sort_index()   <strong class="bold">Divorced             0.07</strong> <strong class="bold">Married              0.34</strong> <strong class="bold">Never-married        0.31</strong> <strong class="bold">Separated            0.02</strong> <strong class="bold">Widowed              0.00</strong> <strong class="bold">NaN                  0.26</strong> <strong class="bold">Name: maritalstatus, dtype: float64</strong></pre></li>
+
+<li>pandas 有一个<a id="_idIndexMarker033"/>类别数据类型，当一个列有有限数量的值时，它可以<a id="_idIndexMarker034"/>比对象数据类型更有效地存储数据。因为我们已经知道所有的对象列都包含分类数据，所以我们应该将这些列转换成分类数据类型。在下面的代码中，我们将创建一个包含对象列<code>catcols</code>的列名的列表。然后，我们遍历这些列，并使用<code>astype</code>将数据类型更改为<code>category</code> : <pre>catcols = nls97abb.select_dtypes(include=["object"]).columns for col in nls97abb[catcols].columns: ...      nls97abb[col] = nls97abb[col].astype('category') ...  nls97abb[catcols].dtypes <strong class="bold">gender                   category</strong> <strong class="bold">maritalstatus            category</strong> <strong class="bold">weeklyhrscomputer        category</strong> <strong class="bold">weeklyhrstv              category</strong> <strong class="bold">highestdegree            category</strong> <strong class="bold">govprovidejobs           category</strong> <strong class="bold">govpricecontrols         category</strong> <strong class="bold">dtype: object</strong></pre></li>
+
+<li>让我们检查一下<a id="_idIndexMarker035"/>我们的类别特性，看是否缺少<a id="_idIndexMarker036"/>值。<code>gender</code>没有缺失值，而<code>highestdegree</code>的缺失值很少。但是<code>govprovidejobs</code>(政府应该提供工作岗位)和<code>govpricecontrols</code>(政府应该控制物价)的绝大多数值都缺失了。这意味着这些特性可能对大多数建模都没用:<pre>nls97abb[catcols].isnull().sum() <strong class="bold">gender               0</strong> <strong class="bold">maritalstatus        2312</strong> <strong class="bold">weeklyhrscomputer    2274</strong> <strong class="bold">weeklyhrstv          2273</strong> <strong class="bold">highestdegree        31</strong> <strong class="bold">govprovidejobs       7151</strong> <strong class="bold">govpricecontrols     7125</strong> <strong class="bold">dtype: int64</strong></pre></li>
+
+<li>我们可以通过向<code>apply</code>传递一个<code>value_counts</code>调用来一次为<a id="_idIndexMarker038"/>多个特性生成<a id="_idIndexMarker037"/>频率。我们可以使用<code>filter</code>来选择我们想要的列——在本例中，是名称中带有<em class="italic"> gov </em>的所有列。注意，因为我们没有将<code>dropna</code>设置为<code>False</code> : <pre> nls97abb.filter(like="gov").apply(pd.value_counts, normalize=True)                  <strong class="bold">govprovidejobs    govpricecontrols</strong> <strong class="bold">1. Definitely              0.25                0.54</strong> <strong class="bold">2. Probably                0.34                0.33</strong> <strong class="bold">3. Probably not            0.25                0.09</strong> <strong class="bold">4. Definitely not          0.16                0.04</strong></pre>，所以每个特性的缺失值都被忽略了</li>
+
+<li>我们可以在数据子集上使用相同的频率。例如，如果我们只想看到已婚人士对政府角色问题的回答，我们可以通过将<code>nls97abb[nls97abb.maritalstatus=="Married"]</code>放在<code>filter</code>之前来设置子集:<pre> nls97abb.loc[nls97abb.maritalstatus=="Married"].\  filter(like="gov").\    apply(pd.value_counts, normalize=True)                  <strong class="bold">govprovidejobs    govpricecontrols</strong> <strong class="bold">1. Definitely              0.17                0.46</strong> <strong class="bold">2. Probably                0.33                0.38</strong> <strong class="bold">3. Probably not            0.31                0.11</strong> <strong class="bold">4. Definitely not          0.18                0.05</strong></pre></li>
+
+<li>因为在这种情况下，只有两个<em class="italic"> gov </em>列，所以执行以下操作可能更容易:<pre> nls97abb.loc[nls97abb.maritalstatus=="Married",    ['govprovidejobs','govpricecontrols']].\    apply(pd.value_counts, normalize=True)                   <strong class="bold">govprovidejobs     govpricecontrols</strong> <strong class="bold">1. Definitely               0.17                 0.46</strong> <strong class="bold">2. Probably                 0.33                 0.38</strong> <strong class="bold">3. Probably not             0.31                 0.11</strong> <strong class="bold">4. Definitely not           0.18                 0.05</strong></pre></li>
+
+</ol>
+
+<p>尽管如此，<a id="_idIndexMarker039"/>使用<code>filter</code>通常会更容易，因为不得不对具有相似名称的特征组执行相同的清理或探索任务并不罕见。</p>
+
+<p>有时，我们可能希望将连续或离散特征建模为分类特征。NLS 数据帧包含<code>highestgradecompleted</code>。就对目标的影响而言，从 5 年增加到 6 年可能不如从 11 年增加到 12 年重要。让我们创建一个二分法特征来代替——也就是说，当一个人完成了 12 个或更多的成绩时为 1，如果他们完成的少于 12 个成绩则为 0，当<code>highestgradecompleted</code>缺失时为缺失。</p>
+
+<ol>
+
+<li value="12">不过，我们需要先清理一下。<code>highestgradecompleted</code>有两个逻辑缺失值——熊猫识别为缺失的实际 NaN 值和调查设计者打算让我们在大多数用例中也视为缺失的 95 值。在继续之前，让我们用<code>replace</code>来解决这个问题:<pre>nls97abb.highestgradecompleted.\   replace(95, np.nan, inplace=True)</pre></li>
+
+<li>我们可以使用<a id="_idIndexMarker041"/> NumPy 的<code>where</code>函数<a id="_idIndexMarker042"/>根据<code>highestgradecompleted</code>的值给<code>highschoolgrad</code>赋值。如果<code>highestgradecompleted</code>为空(<code>NaN</code>，我们将<code>NaN</code>分配给新列<code>highschoolgrad</code>。如果<code>highestgradecompleted</code>的值不为空，下一个子句测试小于 12 的值，如果为真，则将<code>highschoolgrad</code>设置为 0，否则设置为 1。我们可以通过使用<code>groupby</code>在<code>highschoolgrad</code> : <pre>nls97abb['highschoolgrad'] = \   np.where(nls97abb.highestgradecompleted.isnull(),np.nan, \   np.where(nls97abb.highestgradecompleted&lt;12,0,1))   nls97abb.groupby(['highschoolgrad'], dropna=False) \   ['highestgradecompleted'].agg(['min','max','size'])                   <strong class="bold">min       max       size</strong> <strong class="bold">highschoolgrad                </strong> <strong class="bold">0                   5        11       1231</strong> <strong class="bold">1                  12        20       5421</strong> <strong class="bold">nan               nan       nan       2332</strong>  nls97abb['highschoolgrad'] = \ ...  nls97abb['highschoolgrad'].astype('category')</pre>的每一级获取<code>highestgradecompleted</code>的最小值和最大值来确认新列<code>highschoolgrad</code>包含我们想要的值</li>
+
+</ol>
+
+<p>虽然 12 作为分类我们的新特性<code>highschoolgrad</code>的阈值在概念上是有意义的，但是如果我们打算使用<code>highschoolgrad</code>作为目标，这会带来一些建模挑战。存在相当大的阶级不平衡，T21 等于 1 阶级是 0 阶级的 4 倍多。我们应该探索使用更多的组来表示。</p>
+
+<ol>
+
+<li value="14">对熊猫做<a id="_idIndexMarker043"/>这件事的一个方法是用<a id="_idIndexMarker044"/>的<code>qcut</code>函数。我们可以将<code>qcut</code>的<code>q</code>参数设置为<code>6</code>来创建尽可能均匀分布的六个组。这些群体现在更接近平衡:<pre>nls97abb['highgradegroup'] = \   pd.qcut(nls97abb['highestgradecompleted'],     q=6, labels=[1,2,3,4,5,6])   nls97abb.groupby(['highgradegroup'])['highestgradecompleted'].\     agg(['min','max','size'])                   <strong class="bold">min         max      size</strong> <strong class="bold">highgradegroup                </strong> <strong class="bold">1                   5          11       1231</strong> <strong class="bold">2                  12          12       1389</strong> <strong class="bold">3                  13          14       1288</strong> <strong class="bold">4                  15          16       1413</strong> <strong class="bold">5                  17          17        388</strong> <strong class="bold">6                  18          20        943</strong> nls97abb['highgradegroup'] = \     nls97abb['highgradegroup'].astype('category')</pre></li>
+
+<li>最后，我通常发现为所有分类特征生成频率并保存输出以便我以后可以引用它是很有帮助的。每当我对可能改变这些频率数据进行一些更改时，我都会重新运行代码。下面的代码<a id="_idIndexMarker045"/>遍历所有类别数据类型的列，而<a id="_idIndexMarker046"/>运行<code>value_counts</code> : <pre> freqout = open('views/frequencies.txt', 'w')   for col in nls97abb.select_dtypes(include=["category"]):       print(col, "----------------------",         "frequencies",       nls97abb[col].value_counts(dropna=False).sort_index(),         "percentages",       nls97abb[col].value_counts(normalize=True).\         sort_index(),       sep="\n\n", end="\n\n\n", file=freqout)    freqout.close()</pre></li>
+
+</ol>
+
+<p>这些是为数据中的分类要素生成单向频率的关键技术。这个节目真正的明星是<code>value_counts</code>方法。我们可以使用<code>value_counts</code>一次创建一个系列的频率，将它与<code>apply</code>一起用于多个列，或者迭代多个列并每次调用<code>value_counts</code>。在这一节中，我们已经看了每一个的例子。接下来，让我们探索一些检查连续特征分布的技术。</p>
+
+<h1 id="_idParaDest-19"><a id="_idTextAnchor018"/>生成连续和离散特征的汇总统计数据</h1>
+
+<p>获得连续或离散<a id="_idIndexMarker049"/>特征的分布<a id="_idIndexMarker048"/>的<a id="_idIndexMarker047"/>感觉比获得分类特征的<a id="_idIndexMarker050"/>感觉要复杂一些。连续要素可以取无限多个值。连续特征的一个例子是体重，一个人可以重 70 公斤，或者 70.1，或者 70.01。离散要素具有有限数量的值，例如看到的鸟的数量或购买的苹果的数量。思考区别的一种方式是，离散特征通常是已经被计数的东西，而连续特征通常通过测量、称重或计时来捕捉。</p>
+
+<p>连续要素通常存储为浮点数，除非它们被约束为整数。在这种情况下，它们可以存储为整数。例如，人类个体的年龄是连续的，但通常被截断成整数。</p>
+
+<p>对于大多数建模目的，连续和离散特征的处理方式是相似的。我们不会把年龄作为一个分类特征。我们假设年龄之间的间隔在 25 岁到 26 岁之间和在 35 岁到 36 岁之间有很大程度上相同的含义，尽管这在极端情况下是不成立的。人类 1 岁到 2 岁的时间间隔与 71 岁到 72 岁的时间间隔完全不同。数据分析师和科学家通常对连续特征和目标之间假定的线性关系持怀疑态度，尽管当这种关系成立时，建模要容易得多。</p>
+
+<p>为了理解连续特征(或离散特征)是如何分布的，我们必须检查其中心趋势、形状和分布。关键汇总统计数据是集中趋势的平均值和中值，形状的偏斜度和峰度，以及范围、四分位范围、方差和标准差。在这一节中，我们将学习如何使用 pandas，并辅以<strong class="bold"> SciPy </strong>库来获取这些统计数据。我们还将讨论建模的重要含义。</p>
+
+<p>在本节中，我们将使用新冠肺炎数据。该数据集包含每个国家的一行，包含截至 2021 年 6 月的总病例和死亡人数，以及每个国家的人口统计数据。</p>
+
+<p class="callout-heading">注意</p>
+
+<p class="callout"><em class="italic">我们的数据世界</em>在<a href="https://ourworldindata.org/coronavirus-source-data">https://ourworldindata.org/coronavirus-source-data</a>提供新冠肺炎公共使用数据。本节将使用的数据是在 2021 年 7 月 9 日下载的。数据中的列比我包含的多。我创建了基于国家的区域列。</p>
+
+<p>按照这些<a id="_idIndexMarker052"/>步骤生成<a id="_idIndexMarker053"/>汇总<a id="_idIndexMarker054"/>统计:</p>
+
+<ol>
+
+<li value="1">让我们将 COVID <code>.csv</code>文件加载到 pandas 中，设置索引，并查看数据。共有 221 行和 16 列。我们设置的索引<code>iso_code</code>包含每行的唯一值。我们使用<code>sample</code>来随机查看两个国家，而不是前两个国家(我们为<code>random_state</code>设置一个值，以便每次运行代码时得到相同的结果):<pre>import pandas as pd import numpy as np import scipy.stats as scistat covidtotals = pd.read_csv("data/covidtotals.csv",     parse_dates=['lastdate']) covidtotals.set_index("iso_code", inplace=True) covidtotals.shape <strong class="bold">(221, 16)</strong> covidtotals.index.nunique() <strong class="bold">221</strong> covidtotals.sample(2, random_state=6).T <strong class="bold">iso_code                         ISL               CZE</strong> <strong class="bold">lastdate                  2021-07-07        2021-07-07</strong> <strong class="bold">location                     Iceland           Czechia</strong> <strong class="bold">total_cases                    6,555         1,668,277</strong> <strong class="bold">total_deaths                      29            30,311</strong> <strong class="bold">total_cases_mill              19,209           155,783</strong> <strong class="bold">total_deaths_mill                 85             2,830</strong> <strong class="bold">population                   341,250        10,708,982</strong> <strong class="bold">population_density                 3               137</strong> <strong class="bold">median_age                        37                43</strong> <strong class="bold">gdp_per_capita                46,483            32,606</strong> <strong class="bold">aged_65_older                     14                19</strong> <strong class="bold">total_tests_thous                NaN               NaN</strong> <strong class="bold">life_expectancy                   83                79</strong> <strong class="bold">hospital_beds_thous                3                 7</strong> <strong class="bold">diabetes_prevalence                5                 7</strong> <strong class="bold">region                Western Europe    Western Europe</strong></pre></li>
+
+</ol>
+
+<p>仅仅通过<a id="_idIndexMarker055"/>观察这两行<a id="_idIndexMarker056"/>，我们就可以看到<a id="_idIndexMarker057"/>冰岛和捷克之间<a id="_idIndexMarker058"/>病例和死亡的显著差异，甚至在人口规模方面。(<code>total_cases_mill</code>和<code>total_deaths_mill</code>分别为每百万人口发病数和死亡数。)数据分析者非常习惯于怀疑数据中是否有其他东西可以解释捷克比冰岛高得多的病例和死亡人数。从某种意义上说，我们总是在进行特征选择。</p>
+
+<ol>
+
+<li value="2">让我们来看一下<a id="_idIndexMarker059"/>每列的非空值的数据<a id="_idIndexMarker060"/>类型和数量<a id="_idIndexMarker061"/>。几乎所有的列都是连续的或离散的。我们分别有 192 行和 185 行的病例和死亡数据，以及可能的目标。我们必须完成的一项重要的数据清理任务是，找出我们能为那些目标值缺失的国家做些什么。我们将在后面讨论如何处理丢失的值:<pre>covidtotals.info() <strong class="bold">&lt;class 'pandas.core.frame.DataFrame'&gt;</strong> <strong class="bold">Index: 221 entries, AFG to ZWE</strong> <strong class="bold">Data columns (total 16 columns):</strong> <strong class="bold"> #   Column             Non-Null Count         Dtype </strong> <strong class="bold">---  -------            --------------  --------------</strong> <strong class="bold"> 0   lastdate             221 non-null  datetime64[ns]</strong> <strong class="bold"> 1   location             221 non-null          object</strong> <strong class="bold"> 2   total_cases          192 non-null         float64</strong> <strong class="bold"> 3   total_deaths         185 non-null         float64</strong> <strong class="bold"> 4   total_cases_mill     192 non-null         float64</strong> <strong class="bold"> 5   total_deaths_mill    185 non-null         float64</strong> <strong class="bold"> 6   population           221 non-null         float64</strong> <strong class="bold"> 7   population_density   206 non-null         float64</strong> <strong class="bold"> 8   median_age           190 non-null         float64</strong> <strong class="bold"> 9   gdp_per_capita       193 non-null         float64</strong> <strong class="bold"> 10  aged_65_older        188 non-null         float64</strong> <strong class="bold"> 11  total_tests_thous     13 non-null         float64</strong> <strong class="bold"> 12  life_expectancy      217 non-null         float64</strong> <strong class="bold"> 13  hospital_beds_thous  170 non-null         float64</strong> <strong class="bold"> 14  diabetes_prevalence  200 non-null         float64</strong> <strong class="bold"> 15  region               221 non-null          object</strong> <strong class="bold">dtypes: datetime64[ns](1), float64(13), object(2)</strong> <strong class="bold">memory usage: 29.4+ KB</strong></pre></li>
+
+<li>现在，我们<a id="_idIndexMarker063"/>准备好<a id="_idIndexMarker064"/>检查一些特性的分布<a id="_idIndexMarker065"/>。我们<a id="_idIndexMarker066"/>可以通过使用<code>describe</code>方法获得我们想要的大部分汇总统计数据。平均值和中位数(50%)是分布中心的良好指标，各有所长。注意到均值和中值之间的显著差异也是一件好事，这是偏斜度的一个指标。例如，我们可以看到，每百万的平均病例数几乎是中位数的两倍，分别为 3.67 万和 1.95 万。这是正偏斜的明显标志。每百万人的死亡率也是如此。</li>
+
+</ol>
+
+<p>病例和死亡的四分位数范围也很大，在这两种情况下，第 75 百分位值比第 25 百分位值大约大 25 倍。我们可以将其与 65 岁及以上人口的百分比和糖尿病患病率进行比较，其中第 75 百分位分别是第 25 百分位的四倍或两倍。我们可以马上看出，这两个可能的特征(<code>aged_65_older</code>和<code>diabetes_prevalence</code>)必须做大量的工作来解释我们目标的巨大差异:</p>
+
+<pre> keyvars = ['location','total_cases_mill','total_deaths_mill',
+...  'aged_65_older','diabetes_prevalence']
+ covidkeys = covidtotals[keyvars]
+ covidkeys.describe()
+total_cases_mill total_deaths_mill aged_65_older diabetes_prevalence
+<strong class="bold">count        192.00       185.00    188.00     200.00</strong>
+<strong class="bold">mean      36,649.37       683.14      8.61       8.44</strong>
+<strong class="bold">std       41,403.98       861.73      6.12       4.89</strong>
+<strong class="bold">min            8.52         0.35      1.14       0.99</strong>
+<strong class="bold">25%        2,499.75        43.99      3.50       5.34</strong>
+<strong class="bold">50%       19,525.73       293.50      6.22       7.20</strong>
+<strong class="bold">75%       64,834.62     1,087.89     13.92      10.61</strong>
+<strong class="bold">max      181,466.38     5,876.01     27.05      30.53</strong></pre>
+
+<ol>
+
+<li value="4">我有时发现查看十分位数的值有助于更好地理解分布。<code>quantile</code>方法可以接受一个分位数的值，比如第 25 个百分点的<code>quantile(0.25)</code>，或者一个列表或元组，比如第 25 和第 50 个百分点的<code>quantile((0.25,0.5))</code>。在下面的代码中，我们使用 NumPy ( <code>np.arange(0.0, 1.1, 0.1)</code>)的<code>arange</code>来生成一个从 0.0 到 1.0 的数组，增量为 0.1。如果我们使用<code>covidkeys.quantile([0.0,0.1,0.2,0.3,0.4,0.5,0.6,0.7,0.8,0.9,1.0])</code> : <pre> covidkeys.quantile(np.arange(0.0, 1.1, 0.1))       total_cases_mill  total_deaths_mill  aged_65_older  diabetes_prevalence <strong class="bold">0.00         8.52       0.35       1.14     0.99</strong> <strong class="bold">0.10       682.13      10.68       2.80     3.30</strong> <strong class="bold">0.20     1,717.39      30.22       3.16     4.79</strong> <strong class="bold">0.30     3,241.84      66.27       3.86     5.74</strong> <strong class="bold">0.40     9,403.58      145.06      4.69     6.70</strong> <strong class="bold">0.50     19,525.73     293.50      6.22     7.20</strong> <strong class="bold">0.60     33,636.47     556.43      7.93     8.32</strong> <strong class="bold">0.70     55,801.33     949.71     11.19    10.08</strong> <strong class="bold">0.80     74,017.81    1,333.79    14.92    11.62</strong> <strong class="bold">0.90     94,072.18    1,868.89    18.85    13.75</strong> <strong class="bold">1.00    181,466.38    5,876.01    27.05    30.53</strong></pre>我们会得到相同的结果</li>
+
+</ol>
+
+<p>对于病例、死亡和糖尿病患病率，大部分范围(最小值和最大值之间的距离)位于分布的最后 10%。死亡尤其如此。这暗示了可能的建模问题，并邀请我们仔细研究离群值，这是我们将在下一节中做的事情。</p>
+
+<ol>
+
+<li value="5">一些<a id="_idIndexMarker071"/>机器学习<a id="_idIndexMarker072"/>算法假设<a id="_idIndexMarker073"/>我们的特征具有<a id="_idIndexMarker074"/>正态(也称为高斯)分布，它们对称分布(具有低偏斜度)，并且它们具有相对正态的尾部(峰度既不太高也不太低)。到目前为止，我们看到的统计数据已经表明，我们的两个可能目标——即每百万人口中的总病例数和死亡数——存在高度的正偏态。让我们通过计算一些特征的偏斜度和峰度来更精确地说明这一点。对于高斯分布，我们期望偏斜值接近 0，峰度值接近 3。<code>total_deaths_mill</code>具有值得注意的偏斜和峰度值，而<code>total_cases_mill</code>和<code>aged_65_older</code>特征具有过低的峰度(细尾):<pre>covidkeys.skew() <strong class="bold">total_cases_mill        1.21</strong> <strong class="bold">total_deaths_mill       2.00</strong> <strong class="bold">aged_65_older           0.84</strong> <strong class="bold">diabetes_prevalence     1.52</strong> <strong class="bold">dtype: float64</strong>  covidkeys.kurtosis() <strong class="bold">total_cases_mill        0.91</strong> <strong class="bold">total_deaths_mill       6.58</strong> <strong class="bold">aged_65_older          -0.56</strong> <strong class="bold">diabetes_prevalence     3.31</strong> <strong class="bold">dtype: float64</strong></pre></li>
+
+<li>我们还可以通过<a id="_idIndexMarker078"/>遍历<code>keyvars</code>列表中的特性并运行<a id="_idIndexMarker079"/> a <code>scistat.shapiro(covidkeys[var].dropna())</code>来<a id="_idIndexMarker075"/>明确测试<a id="_idIndexMarker076"/>每个分布的<a id="_idIndexMarker077"/>正常性。注意，为了运行测试，我们需要用<code>dropna</code>删除丢失的值。小于 0.05 的 p 值表明我们可以拒绝正态的零假设，这是四个特征中每一个的情况:<pre>for var in keyvars[1:]:       stat, p = scistat.shapiro(covidkeys[var].dropna())       print("feature=", var, "     p-value=", '{:.6f}'.format(p))   <strong class="bold">feature= total_cases_mill       p-value= 0.000000</strong> <strong class="bold">feature= total_deaths_mill      p-value= 0.000000</strong> <strong class="bold">feature= aged_65_older          p-value= 0.000000</strong> <strong class="bold">feature= diabetes_prevalence    p-value= 0.000000</strong></pre></li>
+
+</ol>
+
+<p>如果我们考虑线性回归等参数模型，这些结果应该让我们停下来。没有一种分布接近正态分布。然而，这不是决定性的。这并不像当我们有正态分布的要素时决定我们应该使用某些模型，而当我们没有时决定我们应该使用非参数模型(比如 k-最近邻)那么简单。</p>
+
+<p>我们希望在做出任何建模决策之前进行额外的数据清理。例如，我们可能决定删除异常值，或者确定是否适合转换数据。我们将在本书的几个章节中探讨变换，如对数和多项式变换。</p>
+
+<p>本节向您展示了如何使用 pandas 和 SciPy 来理解连续和离散要素是如何分布的，包括它们的集中趋势、形状和分布。为建模中可能包含的任何特性或目标生成这些统计数据是有意义的。这也为我们指明了方向，我们需要做更多的工作来准备我们的数据进行分析。我们需要识别缺失值和异常值，并找出我们将如何处理它们。我们也应该想象我们连续特征的分布。这很少不产生额外的见解。我们将在下一节学习如何识别异常值，并在下一节创建可视化。</p>
+
+<h1 id="_idParaDest-20"><a id="_idTextAnchor019"/>识别单变量分析中的极值和异常值</h1>
+
+<p>一个<a id="_idIndexMarker080"/>异常值可以被认为是一个带有特征值的<a id="_idIndexMarker081"/>观察值，或者是<a id="_idIndexMarker082"/>特征值之间的关系，它们是如此不寻常，以至于<a id="_idIndexMarker083"/>它们不能帮助解释其余数据中的关系。这对于建模很重要，因为我们不能假设异常值会对我们的参数估计产生中性影响。有时，我们的模型如此努力地构建可以解释异常值观察模式的参数估计，以至于我们损害了模型对所有其他观察的解释或预测能力。如果你曾经花了几天时间试图解释一个模型，却发现一旦你去除了一些异常值，你的系数和预测就完全变了，请举手。</p>
+
+<p>我应该很快补充一点，对于离群值没有一致的定义。我在本书中提供了前面的定义，因为它有助于我们区分异常值和极值。这两者之间有相当多的重叠，但是许多极值并不是异常值。这是因为这些值反映了特征中的自然且可解释的趋势，或者因为它们反映了在整个数据中观察到的特征之间的相同关系。反之亦然。有些异常值不是极值。例如，一个目标值可能正好在分布的中间，但却有非常意外的预测值。</p>
+
+<p>对于我们的<a id="_idIndexMarker084"/>建模，如果不参考多元关系，很难说<a id="_idIndexMarker085"/>某个特定特征或目标值是异常值。但是，在我们的单变量分析中，当我们看到值在中间偏左或偏右时，它至少应该发出一个危险信号。这将促使我们进一步研究该值的观测值，包括检查其他特性的值。我们将在接下来的两章中更详细地研究多元关系。在这里，以及在可视化的下一节中，我们将重点关注在查看一个变量时识别极值和异常值。</p>
+
+<p>识别极值的一个好的起点是看它离分布中间的距离。一种常用的方法是从<strong class="bold">四分位数范围</strong> ( <strong class="bold"> IQR </strong>)计算每个值的距离<a id="_idIndexMarker086"/>，这是第一个四分位数值和第三个四分位数值之间的距离。我们通常标记第三个四分位数以上或第一个四分位数以下超过四分位数间距 1.5 倍的任何值。我们可以使用这种方法来识别新冠肺炎数据中的异常值。</p>
+
+<p>让我们开始吧:</p>
+
+<ol>
+
+<li value="1">让我们从<a id="_idIndexMarker087"/>导入我们将<a id="_idIndexMarker088"/>需要的库开始。除了<a id="_idIndexMarker089"/> pandas 和 NumPy，我们将<a id="_idIndexMarker090"/>使用 Matplotlib 和 statsmodels 来创建我们将要创建的地块。我们还将加载 COVID 数据，并选择我们需要的变量:<pre>import pandas as pd import numpy as np import matplotlib.pyplot as plt import statsmodels.api as sm covidtotals = pd.read_csv("data/covidtotals.csv") covidtotals.set_index("iso_code", inplace=True) keyvars = ['location','total_cases_mill','total_deaths_mill',   'aged_65_older','diabetes_prevalence','gdp_per_capita'] covidkeys = covidtotals[keyvars]</pre></li>
+
+<li>我们来看看<code>total_cases_mill</code>。我们得到第一个和第三个四分位值，并计算四分位间距，<code>1.5*(thirdq-firstq)</code>。然后，我们计算它们的阈值，以确定最高和最低极值，分别是<code>interquartilerange+thirdq</code>和<code>firstq-interquartilerange</code>(如果你熟悉箱线图，你会注意到这是用于箱线图的晶须的相同计算；我们将在下一节讨论箱线图):<pre>thirdq, firstq = covidkeys.total_cases_mill.quantile(0.75), covidkeys.total_cases_mill.quantile(0.25) interquartilerange = 1.5*(thirdq-firstq) extvalhigh, extvallow = interquartilerange+thirdq, firstq-interquartilerange print(extvallow, extvalhigh, sep=" &lt;--&gt; ") <strong class="bold">-91002.564625 &lt;--&gt; 158336.930375</strong></pre></li>
+
+<li>这个<a id="_idIndexMarker091"/>计算表明任何大于 158，337 的<a id="_idIndexMarker093"/>的<code>total_cases_mill</code>的<a id="_idIndexMarker092"/>值都可以被<a id="_idIndexMarker094"/>认为是极端值。我们可以忽略低端的极值，因为它们可能是负值:<pre>covidtotals.loc[covidtotals.total_cases_mill&gt;extvalhigh].T <strong class="bold">iso_code                   AND         MNE         SYC</strong> <strong class="bold">lastdate            2021-07-07  2021-07-07  2021-07-07</strong> <strong class="bold">location            Andorra     Montenegro  Seychelles</strong> <strong class="bold">total_cases          14,021        100,392      16,304</strong> <strong class="bold">total_deaths            127          1,619          71</strong> <strong class="bold">total_cases_mill    181,466        159,844     165,792</strong> <strong class="bold">total_deaths_mill     1,644          2,578         722</strong> <strong class="bold">population           77,265        628,062      98,340</strong> <strong class="bold">population_density      164             46         208</strong> <strong class="bold">median_age              NaN             39          36</strong> <strong class="bold">gdp_per_capita          NaN         16,409      26,382</strong> <strong class="bold">aged_65_older           NaN             15           9</strong> <strong class="bold">total_tests_thous       NaN            NaN         NaN</strong> <strong class="bold">life_expectancy          84             77          73</strong> <strong class="bold">hospital_beds_thous     NaN              4           4</strong> <strong class="bold">diabetes_prevalence       8             10          11</strong> <strong class="bold">region              Western        Eastern        East</strong>  <strong class="bold">                     Europe         Europe      Africa</strong></pre></li>
+
+<li>安道尔、黑山和塞舌尔都有<code>total_cases_mill</code>高于<a id="_idIndexMarker095"/>的门槛金额。这促使我们<a id="_idIndexMarker096"/>探索这些国家可能<a id="_idIndexMarker097"/>出类拔萃的其他方式，以及我们的特色是否能抓住这一点。我们不会在这里深入多元分析，因为我们将在下一章做，但这是一个好主意，让我们开始思考为什么这些极值可能有意义，也可能没有意义。在整个数据集上使用一些方法可能会对我们有所帮助:<pre>covidtotals.mean() <strong class="bold">total_cases               963,933</strong> <strong class="bold">total_deaths              21,631</strong> <strong class="bold">total_cases_mill          36,649</strong> <strong class="bold">total_deaths_mill         683</strong> <strong class="bold">population                35,134,957</strong> <strong class="bold">population_density        453</strong> <strong class="bold">median_age                30</strong> <strong class="bold">gdp_per_capita            19,141</strong> <strong class="bold">aged_65_older             9</strong> <strong class="bold">total_tests_thous         535</strong> <strong class="bold">life_expectancy           73</strong> <strong class="bold">hospital_beds_thous       3</strong> <strong class="bold">diabetes_prevalence       8</strong> </pre></li>
+
+</ol>
+
+<p>这三个国家和其他国家的主要区别在于它们的人口非常少。令人惊讶的是，它们的人口密度都比平均水平低得多。这与你的预期相反，值得我们在本书的分析中进一步考虑。</p>
+
+<p class="callout-heading">IQR 计算的替代方法</p>
+
+<p class="callout">使用四分位范围来确定极值的另一种方法是使用远离平均值的几个标准差，比如 3。这种方法的一个缺点是比使用四分位数范围更容易受到极值的影响。</p>
+
+<p>我发现<a id="_idIndexMarker099"/>为<a id="_idIndexMarker100"/>我的数据中的所有关键目标和特征生成这种分析很有帮助，所以让我们自动化这种识别极值的<a id="_idIndexMarker102"/>方法。我们还应该将结果输出到一个文件中，以便在需要时使用它们:</p>
+
+<ol>
+
+<li value="5">让我们定义一个函数<code>getextremevalues</code>，它遍历我们的数据帧的所有列(除了第一列，它包含 location 列)，计算该列的四分位数范围，选择该列的值高于高阈值或低于低阈值的所有观察值，然后将结果附加到新的数据帧(<code>dfout</code> ): <pre>def getextremevalues(dfin):       dfout = pd.DataFrame(columns=dfin.columns,                             data=None)       for col in dfin.columns[1:]:         thirdq, firstq = dfin[col].quantile(0.75), \           dfin[col].quantile(0.25)         interquartilerange = 1.5*(thirdq-firstq)         extvalhigh, extvallow = \           interquartilerange+thirdq, \           firstq-interquartilerange         df = dfin.loc[(dfin[col]&gt;extvalhigh) | (dfin[col]&lt;extvallow)]         df = df.assign(varname = col,           threshlow = extvallow,           threshhigh = extvalhigh)         dfout = pd.concat([dfout, df])     return dfout</pre></li>
+
+<li>现在，我们<a id="_idIndexMarker103"/>可以将我们的<code>covidkeys</code>数据帧<a id="_idIndexMarker104"/>传递给<code>getextremevalues</code>函数，以获得包含每一列的极值<a id="_idIndexMarker105"/>的数据帧。然后，我们<a id="_idIndexMarker106"/>可以显示每一列的极值数量，这告诉我们人口中每百万人的总死亡数有四个极值(<code>total_deaths_mill</code>)。现在，我们可以将数据输出到一个 Excel 文件:<pre>extremevalues = getextremevalues(covidkeys) extremevalues.varname.value_counts() <strong class="bold">gdp_per_capita         9</strong> <strong class="bold">diabetes_prevalence    8</strong> <strong class="bold">total_deaths_mill      4</strong> <strong class="bold">total_cases_mill       3</strong> <strong class="bold">Name: varname, dtype: int64</strong> extremevalues.to_excel("views/extremevaluescases.xlsx")</pre></li>
+
+<li>让我们更仔细地看看极端的<a id="_idIndexMarker108"/>百万分之死亡数值。我们<a id="_idIndexMarker109"/>可以查询我们刚刚创建的数据帧<a id="_idIndexMarker110"/>来获得<code>total_deaths_mill</code>的<code>threshhigh</code>值，也就是<code>2654</code>。我们还可以获得那些具有极值的国家的其他关键特征，因为我们已经将这些数据包含在新的数据框架中:<pre>extremevalues.loc[extremevalues.varname=="total_deaths_mill",     'threshhigh'][0] <strong class="bold">2653.752</strong> extremevalues.loc[extremevalues.varname=="total_deaths_mill",       keyvars].sort_values(['total_deaths_mill'], ascending=False)       <strong class="bold">location              total_cases_mill  total_deaths_mill</strong> <strong class="bold">PER   Peru                    62,830            5,876</strong> <strong class="bold">HUN   Hungary                 83,676            3,105</strong> <strong class="bold">BIH   Bosnia and Herzegovina  62,499            2,947</strong> <strong class="bold">CZE   Czechia                 155,783           2,830</strong> <strong class="bold">     _65_older  diabetes_prevalence  gdp_per_capita  </strong> <strong class="bold">PER      7              6                12,237</strong> <strong class="bold">HUN     19              8                26,778</strong> <strong class="bold">BIH     17             10                11,714</strong> <strong class="bold">CZE     19              7                32,606</strong></pre></li>
+
+</ol>
+
+<p>秘鲁、匈牙利、波斯尼亚<a id="_idIndexMarker111"/>和黑塞哥维那以及<a id="_idIndexMarker112"/>捷克的<code>total_deaths_mill</code>都高于极值阈值。其中三个国家最突出的一点是，65 岁或以上人口的百分比也比平均值高多少(如前表所示，该特征的平均值为 9)。虽然这些是死亡的极端值，但是人口中老年人的百分比和 COVID 死亡之间的关系可能解释了这一点，并且可以在不使模型过度适应这些极端情况的情况下做到这一点。我们将在下一章讨论一些解决这个问题的策略。</p>
+
+<p>到目前为止，我们已经讨论了异常值和极值，但没有提到分布形状。到目前为止，我们所暗示的是，一个极值是一个罕见的值——比分布中心附近的值要罕见得多。但是当特征的分布接近正态时，这是最有意义的。另一方面，如果特征具有<a id="_idIndexMarker115"/>均匀分布，则非常高的值<a id="_idIndexMarker116"/>不会比任何其他值<a id="_idIndexMarker117"/>更少。</p>
+
+<p>在实践中，我们会考虑相对于特征分布的极值或异常值。<strong class="bold">分位数-分位数</strong> ( <strong class="bold"> Q-Q </strong>)图<a id="_idIndexMarker118"/>可以让我们以相对于理论分布(正态分布、均匀分布、对数分布或其他分布)的图形来查看分布，从而提高我们对分布的感觉。让我们来看看:</p>
+
+<ol>
+
+<li value="1">让我们创建一个相对于正态分布的每百万病例总数的 Q-Q 图。我们可以为此使用<code>statsmodels</code>库:<pre>sm.qqplot(covidtotals[['total_cases_mill']]. \   sort_values(['total_cases_mill']).dropna(),line='s') ) plt.show()</pre></li>
+
+</ol>
+
+<p>这会产生以下情节:</p>
+
+<div><div><img alt="Figure 1.1 – Q-Q plot of total cases per million&#10;&#10;" height="454" src="img/B17978_01_001.jpg" width="613"/>
+
+</div>
+
+</div>
+
+<p class="figure-caption">图 1.1-每百万病例总数的 Q-Q 图</p>
+
+<p>这个<a id="_idIndexMarker119"/> Q-Q 图清楚地表明，国家间总病例的分布是不正常的。我们可以通过数据点偏离红线的程度来看出这一点。这是一个 Q-Q 图，我们期望从一个有正偏斜的分布中得到。这与我们已经为 total cases 特性计算的汇总统计数据是一致的。这进一步强化了我们的发展意识，因为我们需要对参数模型保持谨慎，而且我们可能不得不考虑一两个以上的异常值。</p>
+
+<p>让我们来看一个 Q-Q 图，图中有一个特性的分布更接近于正态分布。COVID 数据中没有很好的候选数据，因此我们将使用美国国家海洋和大气管理局 2019 年的陆地温度数据。</p>
+
+<p class="callout-heading">数据注释</p>
+
+<p class="callout">陆地温度数据集包含 2019 年全球 12，000 多个站点的平均温度读数(摄氏度)，尽管大多数站点位于美国。原始数据来自全球历史气候学网络综合数据库。美国国家海洋和大气管理局已在<a href="https://www.ncdc.noaa.gov/data-access/land-based-station-data/land-based-datasets/global-historical-climatology-network-monthly-version-4">https://www . ncdc . NOAA . gov/data-access/land-based-station-data/land-based-datasets/global-historical-climatology-network-monthly-version-</a>2 上公开使用该网站。</p>
+
+<ol>
+
+<li value="2">首先，让我们将数据加载到一个熊猫数据框架中，并对温度特征<code>avgtemp</code>进行一些描述性统计。我们必须在正常的<code>describe</code>输出中增加一些百分位数的统计数据，以便更好地理解值的范围。<code>avgtemp</code>是 12，095 个气象站中每个气象站全年的平均温度。所有气象站的平均温度为 11.2 摄氏度。中位数是 10.4。然而，也有一些非常不利的数值，包括 14 个气象站的平均温度低于零下 25 度。这导致了适度的负偏斜，尽管偏斜和峰度都更接近于正态分布的预期值:<pre>landtemps = pd.read_csv("data/landtemps2019avgs.csv") landtemps.avgtemp.describe(percentiles=[0.05, 0.1, 0.25, 0.5, 0.75, 0.9, 0.95]) <strong class="bold">count        12,095.0</strong> <strong class="bold">mean             11.2</strong> <strong class="bold">std               8.6</strong> <strong class="bold">min             -60.8</strong> <strong class="bold">5%               -0.7</strong> <strong class="bold">10%               1.7</strong> <strong class="bold">25%               5.4</strong> <strong class="bold">50%              10.4</strong> <strong class="bold">75%              16.9</strong> <strong class="bold">90%              23.1</strong> <strong class="bold">95%              27.0</strong> <strong class="bold">max              33.9</strong> <strong class="bold">Name: avgtemp, dtype: float64</strong>  landtemps.loc[landtemps.avgtemp&lt;-25,'avgtemp'].count() <strong class="bold">14</strong> landtemps.avgtemp.skew() <strong class="bold">-0.2678382583481768</strong> landtemps.avgtemp.kurtosis() <strong class="bold">2.169831370706107</strong>3</pre></li>
+
+<li>现在，让我们来看看平均温度的 Q-Q 图:<pre>sm.qqplot(landtemps.avgtemp.sort_values().dropna(), line='s') plt.tight_layout() plt.show()</pre></li>
+
+</ol>
+
+<p>这会产生以下情节:</p>
+
+<div><div><img alt="Figure 1.2 – Q-Q plot of average temperatures&#10;&#10;" height="453" src="img/B17978_01_002.jpg" width="615"/>
+
+</div>
+
+</div>
+
+<p class="figure-caption">图 1.2–平均温度的 Q-Q 图</p>
+
+<p>沿着<a id="_idIndexMarker122"/>山脉的大部分，平均气温的分布看起来非常接近正常。例外情况是极低的温度，导致少量的负偏差。在高端也存在一些偏离正常的情况，尽管这不是什么大问题(您可能已经注意到，具有负偏斜的要素的 Q-Q 图具有伞状形状，而具有正偏斜的要素(如总例数)则更像碗状形状)。</p>
+
+<p>我们在努力理解可能的特征和目标的分布方面有了一个良好的开端，并且在相关的努力中，识别极端值和异常值。当我们构建、提炼和解释我们的模型时，这是我们手边的重要信息。但是我们可以做更多的事情来提高我们对数据的直觉。好的下一步是构建关键特征的可视化。</p>
+
+<h1 id="_idParaDest-21"><a id="_idTextAnchor020"/>使用直方图、箱线图和小提琴图来检查特征的分布</h1>
+
+<p>我们已经生成了许多构成直方图或箱线图数据点的数字。但是，当我们看到用图形表示的数据时，我们通常会加深对数据的理解。我们看到观察值聚集在平均值周围，我们注意到尾部的大小，我们看到似乎是极端值。</p>
+
+<h2 id="_idParaDest-22"><a id="_idTextAnchor021"/>使用直方图</h2>
+
+<p>按照以下步骤创建直方图:</p>
+
+<ol>
+
+<li value="1">在本节中，我们将使用 COVID 数据和温度数据。除了我们到目前为止使用过的库之外，我们必须导入 Seaborn 来创建一些比我们在 Matplotlib 中更容易的图:<pre>import pandas as pd import numpy as np import matplotlib.pyplot as plt import seaborn as sns landtemps = pd.read_csv("data/landtemps2019avgs.csv") covidtotals = pd.read_csv("data/covidtotals.csv", parse_dates=["lastdate"]) covidtotals.set_index("iso_code", inplace=True)</pre></li>
+
+<li>现在，让我们创建一个简单的直方图。我们可以使用 Matplotlib 的<code>hist</code>方法来创建每百万例总数的直方图。我们也将为平均值和中间值画线:<pre>plt.hist(covidtotals['total_cases_mill'], bins=7) plt.axvline(covidtotals.total_cases_mill.mean(), color='red',    linestyle='dashed', linewidth=1, label='mean') plt.axvline(covidtotals.total_cases_mill.median(), color='black',    linestyle='dashed', linewidth=1, label='median') plt.title("Total COVID Cases") plt.xlabel('Cases per Million') plt.ylabel("Number of Countries") plt.legend() plt.show()</pre></li>
+
+</ol>
+
+<p>此<a id="_idIndexMarker124"/>产生以下情节:</p>
+
+<div><div><img alt="Figure 1.3 – Total COVID cases&#10;&#10;" height="433" src="img/B17978_01_003.jpg" width="555"/>
+
+</div>
+
+</div>
+
+<p class="figure-caption">图 1.3–COVID 病例总数</p>
+
+<p>该直方图强调的总体分布的一个方面是，大多数国家(192 个国家中的 100 多个)处于第一类，介于百万分之 0 病例和百万分之 25，000 病例之间。这里，我们可以看到正偏斜，平均值被极高的值向右拉。这与我们在上一节使用 Q-Q 图时发现的情况一致。</p>
+
+<ol>
+
+<li value="3">让我们从陆地温度数据集中创建一个平均温度直方图:<pre>plt.hist(landtemps['avgtemp']) plt.axvline(landtemps.avgtemp.mean(), color='red', linestyle='dashed', linewidth=1, label='mean') plt.axvline(landtemps.avgtemp.median(), color='black', linestyle='dashed', linewidth=1, label='median') plt.title("Average Land Temperatures") plt.xlabel('Average Temperature') plt.ylabel("Number of Weather Stations") plt.legend() plt.show()</pre></li>
+
+</ol>
+
+<p>这个<a id="_idIndexMarker126"/>产生了以下情节:</p>
+
+<div><div><img alt="Figure 1.4 – Average land temperatures&#10;&#10;" height="433" src="img/B17978_01_004.jpg" width="564"/>
+
+</div>
+
+</div>
+
+<p class="figure-caption">图 1.4-平均陆地温度</p>
+
+<p>来自陆地温度数据集的平均陆地温度直方图看起来非常不同。除了几个高度负值，这种分布看起来更接近正常。在这里，我们可以看到平均值和中位数非常接近，分布看起来相当对称。</p>
+
+<ol>
+
+<li value="4">我们<a id="_idIndexMarker127"/>应该看看分布最左边的观测值。它们都在南极洲或加拿大的最北端。在这里，我们不得不怀疑，在我们构建的模型中包含具有如此极值的观测值是否有意义。然而，仅仅根据这些结果作出这样的决定还为时过早。我们将在下一章检查识别异常值的多变量技术时回到这个问题:<pre> landtemps.loc[landtemps.avgtemp&lt;-25,['station','country','avgtemp']].\ ...  sort_values(['avgtemp'], ascending=True)       <strong class="bold">station               country          avgtemp</strong> <strong class="bold">827   DOME_PLATEAU_DOME_A   Antarctica      -60.8</strong> <strong class="bold">830   VOSTOK                Antarctica      -54.5</strong> <strong class="bold">837   DOME_FUJI             Antarctica      -53.4</strong> <strong class="bold">844   DOME_C_II             Antarctica      -50.5</strong> <strong class="bold">853   AMUNDSEN_SCOTT        Antarctica      -48.4</strong> <strong class="bold">842   NICO                  Antarctica      -48.4</strong> <strong class="bold">804   HENRY                 Antarctica      -47.3</strong> <strong class="bold">838   RELAY_STAT            Antarctica      -46.1</strong> <strong class="bold">828   DOME_PLATEAU_EAGLE    Antarctica      -43.0</strong> <strong class="bold">819   KOHNENEP9             Antarctica      -42.4</strong> <strong class="bold">1299  FORT_ROSS             Canada          -30.3</strong> <strong class="bold">1300  GATESHEAD_ISLAND      Canada          -28.7</strong> <strong class="bold">811   BYRD_STATION          Antarctica      -25.8</strong> <strong class="bold">816   GILL                  Antarctica      -25.5</strong></pre></li>
+
+</ol>
+
+<p>同时可视化集中趋势、扩散和异常值的一个极好的<a id="_idIndexMarker128"/>方法是使用箱线图。</p>
+
+<h2 id="_idParaDest-23"><a id="_idTextAnchor022"/>使用箱线图</h2>
+
+<p><strong class="bold">箱线图</strong>向我们展示了<a id="_idIndexMarker129"/>四分位间距，其中触须代表四分位间距的 1.5 倍，超出该范围的数据点可被视为极值。如果这个计算看起来很熟悉，那是因为它和我们在本章前面用来确定极值的计算方法是一样的！让我们开始吧:</p>
+
+<ol>
+
+<li value="1">我们可以使用 Matplotlib <code>boxplot</code>方法来创建人口中每百万人的总病例数的箱线图。我们可以绘制箭头来显示四分位数范围(第一个四分位数、中间值和第三个四分位数)和极值阈值。阈值以上的三个圆可以认为是极值。从四分位数范围到极值阈值的线通常被称为晶须。通常在四分位数范围的上下都有胡须，但是在这种情况下，低于第一个四分位数值的阈值将是负的:<pre>plt.boxplot(covidtotals.total_cases_mill.dropna(), labels=['Total Cases per Million']) plt.annotate('Extreme Value Threshold', xy=(1.05,157000), xytext=(1.15,157000), size=7, arrowprops=dict(facecolor='black', headwidth=2, width=0.5, shrink=0.02)) plt.annotate('3rd quartile', xy=(1.08,64800), xytext=(1.15,64800), size=7, arrowprops=dict(facecolor='black', headwidth=2, width=0.5, shrink=0.02)) plt.annotate('Median', xy=(1.08,19500), xytext=(1.15,19500), size=7, arrowprops=dict(facecolor='black', headwidth=2, width=0.5, shrink=0.02)) plt.annotate('1st quartile', xy=(1.08,2500), xytext=(1.15,2500), size=7, arrowprops=dict(facecolor='black', headwidth=2, width=0.5, shrink=0.02)) plt.title("Boxplot of Total Cases") plt.show()</pre></li>
+
+</ol>
+
+<p>这个<a id="_idIndexMarker130"/>产生了以下情节:</p>
+
+<div><div><img alt="Figure 1.5 – Boxplot of total cases&#10;&#10;" height="416" src="img/B17978_01_005.jpg" width="560"/>
+
+</div>
+
+</div>
+
+<p class="figure-caption">图 1.5–所有病例的箱线图</p>
+
+<p>仔细观察四分位范围是有帮助的，特别是中位数落在该范围内的地方。对于该箱线图，中值位于范围的下限。这就是我们在正偏斜分布中看到的。</p>
+
+<ol>
+
+<li value="2">现在，让我们<a id="_idIndexMarker131"/>创建一个平均温度的箱线图。所有的极值现在都在分布的低端。不出所料，考虑到我们已经看到的平均温度特征，中线比我们之前的箱线图更接近四分位数范围的中心(我们这次不会注释该图，我们上次只是出于解释目的才这样做):<pre> plt.boxplot(landtemps.avgtemp.dropna(), labels=['Boxplot of Average Temperature'])  plt.title("Average Temperature")  plt.show()</pre></li>
+
+</ol>
+
+<p>这会产生以下情节:</p>
+
+<div><div><img alt="Figure 1.6 – Boxplot of average temperature&#10;&#10;" height="414" src="img/B17978_01_006.jpg" width="537"/>
+
+</div>
+
+</div>
+
+<p class="figure-caption">图 1.6-平均温度箱线图</p>
+
+<p>直方图<a id="_idIndexMarker132"/>有助于我们看到分布的范围，而箱线图可以很容易地识别异常值。我们可以在一个带有小提琴图的图形中很好地了解分布的范围和异常值。</p>
+
+<h2 id="_idParaDest-24"><a id="_idTextAnchor023"/>利用小提琴情节</h2>
+
+<p>Violin 图<a id="_idIndexMarker133"/>将直方图和箱线图组合成一个图。它们显示了 IQR、中值和晶须，以及在所有值范围内的观察频率。</p>
+
+<p>让我们开始吧:</p>
+
+<ol>
+
+<li value="1">我们可以使用 Seaborn 创建每百万 COVID 案例和平均温度特征的小提琴图。我在这里使用 Seaborn，而不是 Matplotlib，因为我更喜欢它的默认选项 violin plots: <pre>import seaborn as sns fig = plt.figure() fig.suptitle("Violin Plots of COVID Cases and Land Temperatures") ax1 = plt.subplot(2,1,1) ax1.set_xlabel("Cases per Million") sns.violinplot(data=covidtotals.total_cases_mill, color="lightblue", orient="h") ax1.set_yticklabels([]) ax2 = plt.subplot(2,1,2) ax2.set_xlabel("Average Temperature") sns.violinplot(data=landtemps.avgtemp, color="wheat",  orient="h") ax2.set_yticklabels([]) plt.tight_layout() plt.show()</pre></li>
+
+</ol>
+
+<p>这个<a id="_idIndexMarker134"/>产生了以下情节:</p>
+
+<div><div><img alt="Figure 1.7 – Violin plots of COVID cases and land temperatures&#10;&#10;" height="446" src="img/B17978_01_007.jpg" width="610"/>
+
+</div>
+
+</div>
+
+<p class="figure-caption">图 1.7–COVID 案例和土地温度的小提琴图</p>
+
+<p>中间带白点的黑条<a id="_idIndexMarker135"/>是四分位区间，白点代表中位数。每个点的高度(当小提琴图是水平的时候)给了我们相对频率。四分位数范围右侧的细黑线代表百万分之一病例数，平均温度的左右两边是须状物。极值显示在胡须以外的分布部分。</p>
+
+<p>如果我要为一个数字特征创建一个图，我将创建一个小提琴图。小提琴图让我在一个图形中看到中心趋势、形状和分布。这里空间不允许，但我通常喜欢创建我所有连续特征的小提琴图，并将它们保存到 PDF 文件中，以供以后参考。</p>
+
+<h1 id="_idParaDest-25"><a id="_idTextAnchor024"/>总结</h1>
+
+<p>在这一章中，我们看了一些探索数据的常用技术。我们学习了如何在分析需要时检索数据子集。我们还使用 pandas 方法生成关于均值、四分位间距和偏斜等特征的关键统计数据。这让我们对每个特征的中心趋势、分布和形状有了更好的认识。这也让我们能够更好地识别异常值。最后，我们使用 Matplotlib 和 Seaborn 库来创建直方图、箱线图和 violin 图。这产生了关于特征分布的额外见解，例如尾部的长度和与正态分布的偏离。</p>
+
+<p>可视化是我们在本章中讨论的单变量分析工具的一个很好的补充。直方图、箱线图和小提琴图显示了每个要素分布的形状和范围。从图形上看，它们通过检查一些汇总统计数据来显示我们可能遗漏的内容，例如分布中哪里有一个(或多个)凸起，哪里有极值。当我们探索二元和多元关系时，这些可视化将非常有用，我们将在第 2 章 、<em class="italic">中<a href="B17978_02_ePub.xhtml#_idTextAnchor025"> <em class="italic">研究特征和目标之间的二元和多元关系</em>。</a></em></p>
+
+</div>
+
+</div>
+
+
+
+</body></html>

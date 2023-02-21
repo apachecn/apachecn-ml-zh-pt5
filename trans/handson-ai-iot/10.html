@@ -1,0 +1,428 @@
+<html><head/><body>
+    
+        <title>AI for the Industrial IoT</title>
+        
+        <meta charset="utf-8"/>
+    
+<!-- kobo-style -->
+<style type="text/css" id="koboSpanStyle">.koboSpan { -webkit-text-combine: inherit; }</style>
+
+
+
+    
+        
+
+                            
+                    <h1 class="header-title">面向工业物联网的人工智能</h1>
+                
+            
+            
+                
+<p>今天，来自不同背景的公司正在意识到<strong>人工智能</strong> ( <strong> AI </strong>)的重要性，因此，正在将其融入他们的生态系统。本章重点介绍一些成功的人工智能驱动的<strong>工业物联网</strong>解决方案。本章结束时，您将已经学习了以下内容:</p>
+<ul>
+<li>人工智能驱动的物联网解决方案如何改变行业</li>
+<li>不同行业为其数据提供人工智能分析，以提高产量、优化物流和改善客户体验</li>
+<li>预防性维修</li>
+<li>基于飞机发动机传感器数据执行代码以执行预防性维护</li>
+<li>电力负荷预测</li>
+<li>实施张量流代码进行短期负荷预测</li>
+</ul>
+
+
+            
+
+            
+        
+    
+
+
+
+    
+        <title>Introduction to AI-powered industrial IoT</title>
+        
+        <meta charset="utf-8"/>
+    
+<!-- kobo-style -->
+<style type="text/css" id="koboSpanStyle">.koboSpan { -webkit-text-combine: inherit; }</style>
+
+
+
+    
+        
+
+                            
+                    <h1 class="header-title">人工智能驱动的工业物联网简介</h1>
+                
+            
+            
+                
+<p>物联网、机器人、大数据和<strong>机器学习</strong> ( <strong> ML </strong>)的融合为工业企业创造了巨大的机遇，也带来了重大挑战。</p>
+<p>低成本传感器、多种云平台和强大的边缘基础设施的可用性正在使各行业采用人工智能变得更加容易和有利可图。这种人工智能驱动的工业物联网正在改变公司提供产品和服务或与客户和合作伙伴互动的方式。</p>
+<p class="mce-root"/>
+<p>人工智能驱动的工业物联网的一个有前途的领域是<strong>预防性维护</strong>。到目前为止，工业企业在维护方面一直是被动的，也就是说，他们要么将维护作为固定计划的一部分来执行，例如每六个月一次，要么仅在一些设备停止运行时才执行。例如，一家物流公司可能会对其车队中的每辆车进行两年一次的服务检查，并按照设定的时间表更换某些零件或整辆车。这种被动维护通常会浪费时间，而且成本高昂。在异常和错误发生之前应用人工智能算法来预测它们可以节省大量时间。</p>
+<p>人工智能驱动的工业物联网可以实现奇迹的另一个领域是人类和机器人之间的合作。机器人已经是工业物联网生态系统的一部分；他们在装配线和仓库中工作，执行对人类工人来说特别重复或危险的任务。目前作为采矿业一部分的半自动卡车、火车和装载机通常由预编程程序、固定轨道和/或远程人工操作员来引导。</p>
+<p>在许多行业情况下，云计算引入的延迟可能是不可接受的，在这种情况下，需要计算基础设施的边缘。</p>
+<p>为了让你了解人工智能驱动的工业物联网的传播和使用，下面列出了一些提供工业物联网服务和解决方案的热门人工智能创业公司:</p>
+<ul>
+<li><strong> Uptake Technologies Inc </strong>:一家总部位于芝加哥的初创公司，由 Brad Keywell 于 2014 年联合创立，开发软件来监控和分析工业设备产生的实时数据，并使用它来改善机器的性能和维护。它正计划将其视野扩展到重型目标行业，如能源、铁路、石油和天然气、采矿和风力发电(<a href="https://www.uptake.com/">https://www.uptake.com/</a>)。</li>
+<li><strong> C3.ai </strong>:由 Thomas Siebel 领导的大数据、物联网和人工智能应用的领先提供商，被 Forrester Research 2018 年工业物联网浪潮报告宣布为物联网平台的领导者。它成立于 2009 年，已经成功地在能源管理、网络效率、欺诈检测和库存优化(<a href="https://c3.ai"> https://c3.ai </a>)领域提供了行业服务。</li>
+<li><strong>Alluvium</strong>:Alluvium 于 2015 年由《黑客的机器学习<em/>的作者德鲁·康威(Drew Conway)创立，使用 ML 和 AI 帮助工业公司实现运营稳定和提高生产。他们的旗舰产品 Primer 可以帮助公司从传感器的原始和提取数据中识别有用的见解，使他们能够在故障发生前预测操作故障(<a href="https://alluvium.io"> https://alluvium.io </a>)。</li>
+<li><strong>Arundo Analytics</strong>:Arundo Analytics 由 Jakob Ramsø领导，成立于 2015 年，提供将实时数据连接到 ML 和其他分析模型的服务。他们有产品来扩展部署的模型，创建和管理实时数据管道(<a href="https://www.arundo.com">https://www.arundo.com</a>)。</li>
+<li><strong> Canvass Analytics </strong>:它利用基于实时运营数据的预测分析，帮助行业做出关键的商业决策。Canvass AI 平台提取由工业机器、传感器和操作系统生成的数百万个数据点，并识别数据中的模式和相关性，以创建新的见解。由 Humera Malik 负责的 Canvass Analytics 成立于 2016 年(<a href="https://www.canvass.io"> https://www.canvass.io </a>)。</li>
+</ul>
+<p>这并不是亚马逊和谷歌等软件技术巨头在工业物联网领域投入大量资金和基础设施的目的。谷歌正在使用预测建模来降低他们的数据中心成本，贝宝正在使用 ML 来发现欺诈性交易。</p>
+
+
+            
+
+            
+        
+    
+
+
+
+    
+        <title>Some interesting use cases</title>
+        
+        <meta charset="utf-8"/>
+    
+<!-- kobo-style -->
+<style type="text/css" id="koboSpanStyle">.koboSpan { -webkit-text-combine: inherit; }</style>
+
+
+
+    
+        
+
+                            
+                    <h1 class="header-title">一些有趣的用例</h1>
+                
+            
+            
+                
+<p>来自不同背景的大量公司正在意识到将数据分析和人工智能融入其生态系统的重要性和影响。从提高他们的运营、供应链和维护效率到提高员工生产率，再到创造新的商业模式、产品和服务，没有一个方面没有探索过人工智能。下面，我们列出了一些人工智能驱动的物联网在行业中的有趣用例:</p>
+<ul>
+<li><strong>预测性维护</strong>:在预测性维护中，AI 算法被用来在故障发生之前预测设备未来的故障。这使得公司能够进行维护，从而减少停机时间。在接下来的章节中，我们将更详细地介绍预防性维护对工业的帮助，以及实现预防性维护的各种方法。</li>
+<li><strong>资产跟踪</strong>:也叫<strong>资产管理</strong>，这是跟踪关键实物资产的方法。通过跟踪关键资产，公司可以优化物流，保持库存水平，并检测任何低效之处。传统上，资产跟踪仅限于向资产添加 RFID 或条形码，因此，保持对其位置的标记，但是，随着人工智能算法的深入研究，现在可以进行更积极的资产跟踪。例如，风车发电站可以感应风速、风向甚至温度的变化，并使用这些参数将单个风车调整到最佳方向，以最大限度地发电。</li>
+<li>车队管理和维护:近十年来，运输行业一直通过优化路线来使用人工智能进行车队管理。许多低成本传感器的出现和边缘计算设备的进步，使得运输公司能够收集和使用从这些传感器接收的数据，不仅通过更好的车对车通信和预防性维护来优化物流，还可以提高安全性。安装嗜睡检测等系统，可以检测到因疲劳或注意力分散而导致的危险行为，并可以要求驾驶员采取对策。</li>
+</ul>
+
+
+            
+
+            
+        
+    
+
+
+
+    
+        <title>Predictive maintenance using AI</title>
+        
+        <meta charset="utf-8"/>
+    
+<!-- kobo-style -->
+<style type="text/css" id="koboSpanStyle">.koboSpan { -webkit-text-combine: inherit; }</style>
+
+
+
+    
+        
+
+                            
+                    <h1 class="header-title">使用人工智能的预测性维护</h1>
+                
+            
+            
+                
+<p>重型机械和设备是任何行业的支柱，就像所有的实物一样，它们会退化、老化和失效。最初，公司通常执行反应式维护，即一旦报告了设备故障就进行维护。这通常会导致计划外停机。对于任何行业而言，计划外的停机时间都会导致严重的资源短缺，并大幅降低效率、产量和利润。为了解决这些问题，工业转向了预防性维护。</p>
+<p>在预防性维护中，按照预定的时间间隔进行定期例行检查。预防性维护要求记录设备及其定期维护。第三次工业革命，计算机被引入工业，使得维护和更新这些记录变得容易。虽然预防性维护使行业免于大多数计划外停机，但它仍然不是最佳选择，因为定期检查可能是不必要的支出。下图概述了四次工业革命的一个例子:</p>
+<p class="CDPAlignCenter CDPAlign"><img class="aligncenter size-full wp-image-1133 image-border" src="img/43713621-93d7-4bd5-a566-6b8ef8defa0c.png" style="width:29.25em;height:14.17em;"/></p>
+<p>知识共享署名下的图像共享:(https://commons.wikimedia.org/wiki/File:Industry_4.0.png)</p>
+<p class="mce-root"/>
+<p>当前自动化和数字化的趋势导致了第四次工业革命，也称为<strong>工业 4.0 </strong>。这使得公司能够部署<strong>机器对机器</strong> ( <strong> M2M </strong>)和<strong>机器对人</strong> ( <strong> M2H </strong>)通信，以及人工智能驱动的分析算法，实现预测性维护，利用过去的数据在故障发生前预测故障。预测性维护策略极大地简化了公司资源的维护和管理。</p>
+<p>预测性维护背后的主要思想是根据状态监测数据预测设备何时可能发生故障。传感器用于监控设备正常运行期间的状态和性能，根据设备的不同，可能会使用不同类型的传感器。一些常见的状态监控参数/传感器值如下:</p>
+<ul>
+<li>振动传感器主要用于检测泵和电机的未对准、不平衡、机械松动或磨损</li>
+<li>电流/电压传感器，用于测量提供给电动机的电流和电压</li>
+<li>超声波分析，用于检测管道系统或储罐中的泄漏，或可移动部件的机械故障和电气设备中的故障</li>
+<li>识别温度波动的红外热成像</li>
+<li>检测液体质量的传感器(例如，在葡萄酒传感器的情况下，检测葡萄酒中不同元素的存在)</li>
+</ul>
+<p>要实施预测性维护，最重要的是确定需要监控的条件。然后部署监控这些条件所需的传感器。最后，收集来自传感器的数据来建立模型。</p>
+
+
+            
+
+            
+        
+    
+
+
+
+    
+        <title>Predictive maintenance using Long Short-Term Memory</title>
+        
+        <meta charset="utf-8"/>
+    
+<!-- kobo-style -->
+<style type="text/css" id="koboSpanStyle">.koboSpan { -webkit-text-combine: inherit; }</style>
+
+
+
+    
+        
+
+                            
+                    <h1 class="header-title">使用长短期记忆的预测性维护</h1>
+                
+            
+            
+                
+<p>为了演示预测性维护，我们将使用 Azure ML(<a href="https://gallery.azure.ai/Collection/Predictive-Maintenance-Template-3">https://gallery . Azure . ai/Collection/Predictive-Maintenance-Template-3</a><a href="https://gallery.azure.ai/Collection/Predictive-Maintenance-Template-3">)中提供的模拟数据。</a>数据集由以下三个文件组成:</p>
+<ul>
+<li><strong>训练数据</strong>:包含飞机发动机运行至故障数据。数据的下载链接是<a href="http://azuremlsamples.azureml.net/templatedata/PM_train.txt">http://azuremlsamples.azureml.net/templatedata/PM_train.txt</a>。</li>
+<li><strong>测试数据</strong>:包含无故障事件记录的飞机发动机运行数据。数据可以从链接:<a href="http://azuremlsamples.azureml.net/templatedata/PM_test.txt">http://azuremlsamples.azureml.net/templatedata/PM_test.txt</a>加载。</li>
+<li><strong>地面真实数据</strong>:这里提供了测试数据中每台发动机真实剩余循环次数的信息。地面实况数据的链接是<a href="http://azuremlsamples.azureml.net/templatedata/PM_truth.txt">http://azuremlsamples.azureml.net/templatedata/PM_truth.txt</a>。</li>
+</ul>
+<p>根据数据源提供的数据描述，训练数据(<kbd>train_FD001.txt</kbd>)由多个以周期为时间单位的多元时间序列组成，每个周期有 21 个传感器读数。每个时间序列都可以被假设为由同一类型的不同引擎生成。假设每台发动机在启动时都有不同程度的初始磨损和制造差异，用户不知道这些信息。在该模拟数据中，假设发动机在每个时间序列开始时正常运转。它在一系列操作周期中的某个点开始退化。这降低了进程，并在数量上增长。当达到预定阈值时，则认为发动机不安全，不能继续运行。换句话说，每个时间序列中的最后一个循环可以被认为是相应发动机的故障点。以样本训练数据为例，<kbd>id=1</kbd>的引擎在<kbd>192</kbd>周期失效，<kbd>id=2</kbd>的引擎在<kbd>287</kbd>周期失效。</p>
+<p>测试数据(<kbd>test_FD001.txt</kbd>)具有与训练数据相同的数据模式。唯一不同的是，数据没有指明故障发生的时间(换句话说，最后一个时间段不代表故障点)。取样本测试数据，带<kbd>id=1</kbd>的发动机从周期<kbd>1</kbd>运行到周期<kbd>31</kbd>。没有显示该发动机在失效前还能持续多少个循环。</p>
+<p>地面实况数据(<kbd>RUL_FD001.txt</kbd>)提供了测试数据中发动机剩余工作循环的次数。以所示的地面真实数据样本为例，测试数据中带有<kbd>id=1</kbd>的发动机在出现故障之前可以运行另一个<kbd>112</kbd>周期。</p>
+<p class="mce-root"/>
+<p class="mce-root"/>
+<p>由于这是一个时间序列数据，我们将使用<strong>长短时记忆</strong> ( <strong> LSTM </strong>)来分类发动机在某个时间段是否会出现故障。这里提供的代码基于 Umberto Griffo 的 GitHub 链接提供的实现:(<a href="https://github.com/umbertogriffo/Predictive-Maintenance-using-LSTM">https://GitHub . com/Umberto Griffo/Predictive-Maintenance-using-LSTM</a>):</p>
+<ol>
+<li>实施预测性维护所需的模块在第一步导入。我们还设置了随机计算的种子，以便结果是可重复的:</li>
+</ol>
+<pre style="padding-left: 60px">import keras<br/>import pandas as pd<br/>import numpy as np<br/>import matplotlib.pyplot as plt<br/>import os<br/><br/># Setting seed for reproducibility<br/>np.random.seed(1234) <br/>PYTHONHASHSEED = 0<br/><br/>from sklearn import preprocessing<br/>from sklearn.metrics import confusion_matrix, recall_score, precision_score<br/>from keras.models import Sequential,load_model<br/>from keras.layers import Dense, Dropout, LSTM</pre>
+<ol start="2">
+<li>让我们读取数据并分配列名，如以下代码所示:</li>
+</ol>
+<pre style="padding-left: 60px"># read training data - It is the aircraft engine run-to-failure data.<br/>train_df = pd.read_csv('PM_train.txt', sep=" ",<br/>         header=None)<br/>train_df.drop(train_df.columns[[26, 27]], <br/>        axis=1, <br/>        inplace=True)<br/>train_df.columns = ['id', 'cycle', 'setting1',<br/>         'setting2', 'setting3', 's1', 's2',<br/>         's3', 's4', 's5', 's6', 's7', 's8',<br/>         's9', 's10', 's11', 's12', 's13', <br/>        's14', 's15', 's16', 's17', 's18', <br/>        's19', 's20', 's21']<br/><br/>train_df = train_df.sort_values(['id','cycle'])<br/><br/># read test data - It is the aircraft engine operating data without failure events recorded.<br/>test_df = pd.read_csv('PM_test.txt', <br/>        sep=" ", header=None)<br/>test_df.drop(test_df.columns[[26, 27]], <br/>        axis=1, <br/>        inplace=True)<br/>test_df.columns = ['id', 'cycle', 'setting1', <br/>        'setting2', 'setting3', 's1', 's2', 's3',<br/>         's4', 's5', 's6', 's7', 's8', 's9', <br/>        's10', 's11', 's12', 's13', 's14',<br/>         's15', 's16', 's17', 's18', 's19', <br/>        's20', 's21']<br/><br/># read ground truth data - It contains the information of true remaining cycles for each engine in the testing data.<br/>truth_df = pd.read_csv('PM_truth.txt', <br/>        sep=" ", <br/>        header=None)<br/>truth_df.drop(truth_df.columns[[1]], <br/>        axis=1, <br/>        inplace=True)</pre>
+<ol start="3">
+<li>作为第一步，我们预测发动机是否会在该时间段内发生故障，因此我们的标签将是<kbd>1</kbd>或<kbd>0</kbd>，也就是说，这将是一个二元分类问题。为了创建二进制标签，我们对数据进行预处理，并创建一个新标签<strong>剩余使用寿命</strong> ( <strong> RUL </strong>)。我们还创建了一个二进制的<kbd>label1</kbd>变量，告知特定的引擎是否会在<kbd>w1</kbd>周期内发生故障。最后，数据(非传感器)被归一化，如下所示:</li>
+</ol>
+<pre style="padding-left: 60px"># Data Labeling - generate column RUL(Remaining Usefull Life or Time to Failure)<br/>rul = pd.DataFrame(train_df.groupby('id')<br/>        ['cycle'].max()).reset_index()<br/>rul.columns = ['id', 'max']<br/>train_df = train_df.merge(rul, <br/>        on=['id'], <br/>        how='left')<br/>train_df['RUL'] = train_df['max'] -     train_df['cycle']<br/>train_df.drop('max', <br/>        axis=1, <br/>        inplace=True)<br/><br/># Let us generate label columns for training data<br/># we will only use "label1" for binary classification, <br/># The question: is a specific engine going to fail within w1 cycles?<br/>w1 = 30<br/>w0 = 15<br/>train_df['label1'] = np.where(train_df['RUL'] &lt;= w1, 1, 0 )<br/><br/># MinMax normalization (from 0 to 1)<br/>train_df['cycle_norm'] = train_df['cycle']<br/>cols_normalize = train_df.columns.difference<br/>        (['id','cycle','RUL','label1'])<br/>min_max_scaler = preprocessing.MinMaxScaler()<br/>norm_train_df = pd.DataFrame(min_max_scaler.<br/>        fit_transform(train_df[cols_normalize]), <br/>        columns=cols_normalize, <br/>        index=train_df.index)<br/>join_df = train_df[train_df.columns.<br/>        difference(cols_normalize)].<br/>        join(norm_train_df)<br/>train_df = join_df.reindex(columns = train_df.columns)<br/><br/>train_df.head()</pre>
+<p class="CDPAlignCenter CDPAlign"><img src="img/db9d096a-4f3b-4f94-8bfa-f43be21b0d05.png" style="width:49.75em;height:15.00em;"/></p>
+<ol start="4">
+<li>在测试数据集上执行类似的预处理，只有一个变化-RUL 值从地面真实数据获得:</li>
+</ol>
+<pre style="padding-left: 60px"># MinMax normalization (from 0 to 1)<br/>test_df['cycle_norm'] = test_df['cycle']<br/>norm_test_df = pd.DataFrame(<br/>        min_max_scaler.<br/>        transform(test_df[cols_normalize]), <br/>        columns=cols_normalize,     <br/>         index=test_df.index)<br/>test_join_df = test_df[test_df.<br/>        columns.difference(cols_normalize)].<br/>        join(norm_test_df)<br/>test_df = test_join_df.<br/>        reindex(columns = test_df.columns)<br/>test_df = test_df.reset_index(drop=True)<br/><br/><br/># We use the ground truth dataset to generate labels for the test data.<br/># generate column max for test data<br/>rul = pd.DataFrame(test_df.<br/>        groupby('id')['cycle'].max()).<br/>        reset_index()<br/>rul.columns = ['id', 'max']<br/>truth_df.columns = ['more']<br/>truth_df['id'] = truth_df.index + 1<br/>truth_df['max'] = rul['max'] + truth_df['more']<br/>truth_df.drop('more', <br/>        axis=1, <br/>        inplace=True)<br/><br/># generate RUL for test data<br/>test_df = test_df.merge(truth_df, <br/>        on=['id'], how='left')<br/>test_df['RUL'] = test_df['max'] - test_df['cycle']<br/>test_df.drop('max', <br/>        axis=1, <br/>        inplace=True)<br/><br/># generate label columns w0 and w1 for test data<br/>test_df['label1'] = np.where<br/>        (test_df['RUL'] &lt;= w1, 1, 0 )<br/>test_df.head()</pre>
+<p class="CDPAlignCenter CDPAlign"><img src="img/af874577-0db2-4421-9166-23f0ab836a8a.png" style="width:49.50em;height:15.17em;"/></p>
+<ol start="5">
+<li>由于我们使用 LSTM 进行时间序列建模，因此我们创建了一个函数，该函数将根据窗口大小生成要提供给 LSTM 的序列。我们选择了<kbd>50</kbd>的窗口大小。我们还需要一个函数来生成相应的标签:</li>
+</ol>
+<pre style="padding-left: 60px"># function to reshape features into <br/># (samples, time steps, features) <br/>def gen_sequence(id_df, seq_length, seq_cols):<br/>    """ Only sequences that meet the window-length<br/>    are considered, no padding is used. This <br/>    means for testing we need to drop those which <br/>    are below the window-length. An alternative<br/>    would be to pad sequences so that<br/>    we can use shorter ones """<br/><br/>    # for one id we put all the rows in a single matrix<br/>    data_matrix = id_df[seq_cols].values<br/>    num_elements = data_matrix.shape[0]<br/>    # Iterate over two lists in parallel.<br/>    # For example id1 have 192 rows and <br/>    # sequence_length is equal to 50<br/>    # so zip iterate over two following list of <br/>    # numbers (0,112),(50,192)<br/>    # 0 50 -&gt; from row 0 to row 50<br/>    # 1 51 -&gt; from row 1 to row 51<br/>    # 2 52 -&gt; from row 2 to row 52<br/>    # ...<br/>    # 111 191 -&gt; from row 111 to 191<br/>    for start, stop in zip(range(0, num_elements-seq_length), range(seq_length, num_elements)):<br/>        yield data_matrix[start:stop, :]<br/><br/>def gen_labels(id_df, seq_length, label):<br/>    # For one id we put all the labels in a <br/>    # single matrix.<br/>    # For example:<br/>    # [[1]<br/>    # [4]<br/>    # [1]<br/>    # [5]<br/>    # [9]<br/>    # ...<br/>    # [200]] <br/>    data_matrix = id_df[label].values<br/>    num_elements = data_matrix.shape[0]<br/>    # I have to remove the first seq_length labels<br/>    # because for one id the first sequence of <br/>    # seq_length size have as target<br/>    # the last label (the previus ones are <br/>    # discarded).<br/>    # All the next id's sequences will have <br/>    # associated step by step one label as target. <br/>    return data_matrix[seq_length:num_elements, :]</pre>
+<p class="mce-root"/>
+<p class="mce-root"/>
+<p class="mce-root"/>
+<p class="mceNonEditable"/>
+<ol start="6">
+<li>现在，让我们为数据生成训练序列和相应的标签，如以下代码所示:</li>
+</ol>
+<pre style="padding-left: 60px"># pick a large window size of 50 cycles<br/>sequence_length = 50<br/><br/># pick the feature columns <br/>sensor_cols = ['s' + str(i) for i in range(1,22)]<br/>sequence_cols = ['setting1', 'setting2', <br/>        'setting3', 'cycle_norm']<br/>sequence_cols.extend(sensor_cols)<br/><br/># generator for the sequences<br/>seq_gen = (list(gen_sequence<br/>        (train_df[train_df['id']==id], <br/>        sequence_length, sequence_cols)) <br/>        for id in train_df['id'].unique())<br/><br/># generate sequences and convert to numpy array<br/>seq_array = np.concatenate(list(seq_gen)).<br/>        astype(np.float32)<br/>print(seq_array.shape)<br/><br/># generate labels<br/>label_gen = [gen_labels(train_df[train_df['id']==id], <br/>        sequence_length, ['label1']) <br/>        for id in train_df['id'].unique()]<br/>label_array = np.concatenate(label_gen).<br/>        astype(np.float32)<br/>print(label_array.shape)</pre>
+<ol start="7">
+<li>我们现在建立一个 LSTM 模型，有两个 LSTM 层和一个全连接层。该模型被训练用于二进制分类，因此，它试图减少二进制交叉熵损失。<kbd>Adam</kbd>优化器用于更新模型参数:</li>
+</ol>
+<pre style="padding-left: 60px">nb_features = seq_array.shape[2]<br/>nb_out = label_array.shape[1]<br/><br/>model = Sequential()<br/><br/>model.add(LSTM(<br/>     input_shape=(sequence_length, nb_features),<br/>     units=100,<br/>     return_sequences=True))<br/>model.add(Dropout(0.2))<br/><br/>model.add(LSTM(<br/>     units=50,<br/>     return_sequences=False))<br/>model.add(Dropout(0.2))<br/><br/>model.add(Dense(units=nb_out,<br/>     activation='sigmoid'))<br/>model.compile(loss='binary_crossentropy', <br/>    optimizer='adam', <br/>    metrics=['accuracy'])<br/><br/>print(model.summary())</pre>
+<p class="CDPAlignCenter CDPAlign"><img class="aligncenter size-full wp-image-1134 image-border" src="img/39a6a841-8fcb-499c-8944-b60c0a07e23e.png" style="width:45.42em;height:21.58em;"/></p>
+<ol start="8">
+<li>我们训练模型，如下所示:</li>
+</ol>
+<pre style="padding-left: 60px">history = model.fit(seq_array, label_array, <br/>        epochs=100, batch_size=200, <br/>        validation_split=0.05, verbose=2,<br/>         callbacks = [keras.callbacks.<br/>            EarlyStopping(monitor='val_loss', <br/>            min_delta=0, patience=10, <br/>            verbose=0, mode='min'),<br/>        keras.callbacks.<br/>            ModelCheckpoint<br/>            (model_path,monitor='val_loss',     <br/>            save_best_only=True, <br/>            mode='min', verbose=0)])    </pre>
+<ol start="9">
+<li>经过训练的模型在测试数据集上给出了 98%的准确度，在验证数据集上给出了 98.9%的准确度。精度值为<kbd>0.96</kbd>，有<kbd>1.0</kbd>的召回和<kbd>0.98</kbd>的 F1 分。不错吧！下图显示了列车模型的这些结果:</li>
+</ol>
+<p class="CDPAlignCenter CDPAlign"><img class="aligncenter size-full wp-image-1135 image-border" src="img/d3461ac4-07d5-4701-9a62-a70015086c06.png" style="width:46.58em;height:25.33em;"/></p>
+<p class="mce-root"/>
+<p class="mce-root"/>
+<p>我们可以用同样的数据来预测飞机发动机的 RUL，也就是说，预测发动机的无故障时间。这将是一个回归问题，现在我们可以使用 LSTM 模型来执行回归。最初的步骤将和以前一样，但从第五步开始我们将有所改变。虽然生成的输入数据序列将保持与以前相同，但目标将不再是二进制标签，相反，我们将使用 RUL 作为回归模型的目标:</p>
+<ol>
+<li>我们使用相同的<kbd>gen_labels()</kbd>函数创建目标值。我们还使用<kbd>gen_sequence()</kbd>函数创建一个验证集:</li>
+</ol>
+<pre style="padding-left: 60px"># generate labels<br/>label_gen = [gen_labels(train_df[train_df['id']==id],<br/>        sequence_length, ['RUL']) <br/>        for id in train_df['id'].unique()]<br/>label_array = np.concatenate(label_gen).astype(np.float32)<br/><br/># val is a list of 192 - 50 = 142 bi-dimensional array <br/># (50 rows x 25 columns)<br/>val=list(gen_sequence(train_df[train_df['id']==1], <br/>        sequence_length, sequence_cols))</pre>
+<ol start="2">
+<li>创建一个 LSTM 模型。我们在培训期间使用<kbd>r2</kbd>作为指标，因此，我们使用 Keras 自定义指标功能和我们自己的指标函数:</li>
+</ol>
+<pre style="padding-left: 60px">def r2_keras(y_true, y_pred):<br/>     """Coefficient of Determination <br/>     """<br/>     SS_res = K.sum(K.square( y_true - y_pred ))<br/>     SS_tot = K.sum(K.square( y_true - K.mean(y_true) ) )<br/>     return ( 1 - SS_res/(SS_tot + K.epsilon()) )<br/><br/># Next, we build a deep network. <br/># The first layer is an LSTM layer with 100 units followed by <br/># another LSTM layer with 50 units. <br/># Dropout is also applied after each LSTM layer to control <br/># overfitting. <br/># Final layer is a Dense output layer with single unit and linear <br/># activation since this is a regression problem.<br/>nb_features = seq_array.shape[2]<br/>nb_out = label_array.shape[1]<br/><br/><br/>model = Sequential()<br/>model.add(LSTM(<br/>     input_shape=(sequence_length, nb_features),<br/>     units=100,<br/>     return_sequences=True))<br/>model.add(Dropout(0.2))<br/>model.add(LSTM(<br/>     units=50,<br/>     return_sequences=False))<br/>model.add(Dropout(0.2))<br/>model.add(Dense(units=nb_out))<br/>model.add(Activation("linear"))<br/>model.compile(loss='mean_squared_error', optimizer='rmsprop',metrics=['mae',r2_keras])<br/><br/><br/>print(model.summary())</pre>
+<p class="CDPAlignCenter CDPAlign"><img src="img/48c70894-7fbe-4469-be8a-77a44b46f56c.png" style="width:49.17em;height:21.08em;"/></p>
+<ol start="3">
+<li>在训练数据集上训练模型，如下所示:</li>
+</ol>
+<pre style="padding-left: 60px"># fit the network<br/>history = model.fit(seq_array, label_array, epochs=100, <br/>    batch_size=200, validation_split=0.05, verbose=2,<br/>    callbacks = [keras.callbacks.EarlyStopping<br/>    (monitor='val_loss', min_delta=0, patience=10, <br/>    verbose=0, mode='min'),<br/>    keras.callbacks.ModelCheckpoint<br/>    (model_path,monitor='val_loss', <br/>    save_best_only=True, mode='min', <br/>    verbose=0)])</pre>
+<ol start="4">
+<li>经训练的模型在测试数据集上提供 0.80 的<kbd>r2</kbd>值，在验证数据集上提供 0.72 的<kbd>r2</kbd>值。我们可以通过超调模型参数来改进我们的结果。接下来，您可以看到训练和验证数据集的模型在训练过程中丢失:</li>
+</ol>
+<p class="CDPAlignCenter CDPAlign"><img class="aligncenter size-full wp-image-1136 image-border" src="img/6285b89e-5545-4260-9e20-e9297f4e6d08.png" style="width:43.17em;height:41.83em;"/></p>
+<p>要运行此代码，请确保您有 Tensorflow 1.4 </p>
+<p>The complete code with both the binary classification and regression model are available at the GitHub repository,  【T15】 . We can also create a model to determine if the failure will occur in different time windows, for example, fails in the window <em> (1，w <sub> 0 </sub> ) </em>或 fails in window(<em>w<sub>0+1</sub>，w <sub> 1 </sub> </em>)天，以此类推。这将是一个多分类问题，需要对数据进行相应的预处理。你可以从 Azure AI Gallery 了解更多关于这个预测性维护模板的信息:<a href="https://gallery.azure.ai/Experiment/Predictive-Maintenance-Step-2A-of-3-train-and-evaluate-regression-models-2">https://Gallery . Azure . AI/Experiment/Predictive-Maintenance-Step-2A-of-3-train-and-evaluate-regression-models-2</a>。</p>
+
+
+            
+
+            
+        
+    
+
+
+
+    
+        <title>Predictive maintenance advantages and disadvantages</title>
+        
+        <meta charset="utf-8"/>
+    
+<!-- kobo-style -->
+<style type="text/css" id="koboSpanStyle">.koboSpan { -webkit-text-combine: inherit; }</style>
+
+
+
+    
+        
+
+                            
+                    <h1 class="header-title">预测性维护的优点和缺点</h1>
+                
+            
+            
+                
+<p class="mce-root">根据 GE 的一份调查报告(<a href="https://www.gemeasurement.com/sites/gemc.dev/files/ge_the_impact_of_digital_on_unplanned_downtime_0.pdf">https://www . GE measurement . com/sites/gemc . dev/files/GE _ the _ impact _ of _ digital _ on _ unplanned _ down _ 0 . pdf</a>)。停机时间对石油和天然气行业的业绩产生了负面影响。这是真的，不仅对于油气行业，所有行业都是如此。因此，为了减少停机时间和提高效率，采用预测性维护非常重要。然而，建立预测性维护的成本相当高，但是一旦正确建立了预测性维护系统，它将有助于提供多种具有成本效益的好处，例如:</p>
+<ul>
+<li>设备维护所需的时间最少</li>
+<li>因维护而损失的最小生产时间</li>
+<li>最后，备件成本也降至最低</li>
+</ul>
+<p>成功的预测性维护能够以积极的方式重塑整个公司。</p>
+<p class="mce-root"/>
+
+
+            
+
+            
+        
+    
+
+
+
+    
+        <title>Electrical load forecasting in industry</title>
+        
+        <meta charset="utf-8"/>
+    
+<!-- kobo-style -->
+<style type="text/css" id="koboSpanStyle">.koboSpan { -webkit-text-combine: inherit; }</style>
+
+
+
+    
+        
+
+                            
+                    <h1 class="header-title">工业电力负荷预测</h1>
+                
+            
+            
+                
+<p>电目前是家庭和工业部门最重要的能源载体。与燃料不同，储存电力既困难又昂贵，因此需要在发电和需求之间建立精确的耦合。因此，电能负荷预测是非常重要的。根据时间范围(预测范围),电力负荷预测分为以下三类:</p>
+<ul>
+<li><strong>短期负荷预测</strong>:一小时到几周的预测</li>
+<li><strong>中期负荷预测</strong>:预测持续时间从几周到几个月不等</li>
+<li><strong>长期负荷预测</strong>:这里的预测是从几个月到几年</li>
+</ul>
+<p>根据需要和应用，可能需要规划一个或所有以前的负荷预测类别。近年来，人们在<strong>短期负荷预测</strong> ( <strong> STLF </strong>)领域做了大量的研究工作。STLF 可以通过提供预测未来负荷的准确方法来帮助工业，这有助于精确规划，降低运营成本，从而增加利润并提供更可靠的电力供应。STLF 根据历史数据(通过智能电表获得)预测未来的能源需求，并预测天气状况。</p>
+<p>负荷预测问题是一个回归问题。可以建模为时间序列问题，也可以建模为静态模型。将负荷预测建模为时间序列数据是最受欢迎的选择。对于时间序列建模，我们可以使用标准的 ML 时间序列模型，如 ARIMA，或者我们可以利用深度学习模型，如递归神经网络和 LSTM。</p>
+<div><p>对于在电力负荷预测中使用的各种策略和模型的全面回顾，请参考本文:</p>
+<p>Fallah，s .，Deo，r .，Shojafar，m .，Conti，m .，Shamshirband，S. (2018)。<em>智能能源管理电网中能源负荷预测的计算智能方法:现状、未来挑战和研究方向</em>。能量，11(3)，596。</p>
+</div>
+<p class="mce-root"/>
+<p class="mce-root"/>
+
+
+            
+
+            
+        
+    
+
+
+
+    
+        <title>STLF using LSTM</title>
+        
+        <meta charset="utf-8"/>
+    
+<!-- kobo-style -->
+<style type="text/css" id="koboSpanStyle">.koboSpan { -webkit-text-combine: inherit; }</style>
+
+
+
+    
+        
+
+                            
+                    <h1 class="header-title">STLF 利用 LSTM</h1>
+                
+            
+            
+                
+<p>这里，我们展示了在 LSTM 的帮助下执行短期负荷预测的代码。训练和测试的数据取自 UCI ML 网站(<a href="https://archive.ics.uci.edu/ml/datasets/Individual+household+electric+power+consumption#">https://archive . ics . UCI . edu/ML/datasets/Individual+household+electric+power+consumption #</a>)。STLF 的代码改编自 GitHub(<a href="https://github.com/demmojo/lstm-electric-load-forecast">https://github.com/demmojo/lstm-electric-load-forecast</a>):</p>
+<ol>
+<li>我们导入必要的模块并设置随机种子，如下所示:</li>
+</ol>
+<pre style="padding-left: 60px">import time<br/>from keras.layers import LSTM<br/>from keras.layers import Activation, Dense, Dropout<br/>from keras.models import Sequential, load_model<br/>from numpy.random import seed<br/><br/>from tensorflow import set_random_seed<br/>set_random_seed(2) # seed random numbers for Tensorflow backend<br/>seed(1234) # seed random numbers for Keras<br/>import numpy as np<br/>import csv<br/>import matplotlib.pyplot as plt<br/><br/>%matplotlib inline</pre>
+<ol start="2">
+<li>定义用于加载数据并将其转换为适合 LSTM 输入的序列的实用函数:</li>
+</ol>
+<pre style="padding-left: 60px">def load_data(dataset_path, sequence_length=60, prediction_steps=5, ratio_of_data=1.0):<br/>    # 2075259 is the total number of measurements <br/>    # from Dec 2006 to Nov 2010<br/>    max_values = ratio_of_data * 2075259<br/><br/>    # Load data from file<br/>    with open(dataset_path) as file:<br/>        data_file = csv.reader(file, delimiter=";")<br/>        power_consumption = []<br/>        number_of_values = 0<br/>        for line in data_file:<br/>            try:<br/>                power_consumption.append(float(line[2]))<br/>                number_of_values += 1<br/>            except ValueError:<br/>                pass<br/><br/>            # limit data to be considered by <br/>            # model according to max_values<br/>            if number_of_values &gt;= max_values: <br/>                break<br/><br/>    print('Loaded data from csv.')<br/>    windowed_data = []<br/>    # Format data into rolling window sequences<br/>    # for e.g: index=0 =&gt; 123, index=1 =&gt; 234 etc.<br/>    for index in range(len(power_consumption) - sequence_length): <br/>            windowed_data.append(<br/>            power_consumption[<br/>            index: index + sequence_length])<br/><br/>    # shape (number of samples, sequence length)<br/>    windowed_data = np.array(windowed_data)<br/><br/>    # Center data<br/>    data_mean = windowed_data.mean()<br/>    windowed_data -= data_mean<br/>    print('Center data so mean is zero <br/>            (subtract each data point by mean of value: ', <br/>            data_mean, ')')<br/>    print('Data : ', windowed_data.shape)<br/><br/>    # Split data into training and testing sets<br/>    train_set_ratio = 0.9<br/>    row = int(round(train_set_ratio * windowed_data.shape[0]))<br/>    train = windowed_data[:row, :]<br/><br/>    # remove last prediction_steps from train set<br/>    x_train = train[:, :-prediction_steps] <br/>    # take last prediction_steps from train set<br/>    y_train = train[:, -prediction_steps:] <br/>    x_test = windowed_data[row:, :-prediction_steps]<br/><br/>    # take last prediction_steps from test set<br/>    y_test = windowed_data[row:, -prediction_steps:] <br/><br/>    x_train = np.reshape(x_train, <br/>            (x_train.shape[0], x_train.shape[1], 1))<br/>    x_test = np.reshape(x_test, <br/>            (x_test.shape[0], x_test.shape[1], 1))<br/><br/>    return [x_train, y_train, x_test, y_test, data_mean]</pre>
+<ol start="3">
+<li>构建 LSTM 模型，我们构建的模型包含两个 LSTM 和一个全连接层:</li>
+</ol>
+<pre style="padding-left: 60px">def build_model(prediction_steps):<br/>    model = Sequential()<br/>    layers = [1, 75, 100, prediction_steps]<br/>    model.add(LSTM(layers[1], <br/>        input_shape=(None, layers[0]), <br/>        return_sequences=True)) # add first layer<br/>    model.add(Dropout(0.2)) # add dropout for first layer<br/>    model.add(LSTM(layers[2], <br/>        return_sequences=False)) # add second layer<br/>    model.add(Dropout(0.2)) # add dropout for second layer<br/>    model.add(Dense(layers[3])) # add output layer<br/>    model.add(Activation('linear')) # output layer <br/>    start = time.time()<br/>    model.compile(loss="mse", optimizer="rmsprop")<br/>    print('Compilation Time : ', time.time() - start)<br/>    return model</pre>
+<ol start="4">
+<li>定型模型，如下面的代码所示:</li>
+</ol>
+<pre style="padding-left: 60px">def run_lstm(model, sequence_length, prediction_steps):<br/>    data = None<br/>    global_start_time = time.time()<br/>    epochs = 1<br/>    ratio_of_data = 1 # ratio of data to use from 2+ million data points<br/>    path_to_dataset = 'data/household_power_consumption.txt'<br/><br/>    if data is None:<br/>        print('Loading data... ')<br/>        x_train, y_train, x_test, y_test, result_mean = load_data(path_to_dataset, sequence_length,<br/>                                                                  prediction_steps, ratio_of_data)<br/>    else:<br/>        x_train, y_train, x_test, y_test = data<br/><br/>    print('\nData Loaded. Compiling...\n')<br/>    <br/>    model.fit(x_train, y_train, batch_size=128, epochs=epochs, validation_split=0.05)<br/>    predicted = model.predict(x_test)<br/>    # predicted = np.reshape(predicted, (predicted.size,))<br/>    model.save('LSTM_power_consumption_model.h5') # save LSTM model<br/><br/>    plot_predictions(result_mean, prediction_steps, predicted, y_test, global_start_time)<br/><br/>    return None<br/><br/><br/>sequence_length = 10 # number of past minutes of data for model to consider<br/>prediction_steps = 5 # number of future minutes of data for model to predict<br/>model = build_model(prediction_steps)<br/>run_lstm(model, sequence_length, prediction_steps)</pre>
+<ol start="5">
+<li>从下图中我们可以看到，我们的模型做出了很好的预测:</li>
+</ol>
+<p class="CDPAlignCenter CDPAlign"><img class="aligncenter size-full wp-image-1137 image-border" src="img/cb3ab15b-14e4-4a5b-9ed6-d6ff41d61856.png" style="width:28.08em;height:20.00em;"/></p>
+<p class="mce-root">完整的代码可以在 GitHub: <kbd>Chapter10/Electrical_load_Forecasting.ipynb</kbd>获得。</p>
+
+
+            
+
+            
+        
+    
+
+
+
+    
+        <title>Summary</title>
+        
+        <meta charset="utf-8"/>
+    
+<!-- kobo-style -->
+<style type="text/css" id="koboSpanStyle">.koboSpan { -webkit-text-combine: inherit; }</style>
+
+
+
+    
+        
+
+                            
+                    <h1 class="header-title">摘要</h1>
+                
+            
+            
+                
+<p>在本章中，我们看到了人工智能支持的物联网对行业产生了重大影响。从制造、物流、农业和采矿到创造新产品和服务，人工智能已经触及到了每个方面。我们可以满怀希望地假设，以人工智能为动力的工业物联网将会更好地改变和破坏当前的业务流程和模式。</p>
+<p>下一章将展示人工智能和物联网如何帮助塑造更好的城市。</p>
+
+
+            
+
+            
+        
+    
+
+</body></html>

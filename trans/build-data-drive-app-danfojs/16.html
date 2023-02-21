@@ -1,0 +1,364 @@
+<html><head/><body>
+
+
+	
+		<title>B17076_13_ePub_RK</title>
+		
+	
+	
+		<div><h1 id="_idParaDest-219"><em class="italic"> <a id="_idTextAnchor222"/>第十三章</em>:附录:JavaScript 基本概念</h1>
+			<p>欢迎来到本书的最后一章。我们把这一章放在了本书的末尾，以免有经验的 JavaScript 开发人员对介绍性的概念感到厌烦。想在尝试使用<code>Danfo.js</code>之前复习 JavaScript 基础知识的开发人员应该阅读这一章。</p>
+			<p>本章结束时，你将理解 JavaScript 的基本概念，这些概念对于用这种语言构建应用程序是必不可少的。您将了解数据类型、条件分支和循环结构以及 JavaScript 函数。</p>
+			<p>具体来说，我们将涵盖以下概念:</p>
+			<ul>
+				<li>JavaScript 快速概述</li>
+				<li>理解 JavaScript 的基础知识</li>
+			</ul>
+			<h1 id="_idParaDest-220"><a id="_idTextAnchor223"/>技术要求</h1>
+			<p>我们将在本章的所有代码示例中使用开发人员控制台。要在默认浏览器中运行任何代码片段，您需要打开开发人员控制台。下表显示了为各种浏览器提供的用于打开控制台的命令:</p>
+			<ul>
+				<li><strong class="bold"> Google Chrome </strong>:要在 Google Chrome 中打开开发者控制台，从浏览器窗口右上角打开<strong class="bold"> Chrome </strong>菜单，选择<strong class="bold">更多工具</strong> | <strong class="bold">开发者工具</strong>。也可以在 macOS 上使用<em class="italic">选项</em> + <em class="italic">命令</em> + <em class="italic"> J </em>快捷键，或者在 Windows/Linux 上使用<em class="italic">Shift</em>+<em class="italic">Ctrl</em>+<em class="italic">J</em>。</li>
+				<li><strong class="bold">微软 Edge </strong>:在微软 Edge 中，打开浏览器窗口右上角的<strong class="bold"> Edge </strong>菜单，选择<strong class="bold"> F12 开发者工具</strong>，也可以直接按<em class="italic"> F12 </em>打开。</li>
+				<li><strong class="bold"> Mozilla Firefox </strong>:在 Mozilla Firefox 中，点击浏览器右上角的<strong class="bold"> Firefox </strong>菜单，选择<strong class="bold"> Web Developer </strong> | <strong class="bold">浏览器</strong> <em class="italic"> </em> <strong class="bold">控制台</strong>。也可以在 macOS 上使用<em class="italic">shift</em>+<em class="italic">⌘</em>+<em class="italic">j</em>快捷键或者在 Windows/Linux 上使用<em class="italic">shift</em>+<em class="italic">ctrl</em>+<em class="italic">j</em>。</li>
+				<li><strong class="bold">Apple Safari</strong>: In Safari, you'll first need to enable the <strong class="bold">Developer</strong> menu in your browser settings. To do that, open Safari's preferences (<em class="italic">Safari Menu </em>| <strong class="bold">Preferences</strong>), select the <strong class="bold">Advanced</strong> tab, and then enable the <strong class="bold">Developer</strong> menu. Once that menu is enabled, you will find the developer console by clicking on <strong class="bold">Develop </strong>| <strong class="bold">Show JavaScript Console</strong>. You can also use the <em class="italic">Option</em> + <em class="italic">⌘</em> + <em class="italic">C</em> shortcut.<p>一旦您的开发人员控制台打开，根据您的浏览器，您将看到一个类似如下所示的控制台:</p></li>
+			</ul>
+			<div><div><img src="img/B17076_13_01.jpg" alt="Figure 13.1 – Chrome browser developer console&#13;&#10;"/>
+				</div>
+			</div>
+			<p class="figure-caption">图 13.1–Chrome 浏览器开发者控制台</p>
+			<p>打开控制台后，您就可以开始编写和测试 JavaScript 代码了。在下一节中，我们将快速浏览 JavaScript 语言的一些重要概念。</p>
+			<h1 id="_idParaDest-221"><a id="_idTextAnchor224"/>JavaScript 快速概述</h1>
+			<p>根据<em class="italic"> Stack Overflow 2020 开发者调查</em>(<a href="https://stackoverflow.blog/2020/05/27/2020-stack-overflow-developer-survey-results/">https://Stack Overflow . blog/2020/05/27/2020-Stack-Overflow-Developer-Survey-results/</a>)，<strong class="bold"> JavaScript </strong>(也称为<strong class="bold"> JS </strong>)是<a id="_idIndexMarker1092"/>世界上最常见的编程语言，大约有 70%的开发者使用它这个统计数据并不令人惊讶，因为在调查进行之前，JavaScript 已经成为最流行的语言很多年了。造成这种情况的原因有很多，我们将在此列出其中一些:</p>
+			<ul>
+				<li>它运行在最常见、最容易获得的平台上——浏览器。</li>
+				<li>围绕它构建了许多有用的框架，如 Node.js、React 和 Angular。</li>
+				<li>它是通用的——也就是说，它可以用于前端和后端应用程序。例如，您可以使用 React、Vue 和 Angular 等 JavaScript 库来构建出色的<strong class="bold">用户界面</strong>(<strong class="bold">ui</strong>)，同时您可以使用 Node.jS 和 Deno 等服务器端包来构建高效的后端/服务器端应用程序。</li>
+				<li>可以<a id="_idIndexMarker1093"/>用于<strong class="bold">物联网</strong> ( <strong class="bold"> IoT </strong>)和跨平台移动应用。</li>
+			</ul>
+			<p>JavaScript 最初是一种仅供浏览器使用的语言，但很快发展到几乎在任何地方都可以使用，从前端应用程序到 Node.js 的后端应用程序，到<a id="_idIndexMarker1094"/>物联网应用程序，以及最近在数据科学/ <strong class="bold">机器学习</strong> ( <strong class="bold"> ML </strong>)领域。</p>
+			<p class="callout-heading">注意</p>
+			<p class="callout">不要把 JavaScript 和 Java 编程语言(<a href="https://en.wikipedia.org/wiki/Java_(programming_language)">https://en . Wikipedia . org/wiki/Java _(programming _ language)</a>)混淆。尽管名称可能相似，但它们在用法、语法甚至语义方面都有很大不同。</p>
+			<p>JavaScript 是动态的和事件驱动的，因此是众多关注的主题，特别是对于来自其他语言的程序员。这导致了可以直接转换成 JavaScript 的语言的产生。这些<a id="_idIndexMarker1098"/>语言中有<strong class="bold"> TypeScript </strong>(微软开发的一种数据类型严格的语言)<strong class="bold"> Dart </strong>(谷歌开发的一种独立语言)<strong class="bold"> CoffeeScript </strong>等等。</p>
+			<h1 id="_idParaDest-222"><a id="_idTextAnchor225"/>理解 JavaScript 的基础</h1>
+			<p>在这一节，作为记忆复习，我们将快速回顾现代 JavaScript 的基本概念。如果您熟悉 JavaScript，那么您可以跳过这一节。</p>
+			<p>正如我们反复提到的，JavaScript 可用于前端和服务器端脚本，因此存在特定于每个环境的语法或特性——例如，出于安全原因，浏览器端 JavaScript 不能访问 Node.js 等文件系统。因此，在本节中，我们将介绍适用于两种环境/任何环境的概念。</p>
+			<h2 id="_idParaDest-223"><a id="_idTextAnchor226"/>声明变量</h2>
+			<p><code>const</code>和<code>let</code>，尽管在旧的脚本中，你会发现用于声明变量的<code>var</code>关键字。通常不鼓励使用<code>var</code>进行变量声明，应该很少使用。在后面的章节中，我们将讨论为什么在现代 JavaScript 中鼓励使用<code>let</code>而不是<code>var</code>的一些原因。</p>
+			<p>以下语句使用<code>let</code>关键字声明了一个变量:</p>
+			<pre>let name;
+let price = 200;
+let message, progress, id;
+ 
+message = "This is a new message";
+progress = 80;
+id = "gh12345";</pre>
+			<p>下一个关键字<code>const</code>可以用来声明一个常量变量——也就是说，一个变量的<a id="_idIndexMarker1102"/>引用在应用程序运行时不能被改变<a id="_idIndexMarker1103"/>。</p>
+			<p>下面的代码片段显示了一些<code>const</code>声明的例子:</p>
+			<pre>const DB_NAME;
+const LAST_NAME = "Williams";
+const TEXT_COLOR = "#B00";
+const TITLE_COLOR = "#F00";</pre>
+			<p class="callout-heading">重要说明</p>
+			<p class="callout">在声明常量时使用大写变量名是一种常见且被广泛鼓励的做法，不仅在 JavaScript 中如此，在许多编程语言中也是如此。</p>
+			<h2 id="_idParaDest-224"><a id="_idTextAnchor227"/>数据类型</h2>
+			<p>JavaScript 支持<a id="_idIndexMarker1104"/>八种基本数据类型。JavaScript 编译器在运行时自动推断出<a id="_idIndexMarker1105"/>声明变量的数据类型，因为 JavaScript 是一种动态类型语言。支持的八种数据类型是<strong class="bold">数字</strong>、<strong class="bold">字符串</strong>、<strong class="bold">布尔</strong>、<strong class="bold">对象</strong>、<strong class="bold"> BigInt </strong>、<strong class="bold">未定义</strong>、<strong class="bold">空值</strong>和<strong class="bold">符号</strong>。</p>
+			<h3>数字</h3>
+			<p><code>number</code>型<a id="_idIndexMarker1106"/>可以用<a id="_idIndexMarker1107"/>表示<code>integers</code>、<code>floating-point numbers</code>、<code>infinity</code>、<code>-infinity</code>和<code>number</code>:</p>
+			<pre>let num1 = 10; //integer
+let num2 = 20.234; //floating point number
+console.log(num1 + num2); //outputs 30.234</pre>
+			<p class="callout-heading">重要说明</p>
+			<p class="callout"><code>infinity</code>和<code>-infinity</code>代表数学正负无穷大(∞)。这些值比任何数字都大。你可以在这里看到一个例子:</p>
+			<p class="callout"><code>console.log(1 / 0); // Infinity</code></p>
+			<p class="callout"><code>NaN</code>子类型表示数字数学运算中的错误——例如，试图用数字除一个字符串，如下所示:</p>
+			<p class="callout"><code>console.log("girl" / 2); // NaN</code></p>
+			<h3>线</h3>
+			<p>JavaScript 中的字符串表示<a id="_idIndexMarker1111"/>文本，必须用单引号(<code>' '</code>)、双引号(<code>" "</code>)或反引号(<code>' '</code>)将<a id="_idIndexMarker1112"/>括起来。您可以在下面的代码片段中看到一些字符串示例:</p>
+			<pre>let name = "John Doe";
+let msg = 'I am on my way';
+let address = '10 Slow ave, NY';</pre>
+			<p>双引号或单引号的选择是基于偏好的，因为它们都执行相同的功能。另一方面，反引号比基本引号有更多的功能。它们允许您使用<code>${...}</code>模板字面语法，轻松地将变量和表达式嵌入字符串。例如，在下面的代码片段中，我们展示了如何在<a id="_idIndexMarker1114"/>新变量消息中轻松嵌入<code>name</code>、<code>address</code>和<code>dog_counts</code>变量:</p>
+			<pre>let name = "John Doe";
+let address = '10 Slow ave, NY';
+let dog_counts = 10;
+let msg = '${name} lives in ${address} and has ${dog_counts} dogs';
+console.log(msg)
+ 
+//outputs
+John Doe lives in 10 Slow ave, NY and has 10 dogs</pre>
+			<p class="callout-heading">小费</p>
+			<p class="callout">string 数据类型有许多用于操作它的内置函数。你可以在<strong class="bold">Mozilla Developer Network</strong>(<strong class="bold">MDN</strong>)文档页面(<a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">https://Developer . Mozilla . org/en-US/docs/Web/JavaScript/Reference/Global _ Objects/String</a>)上找到很多这样的函数<a id="_idIndexMarker1115"/>。</p>
+			<h3>布尔代数学体系的</h3>
+			<p>布尔数据类型是一种<a id="_idIndexMarker1116"/>逻辑类型。它只有<a id="_idIndexMarker1117"/>两个值:<code>true</code>和<code>false</code>。布尔值主要用于比较操作和存储<em class="italic">是</em> / <em class="italic">否</em>值。让我们看看下面的例子:</p>
+			<pre>let pageClicked = false; // No, the page was not clicked
+let pageOpened = true; // Yes, the page was opened
+ 
+if (5 &gt; 1) { //Evaluates to the Boolean value true
+  console.log("Yes! It is.")
+}</pre>
+			<p>接下来，我们来谈谈对象类型。</p>
+			<h3>目标</h3>
+			<p>JavaScript 中的对象是一种非常特殊的类型。它可能是 JavaScript 中最重要的类型，几乎应用于语言的各个方面。object 数据类型是 JavaScript 中唯一的非原始类型。它可以存储不同类型数据的键控集合，包括它自己。</p>
+			<p class="callout-heading">小费</p>
+			<p class="callout">编程语言中的基本类型是最基本的类型，通常存储一种类型的值。另一方面，非基元类型可以存储不止一种类型的值，并且还可以扩展来执行其他功能。</p>
+			<p>创建对象有两种方法，如下所示:</p>
+			<ul>
+				<li>The first and most common way is to use curly brackets with an optional list of key-value properties, as illustrated here:<p><code>let page = {}</code></p></li>
+				<li>And a not so common way is by using object constructor syntax, as follows:<p><code>let page = new Object()</code></p></li>
+			</ul>
+			<p>可以在同一个步骤中创建和初始化对象，如下面的代码片段所示:</p>
+			<pre>let page = {
+  title: 'Home page',
+  Id: 23422,
+  text: 'This is the first page in my website',
+  rank: 32.09,
+  "closed": false,
+  owner: {
+    name: 'John Doe',
+    level: 'admin',
+    lastLoggedIn: 'Aug 5th',
+  },
+}</pre>
+			<p>请注意，<a id="_idIndexMarker1120"/>对象页面可以存储多种类型的数据，甚至是<a id="_idIndexMarker1121"/>其他对象(作为所有者)。这表明对象可以被嵌套以包含越来越多的对象。</p>
+			<p>要访问对象值，可以使用方括号，如下所示:</p>
+			<pre>console.log(page["closed"])
+//outputs false</pre>
+			<p>或者，你可以使用点<code>page.rank</code>符号，像这样:</p>
+			<pre>console.log(page.rank)</pre>
+			<p>这将产生以下输出:</p>
+			<pre>//outputs 32.09</pre>
+			<p>在<a href="B17076_01_ePub_RK.xhtml#_idTextAnchor014"> <em class="italic">第一章</em> </a>，<em class="italic">现代 JavaScript 概述</em>中，你了解了对象的一些重要属性，这些属性让它们变得非常强大。</p>
+			<h2 id="_idParaDest-225"><a id="_idTextAnchor228"/>条件分支和循环</h2>
+			<p>条件分支和循环<a id="_idIndexMarker1122"/>是任何编程语言的重要方面，JavaScript <a id="_idIndexMarker1124"/>也提供了它们。为了使<a id="_idIndexMarker1125"/>根据某些条件执行不同的动作，可以使用<code>if</code>、<code>if..else</code>、条件/三元运算符和<code>switch </code>语法。除了条件分支之外，您可能希望重复执行特定次数的操作。这就是循环发挥作用的地方。JavaScript 提供了循环结构，如<code>while</code>、<code>do...while</code>、<code>for..of</code>、<code>for..in</code>和传统的<code>for</code>循环。我们将在下一节中简要介绍这些陈述。</p>
+			<h3>如果语句</h3>
+			<p>一条<code>if</code>语句评估圆括号中的<a id="_idIndexMarker1126"/>一个表达式、一个条件或一段<a id="_idIndexMarker1127"/>代码，并且仅当它是<code>true</code>时才执行该语句。这是一个单向条件，只在为真时运行。您可以在下面的代码片段中看到这样的示例:</p>
+			<pre>let age = 25
+if (age &gt;= 18){
+  console.log("You're an adult!")  //will run since age is greater than 18
+}
+//outputs
+You're an adult!</pre>
+			<h3>如果...else 语句</h3>
+			<p>一个<code>if...else</code>语句提供了一个<a id="_idIndexMarker1128"/>额外块，当初始条件变为<code>false</code>时，该块运行<a id="_idIndexMarker1129"/>。这是一个例子:</p>
+			<pre>let age = 15
+if (age &gt; 18){
+  console.log("You're an adult!")
+}else{
+  console.log("You're still a teenager!")
+}
+//outputs
+You're still a teenager!</pre>
+			<h3>条件/三元运算符</h3>
+			<p>三元运算符是一种更短、更简洁的编写语句的方式。它主要用于根据两个条件分配变量。三元运算符的语法如下所示:</p>
+			<pre>let result = condition ? val1 : val2;</pre>
+			<p>如果<a id="_idIndexMarker1132"/>条件为真，则<code>val1</code>执行<a id="_idIndexMarker1133"/>并分配给<code>result</code>，否则<code>val2</code>被分配。下面的代码片段显示了使用它的一个示例:</p>
+			<pre>let age = 20
+let isAdult = age &gt; 18 ? true : false; //age is greater than 18, so true is returned
+console.log(isAdult) 
+//outputs
+true </pre>
+			<h3>交换语句</h3>
+			<p>一条<code>switch</code>语句可以用<a id="_idIndexMarker1134"/>替换多条<code>if...else</code>语句，以一种<a id="_idIndexMarker1135"/>更简洁易读的方式。语法如下所示:</p>
+			<pre>switch(value) {
+  case 'option1':  // if (value === 'option1')
+    ...
+    [break]
+  case 'option2':  // if (value === 'option2')
+    ...
+    [break]
+ case 'option3':  // if (value === 'option3')
+    ...
+    [break]
+  default:
+    ...
+    [break]
+}</pre>
+			<p>对照每个<code>case </code>语句检查<code>switch</code>括号中的变量或表达式<a id="_idIndexMarker1136"/>，如果条件为真，则执行相应的代码<a id="_idIndexMarker1137"/>。当所有其他条件都失败时，将执行 default 语句。以下代码片段显示了一个使用<code>switch</code>语句的示例:</p>
+			<pre>let value = 4
+switch (value) {
+  case 1:
+    console.log( 'You selected 1' );
+    break;
+  case 2:
+    console.log( 'You selected 2' );
+    break;
+  case 4:
+    console.log( 'You selected 4!' ); //gets executed
+    break;
+  default:
+    console.log( "No such value" );
+}
+ 
+//outputs
+"You selected 4!"</pre>
+			<p>在<a id="_idIndexMarker1138"/>每个案例之后的<code>break</code>声明对于<a id="_idIndexMarker1139"/>停止后续案例的执行非常重要。如果忽略了<code>break</code>语句，那么后续的案例也会被执行。</p>
+			<h3>while 循环</h3>
+			<p>只要<a id="_idIndexMarker1141"/>条件为真，<code>while</code>循环就会重复执行<a id="_idIndexMarker1140"/>代码块。语法如下面的代码片段所示:</p>
+			<pre>while (condition) {
+  // loop body
+}</pre>
+			<p>让我们看看下面这个使用<code>while</code>循环的例子:</p>
+			<pre>let year = 2015;
+while (year &lt;= 2020) {
+  console.log( year );
+  year++
+}
+//outputs
+2015
+2016
+2017
+2018
+2019
+2020</pre>
+			<p>只要年份小于或等于<code>2020</code>，前面的代码就会连续打印出年份。注意<code>year++</code>部分。为了在某个时候打破<code>while</code>循环，这很重要。</p>
+			<h3>do…while 循环</h3>
+			<p>一个<code>do...while</code>循环与一个<code>while</code>循环非常<a id="_idIndexMarker1142"/>相似，只有<a id="_idIndexMarker1143"/>有一点不同——在条件被测试之前，主体至少被执行一次。语法如下所示:</p>
+			<pre>do {
+  // loop body
+} while (condition);</pre>
+			<p>让我们看看下面这个<code>do...while</code>循环的例子:</p>
+			<pre>let year = 2015;
+do {
+  console.log( year );
+  year++;
+} while (year &lt;= 2020);</pre>
+			<p>如果您需要在执行条件检查之前至少执行一段代码，那么<code>do...while</code>循环就很重要。</p>
+			<p class="callout-heading">重要说明</p>
+			<p class="callout">永远记住设置一个条件，在某个时候中断循环，否则你的循环将永远执行下去——尽管理论上，浏览器和服务器端会在某个时间后停止这样的循环。</p>
+			<h3>for 循环</h3>
+			<p><code>for</code>循环是 JavaScript 中最流行的<a id="_idIndexMarker1144"/>循环结构。这里显示了<a id="_idIndexMarker1145"/>的语法:</p>
+			<pre>for (initialization; condition; step) {
+  // loop body
+}</pre>
+			<p>该语法有三个重要部分，概述如下:</p>
+			<ul>
+				<li><code>let i = 0</code>)。</li>
+				<li><strong class="bold">条件部分</strong>:该代码在每次循环交互前进行<a id="_idIndexMarker1147"/>检查。如果为假，则循环停止。</li>
+				<li><strong class="bold">步骤部分</strong>:该步骤很重要<a id="_idIndexMarker1148"/>，因为它通常会增加一个将被测试的计数器或变量。</li>
+			</ul>
+			<p>使用<code>for</code>循环的<a id="_idIndexMarker1149"/>的一个例子是这里给出的<a id="_idIndexMarker1150"/>:</p>
+			<pre>for (let i=0; i &lt;=5; i++){
+  console.log(i)
+}
+//outputs
+0
+1
+2
+3
+4
+5</pre>
+			<p class="callout-heading">注意</p>
+			<p class="callout">注意，我们在<code>for</code>循环的步骤部分使用了后增量操作符(<code>i++)</code>？这是非常标准的，这只是<code>i = i + 1</code>的简写。</p>
+			<h3>为...的和为的...在循环中</h3>
+			<p><code>for...of</code>和<code>for...in</code>循环<a id="_idIndexMarker1151"/>是<code>for</code>循环的<a id="_idIndexMarker1152"/>变体<a id="_idIndexMarker1153"/>，用于在可迭代对象上迭代<a id="_idIndexMarker1154"/>。<strong class="bold"> Iterables </strong>是特殊的<a id="_idIndexMarker1155"/>数据类型，比如对象、数组、映射和字符串，它们具有可迭代的属性——换句话说，属性或值可以循环。</p>
+			<p>一个<code>for...of</code>循环主要用于遍历对象，比如数组和字符串。语法如下所示:</p>
+			<pre>for (let val of iterable) {
+  //loop body
+}</pre>
+			<p>让我们<a id="_idIndexMarker1156"/>看看<a id="_idIndexMarker1158"/>后面的<a id="_idIndexMarker1157"/>使用<code>for...of</code>循环的<a id="_idIndexMarker1159"/>示例:</p>
+			<pre>let animals = [ "bear", "lion", "giraffe", "jaguar" ];
+// Print out each type of animal
+for (let animal of animals) {
+    console.log(animal);
+}
+//outputs
+"bear"
+"lion"
+"giraffe"
+"jaguar"</pre>
+			<p><code>for...in</code>循环用于循环对象。语法非常类似于<code>for...of</code>循环，如下面的代码片段所示:</p>
+			<pre>for (let val in iterable) {
+  //loop body
+}</pre>
+			<p>一个<code>for...in</code>循环应该是<a id="_idIndexMarker1160"/>只用于可枚举的对象，而不是<a id="_idIndexMarker1161"/>可迭代的数组。</p>
+			<p>使用<code>for...in</code>回路的<a id="_idIndexMarker1163"/>的<a id="_idIndexMarker1162"/>示例如下所示:</p>
+			<pre>let user = {
+  name: "Hannah Montana",
+  age: 24,
+  level: 2,
+};
+for (key in user) {
+    console.log(user[key]);
+}
+//outputs
+"Hannah Montana"
+24
+2</pre>
+			<p class="callout-heading">进一步阅读</p>
+			<p class="callout"><code>for...in</code>和<code>for...of</code>是用于迭代数据结构的循环结构。它们之间的主要区别是它们迭代的数据结构。<code>for...in</code>遍历一个对象的所有可枚举属性键，而<code>for...of</code>遍历一个可迭代对象的值。</p>
+			<h2 id="_idParaDest-226"><a id="_idTextAnchor229"/> JavaScript 函数</h2>
+			<p>在这一部分，我们将学习关于 JavaScript 函数的<a id="_idIndexMarker1164"/>。<code>console.log</code>内置功能，每当我们需要打印文本到控制台。这说明了函数有多重要，因为一个函数一旦定义，就可以用任何方式调用任何次数来执行相同的操作。</p>
+			<p>JavaScript 中的一个函数通常是这样的:</p>
+			<pre>function sayHi() {
+  console.log('Hello World!')
+}
+sayHi()
+//output
+"Hello World!"</pre>
+			<p>一个函数也可以在括号内接受一系列逗号分隔的参数，这些参数可用于执行计算。例如，带有一些参数的函数通常如下所示:</p>
+			<pre>function sayHi(name, message) {
+  console.log('This is a message from ${name}. The message read thus: ${message}')
+}
+ 
+sayHi("Jenny", "How are you doing?")
+//output
+"This is a message from Jenny. The message read thus: How are you doing?"</pre>
+			<p>下面列出了一些关于函数的重要注意事项:</p>
+			<ul>
+				<li>在函数内部声明的变量是该函数的局部变量，只能在函数内部访问。这里有一个例子:<pre>function sayHi() {   let name = 'Jane'   console.log(name) }   sayHi() //output "Jane" console.log(name) //throws error: ReferenceError: name is not defined </pre></li>
+				<li>函数可以<a id="_idIndexMarker1166"/>访问全局变量。全局变量是在函数范围之外声明的变量，可用于每个代码块。你可以在这里看到一个例子:<pre>let name = 'Jenny' function sayHi() {   console.log(name) } sayHi() //output "Jenny"</pre></li>
+				<li>Functions can return values. This is important when a function performs some computation and the result needs to be used elsewhere. The functions we have been working with up till now mostly return nothing/undefined and they are referred to as void functions. Let's look at the following example of a function returning a value:<pre>function add(num1, num2) {
+  let sum = num1 + num2
+  return sum
+}
+let result = add(25, 30)
+console.log(result)
+ 
+//output
+55</pre><p class="callout-heading">小费</p><p class="callout">函数中的<code>return</code>语句一次只能返回一个值。为了返回多个值，可以将结果作为 JavaScript 对象返回。你可以在这里看到一个例子:</p><p class="callout"><code> function add(num1, num2) {</code></p><p class="callout"><code>  let sum = num1 + num2</code></p><p class="callout"><code>  return {sum: sum, funcName: "add"}}</code></p><p class="callout"><code>let result = add(25, 30)</code></p><p class="callout"><code> console.log(result) </code></p><p class="callout"><code>//output</code></p><p class="callout"><code>Object {  funcName: "add",  sum: 55}</code></p></li>
+			</ul>
+			<h3>回调函数</h3>
+			<p>回调在 JavaScript 中非常重要。回调是作为参数传递给另一个函数的函数<a id="_idIndexMarker1168"/>。调用此参数是为了根据外部函数中的某些条件执行某些操作。让我们看看下面的例子，以便更好地理解回调:</p>
+			<pre>function showValue(value) {
+  console.log(value)
+}
+function err() {
+  console.log("Wrong value specified!!")
+}</pre>
+			<p>在前面的<a id="_idIndexMarker1169"/>代码示例中，我们创建了两个<a id="_idIndexMarker1170"/>回调函数<code>showValue</code>和<code>error</code>。您可以在下面的代码片段中看到它们的使用:</p>
+			<pre>function printValues(value, showValue, error) {
+  if (value &gt; 0){
+    showValue(value)
+  }else{
+    error()
+  }
+}</pre>
+			<p><code>showValue</code>回调函数将传递给它的参数打印到控制台，而<code>error</code>回调函数打印一条错误消息。现在可以使用回调函数了，如下面的代码片段所示:</p>
+			<pre>printValues(20, showValue, err);
+//outputs 20
+ 
+printValues(0, showValue, err);
+//outputs "Wrong value specified!!"</pre>
+			<p><code>printValues</code>函数首先测试值是否大于<code>0</code>，然后调用<code>showValue</code>或<code>error</code>回调函数。</p>
+			<p>回调不仅仅接受命名函数。他们也可以接受匿名函数；这样，就有可能创建<em class="italic">嵌套回调</em>。</p>
+			<p>让我们假设<a id="_idIndexMarker1171"/>有一个<code>doSomething</code>函数执行一个<a id="_idIndexMarker1172"/>特定的任务，我们希望在任务完成之前执行不同的操作。这意味着我们可以将一个回调函数传递给另一个回调函数，从而创建嵌套的回调函数，如下面的代码块所示:</p>
+			<pre>doSomething(((((()=&gt;{
+//dosomething A
+         })=&gt;{
+    //dosomething B
+       })=&gt;{
+   //dosomething C
+     })=&gt;{
+  //dosomething D
+   })=&gt;{
+ //dosomething E
+})</pre>
+			<p>前面的代码就是我们称之为回调地狱的代码。这种方法有很多问题，并且变得难以管理。在<a href="B17076_01_ePub_RK.xhtml#_idTextAnchor014"> <em class="italic">第 1 章</em> </a>(现代 JavaScript 的<em class="italic">概述)中，我们通过使用<strong class="bold">应用编程接口</strong> ( <strong class="bold"> API </strong>)介绍了一种现代且更有效的方式来<a id="_idIndexMarker1174"/>处理回调。这要干净得多，并且将消除许多与回调地狱相关的问题。</em></p>
+			<p class="callout-heading">重要说明</p>
+			<p class="callout">默认情况下，JavaScript 是异步的，因此长时间执行的函数会被排队，可能永远不会在您需要它们之前执行。回调主要用于继续代码执行，并确保返回正确的结果。</p>
+			<h1 id="_idParaDest-227"><a id="_idTextAnchor230"/>总结</h1>
+			<p>在本章中，我们介绍了 JavaScript 编程语言的基本方面。我们从一些基本背景开始，解释了为什么 JavaScript 是当今世界上最流行的语言，以及 JavaScript 的各种用途。接下来，我们看了这门语言的基本概念，其中我们谈到了声明变量以及 JavaScript 中可用的八种数据类型。接下来，我们讨论了 JavaScript 中的分支和循环结构，并展示了一些使用它们的例子，最后，我们简要讨论了 JavaScript 中的函数和类。</p>
+		</div>
+	
+
+</body></html>

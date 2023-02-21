@@ -1,0 +1,869 @@
+<html><head/><body>
+
+
+	
+		<title>B17076_05_ePub_RK</title>
+		
+	
+	
+		<div><h1 id="_idParaDest-100"><em class="italic"> <a id="_idTextAnchor099"/>第五章</em>:用 Plotly.js 实现数据可视化</h1>
+			<p>绘图和可视化是数据分析中非常重要的任务，因此，我们将用整整一章来讨论它们。数据分析师通常会执行绘图和数据可视化，作为<strong class="bold">探索性数据分析</strong> ( <strong class="bold"> EDA </strong>)阶段的一部分。这可以极大地帮助识别隐藏在数据中的有用模式，并为数据建模建立直觉。</p>
+			<p>在这一章中，你将学习如何使用<strong class="bold"> Plotly.js </strong>来创建丰富的交互式绘图，并嵌入到任何 web 应用程序中。</p>
+			<p>具体来说，我们将涵盖以下主题:</p>
+			<ul>
+				<li><a id="_idTextAnchor100"/>plotly . js 简介</li>
+				<li><a id="_idTextAnchor101"/>plotly . js 的基础知识</li>
+				<li><a id="_idTextAnchor102"/>用 Plotly.js 创建基本图表</li>
+				<li><a id="_idTextAnchor103"/>用 Plotly.js 创建统计图</li>
+			</ul>
+			<h1 id="_idParaDest-101"><a id="_idTextAnchor104"/>技术要求</h1>
+			<p>为了理解本章内容，您应该具备以下条件:</p>
+			<ul>
+				<li>Chrome、Safari、Opera 或 Firefox 等现代浏览器</li>
+				<li>系统上安装的<strong class="bold"> Node.js </strong>和<strong class="bold">Danfo Notebook</strong>(<strong class="bold">Dnotebook</strong>)</li>
+				<li>用于下载数据集的稳定互联网连接</li>
+			</ul>
+			<p>Dnotebook 的安装说明可以在<a href="B17076_02_ePub_RK.xhtml#_idTextAnchor045"> <em class="italic">第二章</em> </a>，<em class="italic">Dnotebook-JavaScript 的交互计算环境</em>中找到。</p>
+			<p class="callout-heading">注意</p>
+			<p class="callout">如果你不想安装任何软件或库，你可以在<a href="https://playnotebook.jsdata.org/">https://playnotebook.jsdata.org/</a>使用在线版本的 Dnotebook。</p>
+			<p><strong class="bold"> Danfo.js </strong>自带出图<strong class="bold">应用编程接口</strong> ( <strong class="bold"> API </strong>)方便出图，引擎盖下使用 Plotly。这是我们在本章中介绍 Plotly.js 的主要原因，因为在这里获得的知识将帮助您在下一章中轻松定制用 Danfo.js 创建的图。</p>
+			<h1 id="_idParaDest-102"><a id="_idTextAnchor105"/>plotly . js 简介</h1>
+			<p>plotly . js(<a href="https://plotly.com/javascript/">https://plotly.com/javascript/</a>)，根据作者的说法<a id="_idIndexMarker400"/>，是一个开源、高级、声明性的<a id="_idIndexMarker401"/>图表库，构建在流行的 D3 . js(<a href="https://d3js.org/">https://d3js.org/</a>)和 stack . GL(<a href="https://github.com/stackgl">https://github.com/stackgl</a>)库的<a id="_idIndexMarker402"/>之上。</p>
+			<p>支持<a id="_idIndexMarker403"/>超过<a id="_idIndexMarker404"/> 40 种图表类型，包括以下几种:</p>
+			<ul>
+				<li>基本图表，如散点图、折线图、条形图和饼图</li>
+				<li>统计图，如箱线图、直方图和密度图</li>
+				<li>科学图表，如热图、对数图和等高线图</li>
+				<li>财务图表，如瀑布图、蜡烛图和时间序列图</li>
+				<li>诸如气泡图、choropleth 图和地图框图之类的地图</li>
+				<li><strong class="bold">散点图和表面图的三维</strong> ( <strong class="bold"> 3D </strong>)图表<a id="_idIndexMarker405"/>，以及 3D 网格</li>
+			</ul>
+			<p>要使用 Plotly.js，您需要访问浏览器的<code>React</code>和<code>Vue</code>的<a id="_idIndexMarker406"/>。在下一节中，我们将看到如何安装 Plotly.js。</p>
+			<h2 id="_idParaDest-103"><a id="_idTextAnchor106"/>通过脚本标签使用 Plotly.js</h2>
+			<p>为了在<code>script</code>标签中使用<a id="_idIndexMarker408"/> Plotly.js <a id="_idIndexMarker409"/>。在下面的<a id="_idIndexMarker410"/>代码片段中，我们将 Plotly.js <code>script</code>标记添加到一个简单 HTML 文件的头部分:</p>
+			<pre>&lt;!DOCTYPE html&gt;
+&lt;html lang="en"&gt;
+&lt;head&gt;
+    &lt;meta charset="UTF-8"&gt;
+    &lt;meta http-equiv="X-UA-Compatible" content="IE=edge"&gt;
+    &lt;meta name="viewport" content="width=device-width, initial-scale=1.0"&gt;
+    &lt;title&gt;Document&lt;/title&gt;
+    &lt;script src="https://cdn.plot.ly/plotly-1.2.0.min.js"&gt;&lt;/script&gt; 
+&lt;/head&gt;
+&lt;body&gt;
+    
+&lt;/body&gt;
+&lt;/html&gt;</pre>
+			<p>如前面的代码片段所示，添加了 Plotly.js <code>script</code>标记后，保存 HTML 文件并在浏览器中打开它。输出将是一个空白页面，但是在底层，Plotly.js 被添加并在页面中可用。我们可以按照以下步骤绘制一个简单的图表来测试这一点:</p>
+			<ol>
+				<li>在将要绘制图表的 HTML 主体中创建一个<code>div</code>标签。我们给它一个<code>myPlot</code>，如下所示:<pre>&lt;body&gt;  &lt;div id="myPlot"&gt; &lt;/body</pre></li>
+				<li>In the body of your HTML page, create sample <code>x</code> and <code>y</code> data, and then plot a <code>scatter</code> plot, as shown<a id="_idIndexMarker412"/> in the<a id="_idIndexMarker413"/> following code snippet:<pre>...
+&lt;body&gt;
+    &lt;div id="myPlot"&gt;&lt;/div&gt;
+    &lt;script&gt;
+        let data = [{
+            x: [1, 3, 5, 6, 8, 9, 5, 8],
+            y: [2, 4, 6, 8, 0, 2, 1, 2],
+            mode: 'markers',
+            type: 'scatter'
+        }]
+        Plotly.newPlot("myPlot", data)
+    &lt;/script&gt;
+&lt;/body&gt;
+...</pre><p>在浏览器中打开 HTML 文件将会得到以下输出:</p></li>
+			</ol>
+			<div><div><img src="img/B17076_5_01.jpg" alt="Figure 5.1 – A simple scatter plot made with Plotly&#13;&#10;"/>
+				</div>
+			</div>
+			<p class="figure-caption">图 5.1–用 Plotly 制作的简单散点图</p>
+			<p>在 Dnotebook 中，我们将在本章中大量使用<a id="_idIndexMarker414"/>和<a id="_idIndexMarker415"/>，您可以通过首先使用<code>load_package</code>函数在顶部单元格中加载脚本来加载和使用 Plotly，如下面的代码片段所示:</p>
+			<pre>load_package(["https://cdn.plot.ly/plotly-1.58.4.min.js"])</pre>
+			<p>然后，在新的单元格中，您可以添加以下代码:</p>
+			<pre>let data = [{
+  x: [1,3,5,6,8,9,5,8],
+  y: [2,4,6,8,0,2,1,2],
+  mode: 'markers',
+  type: 'scatter'
+}]
+ 
+Plotly.newPlot(this_div(), data)</pre>
+			<p>运行前面的代码单元将产生以下输出:</p>
+			<div><div><img src="img/B17076_5_02.jpg" alt="Figure 5.2 – A simple scatter plot made with Plotly on Dnotebook&#13;&#10;"/>
+				</div>
+			</div>
+			<p class="figure-caption">图 5.2–在 Dnotebook 上用 Plotly 制作的简单散点图</p>
+			<p>您可以看到前面部分的代码与 HTML 版本是一样的，只有一点小小的不同——将<code>this_div</code>函数传递给了<code>Plotly.newPlot</code>。</p>
+			<p><code>this_div</code>函数只是一个 Dnotebook 辅助函数，它创建并返回代码单元块下面的<code>div</code>标记的 ID。这意味着无论何时你在 Dnotebook 中处理绘图，你都可以使用<code>this_div</code>函数得到一个<code>div</code>标签。</p>
+			<p class="callout-heading">注意</p>
+			<p class="callout">接下来，我们将使用<code>this_div</code>而不是指定一个<code>div</code>标签 ID。这是因为我们将主要在一个笔记本<a id="_idIndexMarker418"/>的环境中工作。使用 HTML 或其他<code>this_div</code>中的代码来标识你想要使用的<code>div</code>标签。</p>
+			<p>现在你知道如何安装 Plotly，我们将进入下一节，这是关于创建基本图表。</p>
+			<h1 id="_idParaDest-104"><a id="_idTextAnchor107"/>plotly . js 的基础知识</h1>
+			<p>使用 Plotly.js 的一个主要优点是它很容易上手，而且你可以指定许多配置来使你的绘图更好。在本节中，我们将介绍一些重要的可用配置选项，还将向您展示如何指定这些选项。</p>
+			<p>在我们进一步讨论之前，让我们先了解如何将数据导入 Plotly。</p>
+			<h2 id="_idParaDest-105"><a id="_idTextAnchor108"/>数据格式</h2>
+			<p>制作一个<code>x</code>和<code>y</code>键，如下面的代码示例所示:</p>
+			<pre>const trace1 = { 
+  x: [20, 30, 40],
+  y: [2, 4, 6]
+}</pre>
+			<p class="callout-heading">注意</p>
+			<p class="callout">一个数据点通常在 Plotly 中被称为<strong class="bold">轨迹</strong>。这是因为您可以在一个图表中绘制多个数据点。这里提供了一个例子:</p>
+			<p class="callout"><code>var data = [trace1, trace2]</code></p>
+			<p class="callout"><code>Plotly.newPlot("my_div", data);</code></p>
+			<p><code>x</code>和<code>y</code>数组可以包含字符串和数字数据。如果包含字符串数据，数据点<a id="_idIndexMarker423"/>按原样绘制，即点对点绘制。这里有一个例子:</p>
+			<pre>var trace1 = {
+    x:['2020-10-04', '2021-11-04', '2023-12-04'],
+    y: ["cat", "goat", "pig"],
+    type: 'scatter'
+};
+Plotly.newPlot(this_div(),  trace1);</pre>
+			<p>运行前面的代码单元将产生以下输出:</p>
+			<div><div><img src="img/B17076_5_03.jpg" alt="Figure 5.3 – A plot of string values against date with Plotly&#13;&#10;"/>
+				</div>
+			</div>
+			<p class="figure-caption">图 5.3–字符串值与 Plotly 日期的关系图</p>
+			<p>另一方面，如果您的数据是数值型的，那么 Plotly 将自动排序，然后选择默认的比例。请看下面的例子:</p>
+			<pre>var trace1 = {
+    x: ['2020-10-04', '2021-11-04', '2023-12-04'],
+    y: [90, 20, 10],
+    type: 'scatter'
+};
+var data = [trace1];
+Plotly.newPlot(this_div(), data);</pre>
+			<p>运行前面的代码单元将产生以下输出:</p>
+			<div><div><img src="img/B17076_5_04.jpg" alt="Figure 5.4 – A plot of numerical values against date with Plotly&#13;&#10;"/>
+				</div>
+			</div>
+			<p class="figure-caption">图 5.4–数值与日期的关系图</p>
+			<p>在我们将<a id="_idIndexMarker424"/>移到配置部分之前，让我们看一个在同一个图表中绘制多个轨迹的例子。首先，我们设置我们的数据，如下面的代码片段所示:</p>
+			<pre>var trace1 = {
+    x:['2020-10-04', '2021-11-04', '2023-12-04'],
+    y: [90, 20, 10],
+    type: 'scatter'
+};
+var trace2 = {
+    x: ['2020-10-04', '2021-11-04', '2023-12-04'],
+    y: [25, 35, 65],
+    mode: 'markers',
+    marker: {
+        size: [20, 20, 20],
+    }
+};
+var data = [trace1, trace2];
+Plotly.newPlot(this_div(), data);</pre>
+			<p>运行<a id="_idIndexMarker425"/>之前的代码单元将给出以下输出:</p>
+			<div><div><img src="img/B17076_5_05.jpg" alt="Figure 5.5 – A plot of multiple traces sharing the same x axis&#13;&#10;"/>
+				</div>
+			</div>
+			<p class="figure-caption">图 5.5–共享同一 x 轴的多条轨迹图</p>
+			<p class="callout-heading">注意</p>
+			<p class="callout">当在单个图表中绘制多个轨迹时，建议这些轨迹共享一个公共轴。这使得你的情节更容易阅读。</p>
+			<p>如果您想知道是否可以向数据数组添加更多的轨迹，那么答案是肯定的——您可以添加任意多的轨迹，但是您必须考虑可解释性，因为添加更多的轨迹可能不容易解释。</p>
+			<p>现在您知道了如何将数据传递到绘图中，让我们了解一些在制作图表时可以传递给 Plotly 的基本配置选项。</p>
+			<h2 id="_idParaDest-106"><a id="_idTextAnchor109"/>绘图的配置选项</h2>
+			<p>配置可用于<a id="_idIndexMarker427"/>设置属性<a id="_idIndexMarker428"/>，如图形的交互性和模式栏<a id="_idIndexMarker429"/>。配置是一个对象，通常作为<code>Plotly.newPlot</code>调用中的最后一个参数传递，如下面的代码片段所示:</p>
+			<pre>config = { … }
+Plotly.newPlot("my_div", data, layout, config)</pre>
+			<p>在下面的章节中，我们将介绍一些我们将在<a href="B17076_08_ePub_RK.xhtml#_idTextAnchor149"> <em class="italic">第 8 章</em> </a>、<em class="italic">创建无代码数据分析/处理系统</em>中使用的常见配置选项。如果你想知道【https://plotly.com/javascript/configuration-options/】有哪些配置选项可以使用，那么你可以在这里了解更多:<a href="https://plotly.com/javascript/configuration-options/"/>。</p>
+			<h3>配置模式栏</h3>
+			<p><strong class="bold">模式栏</strong>是一个水平<a id="_idIndexMarker431"/>工具栏<a id="_idIndexMarker432"/>，它提供了<a id="_idIndexMarker433"/>许多可用于与图表交互的选项。默认情况下，模式栏仅在您将鼠标悬停在图表上时才可见，尽管这是可以更改的，我们将在下一节中看到。</p>
+			<h4>使模式栏始终可见</h4>
+			<p>要使模式栏<a id="_idIndexMarker434"/>始终可见，可以将<code>displayModeBar</code>属性设置为<code>true</code>，如下面的代码片段所示:</p>
+			<pre>var trace1 = {
+    x: ['2020-10-04', '2021-11-04', '2023-12-04'],
+    y: [90, 20, 10],
+    type: 'scatter'
+};
+var data = [trace1];
+var layout = {
+    title: 'Configure modebar'
+};
+var config = {
+  displayModeBar: true
+};
+Plotly.newPlot(this_div(), data, layout, config);</pre>
+			<p>运行前面的代码单元将产生以下输出:</p>
+			<div><div><img src="img/B17076_5_06.jpg" alt="Figure 5.6 – Configuring modebar to always display&#13;&#10;"/>
+				</div>
+			</div>
+			<p class="figure-caption">图 5.6–将模式栏配置为始终显示</p>
+			<p>如果您不需要<a id="_idIndexMarker435"/>模式栏，那么将<code>displayModeBar</code>功能设置为<code>false</code>将确保模式栏隐藏，即使您悬停在它上面。</p>
+			<h4>从模式栏中移除按钮</h4>
+			<p>通过将不需要的按钮名称传递给<code>modeBarButtonsToRemove</code> <code>config</code>属性，可以从模式栏中删除<a id="_idIndexMarker436"/>按钮<a id="_idIndexMarker437"/>，我们将在本节中演示。</p>
+			<p>使用与<em class="italic">使模式栏始终可见</em>部分相同的轨迹，我们将从模式栏中移除放大按钮。您可以在下面的屏幕截图中看到移除前的放大按钮:</p>
+			<div><div><img src="img/B17076_5_07.jpg" alt="Figure 5.7 – Zoom-in button before removal&#13;&#10;"/>
+				</div>
+			</div>
+			<p class="figure-caption">图 5.7–移除前的放大按钮</p>
+			<p>在前面的屏幕截图中，我们显示了移除放大按钮之前的图表。接下来，我们将设置<code>config</code>选项来移除按钮，如下面的代码片段所示:</p>
+			<pre>var config = {
+  displayModeBar: true,
+  modeBarButtonsToRemove: ['zoomIn2d']
+};
+Plotly.newPlot(this_div(), data, layout, config);</pre>
+			<p>运行<a id="_idIndexMarker438"/>前一个<a id="_idIndexMarker439"/>代码单元将给出以下输出:</p>
+			<div><div><img src="img/B17076_5_08.jpg" alt="Figure 5.8 – Chart after zoom-in button removal&#13;&#10;"/>
+				</div>
+			</div>
+			<p class="figure-caption">图 5.8-移除放大按钮后的图表</p>
+			<p>使用前面示例中演示的方法，您可以从图表中删除任何按钮。在这里可以看到所有可以移除的模式栏按钮<a id="_idIndexMarker440"/>的名称:<a href="https://plotly.com/javascript/configuration-options/#remove-modebar-buttons">https://plotly . com/JavaScript/configuration-options/# remove-modebar-buttons</a>。</p>
+			<h4>向模式栏添加自定义按钮</h4>
+			<p>Plotly 为<a id="_idIndexMarker441"/>提供了一种方式<a id="_idIndexMarker442"/>来将带有自定义行为的按钮添加到模式栏中。当我们想要用自定义行为扩展我们的图时，这变得很有用——例如，链接到您的个人网站。</p>
+			<p>在下面的例子中，我们将添加一个自定义按钮，当用户单击它时，向用户显示<code>This</code><code>is</code><code>an</code><code>example</code><code>of</code><code>a</code><code>plot</code><code>that</code><code>answers</code><code>a</code><code>question</code><code>on</code><code>click</code>。</p>
+			<p class="callout-heading">注意</p>
+			<p class="callout">添加自定义按钮在 Dnotebook 中不起作用，所以我们将在一个 HTML 文件中这样做。你可以用 Plotly 脚本建立一个 HTML 文件，正如我们在<em class="italic">中通过脚本标签</em>使用 Plotly.js 一节中所演示的。</p>
+			<p>在 HTML 文件的 body <a id="_idIndexMarker443"/>部分<a id="_idIndexMarker444"/>中，添加以下代码:</p>
+			<pre>&lt;div id="mydiv"&gt;&lt;/div&gt;
+&lt;script&gt;
+        ...
+        var config = {
+            displayModeBar: true,
+          <strong class="bold">  </strong><strong class="bold">modeBarButtonsToAdd: [</strong>
+<strong class="bold">                {</strong>
+<strong class="bold">                    name: 'about',</strong>
+<strong class="bold">                    icon: Plotly.Icons.question,</strong>
+<strong class="bold">                    click: function (gd) {</strong>
+<strong class="bold">                        alert('This is an example of a plot that answers a question on click')</strong>
+<strong class="bold">                    }</strong>
+<strong class="bold">                }]</strong>
+        }
+        Plotly.newPlot("mydiv", data, layout, config);
+ &lt;/script&gt;</pre>
+			<p>在浏览器<a id="_idIndexMarker446"/>中保存并打开前面的<a id="_idIndexMarker445"/> HTML 文件，点击你刚刚创建的按钮。它应该显示一个带有您指定的文本的警报，类似于下面的屏幕截图所示:</p>
+			<div><div><img src="img/B17076_5_09.jpg" alt="Figure 5.9 – Chart with a custom button&#13;&#10;"/>
+				</div>
+			</div>
+			<p class="figure-caption">图 5.9–带有自定义按钮的图表</p>
+			<p>在我们之前展示的代码片段中，请注意<code>modeBarButtonsToAdd</code>配置选项。这个选项是我们定义要添加的按钮的地方，也是我们点击它时会发生什么的地方。创建自定义按钮<a id="_idIndexMarker447"/>时可指定的主要属性如下:</p>
+			<ul>
+				<li><code>name</code>:按钮的名称。</li>
+				<li><code>icon</code>:模式栏中显示的图标/图像。这可以是自定义图标，也可以是任何内置的 Plotly 图标(<a href="https://github.com/plotly/plotly.js/blob/master/src/fonts/ploticon.js">https://github . com/Plotly/Plotly . js/blob/master/src/fonts/ploticon . js</a>)。</li>
+				<li><code>click</code>:这定义了当你点击按钮时会发生什么。在这里，您可以指定任何 JavaScript 函数，甚至更改图表的行为。</li>
+			</ul>
+			<p>接下来，我们来看看如何制作静态图表。</p>
+			<h3>制作静态图表</h3>
+			<p>默认情况下，Plotly 图表<a id="_idIndexMarker448"/>是交互式的。如果你想让<a id="_idIndexMarker449"/>使它们成为静态的，那么你可以在<code>config</code>对象中指定以下选项:</p>
+			<pre>var config = {
+  staticPlot: true
+}</pre>
+			<p>当我们只想以分散注意力的交互方式显示图表时，静态图表会很有用。</p>
+			<p>接下来，我们将向您展示如何创建响应性图表。</p>
+			<h3>制作响应图表</h3>
+			<p>要使图表<a id="_idIndexMarker450"/>具有响应性，例如<a id="_idIndexMarker451"/>可以自动调整显示它的窗口的大小，您可以将<code>responsive</code>属性设置为<code>true</code>，如下面的代码片段所示:</p>
+			<pre>var config = {
+   responsive: true
+}</pre>
+			<p>当您创建将在不同屏幕尺寸上显示的网页时，响应式图表非常有用。</p>
+			<p>在下一节中，我们将向您展示如何下载和设置图表中的下载选项。</p>
+			<h3>自定义下载绘图选项</h3>
+			<p>默认情况下，当显示模式栏时，您<a id="_idIndexMarker452"/>可以将 plottly chart<a id="_idIndexMarker453"/>保存为<strong class="bold">便携式网络图形</strong> ( <strong class="bold"> PNG </strong>)文件。这可以<a id="_idIndexMarker454"/>自定义，可以设置下载图像类型，以及文件名、高度、宽度等其他属性。</p>
+			<p>为了实现这一点，您可以在<code>config</code>对象中设置<code>toImageButtonOptions</code>属性，正如我们在下面的<a id="_idIndexMarker456"/>代码片段中演示的<a id="_idIndexMarker455"/>:</p>
+			<pre>var config = {
+  toImageButtonOptions: {
+    format: 'jpeg', // one of png, svg, jpeg, webp
+    filename: 'my_image', // the name of the file
+    height: 600,
+    width: 700,
+  }
+}</pre>
+			<p>最后，在下一节中，我们将演示如何更改图表的区域设置。</p>
+			<h3>更改默认区域设置</h3>
+			<p>为说其他语言的人制作图表时，地区很重要。这可以极大地提高图表的可解释性。</p>
+			<p>按照下面的步骤，我们将把默认区域设置从英语更改为法语:</p>
+			<ol>
+				<li value="1">Get the specific locale and add it to your HTML file (or load it using <code>load_scripts</code> in Dnotebook), as shown in the following code snippet:<pre>...
+&lt;head&gt;
+    &lt;script src="https://cdn.plot.ly/plotly-1.58.4.min.js"&gt;&lt;/script&gt;
+    &lt;script src="https://cdn.plot.ly/plotly-locale-fr-latest.js"&gt;&lt;/script&gt;  &lt;!-- load locale --&gt;
+&lt;/head&gt;
+...</pre><p>在 Dnotebook 中，这可以使用<code>load_package</code>来完成，如下所示:</p><pre>load_package(["https://cdn.plot.ly/plotly-1.58.4.min.js", "https://cdn.plot.ly/plotly-locale-fr-latest.js"])</pre></li>
+				<li>在您的<code>config</code>对象中，指定区域设置，如下面的代码片段所示:<pre>var config = {    locale: "fr" }</pre></li>
+			</ol>
+			<p>让我们看一个完整的<a id="_idIndexMarker459"/>示例<a id="_idIndexMarker460"/>和相应的输出。将以下代码添加到 HTML 文件的正文中:</p>
+			<pre>&lt;div id="mydiv"&gt;&lt;/div&gt;
+ &lt;script&gt;
+      var trace1 = {
+            x: ['2020-10-04', '2021-11-04', '2023-12-04'],
+            y: [90, 20, 10],
+            type: 'scatter'
+        };
+        var trace2 = {
+            x: ['2020-10-04', '2021-11-04', '2023-12-04'],
+            y: [25, 35, 65],
+            mode: 'markers',
+            marker: {
+                size: [20, 20, 20],
+            }
+        };
+        var data = [trace1, trace2];
+        var layout = {
+            title: 'Change Locale',
+            showlegend: false
+        };
+        var config = {
+            locale: "fr"
+        };
+        Plotly.newPlot("mydiv", data, layout, config);
+    &lt;/script&gt;</pre>
+			<p>在<a id="_idIndexMarker462"/>浏览器中加载 HTML 页面<a id="_idIndexMarker461"/>显示如下图表，其中<code>locale</code>设置为法语:</p>
+			<div><div><img src="img/B17076_5_10.jpg" alt="Figure 5.10 – Chart with locale set to French&#13;&#10;"/>
+				</div>
+			</div>
+			<p class="figure-caption">图 5.10–区域设置为法语的图表</p>
+			<p>现在你知道了如何配置你的图表，我们将继续图表配置的另一个重要方面:<strong class="bold">布局</strong>。</p>
+			<h2 id="_idParaDest-107"><a id="_idTextAnchor110"/>阴谋地布局</h2>
+			<p><code>layout</code>(<a href="https://plotly.com/javascript/reference/layout/">https://plotly.com/javascript/reference/layout/</a>)是传递给<code>Plotly.newPlot</code>函数的第三个<a id="_idIndexMarker463"/>参数。它用于<a id="_idIndexMarker465"/>配置绘制图表的区域/布局，以及诸如标题、文本、图例等属性。</p>
+			<p>您可以设置六种布局属性:标题、图例、边距、大小、字体和颜色。我们将通过例子演示如何使用它们。</p>
+			<h3>配置图表标题</h3>
+			<p><code>title</code>属性<a id="_idIndexMarker466"/>配置<a id="_idIndexMarker467"/>图表标题，即显示在图表顶部的文本。要添加标题，只需将文本传递给<code>layout</code>对象中的<code>title</code>属性，如以下代码片段所示:</p>
+			<pre>var layout = {
+    title: 'This is an example title,
+};</pre>
+			<p>更明确地说，特别是如果您需要配置如何定位标题文本，那么您可以设置<code>title</code>的<code>text</code>属性，如下面的代码片段所示:</p>
+			<pre>var layout = {
+  title: {text: 'This is an example title'}
+};</pre>
+			<p>使用上述格式，我们可以使用其他属性轻松配置其他属性，如标题位置，如下所示:</p>
+			<ul>
+				<li><code>x</code>:0 到 1 之间的数字，用于设置标题文本相对于显示它的容器的<code>x</code>位置。</li>
+				<li><code>y</code>:也是一个介于 0 和 1 之间的数字，用于设置标题文本相对于显示它的容器的<code>y</code>位置。</li>
+				<li><code>xanchor</code>:这可以是<code>auto</code>、<code>left</code>、<code>center</code>或<code>right</code>对准中的一种。它设置标题相对于其<code>x</code>位置的水平对齐。</li>
+				<li><code>yanchor</code>:可以是<code>auto</code>、<code>top</code>、<code>middle</code>或<code>bottom</code>对中的一种。它设置标题相对于其<code>y</code>位置的垂直对齐。</li>
+			</ul>
+			<p>让我们来看一个配置<code>title</code>的<a id="_idIndexMarker468"/>示例<a id="_idIndexMarker469"/>，将其显示在图表的右上角，如下所示:</p>
+			<pre>var trace1 = {
+    x:['2020-10-04', '2021-11-04', '2023-12-04'],
+    y: [90, 20, 10],
+    type: 'scatter'
+};
+var data = [trace1];
+var layout = {
+  title: { text: 'This is an example title',
+          x: 0.8,
+          y: 0.9,
+          xanchor: "right"}
+};
+Plotly.newPlot(this_div(), data, layout, config);</pre>
+			<p>这将产生以下输出:</p>
+			<div><div><img src="img/B17076_5_11.jpg" alt="Figure 5.11 – Chart with title configured to top right&#13;&#10;"/>
+				</div>
+			</div>
+			<p class="figure-caption">图 5.11–标题配置在右上方的图表</p>
+			<p>你可以<a id="_idIndexMarker470"/>也可以<a id="_idIndexMarker471"/>设置<a id="_idIndexMarker472"/>标题的<strong class="bold">填充</strong>。填充可以接受以下参数:</p>
+			<ul>
+				<li><code>t</code>:设置标题的顶部填充</li>
+				<li><code>b</code>:设置标题的底部填充</li>
+				<li><code>r</code>:设置右填充，仅在<code>xanchor</code>属性设置为<code>right </code>时起作用</li>
+				<li><code>l</code>:设置左填充，仅在<code>xanchor</code>属性设置为<code>left </code>时起作用</li>
+			</ul>
+			<p>例如，要设置标题的<code>right</code>填充，可以将<code>xanchor</code>属性设置为<code>right</code>，然后配置<code>pad</code>的<code>r</code>属性，如下面的代码片段所示:</p>
+			<pre> var layout = {
+  title: {text: 'This is an example title',
+          xanchor: "right",
+          pad: {r: 100}}
+};</pre>
+			<p>注意前面代码<a id="_idIndexMarker475"/>片段中的<code>100</code>中的填充<a id="_idIndexMarker473"/>参数<a id="_idIndexMarker474"/>表示 100px。</p>
+			<p>在下一节中，我们将了解如何配置图表的图例。</p>
+			<h3>配置 Plotly 图例</h3>
+			<p>图例描述了图表中显示的数据。当您在单个图表中显示多种形式的数据时，图例非常重要。</p>
+			<p>默认情况下，当图表中有多个轨迹时，Plotly 会显示一个图例。您还可以通过将<code>layout</code>的<code>showLegend</code>属性设置为<code>true</code>来显式显示图例，如以下代码片段所示:</p>
+			<pre>var layout = {
+  showLegend: true
+};</pre>
+			<p>激活图例后，您可以通过设置以下属性来自定义图例的显示方式:</p>
+			<ul>
+				<li><code>bgcolor</code>:设置图例的背景颜色。默认设置为<code>#fff</code>(白色)。</li>
+				<li><code>bordercolor</code>:设置图例边框的颜色。</li>
+				<li><code>borderwidth</code>:设置图例边框的宽度(以像素为单位)。</li>
+				<li><code>font</code>: An object with the following properties:<p>a) <code>family</code>:任何支持的 HTML 字体系列。</p><p>b) <code>size</code>:图例文字的大小。</p><p>c) <code>color</code>:图例文字的颜色。</p></li>
+			</ul>
+			<p>在下面的代码片段中，我们<a id="_idIndexMarker478"/>展示了一个使用这些属性来配置图例的示例<a id="_idIndexMarker479"/>:</p>
+			<pre>var trace1 = {
+    x: ['2020-10-04', '2021-11-04', '2023-12-04'],
+    y: [90, 20, 10],
+    type: 'scatter'
+};
+var trace2 = {
+    x: ['2020-10-04', '2021-11-04', '2023-12-04'],
+    y: [25, 35, 65],
+    mode: 'markers',
+    marker: {
+        size: [20, 20, 20],
+    }
+};
+var data = [trace1, trace2];
+var layout = {
+  title: {text: 'This is an example title'},
+  showLegend: true,
+  legend: {bgcolor: "#fcba03",
+          bordercolor: "#444",
+          borderwidth: 1,
+          font: {family: "Arial", size: 30, color: "#fff"}}
+};
+Plotly.newPlot(this_div(), data, layout, config);</pre>
+			<p>前面的<a id="_idIndexMarker480"/>代码<a id="_idIndexMarker481"/>给出以下输出:</p>
+			<div><div><img src="img/B17076_5_12.jpg" alt="Figure 5.12 – Chart showing legend with custom configuration &#13;&#10;"/>
+				</div>
+			</div>
+			<p class="figure-caption">图 5.12–显示自定义配置图例的图表</p>
+			<p>接下来，我们将展示如何配置整体布局的边距。</p>
+			<h3>配置布局边距</h3>
+			<p><code>margin</code>属性配置<a id="_idIndexMarker482"/>屏幕上图表的位置<a id="_idIndexMarker483"/>。它支持所有的边距属性(<code>l</code>、<code>r</code>、<code>t</code>和<code>b</code>)。在下面的代码片段中，我们使用所有四个属性来演示如何设置布局边距:</p>
+			<pre>... 
+var layout = {
+  title: {text: 'This is an example title'},
+  margin: {l: 200, r: 200, t: 230, b: 100}
+};
+Plotly.newPlot(this_div(), data, layout, config);</pre>
+			<p>这将产生以下输出:</p>
+			<div><div><img src="img/B17076_5_13.jpg" alt="Figure 5.13 – Chart with margin configured&#13;&#10;"/>
+				</div>
+			</div>
+			<p class="figure-caption">图 5.13–配置了边距的图表</p>
+			<p>注意到前面截图中图表<a id="_idIndexMarker485"/>周围的空间<a id="_idIndexMarker484"/>了吗？这是设定的边距。需要注意的是，边距也是以像素为单位的。</p>
+			<p>接下来，我们将看看如何设置布局尺寸。</p>
+			<h3>配置布局大小</h3>
+			<p>有时，我们可能<a id="_idIndexMarker486"/>想要更大的<a id="_idIndexMarker487"/>或更小的布局，这可以使用<code>width</code>、<code>height</code>或——方便地——属性来配置，如我们在下面的代码片段中演示的:</p>
+			<pre>...
+var layout = {
+  title: {text: 'This is an example title'},
+  width: 1000,
+  height: 500
+};
+Plotly.newPlot(this_div(), data, layout, config);</pre>
+			<p>这将产生以下输出:</p>
+			<div><div><img src="img/B17076_5_14.jpg" alt="Figure 5.14 – Chart with size configured&#13;&#10;"/>
+				</div>
+			</div>
+			<p class="figure-caption">图 5.14–配置了大小的图表</p>
+			<p>当我们希望 Plotly 自动<a id="_idIndexMarker489"/>设置布局的尺寸时，可以将<code>autosize</code>属性<a id="_idIndexMarker488"/>设置为<code>true</code>。</p>
+			<p class="callout-heading">注意</p>
+			<p class="callout">要<a id="_idIndexMarker490"/>查看<code>layout</code>中可以配置的其他属性，可以在这里访问 Plotly 官方 API 参考:【https://plotly.com/javascript/reference/layout T42】。</p>
+			<p>在下一节中，我们将向您展示如何根据您想要传达的信息制作不同类型的图表。</p>
+			<h1 id="_idParaDest-108"><a id="_idTextAnchor111"/>使用 Plotly.js 创建基本图表</h1>
+			<p>Plotly.js 支持<a id="_idIndexMarker491"/>许多基本图表<a id="_idIndexMarker492"/>，可以快速用来传达信息。Plotly 中可用的一些基本图表示例有散点图、折线图、条形图、饼图和气泡图、点状图、树形图、表格等。你可以在这里找到完整的<a id="_idIndexMarker493"/>支持的基本图表列表:<a href="https://plotly.com/javascript/basic-charts/">https://plotly.com/javascript/basic-charts/</a>。</p>
+			<p>在本节中，我们将介绍一些基本图表，如散点图、条形图和气泡图。</p>
+			<p>首先，我们将从散点图开始。</p>
+			<h3>使用 Plotly.js 创建散点图</h3>
+			<p>一个<strong class="bold">散点图</strong>通常用于<a id="_idIndexMarker494"/>绘制<a id="_idIndexMarker495"/>两个变量<a id="_idIndexMarker496"/>的相互关系。图<a id="_idIndexMarker497"/>显示为点的集合，因此得名<em class="italic">散点图</em>。以下屏幕截图显示了散点图的示例:</p>
+			<div><div><img src="img/B17076_5_15.jpg" alt="Figure 5.15 – Example of a scatter plot showing Fare against Age margin &#13;&#10;"/>
+				</div>
+			</div>
+			<p class="figure-caption">图 5.15–显示票价与年龄差距的散点图示例</p>
+			<p>要使用 Plotly 制作散点图<a id="_idIndexMarker498"/>和图<a id="_idIndexMarker499"/>，只需指定图的类型，如下例所示:</p>
+			<pre>var trace1 = {
+    x: [2, 5, 7, 12, 15, 20],
+    y: [90, 80, 10, 20, 30, 40],
+    type: 'scatter'
+};
+var data = [trace1];
+Plotly.newPlot(this_div(), data);</pre>
+			<p>这将产生以下输出:</p>
+			<div><div><img src="img/B17076_5_16.jpg" alt="Figure 5.16 – Example scatter plot of sales versus margin&#13;&#10;"/>
+				</div>
+			</div>
+			<p class="figure-caption">图 5.16–销售额与利润的散点图示例</p>
+			<p>默认情况下，点<a id="_idIndexMarker501"/>使用<a id="_idIndexMarker503"/>线连接<a id="_idIndexMarker502"/>在一起。您可以通过设置<a id="_idIndexMarker504"/>模式类型来改变这种行为。模式类型可以是以下任何一种:</p>
+			<ul>
+				<li><code>markers </code></li>
+				<li><code>lines</code></li>
+				<li><code>text</code></li>
+				<li><code>none</code></li>
+			</ul>
+			<p>您还可以使用一种以上的模式，用加号将它们连接在一起，例如<code>markers+text+lines</code>或<code>markers+lines</code>。</p>
+			<p>在下面的例子中，我们使用<code>markers</code>和<code>text</code>作为我们的模式类型:</p>
+			<pre>var trace1 = {
+    x: [2, 5, 7, 12, 15, 20],
+    y: [90, 80, 10, 20, 30, 40],
+    type: 'scatter',
+<strong class="bold">    mode: 'markers+text'</strong>
+};
+var data = [trace1];
+Plotly.newPlot(this_div(), data);</pre>
+			<p>这将产生以下输出:</p>
+			<div><div><img src="img/B17076_5_17.jpg" alt="Figure 5.17 – Scatter plot with mode type set to markers+text&#13;&#10;"/>
+				</div>
+			</div>
+			<p class="figure-caption">图 5.17–模式类型设置为标记+文本的散点图</p>
+			<p>如前所述，您可以在单个图表中绘制多个散点图，并且可以根据需要<a id="_idIndexMarker505"/>配置<a id="_idIndexMarker506"/>每个轨迹。在下面的<a id="_idIndexMarker507"/>示例中，我们绘制了三个配置了不同模式的散点图:</p>
+			<pre>var trace1 = {
+  x: [1, 2, 3, 4, 5],
+  y: [1, 6, 3, 6, 1],
+  mode: 'markers',
+  type: 'scatter',
+  name: 'Trace 1',
+};
+var trace2 = {
+  x: [1.5, 2.5, 3.5, 4.5, 5.5],
+  y: [4, 1, 7, 1, 4],
+  mode: 'lines',
+  type: 'scatter',
+  name: 'Trace 2',
+};
+var trace3 = {
+  x: [1, 2, 3, 4, 5],
+  y: [4, 1, 7, 1, 4],
+  mode: 'markers+text',
+  type: 'scatter',
+  name: 'Trace 3',
+};
+var data = [ trace1, trace2, trace3];
+var layout = {
+  title:'Data Labels Hover',
+  width: 1000
+};
+Plotly.newPlot(this_div(), data, layout);</pre>
+			<p>运行前面的代码单元会产生以下输出:</p>
+			<div><div><img src="img/B17076_5_18.jpg" alt="Figure 5.18 – Scatter plot with three traces&#13;&#10;"/>
+				</div>
+			</div>
+			<p class="figure-caption">图 5.18–三条迹线的散点图</p>
+			<p>现在你已经学会了基本图表的概念，你可以很容易地从自定义数据点创建散点图，并使用所需的属性自定义大小。</p>
+			<p>接下来，我们简单看一下条形图。</p>
+			<h3>创建条形图</h3>
+			<p>条形图<a id="_idIndexMarker511"/>是 Plotly.js 中提供的另一种流行的<a id="_idIndexMarker512"/>类型的图表<a id="_idIndexMarker513"/>。它用于使用矩形条显示数据点之间的关系，其高度或长度与它们所代表的值成比例。条形图<a id="_idIndexMarker514"/>主要用于绘制<strong class="bold">分类数据</strong>。</p>
+			<p class="callout-heading">注意</p>
+			<p class="callout">分类数据或分类变量是具有固定或有限数量的可能值的变量。英语字母表中的字母是分类数据的一个例子。</p>
+			<p>为了在 Plotly.js 中制作条形图，您传递一个带有相应<a id="_idIndexMarker515"/>条形高度/长度<a id="_idIndexMarker516"/>的分类数据点，然后<a id="_idIndexMarker517"/>将类型设置为<code>bar</code>，如下例所示:</p>
+			<pre>var data = [
+  {
+    x: ['Apple', 'Mango', 'Pear', 'Banana'],
+    y: [20, 20, 15, 40],
+    type: 'bar'
+  }
+];
+Plotly.newPlot(this_div(), data);</pre>
+			<p>运行前面的代码单元会产生以下输出:</p>
+			<div><div><img src="img/B17076_5_19.jpg" alt="Figure 5.19 – Simple bar chart with four variables&#13;&#10;"/>
+				</div>
+			</div>
+			<p class="figure-caption">图 5.19-四个变量的简单条形图</p>
+			<p>通过创建多个<a id="_idIndexMarker519"/>轨迹并将其作为数组<a id="_idIndexMarker520"/>传递，可以在一个布局中绘制多个条形图<a id="_idIndexMarker518"/>。例如，在下面的代码片段中，我们创建了两条轨迹和一个图:</p>
+			<pre>var trace1 = {
+    x: ['Apple', 'Mango', 'Pear', 'Banana'],
+    y: [20, 20, 15, 40],
+    type: 'bar'
+  }
+var trace2 = {
+    x: ['Goat', 'Lion', 'Spider', 'Tiger'],
+    y: [25, 10, 14, 36],
+    type: 'bar'
+  }
+var data = [trace1, trace2]
+Plotly.newPlot(this_div(), data);</pre>
+			<p>运行前面的代码单元会产生以下输出:</p>
+			<div><div><img src="img/B17076_5_20.jpg" alt="Figure 5.20 – A bar chart with two traces&#13;&#10;"/>
+				</div>
+			</div>
+			<p class="figure-caption">图 5.20–有两条轨迹的条形图</p>
+			<p>当绘制同一类别中的多个轨迹时，可以指定一个<code>barmode </code>属性。<code>barmode</code>属性<a id="_idIndexMarker521"/>可以是<code>stack</code>或<code>group</code>模式中的一种<a id="_idIndexMarker522"/>。例如，在<a id="_idIndexMarker523"/>下面的代码片段中，我们在<code>stack</code>模式下制作了两个具有相同类别的轨迹的条形图:</p>
+			<pre>var trace1 ={
+    x: ['Apple', 'Mango', 'Pear', 'Banana'],
+    y: [20, 20, 15, 40],
+    type: 'bar',
+    name: "Bar1"
+  }
+var trace2 = {
+    x: ['Apple', 'Mango', 'Pear', 'Banana'],
+    y: [25, 10, 14, 36],
+    type: 'bar',
+   name: "Bar2"
+  }
+var data = [trace1, trace2]
+var layout = {
+  barmode: 'stack'
+}
+Plotly.newPlot(this_div(), data, layout);</pre>
+			<p>运行前面的<a id="_idIndexMarker524"/>代码单元<a id="_idIndexMarker525"/>给出<a id="_idIndexMarker526"/>以下输出:</p>
+			<div><div><img src="img/B17076_5_21.jpg" alt="Figure 5.21 – A bar chart with two traces in stack mode&#13;&#10;"/>
+				</div>
+			</div>
+			<p class="figure-caption">图 5.21–堆栈模式下两条轨迹的条形图</p>
+			<p>在下面的代码片段中，我们将<code>barmode</code>属性更改为<code>group</code>(默认模式):</p>
+			<pre>...
+var layout = {
+  barmode: 'group'
+}
+...</pre>
+			<p>这会产生以下输出:</p>
+			<div><div><img src="img/B17076_5_22.jpg" alt="Figure 5.22 – A bar chart with two traces in group mode&#13;&#10;"/>
+				</div>
+			</div>
+			<p class="figure-caption">图 5.22–分组模式下两条轨迹的条形图</p>
+			<p>在制作条形图时，您可以<a id="_idIndexMarker529"/>指定许多<a id="_idIndexMarker527"/>其他选项<a id="_idIndexMarker528"/>，但我们不会在本节中涵盖所有选项。你可以在这里的官方文档中看到所有的配置选项，以及清晰的<a id="_idIndexMarker530"/>创建好的条形图的例子:<a href="https://plotly.com/javascript/bar-charts/">https://plotly.com/javascript/bar-charts/</a>。</p>
+			<p>在下一节中，我们将简要介绍气泡图。</p>
+			<h3>创建气泡图</h3>
+			<p>气泡图<a id="_idIndexMarker531"/>是另一种非常流行的<a id="_idIndexMarker532"/>类型<a id="_idIndexMarker533"/>的图表，可以用来覆盖信息。它基本上是散点图的扩展，指定了点的大小。让我们看看下面的代码示例:</p>
+			<pre>var trace1 = {
+  x: [1, 2, 3, 4],
+  y: [10, 11, 12, 13],
+  mode: 'markers',
+  marker: {
+    size: [40, 60, 80, 100]
+  }
+};
+var data = [trace1]
+Plotly.newPlot(this_div(), data, layout);</pre>
+			<p>运行前面的代码单元会产生以下输出:</p>
+			<div><div><img src="img/B17076_5_23.jpg" alt="Figure 5.23 – A simple bubble chart &#13;&#10;"/>
+				</div>
+			</div>
+			<p class="figure-caption">图 5.23–一个简单的气泡图</p>
+			<p>在前面的<a id="_idIndexMarker534"/>代码片段<a id="_idIndexMarker535"/>中，你可以看到主要的变化是模式和指定大小的标记。大小与点一一对应，如果要对每个气泡应用大小，必须指定大小。</p>
+			<p>您还可以通过传递颜色数组来更改单个气泡的颜色，如下面的代码片段所示:</p>
+			<pre>...
+  marker: {
+    size: [40, 60, 80, 100],
+    <strong class="bold">color: ['rgb(93, 164, 214)', 'rgb(255, 144, 14)',  'rgb(44, 160, 101)', 'rgb(255, 65, 54)'],</strong>
+  }
+...</pre>
+			<p>运行前面的代码单元会产生以下输出:</p>
+			<div><div><img src="img/B17076_5_24.jpg" alt="Figure 5.24 – A simple bubble chart with different colors&#13;&#10;"/>
+				</div>
+			</div>
+			<p class="figure-caption">图 5.24–不同颜色的简单气泡图</p>
+			<p>气泡图<a id="_idIndexMarker537"/>非常有用，如果你需要<a id="_idIndexMarker538"/>更多地了解<a id="_idIndexMarker539"/>或者看到一些更高级的例子，你可以在这里查看 Plotly 的文档<a id="_idIndexMarker540"/>中的例子页面:<a href="https://plotly.com/javascript/bubble-charts/">https://plotly.com/javascript/bubble-charts/</a>。</p>
+			<p>你可以制作许多其他类型的基本情节，但遗憾的是，我们无法涵盖所有的情节。Plotly 的文档<a id="_idIndexMarker541"/>中的<em class="italic">基本图表</em>页面(<a href="https://plotly.com/javascript/basic-charts/">https://plotly.com/javascript/basic-charts/</a>)是学习如何制作这些令人敬畏的图表的好地方，我们鼓励你去看一看。</p>
+			<p>在下一节中，我们将向您介绍一些统计图表。</p>
+			<h1 id="_idParaDest-109"><a id="_idTextAnchor112"/>用 Plotly.js 创建统计图</h1>
+			<p>统计图是不同类型的图表，主要由统计学家或数据科学家用来传递信息。直方图、箱线图、小提琴图、密度图等都是统计图的例子。在接下来的小节中，我们将简要介绍三种类型的统计图——直方图、箱线图和小提琴图。</p>
+			<h2 id="_idParaDest-110"><a id="_idTextAnchor113"/>使用 Plotly.js 创建直方图</h2>
+			<p>直方图<a id="_idIndexMarker544"/>用于<a id="_idIndexMarker545"/>表示<a id="_idIndexMarker546"/>数字/连续数据的分布或扩散。直方图类似于条形图，有时人们可能会混淆两者。区分它们的一个简单方法是它们可以显示的数据类型。直方图使用连续变量而不是分类变量，并且只需要一个值作为数据。</p>
+			<p>在下面的代码片段中，我们展示了一个生成随机数的直方图示例:</p>
+			<pre>var x = [];
+for (let i = 0; i &lt; 1000; i ++) { //generate random numbers
+x[i] = Math.random();
+}
+var trace = {
+    x: x,
+    type: 'histogram',
+  };
+var data = [trace];
+Plotly.newPlot(this_div(), data);</pre>
+			<p>在前面的<a id="_idIndexMarker547"/>代码片段中，您<a id="_idIndexMarker548"/>将观察到<a id="_idIndexMarker549"/>的<code>trace</code>属性只指定了<code>x</code>数据。这与我们之前提到的一致—直方图只需要一个值。我们还将绘图类型指定为<code>histogram</code>，运行代码单元会得到以下输出:</p>
+			<div><div><img src="img/B17076_5_25.jpg" alt="Figure 5.25 – A histogram with random values of x&#13;&#10;"/>
+				</div>
+			</div>
+			<p class="figure-caption">图 5.25-随机值为 x 的直方图</p>
+			<p>指定一个<code>y</code>值而不是<code>x</code>将产生一个水平直方图，如下例所示:</p>
+			<pre>...
+var trace = {
+    y: y,
+    type: 'histogram',
+  };
+...</pre>
+			<p>运行前面的<a id="_idIndexMarker550"/>代码<a id="_idIndexMarker551"/>单元会给出<a id="_idIndexMarker552"/>以下输出:</p>
+			<div><div><img src="img/B17076_5_26.jpg" alt="Figure 5.26 – A histogram with random values of y&#13;&#10;"/>
+				</div>
+			</div>
+			<p class="figure-caption">图 5.26-随机 y 值的直方图</p>
+			<p>您还可以通过创建多个轨迹并将<code>barmode</code>属性<a id="_idIndexMarker553"/>设置为<code>stack</code>来创建堆叠、重叠或分组直方图，如下面的<a id="_idIndexMarker555"/>示例中的<a id="_idIndexMarker554"/>所示:</p>
+			<pre>var x1 = [];
+var x2 = [];
+for (var i = 0; i &lt; 1000; i ++) {
+x1[i] = Math.random();
+x2[i] = Math.random();
+}
+var trace1 = {
+  x: x1,
+  type: "histogram",
+};
+var trace2 = {
+  x: x2,
+  type: "histogram",
+};
+var data = [trace1, trace2];
+var layout = {barmode: "stack"};
+Plotly.newPlot(this_div(), data, layout);</pre>
+			<p>运行前面的代码单元会产生以下输出:</p>
+			<div><div><img src="img/B17076_5_27.jpg" alt="Figure 5.27 – A histogram in stack mode&#13;&#10;"/>
+				</div>
+			</div>
+			<p class="figure-caption">图 5.27–堆栈模式下的直方图</p>
+			<p>通过改变<code>barmode</code>覆盖图的<a id="_idIndexMarker556"/>，我们<a id="_idIndexMarker557"/>得到以下<a id="_idIndexMarker558"/>输出:</p>
+			<pre>…
+var layout = {barmode: "overlay"};
+…</pre>
+			<p>运行前面的代码单元会产生以下输出:</p>
+			<div><div><img src="img/B17076_5_28.jpg" alt="Figure 5.28 – A histogram in overlay mode&#13;&#10;"/>
+				</div>
+			</div>
+			<p class="figure-caption">图 5.28–叠加模式下的直方图</p>
+			<p>要查看更多绘制<a id="_idIndexMarker560"/>直方图<a id="_idIndexMarker561"/>以及各种配置选项的<a id="_idIndexMarker559"/>示例，您可以在此查看直方图<a id="_idIndexMarker562"/>文档页面:<a href="https://plotly.com/javascript/histograms/">https://plotly.com/javascript/histograms/</a>。</p>
+			<p>在下一节中，我们将介绍箱线图。</p>
+			<h2 id="_idParaDest-111"><a id="_idTextAnchor114"/>用 Plotly.js 创建盒状图</h2>
+			<p><strong class="bold">箱型图</strong>是描述性<a id="_idIndexMarker565"/>统计中非常常见的<a id="_idIndexMarker563"/>类型图<a id="_idIndexMarker564"/>。它用图形<a id="_idIndexMarker566"/>显示了使用四分位数的数字数据组。盒状图<a id="_idIndexMarker567"/>也有线<a id="_idIndexMarker568"/>在它们上面或下面延伸，称为<strong class="bold">须</strong>。胡须代表上下<strong class="bold">四分位数</strong>之外的可变性。</p>
+			<p class="callout-heading">小费</p>
+			<p class="callout">四分位数将指定数量的数据点分成四个部分或四分之一。第一个四分位数是最低的 25%的数据点，第二个四分位数在 25%到 50%之间(达到中值)，第三个四分位数是 50%到 75%(高于中值)，最后，第四个四分位数描绘了最高的 25%的数字。</p>
+			<p>下面的<a id="_idIndexMarker569"/>图<a id="_idIndexMarker570"/>可以帮助你更好的理解方框图:</p>
+			<div><div><img src="img/B17076_5_29.jpg" alt="Figure 5.29 – Diagram depicting a box plot (source: Redrawn from https://aiaspirant.com/box-plot/)&#13;&#10;"/>
+				</div>
+			</div>
+			<p class="figure-caption">图 5.29–描绘箱线图的图表(来源:根据 https://aiaspirant.com/box-plot/重新绘制)</p>
+			<p>在 Plotly.js 中，我们通过传递数据并将<code>trace</code>类型设置为<code>box</code>来绘制一个方框图。我们在下面的<a id="_idIndexMarker572"/>示例中演示了这一点:</p>
+			<pre>var y0 = [];
+var y1 = [];
+for (var i = 0; i &lt; 50; i ++) {//generate some random numbers
+y0[i] = Math.random();
+y1[i] = Math.random() + 1;
+}
+var trace1 = {
+  y: y0,
+  type: 'box'
+};
+var trace2 = {
+  y: y1,
+  type: 'box'
+};
+var data = [trace1, trace2];
+Plotly.newPlot(this_div(), data);</pre>
+			<p>运行前面的代码单元会产生以下输出:</p>
+			<div><div><img src="img/B17076_5_30.jpg" alt="Figure 5.30 – A simple box plot with two traces&#13;&#10;"/>
+				</div>
+			</div>
+			<p class="figure-caption">图 5.30–一个有两条迹线的简单箱形图</p>
+			<p>我们可以配置<a id="_idIndexMarker573"/>箱线图的布局<a id="_idIndexMarker574"/>为水平，而不是默认的垂直格式。在下一节中，我们将演示如何做到这一点。</p>
+			<h3>制作水平箱线图</h3>
+			<p>您可以通过在轨迹中指定<code>x</code>值而不是<code>y</code>值来绘制水平<a id="_idIndexMarker575"/>图。我们在下面的代码片段中演示了这一点:</p>
+			<pre>var x0 = [];
+var x1 = [];
+for (var i = 0; i &lt; 50; i ++) {
+x0[i] = Math.random();
+x1[i] = Math.random() + 1;
+}
+var trace1 = {
+  x: x0,
+  type: 'box'
+};
+var trace2 = {
+  x: x1,
+  type: 'box'
+};
+var data = [trace1, trace2];
+Plotly.newPlot(this_div(), data);</pre>
+			<p>运行前面的<a id="_idIndexMarker576"/>代码单元会产生以下输出:</p>
+			<div><div><img src="img/B17076_5_31.jpg" alt="Figure 5.31 – A simple box plot with two traces&#13;&#10;"/>
+				</div>
+			</div>
+			<p class="figure-caption">图 5.31–一个有两条迹线的简单箱形图</p>
+			<p>您也可以制作分组盒图，如我们在下一节中所示。</p>
+			<h3>制作分组箱线图</h3>
+			<p>共享同一个<em class="italic"> x </em>轴的多条轨迹<a id="_idIndexMarker577"/>可以组合成一个方框图，如以下代码片段所示:</p>
+			<pre>var x = ['Season 1', 'Season 1', 'Season 1', 'Season 1', 'Season 1', 'Season 1',
+         'Season 2', 'Season 2', 'Season 2', 'Season 2', 'Season 2', 'Season 2']
+var trace1 = {
+  y: [2, 2, 6, 1, 5, 4, 2, 7, 9, 1, 5, 3],
+  x: x,
+  name: 'Blues FC',
+  marker: {color: '#3D9970'},
+  type: 'box'
+};
+var trace2 = {
+  y: [6, 7, 3, 6, 0, 5, 7, 9, 5, 8, 7, 2],
+  x: x,
+  name: 'Reds FC',
+  marker: {color: '#FF4136'},
+  type: 'box'
+};
+var trace3 = {
+  y: [1, 3, 1, 9, 6, 6, 9, 1, 3, 6, 8, 5],
+  x: x,
+  name: 'Greens FC',
+  marker: {color: '#FF851B'},
+  type: 'box'
+};
+var data = [trace1, trace2, trace3];
+var layout = {
+  yaxis: {
+    title: 'Points in two seasons',
+  },
+  boxmode: 'group'
+};
+Plotly.newPlot(this_div(), data, layout);</pre>
+			<p>运行前面的<a id="_idIndexMarker578"/>代码单元会产生以下输出:</p>
+			<div><div><img src="img/B17076_5_32.jpg" alt="Figure 5.32 – A box plot with three traces grouped together&#13;&#10;"/>
+				</div>
+			</div>
+			<p class="figure-caption">图 5.32–三条迹线组合在一起的箱线图</p>
+			<p>在制作盒状图时，您可以设置许多其他选项<a id="_idIndexMarker579"/>，但是我们会让您在这里的盒状图文档中阅读关于它们的更多信息<a id="_idIndexMarker580"/>:<a href="https://plotly.com/javascript/box-plots/">https://plotly.com/javascript/box-plots/</a>。</p>
+			<p>在下一节，我们将简要介绍小提琴情节。</p>
+			<h2 id="_idParaDest-112"><a id="_idTextAnchor115"/>使用 Plotly.js 创建小提琴情节</h2>
+			<p>一个<strong class="bold">小提琴剧情</strong>是一个<a id="_idIndexMarker582"/>盒子剧情的延伸<a id="_idIndexMarker581"/>。它还使用四分位数描述了<a id="_idIndexMarker583"/>数据点<a id="_idIndexMarker584"/>，就像一个箱线图，只有一个主要区别——它还显示了数据的分布。</p>
+			<p>下图显示了小提琴图和箱形图之间的共同特征:</p>
+			<div><div><img src="img/B17076_5_33.jpg" alt="Figure 5.33 – Common properties between a violin plot and a box plot (Redrawn from https://towardsdatascience.com/violin-plots-explained-fb1d115e023d)&#13;&#10;"/>
+				</div>
+			</div>
+			<p class="figure-caption">图 5.33-violin 图和 box 图之间的共同属性(根据 https://towardsdatascience . com/violin-plots-explained-fb1d 115 e 023d 重新绘制)</p>
+			<p>violin 图的曲线区域显示了数据的基本分布，比箱形图传达了更多的信息。</p>
+			<p>在 Plotly 中，你可以很容易地通过改变类型为<code>violin</code>来制作小提琴的情节。例如，在下面的<a id="_idIndexMarker585"/>代码片段中，我们重用了<a id="_idIndexMarker586"/>方框图部分的代码，只有两个主要的变化:</p>
+			<pre>var x = ['Season 1', 'Season 1', 'Season 1', 'Season 1', 'Season 1', 'Season 1',
+         'Season 2', 'Season 2', 'Season 2', 'Season 2', 'Season 2', 'Season 2']
+var trace1 = {
+  y: [2, 2, 6, 1, 5, 4, 2, 7, 9, 1, 5, 3],
+  x: x,
+  name: 'Blues FC',
+  marker: {color: '#3D9970'},
+  <strong class="bold">type: 'violin'</strong>
+};
+var trace2 = {
+  y: [6, 7, 3, 6, 0, 5, 7, 9, 5, 8, 7, 2],
+  x: x,
+  name: 'Reds FC',
+  marker: {color: '#FF4136'},
+  <strong class="bold">type: 'violin'</strong>
+};
+var trace3 = {
+  y: [1, 3, 1, 9, 6, 6, 9, 1, 3, 6, 8, 5],
+  x: x,
+  name: 'Greens FC',
+  marker: {color: '#FF851B'},
+  <strong class="bold">type: 'violin',</strong>
+};
+var data = [trace1, trace2, trace3];
+var layout = {
+  yaxis: {
+    title: 'Points in two seasons',
+  },
+  <strong class="bold">violinmode: 'group'</strong>
+}; 
+Plotly.newPlot(this_div(), data, layout);</pre>
+			<p>运行前面的<a id="_idIndexMarker587"/>代码单元<a id="_idIndexMarker588"/>会产生以下输出:</p>
+			<div><div><img src="img/B17076_5_34.jpg" alt="Figure 5.34 – A violin plot with three traces grouped together&#13;&#10;"/>
+				</div>
+			</div>
+			<p class="figure-caption">图 5.34-三条迹线组合在一起的小提琴图</p>
+			<p>正如其他图表类型一样，您也可以配置 violin <a id="_idIndexMarker590"/>图的显示方式。例如，我们可以在 violin 图中显示基本的方框图，如以下代码片段所示:</p>
+			<pre>var x = ['Season 1', 'Season 1', 'Season 1', 'Season 1', 'Season 1', 'Season 1',
+         'Season 2', 'Season 2', 'Season 2', 'Season 2', 'Season 2', 'Season 2']
+var trace = {
+  y: [1, 3, 1, 9, 6, 6, 9, 1, 3, 6, 8, 5],
+  x: x,
+  name: 'Greens FC',
+  marker: {color: '#FF851B'},
+  type: 'violin',
+  box: {
+    visible: true
+  },
+};
+var data = [trace];
+var layout = {
+  yaxis: {
+    title: 'Point in two seasons',
+  },
+};
+Plotly.newPlot(this_div(), data, layout);</pre>
+			<p>运行<a id="_idIndexMarker591"/>前一个<a id="_idIndexMarker592"/>代码单元产生以下输出:</p>
+			<div><div><img src="img/B17076_5_35.jpg" alt="Figure 5.35 – A violin plot with underlying box plot shown&#13;&#10;"/>
+				</div>
+			</div>
+			<p class="figure-caption">图 5.35–显示了基本盒状图的小提琴图</p>
+			<p>要查看其他<a id="_idIndexMarker593"/>配置<a id="_idIndexMarker594"/>选项以及一些高级设置，可以在这里查看小提琴剧情的文档<a id="_idIndexMarker595"/>:<a href="https://plotly.com/javascript/violin/">https://plotly.com/javascript/violin/</a>。</p>
+			<p>至此，我们不得不结束关于 Plotly.js 的介绍部分。在下一章中，我们将向您展示如何使用 Danfo.js 快速、轻松地绘制该特定库支持的任何类型的数据。</p>
+			<h1 id="_idParaDest-113"><a id="_idTextAnchor116"/>总结</h1>
+			<p>在本章中，我们介绍了 Plotly.js 的绘图和可视化。首先，我们简要介绍了 Plotly.js，包括安装设置。然后，我们继续讨论图表配置和布局定制。最后，我们向您展示了如何创建一些基本图表和统计图表。</p>
+			<p>您在本章中获得的知识将帮助您轻松创建可嵌入网站或 web 应用程序的交互式图表。</p>
+			<p>在下一章中，我们将介绍 Danfo.js 的数据可视化，您将看到如何利用 Plotly.js 的知识，直接从您的数据帧或数据系列中轻松创建令人惊叹的图表。</p>
+		</div>
+	
+
+</body></html>

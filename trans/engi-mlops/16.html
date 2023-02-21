@@ -1,0 +1,187 @@
+<html><head/><body>
+
+
+	
+		<title>B16572_13_Final_JM_ePub</title>
+		
+	
+	
+		<div><h1 id="_idParaDest-202">第十三章:管理持续学习的 ML 系统</h1>
+			<p><a id="_idTextAnchor235"/>在本章中，我们将思考在<strong class="bold">机器学习</strong> ( <strong class="bold"> ML </strong>)解决方案中持续学习的需求。适应是机器智能的核心。适应越好，系统越好。持续学习关注外部环境并适应它。实现对 ML 系统的持续学习可以获得巨大的好处。当我们探索持续学习和研究可解释监控框架的治理组件时，我们将看看成功治理 ML 系统需要什么，这有助于我们控制和治理 ML 系统以实现最大价值。</p>
+			<p>我们将通过启用警报和动作特性来深入研究治理的实际实现。接下来，我们将研究保证模型质量和控制部署的方法，并且我们将学习生成模型审计和报告的最佳实践。最后，我们将了解支持模型再训练和维护 CI/CD 管道的方法。</p>
+			<p>让我们首先思考持续学习的必要性，然后继续探讨本章中的以下主题:</p>
+			<ul>
+				<li>理解持续学习的需要</li>
+				<li>使用可解释的监控来管理 ML 系统</li>
+				<li>启用模型再训练</li>
+				<li>维护 CI/CD 渠道</li>
+			</ul>
+			<h1 id="_idParaDest-203">理解持续学习的需要</h1>
+			<p>当我们在<a href="B16572_01_Final_JM_ePub.xhtml#_idTextAnchor015"> <em class="italic">第 1 章</em> </a>、<em class="italic">m lops 工作流程基础</em>中开始<a id="_idIndexMarker854"/>时，我们了解了组织中 AI 采用受阻的原因。原因之一是在 ML 系统中缺乏持续学习。是的，不断学习！我们将在本章中解决这一挑战，并确保我们在本章结束时了解如何启用这一功能。现在，让我们看看持续学习。</p>
+			<h2 id="_idParaDest-204"><a id="_idTextAnchor237"/>持续学习</h2>
+			<p>持续学习建立在从数据、人类专家和外部<a id="_idIndexMarker855"/>环境中持续学习的原则之上。持续学习使终身学习成为可能，适应是其核心。它使 ML 系统随着时间的推移变得智能，以适应手边的任务。它通过监控和学习环境以及协助 ML 系统的人类专家来做到这一点。持续学习可以成为 ML 系统的一个强大的附件。随着时间的推移，它可以让你实现人工智能系统的最大潜力。强烈建议继续学习。让我们来看一个例子:</p>
+			<div><div><img src="img/B16572_13_01.jpg" alt="Figure 13.1 – A loan issuing officer – a traditional system versus an ML system assisted by a human &#13;&#10;"/>
+				</div>
+			</div>
+			<p class="figure-caption">图 13.1-贷款发放场景-传统系统与人工辅助的 ML 系统</p>
+			<p>与在一个完全依赖于人类雇员的组织中拥有一个传统的过程相比，部署一个模型(通过持续学习来实现)有几个优点。例如，在上图中，我们可以在两种情况下看到银行贷款审批流程的步骤。第一个场景仅由人类专家驱动(例如在传统的银行设置中)。第二个场景是使用 ML 系统来筛选申请、协商、提供贷款申请最终确定(其中人类专家审查 ML 系统的决策并批准或拒绝它)以及批准贷款，从而自动化或增强流程。传统设置的处理时间为 1 周，而 ML 系统(与人类专家一起工作)的处理时间为 6 小时。</p>
+			<p>ML 系统对银行来说更快更可持续，因为它在人工助手的帮助下不断学习和改进。人类雇员在公司或工作中有固定的雇佣期限。当他们离开时，他们的领域专业知识就消失了，培训一名新员工或让一名新员工入职完成同样的任务成本高昂。另一方面，ML <a id="_idIndexMarker856"/>模型与人类专家一起工作或由人类专家协助，随着时间的推移不断学习，设法随时间学习并无限期地保留该知识(关于时间)。与员工不断变化的传统方法相比，通过 ML 系统(以及人类专家)获得的持续学习可以被银行永久保留。从长远来看，持续学习可以为 ML 系统和企业释放巨大的价值。</p>
+			<h2 id="_idParaDest-205">持续学习的需要</h2>
+			<p>下面的<a id="_idIndexMarker857"/>图表显示了为什么需要持续学习的一些原因，以及它将如何增强您的 ML 系统以最大化您的商业价值:</p>
+			<div><div><img src="img/B16572_13_02.jpg" alt="Figure 13.2 – Benefits of continual learning &#13;&#10;"/>
+				</div>
+			</div>
+			<p class="figure-caption">图 13.2-持续学习的好处</p>
+			<p>让我们详细了解一下<a id="_idIndexMarker858"/>持续学习的好处:</p>
+			<ul>
+				<li><strong class="bold">适应</strong>:在大多数简单的应用中，当数据不断进入时，数据漂移可能保持不变。然而，许多应用程序已经动态地改变了数据漂移，例如推荐或异常检测系统，其中数据保持流动。在这种情况下，不断学习对于适应和准确预测非常重要。因此，适应不断变化的数据和环境非常重要。</li>
+				<li><strong class="bold">可扩展性</strong>:IDC 发布的白皮书(<a href="https://www.seagate.com/files/www-content/our-story/trends/files/idc-seagate-dataage-whitepaper.pdf">https://www . Seagate . com/files/www-content/our-story/trends/files/IDC-Seagate-data age-white paper . pdf</a>)提出，到 2025 年，数据生成速率将增长到 160 ZB/年，我们将无法存储所有数据。这篇论文预测我们只能储存 3%到 12%的二氧化碳。数据需要即时处理；否则，它将会丢失，因为存储基础架构跟不上产生的数据。这里的主要技巧是处理一次传入的数据，只存储必要的信息，然后去掉其余的。</li>
+				<li><strong class="bold">相关性</strong>:来自 ML 系统的预测需要具有相关性，并且需要适应不断变化的环境。需要不断学习，以保持 ML 系统与不断变化的上下文和环境高度相关并具有价值。</li>
+				<li><strong class="bold">性能</strong>:持续学习将使 ML 系统实现高性能，因为它通过适应变化的数据和环境来使 ML 系统具有相关性。换句话说，通过提供更有意义或更有价值的预测，更相关将提高 ML 系统的性能，例如在准确性或其他度量方面。</li>
+			</ul>
+			<p>由于这些原因，ML 系统需要持续的学习，所以没有持续的学习，我们就不能达到 ML 系统所能提供的最大价值。换句话说，项目注定要失败。持续学习是人工智能项目成功的关键。作为可解释的监控的一部分，有效的治理策略可以实现持续的学习。持续学习的一个重要部分是模型再训练，这样我们就可以应对不断发展的<a id="_idIndexMarker859"/>数据并做出相关决策。要做到这一点，我们可以融合可解释的监控和模型再训练，以实现持续学习:</p>
+			<p><strong class="bold">可解释的监控+模型再训练=持续学习</strong></p>
+			<p>展望未来，我们将看到不断深入的学习。现在，让我们来探索如何给 ML 系统带来有效的治理。</p>
+			<h1 id="_idParaDest-206"><a id="_idTextAnchor239"/>可解释的监控-治理</h1>
+			<p>在本节中，我们将针对我们一直在处理的业务用例<a id="_idIndexMarker860"/>实施我们之前在<a href="B16572_11_Final_JM_ePub.xhtml#_idTextAnchor206"> <em class="italic">第 11 章</em> </a>、<em class="italic">监控您的 ML 系统的关键原则</em>中了解到的治理机制。我们将深入研究管理 ML 系统的三个组成部分，如下图所示:</p>
+			<div><div><img src="img/B16572_13_03.jpg" alt="Figure 13.3 – Components of governing your ML system &#13;&#10;"/>
+				</div>
+			</div>
+			<p class="figure-caption">图 13.3–管理您的 ML 系统的组成部分</p>
+			<p>ML 系统的有效性来自于它们如何被管理以最大化商业价值。为了具有端到端的可跟踪性并遵守法规，系统治理需要质量保证和监控、模型审计和报告。我们可以通过监控和分析模型输出来管理和控制 ML 系统。智能警告和行为指导治理，以优化业务价值。让我们看看 ML 系统的治理是如何通过警告和行为、模型质量保证和控制、模型审计和报告来编排的。</p>
+			<h2 id="_idParaDest-207"><a id="_idTextAnchor240"/>警报和操作</h2>
+			<p>通过执行预定检查来检测状况，从而生成警报<a id="_idIndexMarker861"/>。满足条件时，会生成警报。根据生成的警报，我们可以执行操作。在这一节中，我们将了解这些元素，以及它们是如何被编排来管理一个 ML 系统的。</p>
+			<h3>什么是警报？</h3>
+			<p>警报是在后台运行的<a id="_idIndexMarker862"/>预定任务，用于监控应用程序，检查是否检测到特定条件。警报由三个因素驱动:</p>
+			<ul>
+				<li>日程安排:我们应该多久检查一次病情？</li>
+				<li><strong class="bold">条件</strong>:需要检测什么？</li>
+				<li><strong class="bold">动作</strong>:当检测到一个条件时，我们应该做什么？</li>
+			</ul>
+			<p>我们可以根据应用程序性能创建警报，以监控以下方面:</p>
+			<ul>
+				<li>基于阈值的可用性警报</li>
+				<li>基于阈值的失败请求警报</li>
+				<li>基于阈值的服务器响应时间警报</li>
+				<li>基于阈值的服务器异常警报</li>
+				<li>基于数据漂移阈值的警报</li>
+				<li>基于模型漂移阈值的警报</li>
+				<li>基于错误或异常的警报</li>
+			</ul>
+			<p>管理 ML 系统的一个重要领域是处理错误，所以让我们把注意力转向错误处理。</p>
+			<h3>处理错误</h3>
+			<p>在应用程序中，潜在的错误总是可能的。我们可以通过解决 ML 应用程序的所有可能的边缘情况来预见它们。使用下图所示的框架，我们可以解决这些错误。该框架的目的是识别边缘情况和自动化调试方法，以处理可能的错误。这将保持 ML 服务正常运行:</p>
+			<div><div><img src="img/B16572_13_04.jpg" alt="Figure 13.4 – Framework for debugging and investigating errors&#13;&#10;"/>
+				</div>
+			</div>
+			<p class="figure-caption">图 13.4–调试和调查错误的框架</p>
+			<p>如上图所示，我们首先确定可能出现错误的资源，并选择一个资源来解决该错误。在选择资源时，我们通过检查资源的高利用率和资源饱和(当资源的容量被完全利用或其容量超过设定的阈值时，资源饱和)来检查错误。在任一问题的情况下，我们通过调查日志和设计处理任何错误的解决方案来调查发现。最后，我们通过使用预制脚本来处理任何问题(阻止系统以最佳方式运行)，例如，通过重新启动资源或重新加载函数或文件来使资源启动并运行在健康状态，从而实现自动化调试。</p>
+			<p>通过解决所有可能的边缘情况，并设计自动化的错误处理或调试，我们可以使我们的应用程序防失败，以服务于我们的用户。拥有一个防失败的应用程序可以实现健壮性，确保用户从使用 ML 应用程序中获得无缝的体验和价值。一旦发现错误，通过调查或创建自动调试过程来解决错误。毕竟，预防胜于治疗。因此，检查所有可能的边缘情况并预先解决它们是有益的。</p>
+			<p>我们可以通过使用异常处理功能来处理<a id="_idIndexMarker864"/>潜在的错误。异常处理是一种编程技术，用于处理需要特别注意的罕见情况。在 Python 中很容易实现各种错误类型的异常处理。我们可以使用<code>try</code>、<code>except</code>、<code>else</code>和<code>finally</code>功能来处理错误和异常，如下图所示:</p>
+			<div><div><img src="img/B16572_13_05.jpg" alt="Figure 13.5 – Handling exceptions and edge cases&#13;&#10;"/>
+				</div>
+			</div>
+			<p class="figure-caption">图 13.5–处理异常和边缘情况</p>
+			<p>在<code>try</code>子句中遇到异常之前，所有的语句都会被执行。在<code>try</code>子句中发现的异常被<code>except</code>块捕获并处理。<code>else</code>块允许您编写只有在<code>try</code>子句中没有异常时才能运行的部分。使用<code>finally</code>，不管有没有任何以前经历过的异常，您都可以运行应该一直运行的部分代码。</p>
+			<p>下面列出了一些可能的常见异常或错误:</p>
+			<div><div><img src="img/012.jpg" alt=""/>
+				</div>
+			</div>
+			<p>这些边缘情况或<a id="_idIndexMarker865"/>错误是常见的，可以通过使用<code>try</code>和<code>exception</code>技术在应用中解决。策略是减轻 ML 系统对用户来说看起来非常基础或幼稚的情况；例如，在聊天中发送错误消息的聊天机器人。在这种情况下，错误的成本很高，用户将失去对 ML 系统的信任。</p>
+			<p>我们将为已经实现的业务用例实现一些定制的异常和错误处理，并基于生成的警报实现操作。让我们开始吧:</p>
+			<ol>
+				<li>In your Azure DevOps project, go to our <code>13_Govenance_Continual_Learning</code>. From there, access the <code>score.py</code> file. We will begin by importing the required libraries. This time, we will use the <code>applicationinsights</code> library to track custom events or exceptions of <a id="_idIndexMarker866"/>Application Insights that are connected to the endpoint:<pre>import json
+import numpy as np
+import os
+import pickle
+import joblib
+import onnxruntime
+import logging
+import time
+from azureml.core.model import Model
+from applicationinsights import TelemetryClient
+from azureml.monitoring import ModelDataCollector
+from inference_schema.schema_decorators import input_schema, output_schema
+from inference_schema.parameter_types.numpy_parameter_type import NumpyParameterType</pre><p>如前面的代码所示，我们已经从<code>applicationinsights</code>库中导入了<code>TelemetryClient</code>函数。我们将使用<code>TelemetryClient</code>函数来访问连接到我们端点的应用洞察。从应用洞察向<code>TelemetryClient</code>功能提供您的工具密钥。</p></li>
+				<li>This <strong class="bold">Instrumentation Key</strong> can be accessed from your Application Insights, which should be connected to the ML application, as shown in the following screenshot:<div><img src="img/B16572_13_06.jpg" alt="Figure 13.6 – Fetching an instrumentation key from Application Insights&#13;&#10;"/></div><p class="figure-caption">图 13.6–从应用洞察中获取工具密钥</p></li>
+				<li>在<a id="_idIndexMarker867"/>获取你的<code>TelemetryClient</code>函数后，如下面的代码所示。这里，我们在<code>tc</code>变量中创建一个<code>TelemetryClient</code>对象，用于跟踪定制事件:<pre>def init():     global model, scaler, input_name, label_name, inputs_dc, prediction_dc, tc         <code>init</code> function to monitor whether a <code>FileNotFound</code> error <a id="_idIndexMarker868"/><a id="_idIndexMarker869"/>occurs when we load the <code>scaler</code> and <code>model</code> artifacts. If a file is not found, the <code>tc.track_events()</code> function will log the error message that's generated by the exception and tag the custom code <code>101</code>. </pre></li>
+				<li>同样，我们将在<code>run</code>函数:<pre>@input_schema('data', NumpyParameterType(np.array([[34.927778, 0.24, 7.3899, 83, 16.1000, 1016.51, 1]]))) @output_schema(NumpyParameterType(np.array([0]))) def run(data):             try:                               inputs_dc.collect(data)             except Exception as e:                 <code>try</code> and <code>except</code> to collect incoming data using the model data collector function. This collects the incoming data and stores it in the <code>blob</code> storage connected to the Azure ML service. If the incoming data contains some anomalous data or a missing value, an exception is raised. We will raise a <code>ValueNotFound</code> error using the <code>track_event</code> function so that we can log the exception message and custom code (in this case, a random or custom number of 201 is given to track the error). After collecting the incoming data, we will attempt to scale the <a id="_idIndexMarker870"/>data before inference:<pre>            try:                 # scale incoming data                 data = scaler.transform(data)             except Exception as e:                  <code>try</code> and <code>except</code> can be handy in this case, since we are trying to scale the data using a <code>scaler</code> file that's been loaded in the <code>init</code> function. <p>If scaling the data is not successful, then an exception is raised. Here, we use the <code>track_event</code> function to track the exception on Application Insights. We generate a custom event named <code>ScalingError</code> in case an exception is generated. An exception message and an error code of <code>301</code> is logged on Application Insights. Likewise, the most important step of dealing with the scoring file – inferencing the model – needs to be done meticulously. </p><p>Now, we will use <code>try</code> and <code>except</code> again to make sure the inference is successful without any exceptions. Let's see how we can handle exceptions in this case. Note that we are accessing element number <code>2</code> for the <code>model.run</code> function. This causes an error in the model's inference as we are referring to an incorrect or nonexistent element of the list:</p><pre>            try:                         # model inference                 result = model.run([label_name], {input_name:  data.astype(np.float32)})[2] # this call is saving model output data into Azure Blob                 prediction_dc.collect(result)                 if result == 0:                     output = "Rain"                                  else:                      output = "No Rain"                 return output             except Exception as e: <code>track_event()</code> function to generate a custom event called <code>InferenceError</code>. This will be logged on Application Insights with an error message and a custom error code of <code>401</code>. This way, we can log custom errors and exceptions on Application Insights and generate actions based on these errors and exceptions. </pre> </pre> </pre>中实现一些其他自定义事件，即<code>ValueNotFound</code>、<code>OutofBoundsException</code>和<code>InferenceError</code></li>
+			</ol>
+			<p>现在，让我们看看如何使用错误日志在 Application Insights 中调查这些错误，并为其生成操作。</p>
+			<h3>设置操作</h3>
+			<p>我们可以根据之前创建的异常事件(在<em class="italic">处理错误</em>部分)设置<a id="_idIndexMarker872"/>警报和操作。在本节中，我们将根据我们生成的警报，以电子邮件通知的形式设置一个操作。每当 Application Insights 中生成异常或警报时，我们都会收到电子邮件通知。然后，我们可以调查并解决它。</p>
+			<p>让我们通过连接到您的 ML 系统端点的 Application Insights 来设置收到警报时的操作(电子邮件)。您可以通过 Azure ML 工作区访问应用洞察。让我们开始吧:</p>
+			<ol>
+				<li value="1">Go to <code>Endpoints</code> and check for Application Insights. Once you've accessed the Application Insights dashboard, click on <code>Transaction search</code>, as shown in the following screenshot, to check for your custom event logs (for example, inference exception):<div><img src="img/B16572_13_07.jpg" alt="Figure 13.7 – Checking the custom event logs&#13;&#10;"/></div><p class="figure-caption">图 13.7–检查自定义事件日志</p></li>
+				<li>You can check for custom events that have been generated upon exceptions and errors occurs via the logs, and then set up alerts and actions for these custom events. To set up an alert and action, go to the <strong class="bold">Monitoring</strong> &gt; <strong class="bold">Alerts</strong> section and click on <strong class="bold">New alert rule</strong>, as shown in the following screenshot:<div><img src="img/B16572_13_08.jpg" alt="Figure 13.8 – Setting up a new alert rule&#13;&#10;"/></div><p class="figure-caption">图 13.8–设置新的警报规则</p></li>
+				<li>Here, you can <a id="_idIndexMarker873"/>create conditions for actions based on alerting. To set up a condition, click on <strong class="bold">Add condition</strong>. You will be presented with a list of signals or log events you can use to make conditions. Select <strong class="bold">InferenceError</strong>, as shown in the following screenshot: <div><img src="img/B16572_13_09.jpg" alt="Figure 13.9 – Configuring a condition &#13;&#10;"/></div><p class="figure-caption">图 13.9–配置条件</p></li>
+				<li>After selecting the <a id="_idIndexMarker874"/>signal or event of your choice, you will get to configure its condition logic, as shown in the following screenshot. Configure the condition by setting up a threshold for it. In this case, we will provide a threshold of <code>400</code> as the error raises a value of <code>401</code> (since we had provided a custom value of <code>401</code> for the <code>InferenceError</code> event). When an inference exception occurs, it raises an <code>InferenceError</code> with a value above <code>400</code> (<code>401</code>, to be precise):<div><img src="img/B16572_13_010.jpg" alt="Figure 13.10 – Configuring the condition logic and threshold&#13;&#10;"/></div><p class="figure-caption">图 13.10–配置条件逻辑和阈值</p></li>
+				<li>After <a id="_idIndexMarker875"/>setting up the threshold, you will be asked to configure other actions, such as running an <strong class="bold">Automation Runbook</strong>, <strong class="bold">Azure Function</strong>, <strong class="bold">Logic App,</strong> or <strong class="bold">Secure Webhook</strong>, as shown in the following screenshot. For now, we will not prompt these actions, but it is good to know that we have them since we can run some scripts or applications as a backup mechanism to automate error debugging:<div><img src="img/B16572_13_011.jpg" alt="Figure 13.11 – Actions to automate debugging (optional)&#13;&#10;"/></div><p class="figure-caption">图 13.11–自动化调试的动作(可选)</p><p>这样，我们可以通过设置预配置的脚本或应用程序来<a id="_idIndexMarker876"/>自动化调试，以防错误发生或防止错误发生。毕竟，预防胜于治疗！</p></li>
+				<li>Finally, we will create a condition. Click <strong class="bold">Review and create</strong> to create the condition, as shown in the preceding screenshot. Once you have created this condition, you will see it in the <strong class="bold">Create alert rule</strong> panel, as shown in the following screenshot. Next, set up an action by clicking on <strong class="bold">Add action groups</strong> and then <strong class="bold">Create action group</strong>:<div><img src="img/B16572_13_012.jpg" alt="Figure 13.12 – Creating an action group&#13;&#10;"/></div><p class="figure-caption">图 13.12–创建行动组</p></li>
+				<li>Provide an email <a id="_idIndexMarker877"/>address so that you can receive notifications, as shown in the following screenshot. Here, you can name your notification (in the <strong class="bold">Alert rule name</strong> field) and provide the necessary information to set up an email alert action:<div><img src="img/B16572_13_013.jpg" alt="Figure 13.13 – Configuring email notifications&#13;&#10;"/></div><p class="figure-caption">图 13.13–配置电子邮件通知</p><p>在提供所有必要的<a id="_idIndexMarker878"/>信息(包括电子邮件)后，点击<strong class="bold">审查+创建</strong>按钮来配置行动(基于错误的电子邮件)。最后，提供预警规则的详细信息，如<strong class="bold">预警规则名称</strong>、<strong class="bold">描述</strong>和<strong class="bold">严重性</strong>，如下图所示:</p><div><img src="img/B16572_13_014.jpg" alt="Figure 13.14 – Configuring email notifications&#13;&#10;"/></div><p class="figure-caption">图 13.14–配置电子邮件通知</p></li>
+				<li>点击<code>InferenceError</code>。至此，您已经创建了一个警报，现在是测试它的时候了。转到<code>13_Govenance_Continual_Learning</code>文件夹并访问<code>test_inference.py</code>脚本(用您的端点链接替换 URL)。然后，通过运行以下命令运行脚本:<pre><strong class="bold">python3 test_inference.py</strong></pre></li>
+				<li>运行脚本将会输出一个错误。执行一些推理后停止脚本。在错误发生后的 5-10 分钟<a id="_idIndexMarker879"/>内，您会收到电子邮件通知，如下图所示:</li>
+			</ol>
+			<div><div><img src="img/B16572_13_015.jpg" alt="Figure 13.15 – Email notification of an error in production &#13;&#10;"/>
+				</div>
+			</div>
+			<p class="figure-caption">图 13.15-生产错误的电子邮件通知</p>
+			<p>祝贺您–您已经成功设置了一个针对错误的电子邮件操作提醒！这样，您可以在发现错误时进行调查，以便解决它并让系统启动和运行。</p>
+			<p>接下来，让我们看看如何确保我们对模型有质量保证，并且能够控制它们，以便最大化商业价值。</p>
+			<h2 id="_idParaDest-208"><a id="_idTextAnchor242"/>模型质量保证和控制</h2>
+			<p>不断发展或动态变化的数据会导致预测错误率增加。这可能是由于业务和外部环境变化导致的数据漂移，也可能是由于数据中毒攻击。预测错误率的这种<a id="_idIndexMarker881"/>增加导致当 ML 模型被重新训练(手动或自动)时，必须重新评估 ML 模型，从而导致比以前的算法更精确的新算法的发现。以下是用新数据测试 ML 模型的一些<a id="_idIndexMarker882"/>指南:</p>
+			<ul>
+				<li>通过重新训练您的模型并评估它们的性能来实现持续学习。</li>
+				<li>定期评估新数据集上所有模型的性能。</li>
+				<li>当替代模型开始提供比现有模型更好的性能或更高的准确性时，发出警报。</li>
+				<li>维护包含最新性能细节和报告的模型注册表。</li>
+				<li>维护所有模型的端到端谱系，以重现它们或向利益相关者解释它们的性能。</li>
+			</ul>
+			<h2 id="_idParaDest-209"><a id="_idTextAnchor243"/>模型审计和报告</h2>
+			<p>为<a id="_idIndexMarker884"/> MLOps 建立<a id="_idIndexMarker883"/>定期审计和报告系统是一种健康的做法，因为它使<a id="_idIndexMarker885"/>组织能够端到端地跟踪其运营，遵守法律，并使他们能够应要求向利益相关方解释其运营。我们可以确保 ML 系统符合已经在社会和政府层面建立和审议的惯例。要审计和报告 MLOps，建议审计员检查审计的基础，如下图所示:</p>
+			<div><div><img src="img/B16572_13_016.jpg" alt="Figure 13.16 – Fundamentals of an audit report for ML Operations&#13;&#10;"/>
+				</div>
+			</div>
+			<p class="figure-caption">图 13.16–洗钱活动审计报告的基础</p>
+			<h3>数据审计</h3>
+			<p>数据是 ML 系统做出许多决策的驱动力。由于这个原因，审计员需要考虑用于审计和报告的数据、检查训练数据、测试数据、推断数据和监控数据。这是非常重要的，并且具有端到端的可追溯性来跟踪数据的使用(例如，哪个数据集用于训练哪个模型)是 MLOps 所需要的。拥有一个<em class="italic"> Git for Data </em>类型的机制来版本化数据可以使审计员引用、检查和记录数据。</p>
+			<h3>模型审计(公平性和绩效)</h3>
+			<p>ML 系统的审计人员需要有一个黑客的思维模式来识别一个模型可能失败的不同方式，并且不能给出公平的预测。首先，使用可解释的人工智能技术检查训练数据并与推断数据进行比较。这可以帮助审计人员在个人层面上对每个模型及其每个预测做出公正的判断。为了对每个模型进行公平性和性能评估，我们可以使用数据切片技术，它可以揭示有价值的信息以进行评估。因此，对于审计人员来说，请求所需人口统计数据和数据切片的数据切片结果是很有价值的。为了进行集体评估，我们可以比较模型并评估它们的性能。这可以揭示进行公平性和绩效评估的另一个角度的信息。</p>
+			<p>如果要进行模型审核，它将评估模型的输入(训练数据)、模型本身及其输出。需要评估数据的一致性和训练数据中可能存在的偏差。例如，如果一个简历筛选模型已经根据以前或历史决策进行了培训，在这些决策中，候选人收到了工作邀请，员工得到了晋升，我们会<a id="_idIndexMarker887"/>希望确保培训数据没有受到过去招聘人员和经理的隐性偏见的影响。对竞争模型进行基准测试，执行统计测试以确保模型从训练推广到未知结果，以及使用最先进的技术来实现模型的可解释性，这些都是模型评估过程的一部分。</p>
+			<h3>项目和治理审计</h3>
+			<p><a id="_idIndexMarker888"/>有必要深入了解 AI 模型来审核算法吗？当然不是。对一个<a id="_idIndexMarker889"/>人工智能系统进展的审计就像一个项目管理审计。期望的成就是否有明确的目标？如果一个政府实体在一个特定的环境中实施了人工智能，这是一个很好且直接的问题。此外，如果外部开发人员已经应用于 AI 系统，那么在开发人员离开后，是否有可行的框架来管理模型？为了减少对专业知识的需求，公司必须有大量的概念创建文档和熟悉模型的员工。因此，从长远来看，审计开发和治理实践是有益的。</p>
+			<p>审计数据考虑、模型公平性和性能以及 ML 系统的项目管理和治理可以提供 MLOps 的全面视图。使用错误警报和操作，我们可以对错误进行及时的调查，以使系统启动并运行，在某些情况下，我们甚至可以进行自动化调试，以自动化错误解决和 MLOps。最后，通过进行模型质量保证、控制和审计，我们可以确保我们的 MLOps 的有效治理。接下来，我们将看看如何启用模型再训练，以便我们拥有 ML 系统的持续学习能力。</p>
+			<h1 id="_idParaDest-210"><a id="_idTextAnchor244"/>启用模特再培训</h1>
+			<p>到目前为止，我们已经讨论了什么是模型漂移以及如何识别它。所以，问题是，我们应该做些什么？如果模型的预测性能由于环境的变化而下降，解决方案是使用代表当前情况的新训练集来重新训练模型。你的模型应该重新训练多少？你如何选择新的锻炼计划？下图显示了根据<strong class="bold">监视器</strong>模块的<a id="_idIndexMarker891"/>结果触发<strong class="bold">构建</strong>模块的<strong class="bold">模型再训练</strong>功能。有两种方式触发模型再训练功能。一种是手动的，另一种是通过自动化模型再训练功能。让我们来看看如何实现这两者:</p>
+			<div><div><img src="img/B16572_13_017.jpg" alt="Figure 13.17 – Model retraining enabled in an MLOps workflow&#13;&#10;"/>
+				</div>
+			</div>
+			<p class="figure-caption">图 13.17–在 MLOps 工作流程中启用的模型再培训</p>
+			<h2 id="_idParaDest-211"><a id="_idTextAnchor245"/>手动模型再训练</h2>
+			<p>产品负责人或<a id="_idIndexMarker892"/>质量保证经理有责任确保手动模型再培训成功。手动模型触发步骤包括评估模型漂移，如果它超过阈值(您需要确定将触发模型再训练的漂移阈值)，则他们必须通过使用新数据集(这可以是先前的训练数据集和最新的推断数据)训练模型来触发模型训练过程。这样，产品所有者或质量保证经理可以完全控制整个过程，并且知道何时以及如何触发模型再培训，以从 ML 系统中交付最大化的价值。</p>
+			<h2 id="_idParaDest-212"><a id="_idTextAnchor246"/>自动化模型再训练</h2>
+			<p>如果您想完全自动化 MLOps 流水线，自动化模型漂移管理可能是重新训练生产模型的理想方法。自动化模型漂移管理是通过配置监控应用程序诊断和模型性能的批处理作业来完成的。然后，您必须激活模型再训练。自动化模型漂移管理的一个关键部分是设置将自动触发再训练模型功能的阈值。如果漂移监控阈值设置得太低，您将面临过于频繁地重新训练的风险，这将导致高昂的计算成本。如果阈值设置得太高，您就有重新培训不够频繁的风险，从而导致次优的生产模型。计算出正确的阈值比看起来更棘手，因为你必须计算出你需要多少额外的训练数据来反映这个新的现实。即使环境发生了变化，用一个训练集很小的模型替换现有的模型也是没有意义的。一旦你弄清楚了阈值，你就可以有工作(例如，作为 CI/CD 管道的一部分)定期比较实时数据集和训练数据的特征分布(正如我们在<a href="B16572_12_Final_JM_ePub.xhtml#_idTextAnchor222"> <em class="italic">第 12 章</em> </a>、<em class="italic">模型服务和监控</em>中所做的)。当检测到较大偏差时(或高于定义的阈值)，系统可以安排模型<a id="_idIndexMarker894"/>重新训练并自动部署新模型。这可以使用诸如 Jenkins 或 Kubernetes 作业或 CI/CD pipeline cron 作业之类的工作调度程序来完成。这样，您可以完全自动化 MLOps 管道和模型再训练部分。</p>
+			<p>请注意，在新数据很少的情况下，或者如果您很少进行批量推断(例如，每 6 个月一次)，重新训练模型是没有意义的。您可以在推理之前训练模型，也可以根据需要定期训练模型。</p>
+			<h1 id="_idParaDest-213"><a id="_idTextAnchor247"/>维护 CI/CD 管道</h1>
+			<p>您可能还记得，在<a href="B16572_10_Final_JM_ePub.xhtml#_idTextAnchor189"> <em class="italic">第十章</em> </a> <em class="italic">【生产发布要点】</em>中，我们提到过<em class="italic">一个型号不是产品；管道就是产品</em>。因此，在建立自动或<a id="_idIndexMarker895"/>半自动 CI/CD 管道后，监控我们管道的性能至关重要。我们可以通过检查 Azure DevOps 中的发布来做到这一点，如下面的截图所示:</p>
+			<div><div><img src="img/B16572_13_018.jpg" alt="Figure 13.18 – Maintaining CI/CD pipeline releases&#13;&#10;"/>
+				</div>
+			</div>
+			<p class="figure-caption">图 13.18–维护 CI/CD 管道发布</p>
+			<p>检查的目标是保持 CI/CD 管道处于健康和稳定的状态。以下是一些保持 CI/CD pip <a id="_idTextAnchor248"/> eline 健康可靠的指南:</p>
+			<ul>
+				<li>如果一个构建被破坏，团队的<strong class="bold">尽快修复</strong>策略应该被执行。</li>
+				<li>集成自动化验收测试。</li>
+				<li>需要拉取请求。</li>
+				<li>同行代码审查每个故事或功能。</li>
+				<li>定期审核系统日志和事件(推荐)。</li>
+				<li>定期向所有团队成员可视地报告指标(例如，slackbot 或电子邮件通知)。</li>
+			</ul>
+			<p>通过实施这些实践，我们可以避免高失败率，并使 CI/CD 管道对所有团队成员都是健壮的、可伸缩的和透明的。</p>
+			<h1 id="_idParaDest-214"><a id="_idTextAnchor249"/>总结</h1>
+			<p>在本章中，我们学习了 ML 解决方案中持续学习的关键原则。我们学习了可解释的监控(治理组件),通过实现实际的错误处理和配置动作，使用电子邮件通知来提醒 ML 系统的开发人员。最后，我们研究了支持模型再训练的方法，以及如何维护 CI/CD 管道。至此，您已经具备了为您的用例自动化和管理 MLOps 的关键技能。</p>
+			<p>祝贺你完成这本书！MLOps 的世界在不断向好的方向发展。现在，您可以使用 MLOps 帮助您的企业蓬勃发展。我希望您喜欢阅读和通过动手完成 MLOps 实施来学习。走出去，做你想看到的改变。祝你的 MLOps 努力一切顺利！</p>
+		</div>
+	
+
+</body></html>

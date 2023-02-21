@@ -1,0 +1,329 @@
+<html><head/><body>
+
+
+	
+		<title>B16572_05_Final_JM_ePub</title>
+		
+	
+	
+		<div><h1 id="_idParaDest-83"><a id="_idTextAnchor093"/>第 5 章:模型评估和包装</h1>
+			<p>在本章中，我们将详细了解 ML 模型评估和可解释性指标。这样可以让我们对 ML 模型训练后的性能有一个全面的了解。我们还将学习如何打包模型并部署它们以备将来使用(比如在生产系统中)。我们将详细研究我们如何在上一章中评估和打包模型，并探索评估和解释模型的新方法，以确保全面理解经过训练的模型及其在生产系统中的潜在可用性。</p>
+			<p><a id="_idTextAnchor095"/> <a id="_idTextAnchor096"/>我们从学习测量、评估和解释模型性能的各种方法开始这一章。我们着眼于测试生产模型和打包 ML 模型用于生产和推理的多种方式。我们将对 ML 模型的评估进行深入研究，为您提供一个框架来评估任何类型的 ML 模型，并将其打包用于生产。准备在评估方面建立一个坚实的基础，并为生产准备好 ML 模型。为此，我们将在本章中讨论以下主要话题:</p>
+			<ul>
+				<li><a id="_idTextAnchor097"/> <a id="_idTextAnchor098"/>模型评估和可解释性度量</li>
+				<li>生产测试方法</li>
+				<li>为什么要包装 ML 机型？</li>
+				<li>如何包装 ML 模型</li>
+				<li>推理就绪模型</li>
+			</ul>
+			<h1 id="_idParaDest-84"><a id="_idTextAnchor099"/>模型评估和可解释性指标</h1>
+			<p>获取数据和训练 ML 模型是创造商业价值的良好开端。在<a id="_idIndexMarker295"/>训练模型之后，衡量模型的表现并理解模型为什么以及如何以某种方式预测或表现是至关重要的。因此，模型评估和可解释性是 MLOps 工作流程的重要组成部分。它们使我们能够理解和验证 ML 模型，以确定它们将产生的商业价值。因为有几种类型的 ML 模型，所以也有许多评估技术。</p>
+			<p>回顾第二章<a href="B16572_02_Final_JM_ePub.xhtml#_idTextAnchor028"><em class="italic"/></a>、<em class="italic">描述你的机器学习问题</em>，其中我们研究了各种类型的模型，分类为学习模型、混合模型、统计<a id="_idIndexMarker296"/>模型和<strong class="bold"> HITL </strong> ( <strong class="bold">人在回路</strong>)模型，我们现在将讨论评估这些模型的不同指标。这里是一些<a id="_idIndexMarker297"/>关键模型评估和<a id="_idIndexMarker298"/>可解释性技术，如图<em class="italic">图 5.1 </em>所示。这些已成为研究和行业中评估模型性能和证明模型性能的标准:</p>
+			<div><div><img src="img/B16572_05_01.jpg" alt="Figure 5.1 – Model evaluation and interpretation taxonomy &#13;&#10;(The techniques in this taxonomy can be applied to almost any business problem when carefully navigated, selected, and executed.)"/>
+				</div>
+			</div>
+			<p class="figure-caption">图 5.1–模型评估和解释分类</p>
+			<p class="figure-caption">(如果仔细导航、选择和执行，这种分类法中的技术几乎可以应用于任何业务问题。)</p>
+			<h2 id="_idParaDest-85"><a id="_idTextAnchor100"/>学习模型的指标</h2>
+			<p><strong class="bold">学习模型</strong>有两种类型——监督学习(监督学习模型或算法基于标记数据进行训练<a id="_idIndexMarker299"/>)和非监督学习(非监督学习模型或算法可以从未标记数据中学习)。</p>
+			<p>正如我们在前面章节中所研究的，监督学习算法的例子包括分类(随机森林、支持向量机等等)和回归(线性回归、逻辑回归等等)算法。另一方面，无监督学习的示例包括聚类(k-means、DBSCAN、高斯混合模型等)和维数减少(PCA、随机森林、向前和向后特征消除等)算法。为了有效地测量这些算法，下面是一些常用和有效的度量标准的例子。</p>
+			<h3>监督学习模型</h3>
+			<p>受监督的<a id="_idIndexMarker300"/>学习模型根据标记的数据进行训练。在训练数据中，输入的结果被标记或已知。因此，当给定基于标记数据的输入时，模型被训练以学习预测结果。对模型进行定型后，评估模型的潜力和性能是非常重要的。下面是一些衡量监督模型的标准。</p>
+			<h4>交叉验证</h4>
+			<p>评估一个<a id="_idIndexMarker301"/> ML 模型对于理解其<a id="_idIndexMarker302"/>行为至关重要，这可能很棘手。通常，数据集分为两个子集:训练集和测试集。首先用训练集来训练模型，然后用测试集来测试模型。在此之后，评估模型的性能，以使用诸如模型对测试数据的准确度百分比之类的度量来确定误差。</p>
+			<p>这种方法是不可靠和不全面的，因为一个测试集的准确性可能不同于另一个测试集。为了避免这个问题，交叉验证提供了一个解决方案，将数据集分割或拆分成多个折叠，并确保每个折叠在某个点上用作测试集，如图<em class="italic">图 5.2 </em>所示:</p>
+			<div><div><img src="img/B16572_05_02.jpg" alt="Figure 5.2 – K-Fold cross-validation&#13;&#10;"/>
+				</div>
+			</div>
+			<p class="figure-caption">图 5.2–K 倍交叉验证</p>
+			<p>有多种交叉验证方法，包括分层交叉验证、留一交叉验证和 K 倍交叉验证。k 折叠交叉验证被广泛使用<a id="_idIndexMarker303"/>,值得注意的是，这种技术包括将数据集分成 k 个折叠/片段，然后在连续迭代中使用每个折叠作为测试集。这个过程是有用的，因为每个迭代都有一个唯一的测试集来度量准确性。然后，每次迭代的精确度被用来寻找平均测试结果(通过简单地取所有测试结果的平均值来计算)。</p>
+			<p>通过交叉验证获得的平均准确度是一个比传统准确度<a id="_idIndexMarker304"/>更可靠、更全面的指标。例如，在<em class="italic">图 5.2 </em>中，我们可以<a id="_idIndexMarker305"/>看到五次迭代。这些迭代中的每一次都有一个独特的测试集，在测试每次迭代的准确性并平均所有准确性后，我们使用 K-fold 交叉验证获得模型的平均准确性。值得注意的是，如果您有一个非常大的训练数据集，或者如果模型需要大量的时间、CPU 和/或 GPU 处理来运行，K-fold 不是一个好的选择。</p>
+			<h4>精确</h4>
+			<p>当分类器被<a id="_idIndexMarker306"/>训练时，精度可以是量化由分类器做出的实际上为真并且属于正类的正类预测的<a id="_idIndexMarker307"/>重要度量。精度量化了正确的正面预测的数量。</p>
+			<p>例如，假设我们已经训练了一个分类器，从图像中预测猫和狗。在推断测试图像上的训练模型时，该模型用于从图像中预测/检测狗(换句话说，狗是阳性类别)。在这种情况下，精度量化了正确的狗预测(正面预测)的数量。</p>
+			<p>精度计算为正确预测的正例与预测的正例总数的比率。</p>
+			<p><em class="italic">精度=真阳性/(真阳性+假阳性)</em></p>
+			<p><strong class="bold">精度</strong>专注于最大限度减少误报。高精度范围从 0 到 1，并且它与低假阳性率相关。精度越高越好；例如，预测<a id="_idIndexMarker309"/>癌症患者是否需要化疗治疗的图像分类器<a id="_idIndexMarker308"/>模型。如果模型预测患者应该在并非真正必要时接受化疗，这可能是非常有害的，因为在不需要时化疗的效果可能是有害的。这个病例是一个危险的假阳性。高精度分数将导致较少的假阳性，而低精度分数将导致大量的假阳性。因此，关于化学疗法治疗，预测模型应该具有高精度分数。</p>
+			<h4>回忆</h4>
+			<p>当分类器被<a id="_idIndexMarker310"/>训练时，召回可用于量化从数据集中的正例总数建立的<a id="_idIndexMarker311"/>正类预测。召回衡量的是在可能做出的肯定预测总数中做出的正确肯定预测的数量。与 precision 不同，Recall 提供了错过正面预测的证据，precision 只告诉我们正面预测总数中正确的正面预测。</p>
+			<p>例如，以之前讨论的相同示例为例，我们训练了一个分类器来从图像中预测猫和狗。在推断测试图像上的训练模型时，该模型用于从图像中预测/检测狗(换句话说，狗是阳性类别)。在这种情况下，回忆量化了错过的狗预测(正面预测)的数量。</p>
+			<p>以这种方式，回忆提供了正面类覆盖的经验指示。</p>
+			<p><em class="italic">召回=真阳性/(真阳性+假阴性)</em></p>
+			<p><strong class="bold">召回</strong>专注于最大限度地减少假阴性。高召回率与低假阴性率相关。召回率越高越好。例如，一个分析机场乘客个人资料的模型试图预测该乘客是否是潜在的恐怖分子。在这种情况下，误报比漏报更安全。如果模型<a id="_idIndexMarker312"/>预测一个无辜的<a id="_idIndexMarker313"/>人是恐怖分子，这可以在更深入的调查后得到验证。但是如果一个恐怖分子通过，许多人可能会有生命危险。在这种情况下，假阴性比假阳性更安全，因为假阴性可以在深入调查的帮助下进行检查。召回率应该很高，以避免假阴性。在这种情况下，高召回分数优先于高精度。</p>
+			<h4>f 分数</h4>
+			<p>在<a id="_idIndexMarker314"/>我们需要避免高假阳性<a id="_idIndexMarker315"/>和高假阴性的情况下，f-score 是达到这种状态的一个有用的衡量标准。F-measure 提供了一种将精度和召回率合并到反映这两种属性的单一度量中的方法。</p>
+			<p>精确和回忆都不能描述整个故事。</p>
+			<p>我们可以用糟糕的回忆来获得最好的精确度，或者，F-measure 表达了精确度和回忆。它是根据以下公式测量的:</p>
+			<p><em class="italic"> F-Measure = (2 *精度*召回)/(精度+召回)</em></p>
+			<p>你的精确度和记忆力的调和平均值就是 F 值。在大多数情况下，您必须在精确度和召回率之间做出选择。如果您优化您的分类器，偏向一个而不偏向另一个，调和平均值会迅速降低。当精度和召回率都差不多的时候，就是最好的时候；例如，通过输入患者的图像和血液检查来预测早期癌症的模型。在这个真实的场景中，如果模型输出大量的假阳性，这可能会给医院带来大量不必要的成本，并可能损害患者的健康。另一方面，如果该模型未能检测出真正的癌症患者，许多生命将处于危险之中。在这种情况下，我们需要避免高假阳性和高假阴性，在这里，f 值是避免高假阳性和假阴性的一个有用的衡量标准。f 分数介于 0 和 1 之间。f 值越高越好。对于高 f 值，我们可以预期更少的假阳性和假阴性。</p>
+			<h4>混淆矩阵</h4>
+			<p>混淆矩阵是<a id="_idIndexMarker316"/>报告一组测试数据样本的分类模型性能的一种度量，预测<a id="_idIndexMarker317"/>值是预先知道的。它是矩阵形式的度量，其中混淆矩阵是一个 N×N 矩阵，N 是被预测的类的数量。例如，假设我们有两个要预测的类(二进制分类)，那么 N=2，因此，我们将有一个 2 X 2 的矩阵，如图<em class="italic">图 5.3 </em>所示:</p>
+			<div><div><img src="img/B16572_05_03.jpg" alt="Figure 5.3 – Confusion matrix for binary classification&#13;&#10;"/>
+				</div>
+			</div>
+			<p class="figure-caption">图 5.3–二元分类的混淆矩阵</p>
+			<p><em class="italic">图 5.3 </em>是糖尿病患者和非糖尿病患者二元分类的混淆矩阵示例。有 181 个测试数据样本，根据这些测试数据样本进行预测，以将患者数据样本分类为糖尿病和非糖尿病类别。使用混淆矩阵，您可以获得关键的洞察力来解释模型的性能。例如，看一眼，你就会知道有多少预测是真的，有多少是假阳性。这些见解对于解释模型在许多情况下的表现是无价的。下面是<a id="_idIndexMarker318"/>这些术语在混淆矩阵中的含义:</p>
+			<ul>
+				<li><strong class="bold">真阳性</strong> ( <strong class="bold"> TP </strong>):这些是根据测试数据样本预测为<strong class="bold">是</strong>而实际为<strong class="bold">是</strong>的情况。</li>
+				<li><strong class="bold">真阴性</strong> ( <strong class="bold"> TN </strong>):这些是预测为<strong class="bold"> no </strong>的情况，根据测试数据样本，这些情况实际上是<strong class="bold"> no </strong>。</li>
+				<li><strong class="bold">误报</strong> ( <strong class="bold"> FP </strong>):根据测试数据样本，模型预测<strong class="bold">是</strong>，但是<strong class="bold">否</strong>。这种类型的<a id="_idIndexMarker319"/>错误被称为<strong class="bold">类型 I 错误</strong>。</li>
+				<li><strong class="bold">假阴性</strong> ( <strong class="bold"> FN </strong>):模型预测<strong class="bold">否</strong>，但根据测试数据样本为<strong class="bold">是</strong>。这种类型的<a id="_idIndexMarker320"/>误差为<a id="_idIndexMarker321"/>，称为<strong class="bold">类型 II 误差</strong>。</li>
+			</ul>
+			<p>在<em class="italic">图 5.3 </em>中，以下内容适用:</p>
+			<ul>
+				<li><em class="italic">x</em>-轴代表由 ML 模型做出的预测。</li>
+				<li><em class="italic"> y </em>轴代表实际标签。</li>
+				<li>矩阵中的第一个和第四个框(对角线框)描绘了正确预测的图像。</li>
+				<li>矩阵中的第二个和第三个方框代表错误预测。</li>
+				<li>在第一个框中，(<strong class="bold">非糖尿病</strong> x <strong class="bold">非糖尿病</strong>)，108 个数据样本(<strong class="bold">真阴性</strong>–<strong class="bold">TN</strong>)被预测为<strong class="bold">非糖尿病</strong>(正确预测)。</li>
+				<li>在第四个框中，(<strong class="bold">糖尿病</strong> x <strong class="bold">糖尿病</strong>)，36 个数据样本(<strong class="bold">真阳性</strong>–<strong class="bold">TP</strong>)被正确预测。</li>
+				<li>第二个框中的其余图像(<strong class="bold">猫</strong> x <strong class="bold">狗</strong> ) 11 个图像是误报。</li>
+				<li>第三个盒子(<strong class="bold">狗</strong> x <strong class="bold">猫</strong>)有 26 个图像，包含假阴性。</li>
+			</ul>
+			<p><a id="_idIndexMarker322"/>混淆矩阵可以提供对测试数据样本所做预测的全貌，这种见解在解释模型性能方面具有<a id="_idIndexMarker323"/>意义。混淆矩阵是分类问题的<em class="italic">事实上的</em>错误分析度量，因为大多数其他度量都是从这个度量中派生出来的。</p>
+			<h4>AUC-ROC</h4>
+			<p>观察模型性能的不同<a id="_idIndexMarker324"/>视角可以使我们能够解释模型<a id="_idIndexMarker325"/>性能并对其进行微调以获得更好的结果。ROC 和 AUC 曲线可以实现这种洞察。让我们<a id="_idIndexMarker326"/>看看<strong class="bold">接收器工作特性</strong> ( <strong class="bold"> ROC </strong>)曲线如何使我们能够解释模型性能。ROC 曲线是一个<a id="_idIndexMarker327"/>图，展示了分类模型在所有分类阈值下的性能。<a id="_idIndexMarker328"/>图用两个参数<a id="_idIndexMarker329"/>来刻画模型的性能:<strong class="bold">真阳性率</strong>(<strong class="bold">TPR</strong>=<em class="italic">TP/TP+FN</em>)和<strong class="bold">假阳性率</strong>(<strong class="bold">FPR</strong>=<em class="italic">FPFP+TN</em>)。</p>
+			<p>下图显示了典型的 ROC 曲线:</p>
+			<div><div><img src="img/B16572_05_04.jpg" alt="Figure 5.4 – ROC-AUC curve&#13;&#10;"/>
+				</div>
+			</div>
+			<p class="figure-caption">图 5.4-ROC-AUC 曲线</p>
+			<p>ROC 曲线描述了不同分类阈值下 TPR 对 FPR 的关系。降低分类的阈值使得更多的项目能够被分类为阳性，这反过来增加了假阳性和<a id="_idIndexMarker330"/>真阳性。曲线 ( <strong class="bold"> AUC </strong>)下的<strong class="bold">面积是用于量化分类器区分类别的有效性或能力的指标，并用于总结 ROC 曲线。</strong></p>
+			<p>AUC 值从<code>0</code>到<code>1</code>变化，如果 AUC 值为<code>1</code>，分类器能够正确区分所有正负类点，如果 AUC 值为<code>0</code>，分类器不能正确区分所有正负类点。当 AUC 值为<code>0.5</code>(没有手动设置阈值)时，则这是一个随机分类器。</p>
+			<p>AUC 有助于我们根据预测的准确性对其进行排序，但它不能给出绝对值。因此<a id="_idIndexMarker331"/>它与规模无关。此外，AUC 独立于分类阈值。当使用 AUC 时，选择的<a id="_idIndexMarker332"/>分类阈值并不重要，因为无论选择什么分类阈值，AUC 都会估计模型预测的质量。</p>
+			<h4>马修相关系数</h4>
+			<p>Brian Matthews <a id="_idIndexMarker333"/>在 1975 年开发了<strong class="bold"> Matthews 相关系数</strong> ( <strong class="bold"> MCC </strong>)作为模型<a id="_idIndexMarker334"/>评估的方法。它计算实际值和期望值之间的差异。它是混淆矩阵结果的扩展，用来度量分类器的低效性。TP、TN、FP 和 FN 是混淆矩阵中的四个元素。这些条目被纳入系数:</p>
+			<div><div><img src="img/Formula_01.jpg" alt=""/>
+				</div>
+			</div>
+			<p>只有当预测对所有这四个类别都有好的结果时，这种方法才会得到高分。MCC 分数范围从<code>-1</code>到<code>+1</code>:</p>
+			<ul>
+				<li><code>1</code>是实际值和预测值之间的最佳一致。</li>
+				<li>当分数为<code>0</code>时，这意味着实际值和预测值完全不一致。相对于实际情况，预测是随机的。</li>
+			</ul>
+			<p>例如，<code>0.12</code>的 MCC 分数表明分类器非常随机。如果是<code>0.93</code>，这个<a id="_idIndexMarker335"/>表示分类器<a id="_idIndexMarker336"/>好。MCC 是帮助测量分类器无效性的有用度量。</p>
+			<h3>无监督学习模型</h3>
+			<p>无监督学习<a id="_idIndexMarker337"/>模型或算法可以从无标签数据中学习。无监督学习可用于从未标记数据中挖掘见解和识别模式。无监督算法广泛用于聚类或异常检测，不依赖于任何标签。这里有一些衡量无监督学习算法性能的指标。</p>
+			<h4>兰德指数</h4>
+			<p>Rand 指数<a id="_idIndexMarker338"/>是一个用于评估<a id="_idIndexMarker339"/>聚类技术质量的指标。它描述了聚类之间的相似程度。兰德指数衡量正确决策的百分比。决策将一对数据点(例如，文档)分配给同一个集群。</p>
+			<p>如果存在<code>N</code>数据点，则<em class="italic">决策总数= N(N-1)/2 </em>，表示参与决策的数据点对。</p>
+			<p><em class="italic">Rand index = TP+TN/TP+FP+FN+TN</em></p>
+			<h4>纯洁</h4>
+			<p><code>1</code>，不良聚类具有接近<code>0</code>的纯度值。<em class="italic">图 5.5 </em>是计算<em class="italic">纯度</em>的一个示例的直观表示，解释如下:</p>
+			<div><div><img src="img/B16572_05_05.jpg" alt="Figure 5.5 – Clusters after clustering&#13;&#10;"/>
+				</div>
+			</div>
+			<p class="figure-caption">图 5.5–聚类后的聚类</p>
+			<p>纯度是关于簇质量的外部评估标准。在<em class="italic">图 5.5 </em>中，三个集群的多数类和<a id="_idIndexMarker343"/>多数类的成员数如下:绿滴 x 5(集群 1)，红点 x 5(集群 2)，十字 x 4(集群 3)。因此，纯度是(1/17) x (5 + 5 + 3) = ~0.76。</p>
+			<h4>轮廓系数</h4>
+			<p>对于聚类算法，确定聚类的质量是很重要的。为了确定<a id="_idIndexMarker345"/>聚类的质量或良好性，轮廓分数或轮廓系数被用作度量。其值范围从<code>-1</code>到<code>1</code>。当聚类清晰可辨或彼此相距甚远时，轮廓得分为<code>1</code>。相反，<code>-1</code>意味着错误地分配了簇，<code>0</code>意味着簇彼此无关。轮廓分数的计算方法如下:</p>
+			<p><em class="italic">剪影得分= (b-a)/max(a，b) </em></p>
+			<p><code>a</code> =聚类内各点之间的平均距离(平均聚类内距离)。</p>
+			<p><code>b</code> =所有聚类之间的平均距离(平均聚类间距离)。</p>
+			<h2 id="_idParaDest-86"><a id="_idTextAnchor101"/>混合模型的指标</h2>
+			<p><a id="_idIndexMarker346"/>通过结合传统方法开发混合方法来解决不同的业务和研究问题，ML 得到了快速发展。混合模型包括半监督、自监督、多实例、多任务、强化、集成、迁移和联合学习模型。为了评估和验证这些模型，根据使用案例和模型<a id="_idIndexMarker347"/>类型使用一系列指标。了解这些指标，以便能够根据您将来要开发和评估的模型使用正确的指标，这是很好的。以下是评估混合模型的指标:</p>
+			<h3>人机对比测试</h3>
+			<p>在训练和测试 ML 和深度<a id="_idIndexMarker348"/>学习模型时，对达到人类水平的表现的热情非常普遍。在<a id="_idIndexMarker349"/>中，为了验证模型并得出结论<a id="_idIndexMarker350"/>模型已经达到或超过人类水平的性能，在任务上进行人机对比实验。使用 ML 模型来实现相同的任务，并且对照 ML 模型的性能来评估人的性能。根据环境和任务，有各种不同的标准来评估人和机器的性能。这里提到一些例子:</p>
+			<ul>
+				<li><strong class="bold">双语评估替角</strong> ( <strong class="bold"> BLEU </strong>)是一种评估文本<a id="_idIndexMarker351"/>质量的方法，用于从一种语言到另一种语言的机器翻译<a id="_idIndexMarker352"/>。将机器翻译算法生成的文本质量与人类的输出进行比较。评估是为了观察机器翻译与专业人工翻译的接近程度。</li>
+				<li><strong class="bold">面向回忆的 Gisting 评估替角</strong> ( <strong class="bold">胭脂</strong>)是一个人对<a id="_idIndexMarker353"/>机器的性能评估指标，用于评估自动摘要和机器翻译等任务<a id="_idIndexMarker354"/>。此指标将自动生成的摘要或翻译与人工生成的摘要/翻译进行比较。</li>
+			</ul>
+			<h4>图灵测试</h4>
+			<p>图灵测试是由著名的艾伦·图灵设计的。他称之为 20 世纪 50 年代的模仿游戏。图灵测试是对机器进行的一项测试，旨在评估其表现出与人类相似的智能行为的能力。在另一种意义上，图灵测试也是一种评估机器欺骗人类的能力的测试，让人类相信机器完成的任务是类似人类的或由人类完成的。例如，我们可以在<em class="italic">图 5.6 </em>中看到图灵<a id="_idIndexMarker356"/>测试的运行，其中基于文本的交互发生在人类询问者 X 和计算机或机器主体(Bob)之间，以及询问者 X 和人类主体(Alice)之间:</p>
+			<div><div><img src="img/B16572_05_06.jpg" alt="Figure 5.6 – Turing test&#13;&#10;"/>
+				</div>
+			</div>
+			<p class="figure-caption">图 5.6–图灵测试</p>
+			<p>在图灵测试期间，人类询问者 X 与 Bob(计算机)和 Alice(人类)进行了一系列的交互，目的是正确区分人类和机器。如果/当询问者不能正确区分它们或者将机器误认为人(Bob 误认为 Alice)时，机器通过图灵测试。</p>
+			<h4>每次回报的奖励</h4>
+			<p>强化学习模型<a id="_idIndexMarker357"/>是混合模型，涉及代理和操作环境之间的持续学习机制，以实现预定义的目标。代理根据实现目标的有效或最佳步骤获得的奖励进行学习。当目标是最优控制时，您将希望通过代理在任务中的表现来衡量它。为了量化代理执行任务的好坏，可以使用奖励的综合衡量标准，如每<a id="_idIndexMarker358"/>集的总奖励(也称为“回报”)或每个时间步长的平均奖励，来评估和优化代理对环境和目标的控制。</p>
+			<h4>遗憾</h4>
+			<p>后悔是一个<a id="_idIndexMarker359"/>常用于强化学习模型等混合模型的度量。在每一个时间步，您计算最佳决策的回报与您的算法所采取的决策之间的差异。累积的遗憾是这样计算出来的。在最优策略下，最小后悔为 0。遗憾越小，算法执行得越好。</p>
+			<p>后悔使代理人的行为能够根据代理人最佳表现的最佳策略进行评估，如图<em class="italic">图 5.7 </em>所示。红色阴影部分是遗憾:</p>
+			<div><div><img src="img/B16572_05_07.jpg" alt="Figure 5.7 – Regret for reinforcement learning&#13;&#10;Shapely Additive Explanations (SHAP)"/>
+				</div>
+			</div>
+			<p class="figure-caption">图 5.7-对强化学习的遗憾</p>
+			<p class="figure-caption">沙普利附加解释(SHAP)</p>
+			<p>模型的可解释性和解释模型为什么做出某些决定或预测在许多商业问题或行业中是至关重要的。使用前面讨论的技术，我们可以解释模型的性能，但仍然有一些灰色区域，如深度学习模型，这是黑盒模型。值得注意的是，一般来说，这些模型可以被训练以在测试数据上实现很好的结果或准确性，但很难说为什么。在这种情况下，<strong class="bold">沙普利附加解释</strong> ( <strong class="bold"> SHAP </strong>)可以用来<a id="_idIndexMarker360"/>解码预测结果发生了什么，以及哪些特征预测最相关。SHAP 在这篇论文中被提出(在 NIPS):<a href="http://papers.nips.cc/paper/7062-a-unified-approach-to-interpreting-model-predictions">http://papers . NIPS . cc/paper/7062-a-unified-approach-to-interpretation-model-predictions</a>。</p>
+			<p>SHAP 为分类和回归模型工作。SHAP 的主要目标是通过计算每个特征的贡献来解释模型<a id="_idIndexMarker361"/>输出预测。SHAP 解释方法使用 Shapley 值来解释模型输出或预测的要素重要性。沙普利值是从合作博弈理论中计算出来的，这些值的范围是从<code>-1</code>到<code>1</code>。Shapley 值描述了模型输出在特征间的分布，如图<em class="italic">图 5.8 </em>所示:</p>
+			<div><div><img src="img/B16572_05_08.jpg" alt="Figure 5.8 – Shapley values bar chart depicting feature importance&#13;&#10;"/>
+				</div>
+			</div>
+			<p class="figure-caption">图 5.8–描述特性重要性的 Shapley 值条形图</p>
+			<p>有几种 SHAP 解释器技术，如 SHAP 树解释器、SHAP 深度解释器、SHAP 线性解释器和 SHAP 内核解释器。根据用例的不同，这些解释者可以提供关于模型预测的有用信息，并帮助我们理解黑盒模型。在这里阅读更多:<a href="https://christophm.github.io/interpretable-ml-book/shap.html">https://christophm . github . io/interpretable-ml-book/shap . html</a></p>
+			<h4>模拟解说者</h4>
+			<p>模仿解释器是一种通过训练可解释的全球<a id="_idIndexMarker362"/>代理模型来模仿黑盒模型的方法。这些经过训练的全局代理模型是可解释的模型，它们被训练成尽可能精确地逼近任何黑盒模型的预测。通过使用代理模型，黑盒模型可以被测量或解释如下。</p>
+			<p>实施以下步骤来训练代理模型:</p>
+			<ol>
+				<li>若要训练代理模型，请从选择数据集 x 开始。该数据集可以与用于训练黑盒模型的数据集相同，也可以是另一个类似分布的数据集，具体取决于用例。</li>
+				<li>获取所选数据集 x 的黑盒模型预测。</li>
+				<li>选择可解释的模型类型(线性模型、决策树、随机森林等)。</li>
+				<li>使用数据集 X 及其预测来训练可解释的模型。</li>
+				<li>现在你有了一个训练有素的代理模型。太棒了。</li>
+				<li>评估代理模型再现黑盒模型预测的程度，例如，使用 R 平方或 F 分数。</li>
+				<li>通过解释代理模型来理解黑盒模型预测。</li>
+			</ol>
+			<p>以下可解释的<a id="_idIndexMarker363"/>模型可以作为代理模型:<strong class="bold">轻梯度推进模型</strong> ( <strong class="bold"> LightGBM </strong>)、线性回归、随机梯度下降或者随机森林和决策树。</p>
+			<p>代理模型可以使 ML 解决方案开发人员衡量和理解黑盒模型的性能。</p>
+			<h4>排列特征重要性解释器</h4>
+			<p><strong class="bold">排列特征重要性</strong> ( <strong class="bold"> PFI </strong>)是一种用于解释分类和回归模型的技术。此<a id="_idIndexMarker364"/>技术有助于解释和理解特征，以模拟输出或预测相关性。PFI 是 SHAP 的替代品。它的工作原理是对整个数据集一次随机评估一个特征，并计算性能评估指标的变化。为每个特征评估性能度量的变化；变化越显著，特性就越重要。</p>
+			<p>PFI 可以描述任何模型的整体行为，但不能解释模型的个别预测。PFI 是 SHAP 的替代方案，但仍有很大不同，因为 PFI 是基于模型性能的下降，而 SHAP 是基于特征属性的大小。</p>
+			<h2 id="_idParaDest-87"><a id="_idTextAnchor102"/>统计模型的指标</h2>
+			<p>正如我们在<a href="B16572_02_Final_JM_ePub.xhtml#_idTextAnchor028"> <em class="italic">第二章</em> </a>、<em class="italic">特征化你的机器学习问题</em>中了解到的，有三种类型的<a id="_idIndexMarker365"/>统计模型:归纳学习、演绎学习、转导学习。统计模型提供了很好的可解释性。</p>
+			<h4>平均</h4>
+			<p>平均值是数据集的<a id="_idIndexMarker366"/>中心值。它是<a id="_idIndexMarker367"/>通过对所有值求和并除以值的个数计算得出的:</p>
+			<p><em class="italic">均值= x1 + x2 + x3 +....+ xn / n </em></p>
+			<h4>标准偏差</h4>
+			<p>标准<a id="_idIndexMarker368"/>偏差测量数据集中值<a id="_idIndexMarker369"/>的离差。标准差越低，数据点越接近平均值。分布广泛的数据集具有较高的标准差。</p>
+			<h4>偏见</h4>
+			<p>偏差衡量自变量(输入)<a id="_idIndexMarker370"/>和因变量(输出)之间映射函数的强度(或刚性)。关于映射的函数形式的模型假设越强，偏差越大。</p>
+			<p>当基础真实(但未知)模型具有匹配属性作为映射函数的假设时，高偏差是有帮助的。然而，如果底层模型没有表现出与映射的函数形式相似的属性，您可能会完全偏离轨道。例如，假设变量中存在线性关系，而实际上是高度非线性的，这将导致不良拟合:</p>
+			<ul>
+				<li><strong class="bold">低偏差</strong>:关于输入到输出映射的函数形式的弱假设<a id="_idIndexMarker372"/></li>
+				<li><strong class="bold">高偏差</strong>:关于输入到输出映射的函数形式的强<a id="_idIndexMarker373"/>假设</li>
+			</ul>
+			<p>偏差总是正值。这里有一个额外的资源来学习更多关于 ML 中的偏倚。这篇文章提供了一个更广泛的解释:<a href="https://kourentzes.com/forecasting/2014/12/17/the-bias-coefficient-a-new-metric-for-forecast-bias/">https://kourentzes . com/forecasting/2014/12/17/the-bias-coefficient-a-new-metric-for-forecast-bias/</a>。</p>
+			<h4>差异</h4>
+			<p>模型的方差<a id="_idIndexMarker374"/>是模型的性能<a id="_idIndexMarker375"/>在拟合不同训练数据时变化的程度。细节对模型的影响通过方差来捕捉。</p>
+			<p>即使训练数据集中有很小的变化，高方差模型也会发生很大的变化。另一方面，即使训练数据集中有很大变化，低方差模型也不会有太大变化。方差总是正的。</p>
+			<h4>r 平方</h4>
+			<p>r 平方，也被称为<a id="_idIndexMarker377"/>决定系数，测量<a id="_idIndexMarker378"/>模型可以解释的因变量的变化。它的计算方法是解释的变化量除以总变化量。简单来说，R 平方衡量数据点与拟合回归线的接近程度。</p>
+			<p>R 平方的值位于<code>0</code>和<code>1</code>之间。较低的 R 平方值表明响应变量<a id="_idIndexMarker379"/>的大部分变化不是由模型解释的，而是由模型中不包括的其他因素<a id="_idIndexMarker380"/>解释的。一般来说，您应该以较高的 R 平方值为目标，因为这表明模型更适合数据。</p>
+			<h4>均方根误差</h4>
+			<p><strong class="bold">均方根误差</strong> ( <strong class="bold"> RMSE </strong>)测量模型预测值和<a id="_idIndexMarker382"/>观察值(真实值)之间的<a id="_idIndexMarker381"/>差异。</p>
+			<p>选项很多，您需要为真实世界的生产场景选择正确的度量标准，以便进行合理的评估；例如，为什么数据科学家或数据科学团队可能希望选择一个评估指标而不是另一个，例如，回归问题的 R 平方平均值。这取决于用例以及数据类型。</p>
+			<h2 id="_idParaDest-88"><a id="_idTextAnchor103"/> HITL 模型指标</h2>
+			<p>有两种类型的<strong class="bold"> HITL </strong>模型——人类强化学习和<a id="_idIndexMarker383"/>主动学习模型。在这些模型中，人机合作促进算法模仿类似人类的行为和结果。这些 ML 解决方案的一个关键驱动因素是循环中的人。人类验证、标记和重新训练模型，以保持模型的准确性。</p>
+			<h3>人类偏见</h3>
+			<p>就像人类的<a id="_idIndexMarker384"/>大脑一样，人工智能系统<a id="_idIndexMarker385"/>也会受到认知偏差的影响。人类认知偏差是扰乱你决策和推理能力的过程，最终导致错误的产生。人类偏见的发生包括刻板印象、选择性感知、从众效应、启动、肯定倾向、观察选择偏差和投机者的错误观念。在许多情况下，为了做出合理和最优的决策，避免 ML 系统的这种偏差是至关重要的。如果我们设法推断出人类的偏见并加以纠正，这将使人工智能系统比人类更加务实。这在基于 HITL 的系统中尤其有用。使用偏差测试，可以识别三种类型的人类<a id="_idIndexMarker386"/>偏差，并对其进行<a id="_idIndexMarker387"/>处理，以维持 ML 系统的决策，使其不受人类偏差的影响。这三种人类偏见如下:</p>
+			<p><strong class="bold">交互偏差</strong></p>
+			<p>当一个 ML 系统被<a id="_idIndexMarker388"/>输入一个包含一个特定类型条目的数据集时，就会引入一个交互偏差，阻止算法识别任何其他类型的条目。这种类型的偏差可以在训练模型的推理测试中识别。诸如 SHAP 和 PFI 的方法在识别特征偏差方面是有用的。</p>
+			<p><strong class="bold">潜在偏差</strong></p>
+			<p>当训练集中的多个示例具有突出的特征时，会出现潜在偏差<a id="_idIndexMarker389"/>。然后，没有该特征的那些不能被算法识别。例如，最近，亚马逊人力资源算法根据公司内部的职位申请来选择人员，显示出对女性的偏见，原因是潜在的偏见。</p>
+			<p><strong class="bold">选择偏差</strong></p>
+			<p>当用于分析的数据选择没有适当随机化时，选择偏差<a id="_idIndexMarker390"/>被引入到算法中。例如，在设计高性能的人脸识别系统时，包括所有可能类型的面部结构和形状以及所有种族和地理样本以避免选择偏差是至关重要的。选择偏差可以通过 SHAP 或 PFI 等方法来识别，以观察模型特征偏差。</p>
+			<h3>最优策略</h3>
+			<p>在<a id="_idIndexMarker391"/>人类强化学习的情况下，系统的<a id="_idIndexMarker392"/>目标是在当前状态下最大化动作的回报。为了使行动的回报最大化，最优策略可以用作衡量系统的标准。最优策略是选择使当前状态的回报/回报最大化的行动的策略。最佳策略是系统发挥最佳性能的理想指标或状态。在基于人类强化学习的系统中，人类操作员或教师设置最优策略，因为系统的目标是达到人类水平的性能。</p>
+			<h3>自动化速度</h3>
+			<p>自动化是指<a id="_idIndexMarker393"/>在没有<a id="_idIndexMarker394"/>直接人工协助的情况下，通过使用机器人或算法自动生产商品或完成任务的过程。</p>
+			<p>ML 系统的自动化水平可以用总任务的自动化率来计算。它基本上是由系统完全自动化的任务的百分比，这些任务不需要任何人工协助。它显示了所有任务中完全自动化的任务的百分比。例如，DeepMind 的 AlphaGo 已经实现了 100%的自动化，可以独立运行，以击败人类世界冠军选手。</p>
+			<h3>风险率</h3>
+			<p>ML 模型执行<a id="_idIndexMarker396"/>错误的概率<a id="_idIndexMarker395"/>被称为<a id="_idIndexMarker397"/>错误率。错误率是根据模型在生产系统中的表现计算出来的。错误率越低，对 ML 系统越有利。人在回路中的目标是降低错误率，并教会 ML 模型以最佳状态运行。</p>
+			<h1 id="_idParaDest-89"><a id="_idTextAnchor104"/>生产测试方法</h1>
+			<p>因为有各种各样的业务在运作，所以有不同类型的生产系统为这些业务服务。在这一节中，我们将探讨常用的不同类型的生产系统或设置，以及如何测试它们。</p>
+			<h2 id="_idParaDest-90"><a id="_idTextAnchor105"/>批量测试</h2>
+			<p>批量测试<a id="_idIndexMarker399"/>通过在不同于其训练环境的环境中执行测试<a id="_idIndexMarker400"/>来验证您的模型。批量测试是在一组数据样本上进行的，以使用选择的度量标准(如准确性、RMSE 或 f1 得分)来测试模型推断。批量测试可以在各种类型的计算机中完成，例如，在云中，或者在远程服务器或测试服务器上。该模型通常作为一个序列化的文件，该文件作为一个对象加载，并根据测试数据进行推断。</p>
+			<h2 id="_idParaDest-91"><a id="_idTextAnchor106"/> A/B 测试</h2>
+			<p>你肯定会遇到 A/B 测试。它通常用于服务设计(网站、移动应用等)和评估营销活动。例如，它用于评估设计中的特定更改或为特定受众定制的内容是否会积极影响业务指标，如用户参与度、点击率或销售率。在使用 A/B 测试来测试 ML 模型时应用了类似的技术。当使用 A/B 测试对模型进行测试时，测试将回答如下重要问题:</p>
+			<ul>
+				<li>新的 B 型车在生产中比现在的 A 型车工作得更好吗？</li>
+				<li>这两个模型的提名者中，哪一个在生产中能更好地推动积极的业务指标？</li>
+			</ul>
+			<p>为了评估 A/B 测试的结果，根据业务或操作使用统计技术来确定哪种模型在生产中表现更好。A/B 测试通常以这种方式进行，实时或实时数据被分割或拆分成两组，即 A 组和 B 组。A 组数据被路由到旧模型，B 组数据被路由到新模型。为了评估新模型(模型 B)是否比旧模型(模型 A)执行得更好，可以使用各种统计技术来评估模型性能(例如，准确度、精确度、召回率、f 分数和 RMSE)，这取决于业务用例或操作。根据与业务度量相关的模型性能的统计分析(业务度量的积极变化)，做出用旧模型替换新模型或者确定哪个模型更好的决策。</p>
+			<p>A/B 测试是使用统计假设测试有条不紊地执行的，该假设验证了硬币的两面——零假设和替代假设。零假设断言新模型不会增加监控业务指标的平均值。另一个假设认为新模型提高了监控业务指标的平均值。最终，A/B 测试用于评估<em class="italic">新模型是否推动了特定业务指标的显著提升</em>。有各种类型的 A/B 测试，取决于业务用例和操作，例如，<code>Z-test</code>、<code>G-test</code>(我建议了解这些和其他)，以及其他。选择正确的 A/B 测试和指标进行评估对您的业务和 ML 运营来说是双赢的。</p>
+			<h2 id="_idParaDest-92"><a id="_idTextAnchor107"/>舞台测试或影子测试</h2>
+			<p>在<a id="_idIndexMarker403"/>为生产部署模型之前，这将<a id="_idIndexMarker404"/>导致做出业务决策，复制一个类似生产的环境(试运行环境)来<a id="_idIndexMarker405"/>测试模型的<a id="_idIndexMarker406"/>性能是有价值的。这对于测试模型的稳健性和评估其对实时数据的性能尤其重要。这可以通过部署开发分支或者在一个临时服务器上测试的模型，并推断出与生产管道相同的数据来实现。这里唯一的缺点是最终用户看不到 develop 分支的结果，或者业务决策不会在登台服务器中做出。将使用适当的指标(例如，准确度、精确度、召回率、f 分数和 RMSE)对试运行环境的结果进行统计评估，以确定与业务指标相关的模型的稳健性和性能。</p>
+			<h2 id="_idParaDest-93"><a id="_idTextAnchor108"/>CI/CD 中的测试</h2>
+			<p>将<a id="_idIndexMarker407"/>测试作为 CI/CD 管道的一部分来实现，在自动化和评估(基于设定的标准)模型性能方面是<a id="_idIndexMarker408"/>有益的。CI/CD 管道可以通过多种方式建立，具体取决于现有的运营和架构，例如:</p>
+			<ul>
+				<li>在 ML 管道成功运行后，CI/CD 管道可以在试运行环境中触发新模型的 A/B 测试。</li>
+				<li>当一个新的模型被训练时，建立一个独立于测试集的数据集来根据合适的度量标准测量它的性能是有益的，并且这个步骤可以完全自动化。</li>
+				<li>CI/CD 管道可以在一天中的固定时间周期性地触发 ML 管道来训练新模型，该新模型使用实况或实时数据来训练新模型或微调现有模型。</li>
+				<li>CI/CD 管道可以监控 ML 模型在生产中的部署模型的性能，这可以使用基于时间的触发器或手动触发器(由负责质量保证的团队成员发起)来触发或管理。</li>
+				<li>CI/CD 管道可以提供两个或更多的登台环境，以对唯一的数据集执行 A/B 测试，从而执行更加多样化和全面的测试。</li>
+			</ul>
+			<p>这些是各种各样的场景，根据需求，CI/CD 管道提供各种<a id="_idIndexMarker409"/>工作流和操作，以满足<a id="_idIndexMarker410"/>业务和技术需求。选择一个有效的架构和 CI/CD 过程可以提高技术操作和团队的整体绩效。CI/CD 测试可以在很大程度上增强和自动化测试。</p>
+			<h1 id="_idParaDest-94"><a id="_idTextAnchor109"/>为什么要包 ML 款？</h1>
+			<p>MLOps 支持训练和评估模型的系统方法。在模型被训练和评估之后，下一步就是将它们投入生产。正如我们所知，ML 不像传统的软件工程那样工作，传统的软件工程本质上是确定性的，其中一段<a id="_idIndexMarker411"/>代码或模块被导入到现有的系统中，并且它工作。工程 ML 解决方案是不确定的，涉及服务 ML 模型以进行预测或分析数据。</p>
+			<p>为了服务于模型，它们需要被打包到软件工件中，以便运送到测试或生产环境中。通常，这些软件工件被打包成一个文件或一堆文件或容器。这使得软件与环境和部署无关。ML 模型需要打包的原因如下:</p>
+			<h2 id="_idParaDest-95"><a id="_idTextAnchor110"/>便携性</h2>
+			<p>将 ML 模型<a id="_idIndexMarker412"/>打包到软件工件中使得它们能够从一个环境运输到另一个环境。这可以通过运输一个文件或一堆文件或一个容器来完成。无论哪种方式，我们都可以在各种设置中运输工件和复制模型。例如，打包的模型可以部署在虚拟机或无服务器设置中。</p>
+			<h2 id="_idParaDest-96"><a id="_idTextAnchor111"/>推论</h2>
+			<p>最大似然推理是一个涉及使用最大似然模型处理实时数据以计算输出的过程，例如<a id="_idIndexMarker413"/>预测或数值分数。封装 ML 模型的目的是为了能够为 ML 推理实时提供 ML 模型。有效的 ML 模型打包(例如，序列化的模型或容器)可以促进部署，并为模型提供实时或批量预测和分析数据的服务。</p>
+			<h2 id="_idParaDest-97"><a id="_idTextAnchor112"/>互操作性</h2>
+			<p>ML 模型互操作性是指两个或多个模型或组件交换<a id="_idIndexMarker414"/>信息，并使用交换的信息来相互学习或微调，并高效执行操作的能力。交换的信息可以是数据、软件工件或模型参数的形式。这样的信息使得模型能够根据其他软件工件的经验进行微调、重新训练或适应各种环境，以便执行和提高效率。封装 ML 模型是实现 ML 模型互操作性的基础。</p>
+			<h2 id="_idParaDest-98"><a id="_idTextAnchor113"/>部署不可知性</h2>
+			<p>将 ML 模型打包到诸如序列化文件或容器之类的软件工件中，使得<a id="_idIndexMarker415"/>模型能够在各种运行时环境中运输和部署，例如在虚拟机、容器无服务器环境、流服务、微服务或批处理服务中。它为使用与 ML 模型打包在一起的相同软件构件的可移植性和部署不可知论提供了机会。</p>
+			<h1 id="_idParaDest-99"><a id="_idTextAnchor114"/>如何包装 ML 车型</h1>
+			<p>根据商业和技术要求以及 ML 的运作，ML 模型可以用各种方式打包。ML 模型有三种包装和运输方式，如以下小节所述。</p>
+			<h2 id="_idParaDest-100"><a id="_idTextAnchor115"/>序列化文件</h2>
+			<p>序列化是打包 ML 模型的重要过程，因为它支持模型的可移植性、互操作性和<a id="_idIndexMarker417"/>模型推理。串行化是将对象或数据结构(例如，变量、数组和元组)转换成可存储的人工制品的方法，例如，转换成可以(跨计算机网络)传输或传送的文件或内存缓冲区。序列化的主要目的是在不同的环境中将序列化的文件重新构造成它以前的数据结构(例如，将序列化的文件构造成 ML 模型变量)。这样，新训练的 ML 模型可以被序列化为文件，并导出到新的环境中，在新的环境中，它可以被反序列化回 ML 模型变量或数据结构，用于 ML 推理。序列化文件不保存或包含任何以前关联的方法或实现。它只保存数据结构，因为它是一个可存储的人工制品，如文件。</p>
+			<p>以下是<em class="italic">图 5.1 </em>中一些流行的序列化格式:</p>
+			<div><div><img src="img/Table_01.jpg" alt="Table 5.1 – Popular ML model serialization formats&#13;&#10;"/>
+				</div>
+			</div>
+			<p class="figure-caption">表 5.1–流行的 ML 模型序列化格式</p>
+			<p>所有这些序列化格式(ONNX 除外)都有一个共同的问题，互操作性问题。为了解决这个问题，ONNX 是由微软、百度、亚马逊和其他大公司支持的开源项目。这使得模型可以使用一个框架(例如，在 scikit-learn 中)进行训练，然后使用 TensorFlow 再次进行再训练。这已经成为工业化人工智能的游戏改变者，因为模型可以互操作和独立于框架。</p>
+			<p>ONNX 开辟了新的途径，如联合学习和迁移学习。序列化模型支持可移植性，也支持不同环境中的批量推理(批量推理或离线推理，是一种对一批数据点或样本生成预测的方法)。</p>
+			<h2 id="_idParaDest-101"><a id="_idTextAnchor116"/>打包或集装箱化</h2>
+			<p>我们经常会遇到不同的生产系统环境。就兼容性、健壮性和可伸缩性而言，每个环境在部署 ML 模型时都面临不同的挑战。这些挑战可以通过标准化一些过程或模块来避免，容器是标准化 ML 模型和软件模块的一个很好的方法。</p>
+			<p>容器是由代码及其所有依赖项组成的标准软件单元。它支持从一个计算环境到另一个计算环境快速可靠地运行应用程序。它使软件不受环境和部署的限制。容器由 Docker 管理和编排。Docker 已经成为开发和编排容器的行业标准。</p>
+			<p>Docker 是一个开源(<a href="https://opensource.com/resources/what-open-source">https://opensource.com/resources/what-open-source</a>)工具。开发它是为了通过使用容器来方便地构建、部署和运行应用程序。通过使用容器，开发人员可以将应用程序与其组件和模块(如文件、库和其他依赖项)打包，并作为一个包进行部署。容器是使用定制设置的 Linux 操作系统运行应用程序的可靠方式。Docker 容器是使用 Dockerfiles 构建的，docker files 用于封装应用程序。构建 Docker 映像后，将构建 Docker 容器。Docker <a id="_idIndexMarker421"/>容器是一个应用程序，由开发人员按照定制的<a id="_idIndexMarker422"/>设置运行。<em class="italic">图 5.8 </em>显示了从 Docker 文件构建和运行 Docker 容器的过程。Docker 文件构建在 Docker 映像中，然后作为 Docker 容器运行:</p>
+			<div><div><img src="img/B16572_05_09.jpg" alt="Figure 5.9 – Docker artifacts&#13;&#10;"/>
+				</div>
+			</div>
+			<p class="figure-caption">图 5.9–Docker 工件</p>
+			<p>Docker 文件、Docker 映像和 Docker 容器是构建和运行容器的基本组件。这里对这些<a id="_idIndexMarker423"/>分别进行描述:</p>
+			<ul>
+				<li><strong class="bold">Docker file</strong>:Docker file 是一个文本<a id="_idIndexMarker424"/>文档，包含开发人员为构建 Docker 映像而定制的一组 Docker 命令。Docker 能够读取 Docker 文件并构建 Docker 映像。</li>
+				<li><strong class="bold"> Docker image </strong>:这是运行时在容器内的根文件系统集合中使用的执行参数的顺序<a id="_idIndexMarker425"/>集合。Docker 图像就像容器的快照。容器由 Docker 图像构成。</li>
+				<li><strong class="bold"> Docker 容器</strong>:容器是由 Docker 图像构成的<a id="_idIndexMarker426"/>。容器是 Docker 映像的运行时实例。</li>
+			</ul>
+			<p>ML 模型可以在 Docker 容器中提供，以实现健壮性、可伸缩性和部署不可知性。在后面的章节中，我们将使用 Docker 部署 ML 模型，以获得实践经验，因此，对这个工具有一个大致的了解是有好处的。</p>
+			<h2 id="_idParaDest-102"><a id="_idTextAnchor117"/>微服务生成和部署</h2>
+			<p>微服务<a id="_idIndexMarker427"/>支持可独立部署的服务集合。这些服务都是高度可维护、可测试和松散耦合的。微服务<a id="_idIndexMarker428"/>由围绕业务能力组织的架构编排，以使系统能够服务于业务需求。例如，Spotify 已经从一个单片复杂系统过渡到一个基于微服务的系统。这是通过将复杂的系统拆分为碎片化的服务来实现的，这些服务具有特定的目标，如搜索引擎、内容标记、内容分类、推荐引擎的用户行为分析以及自动生成的播放列表。碎片化的微服务现在都是由专门的团队开发的。每个微服务都是独立的，相互之间的依赖性更小。这样更容易开发和维护。公司可以与客户服务保持一致，在不降低服务的情况下持续改进。</p>
+			<p>通常，微服务是通过将序列化文件裁剪成容器化的 Docker 映像来生成的。然后，这些 Docker 映像可以部署和编排到任何 Docker 支持的环境中。部署和管理 Docker 映像可以使用容器管理工具来执行，比如 Kubernetes。Docker 支持极端的可移植性和互操作性，Docker 镜像可以轻松部署到任何流行的云服务，如 Google Cloud、Azure 或 AWS。只要支持 Docker，Docker 映像可以部署到任何 Docker 公司服务器或数据中心或实时环境中并进行管理。</p>
+			<p>微服务可以以 REST API 格式提供，这是一种流行的服务 ML 模型的方式。一些 Python 框架，如 Flask、Django 和 FastAPI，在支持 ML 模型作为 REST API 微服务方面已经变得很流行。为了促进健壮和可扩展的系统操作，软件开发人员可以通过 REST API 与 Dockerized 微服务同步。要在 Kubernetes 支持的基础设施上协调基于 Docker 的微服务部署，Kubeflow 是一个不错的选择。它与云无关，可以在本地或本地机器上运行。除此之外，Kubeflow 基于 Kubernetes，但将 Kubernetes 的细节和困难保留在一个盒子里。Kubeflow 是一种健壮的服务模型的方式。这是一个值得探索的工具:<a href="https://www.kubeflow.org/docs/started/kubeflow-overview/">https://www.kubeflow.org/docs/started/kubeflow-overview/</a>。</p>
+			<h1 id="_idParaDest-103"><a id="_idTextAnchor118"/>推论现成的模型</h1>
+			<p>我们之前研究过一个预测港口天气的商业问题。为了构建这个<a id="_idIndexMarker429"/>业务问题的解决方案，执行了数据处理和 ML 模型训练，然后序列化模型。现在，在本节中，我们将探索如何在序列化模型上进行推理。这一节的代码可以从本书的 GitHub 库的相应文件夹中的 Jupyter 笔记本中获得。以下是运行代码的说明:</p>
+			<ol>
+				<li value="1">再次登录 Azure 门户。</li>
+				<li>从<code>MLOps_WS</code>工作区，然后点选<code>MLOps_WS</code>工作区。</li>
+				<li>在<strong class="bold">管理</strong>部分，点击<strong class="bold">计算</strong>部分，然后选择在<a href="B16572_04_Final_JM_ePub.xhtml#_idTextAnchor074"> <em class="italic">第 4 章</em> </a>、<em class="italic">机器学习管道</em>中创建的机器。点击<strong class="bold">启动</strong>按钮启动实例。当虚拟机准备就绪时，单击 JupyterLab 链接。</li>
+				<li>现在，在 JupyterLab 中，导航到该章节对应的文件夹(<code>05_model_evaluation_packaging</code>)并打开笔记本(<code>model_evaluation_packaging.ipynb</code>)。</li>
+			</ol>
+			<h2 id="_idParaDest-104"><a id="_idTextAnchor119"/>连接到工作区并导入模型工件</h2>
+			<p>首先，我们导入<a id="_idIndexMarker430"/>必备包，使用<code>Workspace()</code>函数连接到 ML <a id="_idIndexMarker431"/>工作空间，然后下载序列化的定标器和模型来执行预测。<code>Scaler</code>将用于将输入数据缩放至与用于模型训练的数据相同的比例。<code>Model</code>文件以 ONNX 格式序列化。使用<code>Model()</code>功能导入<code>Scaler</code>和<code>Model</code>文件:</p>
+			<pre>import pandas as pd
+import numpy as np
+import warnings
+import pickle
+from math import sqrt
+warnings.filterwarnings('ignore')
+from azureml.core.run import Run
+from azureml.core.experiment import Experiment
+from azureml.core.workspace import Workspace
+from azureml.core.model import Model
+# Connect to Workspace
+ws = Workspace.from_config()
+print(ws)
+# Load Scaler and model to test
+scaler = Model(ws,'scaler').download(exist_ok=True)
+svc_model = Model(ws,'support-vector-classifier').download(exist_ok=True)</pre>
+			<p>运行这段代码后，您将在 JupyterLab 窗口的左侧面板中看到下载的新文件。</p>
+			<h2 id="_idParaDest-105"><a id="_idTextAnchor120"/>加载模型构件进行推理</h2>
+			<p>我们打开并<a id="_idIndexMarker432"/>将<code>Scaler</code>和<code>Model</code>文件加载到可用于 ML 模型推断的变量中。使用 pickle 读取<code>Scaler</code>并将其加载到变量中，ONNX 运行时使用<code>InferenceSession()</code>加载 ONNX 文件，以进行 ML 模型预测，如下所示:</p>
+			<pre>with open('scaler.pkl', 'rb') as file:
+    scaler = pickle.load(file)
+# Compute the prediction with ONNX Runtime
+import onnxruntime as rt
+import numpy
+sess = rt.InferenceSession("svc.onnx")
+input_name = sess.get_inputs()[0].name
+label_name = sess.get_outputs()[0].name</pre>
+			<h3>ML 模型推理</h3>
+			<p>要执行 ML 模型<a id="_idIndexMarker433"/>推断，请缩放测试数据并设置推断 u <a id="_idTextAnchor121"/>使用<code>fit_transform()</code>方法。现在，使用 ONNX 会话对测试数据进行推断，并通过以<code>float</code> <code>32</code>格式传递输入数据<code>test_data</code>来运行<code>sess.run()</code>。最后，打印模型推理的结果:</p>
+			<pre>test_data = np.array([34.927778, 0.24, 7.3899, 83, 16.1000, 1])
+test_data = scaler.fit_transform(test_data.reshape(1, 6))
+# Inference 
+pred_onx = sess.run([label_name], {input_name: test_data.astype(numpy.float32)})[0]
+print(pred_onx[0])</pre>
+			<p>通过这些步骤，我们已经成功地下载了序列化的模型，将其加载到一个变量中，并对一个测试数据样本执行了推断。块代码的预期结果是值<code>1</code>。</p>
+			<h1 id="_idParaDest-106"><a id="_idTextAnchor122"/>总结</h1>
+			<p>在这一章中，我们探讨了评估和解释 ML 模型的各种方法。我们已经了解了生产测试方法和打包模型的重要性，为什么以及如何打包模型，以及在生产中为 ML 模型推断打包模型的各种实用性和工具。最后，为了理解打包和解包序列化模型进行推理的工作，我们使用测试数据上的序列化模型执行了 ML 模型推理的实际实现。</p>
+			<p>在下一章，我们将学习更多关于部署你的 ML 模型。系好安全带，准备将您的模型投入生产！</p>
+		</div>
+	
+
+</body></html>

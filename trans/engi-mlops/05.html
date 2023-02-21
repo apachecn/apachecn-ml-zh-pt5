@@ -1,0 +1,245 @@
+<html><head/><body>
+
+
+	
+		<title>B16572_04_Final_JM_ePub</title>
+		
+	
+	
+		<div><h1 id="_idParaDest-69">第四章:机器学习管道</h1>
+			<p><a id="_idTextAnchor075"/>在这一章中，我们将通过使用 MLOps 方法的实践示例来探索和实现<strong class="bold">机器学习</strong> ( <strong class="bold"> ML </strong>)流水线。我们将通过解决我们在第 3 章 、<em class="italic">代码与数据</em>中一直在处理的业务问题来了解更多信息。这种理论和实践相结合的学习方法将确保你对为你的问题或你公司的问题设计和实现 ML 管道有全面的了解。ML 管道具有模块化脚本或代码，用于执行 ML 中的所有传统步骤，例如在训练或重新训练任何模型之前的数据预处理、特征工程和特征缩放。<a id="_idTextAnchor076"/>T13】</p>
+			<p>本章开始时，我们通过执行特征工程来获取上一章中处理过的预处理数据，并对其进行缩放，以使其符合 ML 训练的形状。我们将发现 ML 管道的原理，并在业务问题上实现它们。接下来，我们将研究 ML 模型训练、超参数调优以及已训练模型的测试。最后，我们将学习如何打包模型及其所需的工件。我们将注册模型以进行进一步评估，并将部署 ML 模型。我们将在本章中讨论以下主要话题:</p>
+			<ul>
+				<li><a id="_idTextAnchor078"/> <a id="_idTextAnchor079"/>了解 ML 管道的基础知识</li>
+				<li>数据摄取和功能工程</li>
+				<li>ML 训练和超参数优化</li>
+				<li>模型测试和定义指标</li>
+				<li>模型包装</li>
+				<li>注册模型和产品工件</li>
+			</ul>
+			<h1 id="_idParaDest-70"><a id="_idTextAnchor080"/>了解 ML 管道的基础知识</h1>
+			<p>在我们进入 ML 管道的<a id="_idIndexMarker233"/>实现之前，让我们先了解一下基础知识。我们将思考 ML 管道，并为 ML 管道实现设置所需的资源，然后我们将开始数据摄取。让我们通过思考我们在第一章 、<em class="italic">m lops 工作流程基础</em>的<em class="italic">图 14</em><a href="B16572_01_Final_JM_ePub.xhtml#_idTextAnchor015"><em class="italic">中讨论的 ML 管道来揭开 ML 管道的神秘面纱。</em></a></p>
+			<div><div><img src="img/B16572_04_001.jpg" alt=" Figure 4.1 – Machine learning pipeline&#13;&#10;"/>
+				</div>
+			</div>
+			<p class="figure-caption">图 4.1–机器学习管道</p>
+			<p>如图<em class="italic">图 4.1 </em>所示，一个全面的 ML 流水线由以下步骤组成:</p>
+			<ol>
+				<li>数据摄取</li>
+				<li>模特培训</li>
+				<li>模型检验</li>
+				<li>模型包装</li>
+				<li>模型注册</li>
+			</ol>
+			<p>出于多样化的考虑，我们将同时使用 Azure ML 服务(基于云)和 MLflow(开源)来实现管道的所有这些步骤。Azure ML 和 MLflow 是 MLOps 的一对电源:它们展示了<em class="italic">表 4.1 </em>中所示的特性。从下表中我们可以看出，它们的功能也是独一无二的。</p>
+			<div><div><img src="img/01.jpg" alt="Table 4.2 – MLflow versus Azure ML service&#13;&#10;"/>
+				</div>
+			</div>
+			<div><div><img src="img/02.jpg" alt="Table 4.2 – MLflow versus Azure ML service&#13;&#10;"/>
+				</div>
+			</div>
+			<p class="figure-caption">表 4.2–ML flow 与 Azure ML 服务</p>
+			<p>为了实现<a id="_idIndexMarker234"/>ML 管道，我们需要一个用于数据集的存储资源和一个用于 ML 模型的计算资源。正如之前在<a href="B16572_02_Final_JM_ePub.xhtml#_idTextAnchor028"> <em class="italic">第二章</em></a><em class="italic">中讨论的，表征你的机器学习问题</em>，我们将执行实现 ML 流水线和业务问题所需的计算，如图<em class="italic">图 4.2 </em>所示。</p>
+			<p>我们在本地计算机或个人电脑上处理数据，开始并预处理我们的 ML 训练数据。对于 ML 培训和管道实施，我们使用云(微软 Azure)上提供的计算资源。尽管可以在您的本地计算机上完成针对管道的 ML 培训，但我们将使用云上的计算资源来学习如何为 ML 管道调配和使用所需的计算资源。</p>
+			<div><div><img src="img/B16572_04_002.jpg" alt=" Figure 4.3 – Computation location for data and ML tasks&#13;&#10;"/>
+				</div>
+			</div>
+			<p class="figure-caption">图 4.3-数据和 ML 任务的计算位置</p>
+			<p>事不宜迟，让<a id="_idIndexMarker236"/>使用以下步骤为 ML 管道配置所需的<a id="_idIndexMarker237"/>计算资源:</p>
+			<ol>
+				<li value="1">Go to your ML workspace.<div><img src="img/B16572_04_003.jpg" alt="Figure 4.4 – Azure Machine Learning workspace&#13;&#10;"/></div><p class="figure-caption">图 4.4–Azure 机器学习工作区</p></li>
+				<li>转到<strong class="bold">计算</strong>选项，点击<strong class="bold">创建</strong>按钮，探索云上可用的计算选项。</li>
+				<li>Select the <a id="_idIndexMarker238"/>suitable compute option for the ML model training to be optimal and efficient. <p>根据您的培训需求和成本限制选择合适的<a id="_idIndexMarker239"/>计算选项，并为其命名。例如，在<em class="italic">图 4.4 </em>中，为实验<code>unique_code-ml-compute1</code>选择了一台计算或虚拟机。在<em class="italic">图 4.4 </em>中选择的计算选项是最便宜的<a id="_idIndexMarker241"/>计算选项之一，这足以为业务问题实施 ML 管道。为了更快地实现和训练 ML 模型，建议使用<code>STANDARD_DS11_V2</code> (2 个内核，14 GB RAM)虚拟机大小。使用此选项，训练一个模型大约需要 12 分钟。</p></li>
+				<li>调配之前创建的计算资源。命名并创建所需的计算资源后，您的计算资源已准备就绪，可以在云上运行 ML 培训，如<em class="italic">图 4.5 </em>所示。</li>
+			</ol>
+			<div><div><img src="img/B16572_04_005.jpg" alt="Figure 4.6 – Provisioned compute in an AzureML workspace&#13;&#10;"/>
+				</div>
+			</div>
+			<p class="figure-caption">图 4.6–azure ml 工作区中的调配计算</p>
+			<p>在<a id="_idIndexMarker242"/>准备好之后，选择<strong class="bold"> JupyterLab </strong>选项。JupyterLab 是一个基于 web 的开源用户界面。它带有文本编辑器、代码编辑器、终端和以可扩展方式集成的<a id="_idIndexMarker243"/>自定义组件等功能。我们将使用它作为连接到供应计算的编程接口来训练 ML 模型。</p>
+			<p>现在，我们将开始动手实现 ML 管道。按照以下步骤<a id="_idIndexMarker244"/>实施 ML 管道:</p>
+			<ol>
+				<li value="1">To start the implementation, clone the repository you have imported into the Azure DevOps project. To clone the repository, click on the <strong class="bold">Clone</strong> button in the upper-right corner from the <strong class="bold">Repos</strong> menu and then click on the <strong class="bold">Generate Git Credentials</strong> button. A hash password will be created.<div><img src="img/B16572_04_006.jpg" alt="Figure 4.7 – Cloning an Azure DevOps Git repository (Generate Git Credentials)&#13;&#10;"/></div><p class="figure-caption">图 4.7–克隆 Azure DevOps Git 存储库(生成 Git 凭证)</p></li>
+				<li>从<strong class="bold">命令行</strong>部分复制 HTTPS 链接来获得 Azure DevOps 资源库链接，就像这样:<pre><strong class="bold">https://xxxxxxxxx@dev.azure.com/xxxxx/Learn_MLOps/_git/Learn_MLOps</strong></pre></li>
+				<li>复制从<em class="italic">步骤 1 </em>生成的<a id="_idIndexMarker245"/>密码，并将其添加到来自<em class="italic">步骤 2 </em>的链接中，方法是在第一个用户名之后添加密码，该用户名在<code>@ </code>字符之前用<code>:</code>隔开。然后可以使用下面的<code>git clone</code>命令，而不会出现许可错误:<pre><strong class="bold">git clone https://user:password_hash@dev.azure.com/user/repo_created</strong></pre></li>
+				<li>Once you are running JupyterLab, we will access the terminal to clone the repository to the azure compute. To access the terminal, you must select the <strong class="bold">Terminal</strong> option from the <strong class="bold">Launcher</strong>  tab. Another way to access the terminal directly is by using the Terminal link from the Application URI column in the list of compute instances in the Azure ML workspace. Go to the <strong class="bold">Terminal</strong> option of JupyterLab and implement the following (as shown in <em class="italic">Figure 4.7</em>):<pre>git clone https://xxxxxxxxx@dev.azure.com/xxxxx/Learn_MLOps/_git/Learn_MLOps</pre><p>以下是输出:</p><div><img src="img/B16572_04_007.jpg" alt="Figure 4.8 – Clone the Azure DevOps Git repository on Azure compute&#13;&#10;"/></div><p class="figure-caption">图 4.8–在 Azure compute 上克隆 Azure DevOps Git 存储库</p></li>
+				<li>Go to the <code>04_MLpipelines</code> folder and follow <a id="_idIndexMarker246"/>the implementation steps on <code>ML-pipeline.ipynb</code> from the cloned repository. All of the following steps are implemented in <code>ML-pipeline.ipynb</code>. It is recommended to follow the file instructions to have a better understanding of the implementation and execute the code yourself in a new file as per your setup. <p>到目前为止，我们已经提供了计算资源，并在计算中克隆了 GitHub 存储库。</p></li>
+				<li>接下来，我们开始通过导入所需的库来实现<code>ML-pipeline.ipynb</code>文件，例如<code>pandas</code>、<code>numpy</code>、<code>azureml</code>、<code>pickle</code>、<code>mlflow</code>等，如下面的代码块所示:<pre>import pandas as pd import numpy as np import warnings from math import sqrt warnings.filterwarnings('ignore') from azureml.core.run import Run from azureml.core.experiment import Experiment from azureml.core.workspace import Workspace from azureml.core.model import Model from azureml.core.authentication import ServicePrincipalAuthentication from azureml.train.automl import AutoMLConfig import pickle from matplotlib import pyplot as plt from matplotlib.pyplot import figure import mlflow</pre></li>
+				<li>接下来，我们使用 setup MLflow(用于跟踪实验)。使用<code>get_mlflow_tracking_url()</code>函数来获得 MLflow <a id="_idIndexMarker247"/>实验和工件应该被记录的位置的跟踪 ID(在这种情况下，我们获得所提供的训练计算的跟踪 ID)。然后，使用<code>set_tracking_uri()</code>函数连接到所提供的训练计算的跟踪 URI(特定资源的统一资源标识符)。跟踪 URI 可以用于远程服务器、数据库连接字符串或本地路径，以便在本地目录中记录数据。在我们的例子中，默认情况下，我们将跟踪 URI 指向本地路径(在提供的训练计算上):<pre>uri = workspace.<code>mlruns</code> folder where MLflow artifacts and logs will be saved for experiments. </pre></li>
+			</ol>
+			<p>通过为您的 MLflow 实验设置<a id="_idIndexMarker248"/>跟踪 URI，您已经为 MLflow 设置了在<code>mlruns</code>文件夹中保存其工件和日志的位置(在您配置的计算上)。执行这些命令后，检查当前路径。您会找到<code>mlruns</code>文件夹。</p>
+			<h1 id="_idParaDest-71"><a id="_idTextAnchor081"/>数据摄取和特征工程</h1>
+			<p>数据对于训练 ML 模型是必不可少的；没有数据，就没有 ML。数据摄取是<a id="_idIndexMarker249"/> ML 管道的触发步骤。它通过从各种数据源提取数据并吸收模型训练所需的数据来处理数据的量、速度、准确性和多样性。</p>
+			<p>通过摄取用于训练 ML 模型的正确数据来启动 ML 管道<a id="_idIndexMarker250"/>。我们将从访问我们在前一章注册的<a id="_idIndexMarker251"/>预处理数据开始。按照以下步骤访问和导入预处理数据，并为 ML 训练做好准备:</p>
+			<ol>
+				<li value="1">使用 Azure ML SDK 中的<code>Workspace()</code>函数，从 ML 工作区的数据存储中访问数据，如下所示:<pre>from azureml.core import Workspace, Dataset subscription_id = 'xxxxxx-xxxxxx-xxxxxxx-xxxxxxx' resource_group = 'Learn_MLOps' workspace_name = 'MLOps_WS' workspace = <code>subscription_id</code>, <code>resource_group</code>, and <code>workspace_name</code> and initiate a workspace object using these credentials. <p>When these instructions are successfully executed in the JupyterLab, you can run the remaining blocks of code in the next cells.</p></pre></li>
+				<li>导入在前一章准备的预处理数据集。使用来自 Azureml SDK 的<code>Dataset</code>函数的<code>.get_by_name()</code>函数导入预处理的数据集，该函数用于检索所需的数据集:<pre># Importing pre-processed dataset dataset = Dataset.<strong class="bold">get_by_name</strong> (workspace, name='processed_weather_data_portofTurku') print(dataset.name, dataset.version)</pre></li>
+				<li>在<a id="_idIndexMarker253"/>成功检索或挂载数据集后，您可以通过打印<code>dataset.name</code>和<code>dataset.version</code>来确认，这将打印<code>processed_weather_data_portofTurku 1</code>或根据您之前给<a id="_idIndexMarker254"/>数据集的名称。</li>
+				<li>在检索预处理的数据之后，为了训练 ML 模型并在训练阶段和后面的阶段测试或评估它，将它分成训练集和验证集是至关重要的。因此，我们将它分为训练集和验证集，按 80%(训练集)和 20%(测试集)的分割比进行分割，如下所示:<pre>df_training = df.iloc[:77160] df_test = df.drop(df_training.index) df_training.to_csv('Data/training_data.csv',index=False) df_test.to_csv('Data/test_data.csv',index=False)</pre></li>
+				<li>在成功地<a id="_idIndexMarker255"/>分割数据之后，这两个<a id="_idIndexMarker256"/>数据集被存储并注册到数据存储(连接到 Azure ML 工作区)，如下所示:<pre>datastore = workspace.get_default_datastore() datastore.upload(src_dir='Data', target_path='data') training_dataset = / Dataset.Tabular.from_delimited_files(datastore.path('data/training_data.csv')) validation_dataset = / Dataset.Tabular.from_delimited_files(datastore.path('data/validation_data.csv')) training_ds = training_dataset.register(workspace=workspace, name='training_dataset', description='Dataset to use for ML training') test_ds = validation_dataset.register(workspace=workspace,                                  name='test_dataset', description='Dataset for validation ML models')</pre></li>
+			</ol>
+			<p>通过使用<code>register()</code>函数，我们<a id="_idIndexMarker257"/>能够注册训练和测试数据集，稍后可以从数据存储中导入这些数据集。</p>
+			<p>接下来，我们将导入训练数据并将其接收到 ML 管道中，稍后使用测试数据集来测试模型在生产中的未知数据上的性能或用于模型分析。</p>
+			<h2 id="_idParaDest-72"><a id="_idTextAnchor082"/>数据摄取(训练数据集)</h2>
+			<p>为了将训练数据接收到 ML 管道中，我们首先使用<code> get_by_name()</code>函数将其导入，并使用<code>to_pandas_dataframe()</code>函数将其转换为 pandas 数据帧:</p>
+			<pre>dataset = Dataset.get_by_name (workspace, name='training_dataset')
+print(dataset.name, dataset.version)
+df = dataset.to_pandas_dataframe ( )</pre>
+			<p>现在检索训练数据集<a id="_idIndexMarker258"/>，并将用于进一步训练 ML 模型。目标是训练分类模型来<a id="_idIndexMarker259"/>预测是否会下雨。因此，选择<code>Temperature</code>、<code>Humidity</code>、<code>Wind_speed</code>、<code>Wind_bearing</code>、<code>Visibility</code>、<code>Pressure</code>和<code>Current_weather_conditions</code>特征来训练二元分类模型以预测未来(提前 4 小时)的天气状况。</p>
+			<p>按照以下步骤选择要素并对其进行缩放:</p>
+			<ol>
+				<li value="1">在训练 ML 模型之前，选择正确的特征和缩放数据是至关重要的。因此，我们选择如下特性。变量<code>X </code>中的值代表自变量，变量<code>Y</code>为因变量(天气预报):<pre>X = df[['Temperature_C', 'Humidity', 'Wind_speed_kmph', 'Wind_bearing_degrees', 'Visibility_km', 'Pressure_millibars', 'Current_weather_condition']].values y = df['Future_weather_condition'].values</pre></li>
+				<li>Split the training data into the training and testing sets (for training validation after training) using the <code>train_test_split()</code> function from <code>sklearn</code>. Fixing the random seed (<code>random_state</code>) is needed to reproduce a training session by keeping the samples from the previous experiment with the same configuration. Hence, we will use <code>random_state=1</code>:<pre># Splitting the Training dataset into Train and Test set for ML training
+from sklearn.model_selection import train_test_split
+X_train, X_val,  y_train, y_val = <strong class="bold">train_test_split</strong>(X, y, test_size=0.2, random_state=1)</pre><p>随着 80%(训练数据)和 20%(测试数据)的分割，训练和测试数据集现在已经<a id="_idIndexMarker260"/>准备好进行特征缩放和 ML 模型训练。</p></li>
+				<li>For the ML model training to be <a id="_idIndexMarker261"/>optimal and efficient, the data needs to be on the same scale. Therefore, we scale the data using <code>StandardScalar()</code> from <code>sklearn</code> to calibrate all the numeric values in the data on the same scale:<pre>from sklearn.preprocessing import StandardScaler
+sc = StandardScaler()
+X_train = sc.fit_transform(X_train)
+X_val = sc.transform(X_val)</pre><p>在此步骤中，使用<code>StandardScalar</code>缩放训练数据的数值，并且基于<code>X_train values</code>在<code>-1</code>到<code>1</code>的范围内转换所有数值。现在我们准备训练 ML 模型(好玩的部分)！</p></li>
+			</ol>
+			<h1 id="_idParaDest-73"><a id="_idTextAnchor083"/>机器学习训练和超参数优化</h1>
+			<p>我们都准备好做有趣的部分，训练 ML <a id="_idIndexMarker262"/>模型！这一步启用模型训练；它具有模块化的脚本或代码，可以执行 ML 训练中的所有传统步骤，例如拟合和转换数据以训练模型，以及调整超参数以收敛最佳模型。该步骤的<a id="_idIndexMarker263"/>输出是一个经过训练的 ML 模型。</p>
+			<p>为了解决业务问题，我们将使用<strong class="bold">支持向量机</strong>分类器和<strong class="bold">随机森林</strong>分类器训练两个知名模型。这些选择是基于它们的受欢迎程度和结果的一致性；您可以自由选择您选择的<a id="_idIndexMarker264"/>型号——这一步没有任何限制。首先，我们将训练支持向量机分类器，然后是随机森林分类器。</p>
+			<h2 id="_idParaDest-74"><a id="_idTextAnchor084"/>支持向量机</h2>
+			<p><strong class="bold">支持向量机(SVM) </strong>是一种流行的<a id="_idIndexMarker265"/>监督学习算法(用于分类和回归)。使用 N 维空间中的超平面对数据点进行分类。众所周知，它以较少的计算能力产生显著的精度。建议从理论上了解 SVM，以便在实践中更好地了解模特培训。想了解更多关于<a id="_idIndexMarker266"/> SVM 的信息，点这里:<a href="https://www.kdnuggets.com/2017/02/yhat-support-vector-machine.html">https://www . kdnugges . com/2017/02/yhat-support-vector-machine . html</a>。</p>
+			<p>让我们从训练 SVM 分类器开始:</p>
+			<ol>
+				<li value="1">我们首先使用 Azure SDK 中的<code>Experiment()</code>函数来启动训练或实验。此函数的目的是启动一个训练运行或实验，以便在 Azure ML 工作区中监控和记录模型训练性能:<pre>myexperiment = Experiment(workspace, "support-vector-machine")</pre></li>
+				<li>Similarly, the MLflow experiment is also initiated to observe a different perspective:  <pre>mlflow.set_experiment("mlflow-support-vector-machine")</pre><p>现在，我们已经在 Azure ML workspace 和 MLflow 中启动了一个实验。将对以下训练步骤进行监控和记录。</p></li>
+				<li>接下来，我们进行超参数调整，以找到最佳参数来收敛最佳模型。这可以手动完成，但存在更有效的自动解决方案，如网格搜索或随机搜索。为了训练，SVM 分类器如下使用网格搜索。我们继续使用来自<code>sklearn</code>的<code>SVC()</code>和<code>Grid SearchCV()</code>函数，并记录 Azure ML 和 MLflow: <pre>from sklearn.svm import SVC from sklearn import svm  from sklearn.model_selection import GridSearchCV parameters = {'kernel':('linear', 'rbf'), 'C':[1, 10]} svc = svm.<code>STANDARD_DS11_V2</code> (2 cores, 14 GB RAM) compute machine). The result or the output of the Grid Search suggests the best performing parameters to be <code>C=1</code> and the kernel as <code>rbf</code>. Using <code>run.log()</code>, we have logged the dataset used to train the model (the training set) and keep track of the experiment. This data is logged to the Azure ML workspace and the MLflow experiments. </pre>上的运行</li>
+				<li>Finally, using the best parameters, a <a id="_idIndexMarker269"/>new model is trained using <code>C=1</code> and <code>kernel='rbf '</code> as follows:  <pre>svc = SVC(C=svc_grid.get_params(deep=True)['estimator__C'], kernel=svc_grid.get_params(deep=True)['estimator__kernel'])
+svc.fit(X_train, y_train)
+# Logging training parameters to AzureML and MLFlow experiments
+run.log("C", svc_grid.get_params(deep=True)['estimator__C'])
+run.log("Kernel", svc_grid.get_params(deep=True)['estimator__kernel'])
+After training the SVC classifier, the following output is shown:
+SVC(C=1.0, cache_size=200, class_weight=None, coef0=0.0,
+  decision_function_shape='ovr', degree=3, gamma='auto_deprecated',
+  kernel='rbf', max_iter=-1, probability=False, random_state=None,
+  shrinking=True, tol=0.001, verbose=False)</pre><p>就这样，我们训练出了 SVM 模型！我们现在将训练随机森林分类器模型。</p></li>
+			</ol>
+			<h2 id="_idParaDest-75"><a id="_idTextAnchor085"/>随机森林分类器</h2>
+			<p>随机森林是另一种流行的监督学习模型(用于分类和回归)。随机森林是一种集成学习方法，使用大量决策树进行操作。在执行模型训练之前，建议了解随机森林模型的理论工作原理。要了解更多关于<a id="_idIndexMarker271"/>随机森林模型的信息，请访问<a href="https://www.kdnuggets.com/2020/01/random-forest-powerful-ensemble-learning-algorithm.html">https://www . kdnugges . com/2020/01/Random-Forest-powerful-ensemble-learning-algorithm . html</a>。</p>
+			<ol>
+				<li value="1">为了开始<a id="_idIndexMarker272"/>训练随机森林分类器，初始化 Azure ML 工作空间中的实验和 MLflow 实验，如下所示:<pre>myexperiment = Experiment(workspace, "support-vector-machine") mlflow.set_experiment("mlflow-support-vector-machine")</pre></li>
+				<li>实验成功启动后，从<code>sklearn.ensemble</code>导入<code>RandomForestClassifier()</code>函数，调用带有所需参数的函数，即可启动训练，如下图。这些参数是随机选择的(没有进行<code>Grid Search</code>)。<code>Grid Search</code>或<code>RandomizedSearch</code>可用于确定最佳参数和优化算法:<pre>from sklearn.ensemble import RandomForestClassifier rf = <strong class="bold">RandomForestClassifier</strong> (max_depth=10, random_state=0, n_estimators=100)</pre></li>
+				<li>使用<code>fit(X_train, y_train)</code>函数通过向其传递训练数据来完成模型训练。训练数据集和参数被记录到 Azure ML 和 MLflow 实验，如下:<pre># initialize runs in Azureml and mlflow run = myexperiment.start_logging() mlflow.start_run() # Log dataset used  run.log("dataset name", dataset.name) run.log("dataset Version", dataset.version) rf.fit(X_train, y_train) # Logging training parameters to AzureML and MLFlow experiments run.log("max_depth", 10) run.log("random_state", 0) run.log("n_estimators", 100)</pre></li>
+				<li>After training, the <a id="_idIndexMarker273"/>output is shown as follows: <pre>RandomForestClassifier(bootstrap=True, class_weight=None, criterion='gini',
+max_depth=10, max_features='auto', max_leaf_nodes=None,
+min_impurity_decrease=0.0, min_impurity_split=None,
+min_samples_leaf=1, min_samples_split=2,
+min_weight_fraction_leaf=0.0, n_estimators=100, n_jobs=None,
+oob_score=False, random_state=0, verbose=0, warm_start=False)</pre><p>这是完成训练随机森林模型时的预期结果。至此，您已经成功地完成了随机森林模型的训练，总共完成了两个 ML 模型:SVM 分类器和随机森林分类器。</p><p>培训后，测试模型在准确性和其他指标方面的性能至关重要，以便<a id="_idIndexMarker274"/>了解模型是否足够适合生产或测试环境。</p></li>
+			</ol>
+			<p>接下来，我们将在训练模型之前对测试数据进行分割，以测试训练模型的性能。</p>
+			<h1 id="_idParaDest-76"><a id="_idTextAnchor086"/>模型测试和定义指标</h1>
+			<p>在这一步中，我们<a id="_idIndexMarker275"/>在<a id="_idIndexMarker276"/>一组单独的数据点上评估已训练模型的性能，这些数据点被命名为测试数据(在数据摄取步骤中已被拆分和版本化)。根据按照用例选择的度量来评估训练模型的推理。这一步的输出是一个关于已训练模型性能的<a id="_idIndexMarker277"/>报告。</p>
+			<p>为了获得对模型性能的全面分析，我们将测量准确度、精确度、召回率和 f 值。这就是他们在业务问题中的实际含义:</p>
+			<ul>
+				<li><strong class="bold">准确率</strong>:数据测试样本预测总数的正确预测数。</li>
+				<li><strong class="bold">精度</strong>:精度衡量被正确预测为阳性的阳性比例。<em class="italic">精度=真阳性/(真阳性+假阳性)</em></li>
+				<li><strong class="bold">召回</strong>:召回衡量被正确识别的实际阳性的比例。<em class="italic">召回=真阳性/(真阳性+假阴性)</em></li>
+				<li><strong class="bold"> F-score </strong>:在 F-score 的计算中，精度和召回率都考虑在内。它是精确度和召回率的调和平均值。<em class="italic"> F1 得分= 2*(召回率*精确度)/(召回率+精确度)</em>。</li>
+			</ul>
+			<p>我们将在<a id="_idIndexMarker279"/>验证<a id="_idIndexMarker280"/>数据集上为经过训练的模型测量这些<a id="_idIndexMarker278"/>指标。让我们看看 SVM 分类器和随机森林分类器的结果。</p>
+			<h2 id="_idParaDest-77"><a id="_idTextAnchor087"/>测试 SVM 分类器</h2>
+			<p>使用<code>sklearn.metrics</code>，我们计算<code>accuracy</code>、<code>f1_score</code>、<code>precision</code>和<code>recall</code>在测试数据样本上的<a id="_idIndexMarker281"/>模型性能，并使用<code>run.log()</code>函数将它们记录到 Azure ML 工作空间和 MLflow 实验中，如下所示。</p>
+			<p>从<code>sklearn.metrics</code>，导入<code>accuracy_score</code>、<code>f1_score</code>、<code>precision_score</code>和<code>recall_score</code>:</p>
+			<pre>predicted_svc = svc.predict(X_test)
+acc = accuracy_score(y_test, predicted_svc)
+fscore = f1_score(y_test, predicted_svc, average="macro")
+precision = precision_score(y_test, predicted_svc, average="macro")
+recall = recall_score(y_test, predicted_svc, average="macro")
+run.log("Test_accuracy", acc)
+run.log("Precision", precision)
+run.log("Recall", recall)
+run.log("F-Score", fscore)
+run.log("Git-sha", sha)</pre>
+			<p>根据实验，测试数据度量的结果记录在 Azure ML 工作空间中。您可以在注册模型之后阅读这些日志(我们将在<em class="italic">注册模型和生产工件</em>中注册模型)。</p>
+			<h2 id="_idParaDest-78"><a id="_idTextAnchor088"/>测试随机森林分类器</h2>
+			<p>类似于我们对<a id="_idIndexMarker282"/> SVM 分类器模型所做的，使用<code>sklearn.metrics</code>我们计算<code>accuracy</code>、<code>f1_score</code>、<code>precision</code>和<code>recall</code>:</p>
+			<pre>acc = accuracy_score(y_test, predicted_rf)
+fscore = f1_score(y_test, predicted_rf, average="macro")
+precision = precision_score(y_test, predicted_rf, average="macro")
+recall = recall_score(y_test, predicted_rf, average="macro")
+run.log("Test_accuracy", acc)
+run.log("Precision", precision)
+run.log("Recall", recall)
+run.log("F-Score", fscore)
+run.log("Git-sha", sha)</pre>
+			<p>使用<code>run.log()</code>函数将测试数据样本上的模型性能度量的输出记录到 Azure ML 工作空间和 MLflow 实验中。</p>
+			<h1 id="_idParaDest-79"><a id="_idTextAnchor089"/>模型包装</h1>
+			<p>经过训练的模型<a id="_idIndexMarker283"/>在前面的步骤中被测试后，<a id="_idIndexMarker284"/>模型可以被序列化为一个文件，以导出到测试或生产环境中。如果处理不当，序列化文件会带来兼容性挑战，比如模型互操作性。模型互操作性是一个挑战，特别是当模型使用不同的框架训练时。例如，如果使用<code>sklearn</code>训练模型 1，使用 TensorFlow 训练模型 2，则不能使用 TensorFlow 导入或导出模型 1 以进行进一步的模型微调或模型推断。</p>
+			<p>为了避免这个问题，ONNX 为模型互操作性提供了一个开放标准。ONNX 代表开放神经网络交换。它为导入和导出模型提供了序列化标准。我们将使用 ONNX 格式来序列化模型，以避免兼容性和互操作性问题。</p>
+			<p>使用 ONNX，使用<code>skl2onnx</code>库对训练好的模型进行<a id="_idIndexMarker285"/>序列化。<a id="_idIndexMarker286"/>模型被序列化为文件<code>svc.onnx</code>，用于进一步将模型导出和导入到测试和生产环境中；</p>
+			<pre># Convert into SVC model into ONNX format file
+from skl2onnx import convert_sklearn
+from skl2onnx.common.data_types import FloatTensorType
+initial_type = [('float_input', FloatTensorType([None, 6]))]
+onx = convert_sklearn(svc, initial_types=initial_type)
+with open("outputs/svc.onnx", "wb") as f:
+    f.write(onx.SerializeToString())</pre>
+			<p>这段代码的输出是一个序列化的<code>svc.onnx</code>文件。类似地，使用 ONNX，我们将把随机森林模型转换成一个名为<code>rf.onnx</code>的序列化文件，以便进一步将模型导出和导入到测试和生产环境中:</p>
+			<pre># Convert into RF model into ONNX format file
+from skl2onnx import convert_sklearn
+from skl2onnx.common.data_types import FloatTensorType
+initial_type = [('float_input', FloatTensorType([None, 6]))]
+onx = convert_sklearn(rf, initial_types=initial_type)
+with open("outputs/rf.onnx", "wb") as f:
+    f.write(onx.SerializeToString())</pre>
+			<p>这段代码的输出是一个序列化的<code>rf.onnx</code>文件。接下来，我们将这些序列化的模型注册到模型注册中心。</p>
+			<h1 id="_idParaDest-80"><a id="_idTextAnchor090"/>注册模型和生产工件</h1>
+			<p>在这一步中，在前面的步骤中已经序列化或容器化的模型被注册并存储在模型注册中心。注册的模型被编译为一个逻辑容器，用于一个或多个作为模型的文件。例如，由多个文件组成的模型可以在模型注册中心注册为单个模型。通过下载注册的模型，可以接收所有文件。注册的模型可以按需部署和用于推理。</p>
+			<p>让我们通过使用 Azure ML SDK 中的<code>model .register()</code>函数来注册上一节中的序列化模型。通过使用这个函数，序列化的 ONNX 文件被注册到工作空间中，以便进一步使用和部署到测试和生产环境中。让我们<a id="_idIndexMarker287"/>注册系列化的 SVM 分类器模型(<code>svc.onnx</code>):</p>
+			<pre># Register Model on AzureML WS
+model = Model.register (model_path = './outputs/svc.onnx', # this points to a local file 
+                       model_name = "support-vector-classifier", 
+                       tags = {'dataset': dataset.name, 'version': dataset.version, 'hyparameter-C': '1', 'testdata-accuracy': '0.9519'}, 
+                       model_framework='pandas==0.23.4',
+                       description = "Support vector classifier to predict weather at port of Turku",
+                       workspace = workspace)
+print('Name:', model.name)
+print('Version:', model.version)</pre>
+			<p>根据需要，通过命名和标记模型来注册模型<a id="_idIndexMarker288"/>。我们可以通过检查注册的型号名称和版本来确认型号注册成功。输出将反映您注册时使用的型号名称(例如<code>support-vector-classifier</code>)，并将型号版本显示为<code>1</code>。同样，让我们<a id="_idIndexMarker289"/>注册序列化的随机森林分类器模型(<code>rf.onnx</code>):</p>
+			<pre># Register Model on AzureML WS
+model = Model.register (model_path = './outputs/rf.onnx', # this points to a local file 
+                       model_name = "random-forest-classifier", 
+                       tags = {'dataset': dataset.name, 'version': dataset.version, 'hyparameter-C': '1', 'testdata-accuracy': '0.9548'}, 
+                       model_framework='pandas==0.23.4',
+                       description = "Random forest classifier to predict weather at port of Turku",
+                       workspace = workspace)
+print('Name:', model.name)
+print('Version:', model.version)</pre>
+			<p>型号注册成功后，<code>print</code>功能的输出将反映您在注册(<code>random-forest-classifier</code>)时使用的型号名称，并将型号版本显示为<code>1</code>。最后，我们将注册用于推理的生产工件。现在你可以在 Azure ML 工作区的<strong class="bold">模型</strong>部分看到这两个模型，如图<em class="italic">图 4.8 </em>所示:</p>
+			<div><div><img src="img/B16572_04_008.jpg" alt="Figure 4.9 – Registered SVM model (with test metrics)&#13;&#10;"/>
+				</div>
+			</div>
+			<p class="figure-caption">图 4.9-注册的 SVM 模型(带有测试指标)</p>
+			<p>这样，您就可以<a id="_idIndexMarker290"/>可视化并分析在 Azure ML 工作空间中训练的每个模型的训练和测试日志。它提供了训练和测试模型的鸟瞰图，同时支持注册模型的可追溯性。</p>
+			<h2 id="_idParaDest-81"><a id="_idTextAnchor091"/>登记生产工件</h2>
+			<p>对于实时的模型推断，需要一个标量<a id="_idIndexMarker291"/>，以便在为 ML 训练缩放数据的尺度上缩放输入数据。我们将使用与使用<code>sc.fit_transform(X_train)</code>的<code>scaling X_train</code>相同的缩放函数，并将该变量序列化到<code>pickle</code>文件中。最后，我们将这个<code>pickle</code>文件注册到工作空间中，以便在需要时进一步检索和使用(特别是在测试和生产环境中的模型推断)。使用<code>pickle</code>，使用<code>pickle.dump()</code>函数将定标器变量<code>sc</code>写入<code>pickle</code>文件，如下所示。</p>
+			<p>用<code>open('./outputs/scaler.pkl', 'wb') as scaler_pkl</code>导入<code>pickle</code>:</p>
+			<pre>    pickle.dump(sc, scaler_pkl)</pre>
+			<p>代码的输出将为缩放器保存一个序列化的<code>pickle</code>文件，文件名为<code>scaler.pkl</code>。接下来，我们将<a id="_idIndexMarker292"/>将这个文件注册到模型注册中心，以便以后下载并与我们的模型一起部署以进行推理。使用<code>model .register()</code>功能注册缩放器，如下所示:</p>
+			<pre># Register Model on AzureML WS
+scaler = Model.register(model_path = './outputs/scaler.pkl', # this points to a local file 
+                       model_name = "scaler", # this is the name the model is registered as
+                       tags = {'dataset': dataset.name, 'version': dataset.version}, 
+                       model_framework='pandas==0.23.4',
+                       description = "Scaler used for scaling incoming inference data",
+                       workspace = workspace)
+print('Name:', scaler.name)
+print('Version:', scaler.version)</pre>
+			<p>在保存和注册 scaler 对象后，可以在 Azure ML 工作空间上找到注册的对象。同样，可以跟踪已注册的车型，如图<em class="italic">图 4.8 </em>所示:</p>
+			<div><div><img src="img/B16572_04_009.jpg" alt="Figure 4.10 – Registered models&#13;&#10;"/>
+				</div>
+			</div>
+			<p class="figure-caption">图 4.10-注册型号</p>
+			<p>恭喜你！<a id="_idIndexMarker293"/> SVM 分类器和随机森林分类器，以及序列化定标器，都在模型注册表中注册。这些模型可以在以后下载和部署。这使我们成功实现了 ML 管道！</p>
+			<h1 id="_idParaDest-82"><a id="_idTextAnchor092"/>总结</h1>
+			<p>在这一章中，我们回顾了 ML 管道的理论，并通过为一个业务问题构建 ML 管道来实践它们。我们为训练这些 ML 模型设置了工具、资源和开发环境。我们从数据摄取步骤开始，然后是模型训练步骤、测试步骤和打包步骤，最后，我们完成了注册步骤。恭喜你。到目前为止，您已经实现了 MLOps 工作流的一个关键构建模块。</p>
+			<p>在下一章，我们将研究评估和包装生产模型。</p>
+		</div>
+	
+
+</body></html>

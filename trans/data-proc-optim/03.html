@@ -1,0 +1,374 @@
+<html><head/><body>
+
+
+
+
+
+<style type="text/css">body{margin:1em;background-color:transparent!important;}#sbo-rt-content *{text-indent:0pt!important;}#sbo-rt-content .bq{margin-right:1em!important;}#sbo-rt-content *{word-wrap:break-word!important;word-break:break-word!important;}#sbo-rt-content table,#sbo-rt-content pre{overflow-x:unset!important;overflow:unset!important;overflow-y:unset!important;white-space:pre-wrap!important;}</style>
+<div><div><p><a id="_idTextAnchor038"/></p>
+			<h1 id="_idParaDest-38"><em class="italic"> <a id="_idTextAnchor039"/>第二章</em>:数据加载、保存、文件格式</h1>
+			<p>世界上大多数数据都保存在本地或远程的文件或数据库中。在本章中，我们将学习如何从多种格式和数据源加载数据，以及如何保存数据，同时详细了解每种可用的方法。</p>
+			<p>Optimus 非常关注已经针对大数据处理进行了优化的数据源，如<strong class="bold"> Avro </strong>、<strong class="bold"> Parquet </strong>和<strong class="bold"> ORC </strong>，以及数据库，如<strong class="bold"> BigQuery </strong>和<strong class="bold"> Redshift </strong>，以便用户手边有他们需要的所有工具来满足他们的数据处理需求。</p>
+			<p>从开发人员的角度来看，Optimus 遵循“包含电池”的范例，因此您不必担心安装额外的库来处理我们用来处理这种格式的<strong class="bold"> Excel </strong>或<strong class="bold"> Avro </strong>文件。然而，在<strong class="bold">数据库</strong>的情况下，每个引擎都有自己的驱动程序，所以将所有驱动程序包含在一个包中会有问题:这将是一个几乎 500 MB 大小的包！</p>
+			<p>我们将在本章中讨论的主题如下:</p>
+			<ul>
+				<li>数据如何在内部移动</li>
+				<li>加载文件</li>
+				<li>从头开始创建数据帧</li>
+				<li>连接到远程数据源</li>
+				<li>保存数据帧</li>
+			</ul>
+			<h2 id="_idParaDest-39"><a id="_idTextAnchor040"/>技术要求</h2>
+			<p>Optimus 可以与多种后端技术一起处理数据，包括 GPU。对于 GPU，Optimus 用的是<strong class="bold">急流</strong>，需要 NVIDIA 卡。关于需求的更多信息，请参见第一章<a href="B17166_01_Final_SB_epub.xhtml#_idTextAnchor015"><em class="italic"/></a>的<em class="italic"> GPU 配置</em>部分。</p>
+			<p>对于数据库，Optimus 将需要不同的数据库驱动程序来处理不同的技术。在<em class="italic">连接数据库</em>部分，我们将解释如何为每种数据库技术安装每种驱动程序。</p>
+			<p>你可以在<a href="https://github.com/PacktPublishing/Data-Processing-with-Optimus">https://github . com/packt publishing/Data-Processing-with-Optimus</a>找到本章的所有代码。</p>
+			<h1 id="_idParaDest-40"><a id="_idTextAnchor041"/>数据如何在内部移动</h1>
+			<p>在我们深入探讨如何加载和保存数据之前，让我们先来探索一下外部存储系统、数据库、CPU、RAM、GPU 和本地存储系统如何相互作用，以便为处理数据做好准备。</p>
+			<p>我们将加载数据的过程分为四类。</p>
+			<h2 id="_idParaDest-41"><a id="_idTextAnchor042"/>文件到内存</h2>
+			<p>使用 CPU 将文件<a id="_idIndexMarker110"/>从磁盘加载到 RAM:</p>
+			<div><div><img src="img/B17166_02_001.jpg" alt="Figure 2.1 – Loading and saving data from a file using CPUs&#13;&#10;" width="1650" height="166"/>
+				</div>
+			</div>
+			<p class="figure-caption">图 2.1–使用 CPU 从文件中加载和保存数据</p>
+			<h2 id="_idParaDest-42"><a id="_idTextAnchor043"/>文件到 GPU 内存</h2>
+			<p>使用 CPU 将文件<a id="_idIndexMarker111"/>从磁盘加载到 GPU 内存。为了将文件保存到磁盘，数据通过 GPU 发送到 CPU，然后发送到磁盘:</p>
+			<div><div><img src="img/B17166_02_002.jpg" alt="Figure 2.2 – Loading and saving data from a file using GPUs&#13;&#10;" width="1650" height="166"/>
+				</div>
+			</div>
+			<p class="figure-caption">图 2.2–使用 GPU 从文件中加载和保存数据</p>
+			<h2 id="_idParaDest-43"><a id="_idTextAnchor044"/>数据库到 RAM</h2>
+			<p>数据<a id="_idIndexMarker112"/>从数据库中提取，并通过 JDBC 驱动程序发送到本地笔记本电脑或集群的内存中:</p>
+			<div><div><img src="img/B17166_02_003.jpg" alt="Figure 2.3 – Loading and saving data from a database using CPUs&#13;&#10;" width="1614" height="162"/>
+				</div>
+			</div>
+			<p class="figure-caption">图 2.3–使用 CPU 从数据库加载和保存数据</p>
+			<h2 id="_idParaDest-44"><a id="_idTextAnchor045"/>数据库到 GPU 内存</h2>
+			<p>在 Optimus 中，数据从数据库中提取出来，通过 JDBC 驱动程序发送到使用 CPU 的 RAM 中。要将数据保存回数据库，需要通过 GPU 将数据发送到 CPU，然后通过 JDBC 驱动程序发送到数据库:</p>
+			<div><div><img src="img/B17166_02_004.jpg" alt="Figure 2.4 – Loading and saving data from a database using GPUs&#13;&#10;" width="1650" height="166"/>
+				</div>
+			</div>
+			<p class="figure-caption">图 2.4–使用 GPU 从数据库加载和保存数据</p>
+			<p>还有完全跳过 CPU 的新<a id="_idIndexMarker114"/>技术，比如<strong class="bold"> GPUDirect 存储</strong>。这可以在处理大数据时极大地提高性能，尽管在撰写本文时还没有用 Optimus 进行测试。欲了解更多信息，请访问<a href="https://developer.nvidia.com/blog/gpudirect-storage/">https://developer.nvidia.com/blog/gpudirect-storage/</a>。</p>
+			<p>当使用 Optimus 时，我们会尽量减少数据移动，因为每次移动都会导致时间损失。在本章的后面，我们将解释这对每个引擎的影响。</p>
+			<h1 id="_idParaDest-45"><a id="_idTextAnchor046"/>加载文件</h1>
+			<p>正如上一章中的<a id="_idIndexMarker115"/>所解释的，为了加载数据帧，我们在 Optimus 实例中使用了<code>.load</code>访问器，它允许我们从不同的源进行加载，比如本地文件系统、数据库和替代文件系统(S3、HDFS 等等)。</p>
+			<p>这个访问器中最有用和最可读的函数是<code>df.load.file</code>，它允许我们推断加载过程中的编码数据，以便我们在加载新数据集时可以忘记额外的配置。以下是一个例子:</p>
+			<pre>from optimus import Optimus
+op = optimus("pandas")
+df = op.load.file("my_file.json")</pre>
+			<p>在前面的代码中，我们只是加载了一个 JSON 文件。在内部，Optimus 检测其格式，然后<a id="_idIndexMarker116"/>创建数据帧。它还可以加载 CSV、JSON、XML、Excel、Parquet、Avro、ORC 和 HDF5 等格式。如果需要，您还可以为其类型调用任何特定的方法，如下所示:</p>
+			<div><div><img src="img/B17166_02_005.jpg" alt="Figure 2.5 – Specific file format loading methods available in Optimus&#13;&#10;" width="623" height="473"/>
+				</div>
+			</div>
+			<p class="figure-caption">图 2.5-Optimus 中可用的特定文件格式加载方法</p>
+			<p>在加载 JSON 文件时，在我们的例子中，并没有推断太多，只有编码格式和多行值支持；但是当加载一个 CSV 文件时，它可能需要推断一些参数，例如分隔字符、编码格式、行终止符和其他可能的格式变量。寻找正确的参数可能非常令人沮丧和耗时，但这就是创建<code>file</code>方法的方式。</p>
+			<p>任何可用方法的参数<a id="_idIndexMarker117"/>在加载数据时都会被<code>file</code>正确地推断出来，但是如果您需要手动加载它们呢？下表显示了可用参数的列表，包括一些与文件格式无关的参数:</p>
+			<div><div><img src="img/B17166_02_006.jpg" alt="Figure 2.6 – Arguments available for file loading in Optimus&#13;&#10;" width="605" height="363"/>
+				</div>
+			</div>
+			<p class="figure-caption">图 2.6–Optimus 中可用于文件加载的参数</p>
+			<p>如果我们在试图通过 Optimus 推断一个乏味的文件的参数时遇到任何问题，我们总是可以使用每种格式可用的任何特定方法来加载。这些方法与我们试图加载的格式同名；最常用的格式之一是 CSV，在某些情况下，它可能需要一堆参数才能正常工作。</p>
+			<p>现在，让我们学习如何加载多种格式的数据，以防我们需要额外的控制。先说<strong class="bold"> CSV </strong>文件。</p>
+			<h2 id="_idParaDest-46"><a id="_idTextAnchor047"/>加载本地 CSV 文件</h2>
+			<p>CSV <a href="http://file">文件</a>是一个使用逗号分隔值的<a id="_idIndexMarker118"/>分隔文本文件。文件的每一行都是一条数据记录。每条记录由一个或多个用逗号分隔的<a href="http://fields">字段</a>组成。</p>
+			<p>让我们稍微研究一下 CSV 格式，因为它比任何其他加载函数有更多的参数:</p>
+			<ul>
+				<li>您可以使用<code>n_rows</code> : <pre><strong class="bold">from optimus import Optimus</strong> <strong class="bold">op = optimus("dask")</strong> <strong class="bold">df = op.load.csv("data/file.csv", n_rows=5)</strong></pre>加载固定数量的行</li>
+				<li>您可以使用<code>header</code>参数:<pre><strong class="bold">df = op.load.csv("data/file.csv", header=None)</strong></pre>加载不带标题的文件</li>
+				<li>您可以通过将哪个值传递给<code>null_vale</code> : <pre><strong class="bold">df = op.load.csv("data/file.csv", null_value="Null")</strong></pre>来加载和分配该值将被假定为 null</li>
+				<li>您可以通过向<code>sep</code> : <pre><strong class="bold">df = op.load.csv("data/file.csv", sep=";")</strong></pre>传递一个字符串来使用特定的分隔符进行加载</li>
+			</ul>
+			<p>我们也可以使用通配符。如果我们需要在一个文件夹中选择多个文件，这非常方便。让我们来看看。</p>
+			<h2 id="_idParaDest-47"><a id="_idTextAnchor048"/>通配符</h2>
+			<p>Optimus 还<a id="_idIndexMarker119"/>允许我们加载多个文件，其路径与传递给加载方法第一个参数的通配符相匹配，如下所示:</p>
+			<pre>from optimus import Optimus
+Op = optimus("cudf")
+df = op.load.csv("csv/*") </pre>
+			<p>前面的代码将返回一个文件列表——特别是一个名为<code>csv</code>的文件夹中的所有文件。如果需要，还可以使用更高级的通配符:</p>
+			<pre>df = op.load.csv("csv/file-*.csv")</pre>
+			<p>前面的<a id="_idIndexMarker120"/>代码将加载所有以<code>file-</code>开头并以<code>csv</code>为扩展名的文件。这尤其有用，例如，加载一系列由另一个程序自动命名的文件。</p>
+			<h3>单字符通配符</h3>
+			<p>另一个支持的通配符是问号，<code>?</code>。它匹配名称中该位置的任何单个<a id="_idIndexMarker121"/>字符；例如:</p>
+			<pre>df = op.load.csv("csv/file-?.csv")</pre>
+			<p>在前面的例子中，我们正在加载在<code>csv</code>目录中名称与<code>file-(anything).csv</code>匹配的所有文件，其中<code>(anything)</code>是单个字符。例如，这将加载枚举文件，如<code>dataset-1.csv</code>或<code>dataset-9.csv</code>，但也加载<code>dataset-a.csv</code>。然而，它不会加载<code>dataset-10.csv</code>。对于更具体的格式，您可以使用字符范围。</p>
+			<h3>字符范围</h3>
+			<p>当需要匹配特定字符时，使用字符范围代替问号<a id="_idIndexMarker122"/>。例如，您可以这样做来查找扩展名前面有数字的所有文件:</p>
+			<pre>df = op.load.csv("csv/file-*[0-9].*.csv")</pre>
+			<p>在本例中，我们正在加载从 0 到 9 枚举的文件，并在扩展名前包含任何字符串。将包括诸如<code>dataset-0.final.csv</code>和<code>dataset-1.wip.csv</code>的文件。</p>
+			<h2 id="_idParaDest-48"><a id="_idTextAnchor049"/>加载大文件</h2>
+			<p>当处理没有使用分布式数据帧技术(如 pandas)的大文件时，用户倾向于使用黑客方法将文件分成多个块，以便将数据加载到内存中并进行处理。在 Optimus 中，当你使用 Dask 或 Vaex 引擎时(正如我们在<a href="B17166_01_Final_SB_epub.xhtml#_idTextAnchor015"> <em class="italic">第 1 章</em> </a>，<em class="italic">中所学，嗨 Optimus！</em>，可以处理核外资源)，您将能够加载比系统内存更大的文件:</p>
+			<pre>op = Optimus("dask")
+df = op.load.csv("s3://my-storage/massive-file.csv")</pre>
+			<p>在涉及大型数据集的项目<a id="_idIndexMarker124"/>中，您会希望从其他文件系统加载，比如 S3 或 HDFS。这可以通过使用已经建立的连接来实现。</p>
+			<p>现在，让我们学习如何从远程数据源加载文件。</p>
+			<h2 id="_idParaDest-49"><a id="_idTextAnchor050"/>从远程连接加载文件</h2>
+			<p>如果我们需要访问远程存储，就需要一个连接实例。使用连接<a id="_idIndexMarker125"/>实例，我们可以从同一个源加载几个文件，而无需重复成功连接到它所需的每个凭证和参数:</p>
+			<pre>from optimus import Optimus
+Op = optimus("dask")
+conn = op.connect.s3(endpoint_url="s3://my-storage/")
+df = op.load.csv("files/foo_file.csv", conn=conn)</pre>
+			<p>在前面的例子中，我们只是创建了一个到 S3 存储桶的连接，然后从其中加载一个文件，将它作为一个名为<code>connection</code>的参数传递给<code>load.csv</code>。之后，我们可以重用<code>conn</code>实例从相同的源加载另一个文件:</p>
+			<pre>df2 = op.load.file("files/file_bar.xml", conn=conn)</pre>
+			<p>在前面的代码行中，我们加载了一个不同的文件，这次使用了<code>load.file</code>，并传递了同一个<code>conn</code>实例。我们在本章前面已经学习了如何为远程数据加载配置连接。</p>
+			<p>现在我们已经学习了如何从本地和远程文件中加载数据，让我们学习如何从数据库中加载数据。</p>
+			<h2 id="_idParaDest-50"><a id="_idTextAnchor051"/>从数据库加载数据</h2>
+			<p>处理数据争论的另一个常见用例是从数据库加载表。此功能<a id="_idIndexMarker126"/>非常方便，因为您不需要将数据保存到文件中，因此可以将其保存到内存中。因此，Optimus 允许我们相对容易地加载工作区中最常见的数据库类型:</p>
+			<pre>from optimus import Optimus
+Op = optimus("dask")
+db = op.connect.mysql(host="localhost", 
+                      database="my_database")
+df = op.load.database_table("foo_table", conn=db)</pre>
+			<p>正如您所看到的，我们正在创建一个连接实例，但是这一次，它连接到一个给定地址的 MySQL 数据库。然后，我们从这个数据库的一个表中装载一个数据帧。</p>
+			<p>使用 Optimus，您可以轻松连接到 10 多种数据库技术。在接下来的部分中，我们将了解更多这方面的内容。</p>
+			<h2 id="_idParaDest-51"><a id="_idTextAnchor052"/>每项技术的特殊依赖性</h2>
+			<p>每种 dataframe 技术都依赖于不同的驱动程序来工作，这意味着需要几十个额外的文件来开箱即用。这将极大地增加 Optimus 包的大小。安装连接到数据库所需的驱动程序是您的责任。</p>
+			<p>在这一节中，我们将看看 Optimus 支持的一些数据库，以及在哪里可以找到所需的文件。请考虑到 URL 可能会随着时间的推移而改变。如果一个链接断开了，一个简单的谷歌搜索应该会给你正确的结果。</p>
+			<h3>火花</h3>
+			<p>当使用<a id="_idIndexMarker128"/> Spark 作为引擎时，您将需要传递<a id="_idIndexMarker129"/> JDBC 文件路径，以便 Spark 知道如何处理特定的数据库。</p>
+			<p>使用以下命令:</p>
+			<pre>Optimus("spark", jars="path/to/jars/folder")</pre>
+			<p>下面是一个数据库技术的列表，在这里你可以找到每一个驱动程序。当<a id="_idIndexMarker131"/>在集群中工作时，确保每个节点都可以访问该文件:</p>
+			<ul>
+				<li>https://dev.mysql.com/downloads/connector/j/</li>
+				<li>https://search.maven.org/search?q=spark-mssql-connector</li>
+				<li>https://jdbc.postgresql.org/</li>
+				<li>Oracle:<a href="https://www.oracle.com/mx/database/technologies/appdev/jdbc-downloads.html%20">https://www . Oracle . com/MX/database/technologies/app dev/JDBC-downloads . html</a></li>
+				<li>SQLite:https://repo1.maven.org/maven2/org/xerial/sqlite-jdbc/</li>
+				<li>redshift:https://docs . AWS . Amazon . com/redshift/latest/mgmt/configure-JDBC-connection . html # download-JDBC-driver</li>
+				<li>Cassandra:<a href="https://mvnrepository.com/artifact/com.datastax.spark/spark-cassandra-connector%20">https://mvn repository . com/artifact/com . datas tax . spark/spark-Cassandra-connector</a></li>
+				<li>presto:<a href="https://repo1.maven.org/maven2/com/facebook/presto/presto-jdbc/%20">https://repo 1 . maven . org/maven 2/com/Facebook/presto/presto-JDBC/</a></li>
+				<li>big query:<a href="https://storage.googleapis.com/spark-lib/bigquery/spark-bigquery-latest.jar%20">https://storage . Google APIs . com/spark-lib/big query/spark-big query-latest . jar</a></li>
+				<li>Impala: <a href="https://www.cloudera.com/downloads/connectors/impala/jdbc/2-6-15.html%20">https://www.cloudera.com/downloads/connectors/impala/jdbc/2-6-15.html</a><p class="callout-heading">注意</p><p class="callout">当你读到这里的时候，这些链接中的一些可能已经过时了，所以请找出最新的版本并下载相应的安装程序或<code>.jar</code>文件。</p></li>
+			</ul>
+			<h3>熊猫和达克</h3>
+			<p>pandas <a id="_idIndexMarker132"/>和 Dask <a id="_idIndexMarker133"/>依赖于<strong class="bold"> SQLAlchemy </strong>，后者根据你想要访问的数据库使用<a id="_idIndexMarker134"/>不同的库。以下是您将需要的库的指南，取决于您想要连接的数据库以及代码库，以防您需要额外的信息:</p>
+			<div><div><img src="img/B17166_02_007.jpg" alt="Figure 2.7 – Database technologies for pandas and Dask&#13;&#10;" width="1493" height="1152"/>
+				</div>
+			</div>
+			<p class="figure-caption">图 2.7-熊猫和 Dask 的数据库技术</p>
+			<h3>和 Dask cuDF</h3>
+			<p>在<a id="_idIndexMarker138"/> cuDF/Dask-cuDF 的<a id="_idIndexMarker137"/>情况下，Optimus <a id="_idIndexMarker139"/>使用与 pandas/Dask 相同的<a id="_idIndexMarker140"/>流程。这里，数据需要在加载到 GPU 内存之前加载到 RAM 中。这意味着加载的 dataframe 必须从 pandas/Dask 序列化才能转换成 cuDF/Dask-cudf，这会降低加载速度。</p>
+			<h3>Vaex</h3>
+			<p>Optimus <a id="_idIndexMarker141"/>也依靠 SQLAlchemy 连接数据库，将数据带给 pandas，并转换成 Vaex。请按照<em class="italic">熊猫和 Dask </em>部分安装你需要的所有驱动程序。</p>
+			<h3>朱鹭</h3>
+			<p>对于 PostgreSQL、SQLite 和 MySQL(从 2021 年 1 月开始实验)，Ibis 依赖于 SQLAlchemy，所以请<a id="_idIndexMarker142"/>遵循<em class="italic"> pandas 和 Dask </em>部分的说明。</p>
+			<p>现在，我们已经研究了可用的数据加载选项，让我们看看如何优化已经加载的数据帧。</p>
+			<h3>内存使用优化</h3>
+			<p>数据类型<a id="_idIndexMarker143"/>会对内存使用产生很大的影响。让我们以熊猫为例，看看一些数据类型的每个值使用多少字节:</p>
+			<ul>
+				<li><strong class="bold"> int8 / uint8 </strong>:消耗 1 字节内存，范围在-128/127 或 0/255 之间。</li>
+				<li><strong class="bold"> bool </strong>:消耗 1 个字节，真或假。</li>
+				<li><strong class="bold"> float16/int16/uint16 </strong>:消耗 2 字节内存，范围在-32768 到 32767 或 0/65535 之间。</li>
+				<li><strong class="bold"> float32/int32/uint32 </strong>:消耗 4 字节内存，范围在-2147483648 到 2147483647 之间。</li>
+				<li><strong class="bold"> float64/int64/uint64 </strong>:消耗 8 字节内存。</li>
+			</ul>
+			<p>如果列的值从 0 到 255，并且使用 float16 作为数据类型，则每个值使用 2 个字节，而不是 1 个字节。因此，将这个列转换成 uint 可以多给你 50%的内存。</p>
+			<p>在这种情况下，Optimus dataframes 使用了<code>optimize</code>方法，一旦我们的数据被加载，它可以帮助我们节省机器上的内存。让我们看看它是如何工作的:</p>
+			<pre>from optimus import Optimus 
+op = Optimus("dask")
+df = op.create.dataframe({
+    "a": [1000,2000,3000,4000,5000]*10000,
+    "b": [1,2,3,4,5]*10000
+})
+df.size()</pre>
+			<p>当我们创建数据集时，我们将<code>*10000</code>输入到每个列的数组中，以增加<a id="_idIndexMarker144"/>数据帧的大小。后来，我们调用了<code>df.size()</code>，它输出了数据帧在内存中所占的字节数，给出了如下结果:</p>
+			<pre>800128</pre>
+			<p>因此，如果我们运行<code>optimize</code>并且列满足标准，我们可以减少这个数字。这对于处理多个大型数据帧非常有用:</p>
+			<pre>df = df.optimize()
+df.size()</pre>
+			<p>这将导致以下输出:</p>
+			<pre>150128</pre>
+			<p>正如我们所看到的，内存使用大大减少了；当处理真实数据时，这可能会有很大变化，因为数据以意想不到的形式出现。这个函数需要一些时间来完成，所以必须小心使用。</p>
+			<p>在前面的例子中，我们使用<code>op.create.dataframe</code>来快速创建一个没有文件或者外部资源的例子。让我们看看这是如何工作的。</p>
+			<h2 id="_idParaDest-52"><a id="_idTextAnchor053"/>从头开始创建数据帧</h2>
+			<p>如果您希望<a id="_idIndexMarker145"/>从 Python 字典创建 dataframe，那么在<code>create</code>访问器上有一个名为<code>dataframe</code>的方法，它需要一个命名字典，该字典应该包含每个条目的一个值数组:</p>
+			<pre>df = op.create.dataframe({
+"name":["OPTIMUS", "BUMBLEBEE", "EJECT"],
+"function":["Leader", "Espionage", 
+            "Electronic Surveillance"]
+})</pre>
+			<p>在前面的示例中，我们只是创建了一个新的 dataframe，其中有两行，每行有三个值。这对于在加载更大的数据集之前快速测试操作可能很方便。</p>
+			<h2 id="_idParaDest-53"><a id="_idTextAnchor054"/>连接到远程数据源</h2>
+			<p>除非您的文件在您的本地磁盘上，否则您将需要在存储服务中创建一个到您的数据源<a id="_idIndexMarker146"/>的连接。Optimus 提供了一种连接到这些设备的方法，即使它需要凭证。</p>
+			<p>存储服务有助于开发人员更轻松地进行网络规模的计算，允许他们随时从网络上的任何地方存储和检索大量数据。</p>
+			<p>为了从远程存储加载，我们需要实例化一个连接。为了实现这一点，我们必须简单地调用<code>op.connect.hdfs</code>来连接到 HDFS 存储系统，或者调用<code>op.connect.s3</code>来连接到 S3 存储系统。当您从远程存储加载文件时，可以保存结果值以供进一步参考。本节稍后将讨论更多替代方案。</p>
+			<p>让我们看一个例子:</p>
+			<pre>conn = op.connect.s3(base_url="s3://bucket/", anon=False, 
+                     use_ssl=True)</pre>
+			<p>在前面的代码中，我们通过传递一些存储选项来创建一个到亚马逊 S3 存储桶的连接。</p>
+			<p>接下来，我们将看看<code>op.connect</code>上的一些可用方法，以及它代表哪些文件系统:</p>
+			<ul>
+				<li><code>file</code>:本地或网络文件系统(未配置连接时默认使用)</li>
+				<li><code>s3</code>:亚马逊 S3</li>
+				<li><code>hdfs</code> : Hadoop 文件系统</li>
+				<li><code>gcs</code>:谷歌云存储</li>
+				<li><code>adl</code>:微软 Azure(数据湖存储)</li>
+				<li><code>abfs</code>:微软 Azure (Blob 存储)</li>
+				<li><code>http</code> / <code>https</code> : HTTP(S)文件系统</li>
+				<li><code>ftp</code> : FTP 文件系统</li>
+			</ul>
+			<p>正如我们之前看到的，我们传递一个<code>base_url</code>参数，包括一段 URL。这样做时，可以在加载文件时传递一个相对路径。如果你想改变数据的来源，这是很有用的。让我们看另一个例子:</p>
+			<pre>conn = op.connect.s3(base_url="s3://bucket/")</pre>
+			<p>要使用前面示例中的连接，我们可以使用以下代码:</p>
+			<pre>df = op.load.file("files/my-remote-file.csv", conn=conn)</pre>
+			<p>它的行为与下面的代码相同:</p>
+			<pre>df = op.load.file("s3://bucket/files/my-remote-file.csv", conn=conn)</pre>
+			<p>在两个例子中，相同的文件将被加载到<code>df</code>，从而推断出格式。接下来，我们将学习如何从使用<code>op.connect</code>创建的连接中获益。</p>
+			<h2 id="_idParaDest-54"><a id="_idTextAnchor055"/>连接凭证</h2>
+			<p>您可以使用凭证<a id="_idIndexMarker148"/>连接到安全存储服务，确保只有特定用户可以访问您存储的数据。</p>
+			<p class="callout-heading">重要说明</p>
+			<p class="callout">当您请求数据时，您可能会暴露您的凭据。如果您使用这种方法，请确保您工作的环境是完全安全的。更安全的方法是将凭证保存在集群的本地文件中。</p>
+			<p>更安全的方法是将凭证放在集群中每个节点的文件上。每个引擎都有自己独特的处理凭证的方式。请参考每个引擎的<a id="_idIndexMarker149"/>文档，了解配置该引擎必须遵循的具体步骤。</p>
+			<p>让我们来了解一下如何为每一个主要的远程存储提供商和可用的系统做到这一点。</p>
+			<h3>谷歌云存储</h3>
+			<p><code>gcs</code>方法的认证<a id="_idIndexMarker150"/>。这需要一个<code>token</code>，可以使用<code>gcsfs</code>中的<code>GCSFileSystem</code>来提供。关于这一点的更多细节可在<code>gcsfs</code>文档中找到:</p>
+			<pre>gcs = GCSFileSystem(...)
+conn = op.connect.gcs(token=gcs.session.credentials)</pre>
+			<h3>蔚蓝的</h3>
+			<p>微软 Azure 存储包括数据湖存储(第一代)和 Blob 存储(第二代)。您可以分别使用<code>adl</code>和<code>abfs</code>方法<a id="_idIndexMarker151"/>设置它们。</p>
+			<p><code>adl</code>的认证要求<code>tenant_id</code>、<code>client_id</code>和<code>client_secret</code>在<code>options</code>字典中:</p>
+			<pre>conn = op.connect.adl(tenant_id="&lt;your tenant id&gt;", client_id="&lt;your client id&gt;", client_secret="&lt;your client secret&gt;")</pre>
+			<p><code>abfs</code>的认证要求<code>account_name</code>和<code>account_key</code>在<code>options</code>中:</p>
+			<pre>conn = op.connect.abfs(account_name="&lt;your account name&gt;", account_key="&lt;your account key&gt;")</pre>
+			<h3>S3</h3>
+			<p>对于 S3，基本要求是<code>key</code>和<code>secret</code>，必须传给<code>s3</code>:</p>
+			<pre>conn = op.connect.s3(key="&lt;your key&gt;", secret="&lt;your secret&gt;")</pre>
+			<p>然而，如果你不想在每次加载文件时都写你的 URL，你可以设置参数:</p>
+			<pre>conn = op.connect.s3(base_url="s3://&lt;your-bucket-address&gt;/", key="&lt;your key&gt;", secret="&lt;your secret&gt;")</pre>
+			<p>或者，您可以传递存储桶的名称:</p>
+			<pre>conn = op.connect.s3(bucket="&lt;your-bucket-name&gt;", key="&lt;your key&gt;", secret="&lt;your secret&gt;")</pre>
+			<p><code>s3</code>的认证需要各种参数。以下列表显示了每个参数及其解释，因为并非所有参数都是不言自明的:</p>
+			<ul>
+				<li><code>anon</code>:访问是否应该匿名(默认:<code>False</code>)。</li>
+				<li><code>key</code>和<code>secret</code>:用于用户认证。</li>
+				<li><code>token</code>:如果其他 S3 客户端已经完成认证。</li>
+				<li><code>use_ssl</code>:连接是否加密安全(默认:<code>True</code>)。</li>
+				<li><code>client_kwargs</code>:向 boto3 客户端传递一个字典，带有<code>region_name</code>或<code>endpoint_url</code>等关键字。</li>
+				<li><code>config_kwargs</code>:字典被传递给<code>s3fs.S3FileSystem</code>，后者将字典传递给 boto3 客户端的配置选项。</li>
+				<li><code>requester_pays</code>:如果认证用户将承担传输成本，则设置为<code>True</code>，这是一些批量数据提供者所要求的。</li>
+				<li><code>default_block_size</code>、<code>default_fill_cache</code>:这些与连续读取之间的缓冲行为有关。</li>
+				<li><code>kwargs</code>:其他参数传递给 boto3 <code>Session</code>对象，如<code>profile_name</code>，从前面提到的配置文件中选择一个认证部分。</li>
+			</ul>
+			<p>你可以像这样使用前面的任何一个术语:</p>
+			<pre>conn = op.connect.s3(key="&lt;your key&gt;", secret="&lt;your secret&gt;", anon=True, use_ssl=False)</pre>
+			<p>在前面的<a id="_idIndexMarker153"/>示例中，我们为 S3 设置了基本认证参数，包括<code>anon</code>和<code>use_ssl</code>。</p>
+			<h3>HDFS</h3>
+			<p><code>hdfs</code>的认证要求<code>host</code>、<code>port</code>和<code>user</code>在<code>options</code>中:</p>
+			<pre>conn = op.connect.hdfs(host="&lt;your host&gt;", port="&lt;your port&gt;", user="&lt;your user&gt;")</pre>
+			<p>您还可以将 Kerberos 票据缓存的路径传递给<code>kerb_ticket</code>:</p>
+			<pre>conn = op.connect.hdfs(host="&lt;your host&gt;", port="&lt;your port&gt;", user="&lt;your user&gt;", kerb_ticket="&lt;your kerb ticket path&gt;")</pre>
+			<p>在前面的例子中，我们设置了基本参数，并在<code>kerb_ticket</code>上包含了一个 Kerberos 票据缓存。</p>
+			<p>如您所见，我们可以从远程文件系统加载。接下来，我们将学习如何使用最常用的引擎从数据库中加载数据集。</p>
+			<h1 id="_idParaDest-55"><a id="_idTextAnchor056"/>连接到数据库</h1>
+			<p>连接到数据库会非常方便，因为你不需要将数据保存到文件中，这样就可以将数据加载到内存中。如果您习惯于处理小文件，这可能看起来微不足道，但将大数据数据集下载到要转换为特定格式的文件可能是一项非常乏味和无聊的任务。这就是直接从数据库加载数据的优势所在。</p>
+			<p>要使用 Optimus 创建到数据库的连接，我们可以使用任何可用的数据库处理方法。这与远程文件系统有一些区别，我们在上一节中已经解释过了:</p>
+			<pre>from optimus import Optimus
+Op = optimus("dask")
+db = op.connect.postgres(address="localhost", user="root",
+                         password="12345678",
+                         database="mydatabase")</pre>
+			<p>在前面的示例中，我们使用某些凭证连接到 PostgreSQL 数据库。如果我们想列出这个数据库中所有可用的表，我们可以简单地调用<code>db.tables()</code>，它将给出连接的数据库中每个表的列表。它还允许我们测试到该数据库的连接:</p>
+			<pre>db.tables()</pre>
+			<p>这给了我们一个类似于下面的结果:</p>
+			<pre>['foo_table', 'bar_table']</pre>
+			<p>Optimus 可以处理的可用数据库引擎有 MySQL、SQLite、PostgreSQL、Oracle、Microsoft SQL Server、BigQuery、Redshift、Cassandra、Presto 和 Redis。它们中的大多数都有相同的可用参数，但这里列出了创建连接最常用的选项:</p>
+			<ul>
+				<li><code>mysql</code> : MySQL</li>
+				<li><code>sqlite</code> : SQLite</li>
+				<li><code>microsoftsql</code> : PostgreSQL</li>
+				<li><code>postgres</code>:甲骨文</li>
+				<li><code>oracle</code>:微软 SQL Server</li>
+				<li><code>bigquery</code>:大查询</li>
+				<li><code>redshift</code>:红移</li>
+				<li><code>cassandra</code>:卡珊德拉</li>
+				<li><code>presto</code>:转眼间</li>
+				<li><code>redis</code> : Redis</li>
+			</ul>
+			<p>正如我们前面提到的，为了正确连接到数据库，每种方法都需要以下参数:</p>
+			<ul>
+				<li><code>host</code>:存储数据库的主机</li>
+				<li><code>port</code>:数据库可用的端口</li>
+				<li><code>user</code>:用户名</li>
+				<li><code>password</code>:密码</li>
+				<li><code>database</code>:您要连接的数据库的名称</li>
+			</ul>
+			<p>一些可用的<a id="_idIndexMarker157"/>引擎有特定的参数。其中一些如下:</p>
+			<ul>
+				<li><code>schema</code>:在 MySQL、Impala、BigQuery、PostgreSQL 和 Redshift 上可用</li>
+				<li><code>tns</code>:甲骨文提供</li>
+				<li><code>service_name</code>:甲骨文公司提供</li>
+				<li><code>sid</code>:甲骨文公司提供</li>
+				<li><code>catalog</code>:很快就能买到</li>
+				<li><code>keyspace</code>:可在 Cassandra 上找到</li>
+				<li><code>table</code>:可在 Cassandra 上找到</li>
+				<li><code>project</code>:在 BigQuery 上可用</li>
+				<li><code>dataset</code>:在 BigQuery 上可用</li>
+			</ul>
+			<p>设置完成后，我们可以从存储数据帧的任何来源加载数据帧:</p>
+			<pre>df = db.to_dataframe("my_table")</pre>
+			<p>加载数据后，您可以开始处理它。数据处理将在<a href="B17166_03_Final_VK_epub.xhtml#_idTextAnchor064"> <em class="italic">第 3 章</em> </a> <em class="italic">、数据扯皮</em>中解决。</p>
+			<p>现在您已经知道如何加载和处理数据，您需要保存它。让我们看看这是如何工作的。</p>
+			<h1 id="_idParaDest-56"><a id="_idTextAnchor057"/>保存数据帧</h1>
+			<p>只需调用 dataframe 实例的<a id="_idIndexMarker158"/>的<code>save</code>访问器上的任何可用方法，就可以保存 Optimus。在本节中，我们将学习如何保存到本地或远程文件系统，以及保存到以前建立的数据库或远程存储连接。</p>
+			<p>将数据保存在文件中时，了解使用哪种格式很重要，这样可以在读取或处理时提高速度。有很多关于如何选择正确的日期格式的信息。我喜欢下面的简单性:</p>
+			<p class="author-quote">“为您的特定数据集找到正确的文件格式可能会很困难。一般来说，如果数据很宽，有大量的属性，并且写入量很大，那么基于行的方法可能是最好的。如果数据范围更窄，属性数量更少，并且需要大量读取，那么基于列的方法可能是最好的。”</p>
+			<p>(Datanami，<a href="https://www.datanami.com/2018/05/16/big-data-file-formats-demystified/">https://www . Datanami . com/2018/05/16/big-data-file-formats-demystified/</a>)</p>
+			<h2 id="_idParaDest-57"><a id="_idTextAnchor058"/>保存到本地文件</h2>
+			<p>保存方法与 Optimus 实例上可用的加载方法非常相似，但是，正如我们之前讨论的那样，保存方法在每个 dataframe 实例中都可用，特别是在<code>save</code>访问器中:</p>
+			<pre>df.save.csv("foo_output.csv", separator=";")</pre>
+			<p>在前面的代码中，我们将存储在<code>df</code>中的数据帧的内容以 CSV 格式保存到名为<code>foo_output.csv</code>的本地文件中。这次，我们将分隔符设置为<code>;</code>。这允许我们以不同于接收格式的格式保存它。</p>
+			<p>当使用一个分布式引擎如<code>True</code>到一个名为<code>single_file</code>的参数时，如下所示:</p>
+			<pre>df.save.csv("foo_output.csv", single_file=True)</pre>
+			<p>现在，让我们了解如何将数据保存到远程数据存储。</p>
+			<h2 id="_idParaDest-58"><a id="_idTextAnchor059"/>使用远程连接保存文件</h2>
+			<p>就像在加载方法中一样，有一个<code>conn</code>参数可用于保存到先前定义的连接:</p>
+			<pre>df.save.xml("files/foo_output.xml", conn=conn)</pre>
+			<p>在前面的<a id="_idIndexMarker160"/>示例中，我们将文件保存在一个在<code>conn</code>变量中配置的文件系统中。这个实例可能包含到一个<strong class="bold"> HDFS </strong>集群、一个<strong class="bold"> S3 </strong>桶或者任何类似系统的连接。</p>
+			<p>现在，让我们看看 Optimus 如何以不同于原始数据的格式保存数据。</p>
+			<h3>以不同格式保存</h3>
+			<p>保存时，Optimus 允许您从源文件中选择不同的文件格式:</p>
+			<pre>from optimus import Optimus
+Op = optimus("dask")
+df = op.load.csv("files/foo_input.csv")</pre>
+			<p>要以 JSON 格式保存数据，只需简单使用<code>.save.json()</code>方法:</p>
+			<pre>df.save.json("files/foo_output.json")</pre>
+			<p>在前面的代码中，我们加载了一个 CSV 文件并保存了一个 JSON 文件。但是，您也可以更改文件的某些方面，例如 CSV 文件的分隔符:</p>
+			<pre>df = op.load.csv("files/foo_input.csv", sep=",")
+df.save.csv("files/foo_output.csv", sep=";")</pre>
+			<p>或者，您可以使用各自的方法将数据保存为 Optimus 支持的任何其他格式，如 Avro、Parquet 或 OCR。</p>
+			<h2 id="_idParaDest-59"><a id="_idTextAnchor060"/>将数据帧保存到数据库表中</h2>
+			<p>为了将<a id="_idIndexMarker161"/>数据帧保存为数据库中的一个表，该数据库之前已经使用<code>connect</code>进行了配置，Optimus 在 Optimus 数据帧的<code>.save</code>访问器中有一个名为<code>database_table</code>的方法:</p>
+			<pre>from optimus import Optimus
+op = optimus("dask")
+df = op.load.csv("files/foo_input.csv")
+df.save.database_table("foo_output_table", db=db)</pre>
+			<p>在前面的<a id="_idIndexMarker162"/>代码中，我们只是将我们的数据帧保存在一个名为<code>foo_output_table</code>的表中，这个表存储在<code>db</code>的数据库中。</p>
+			<h2 id="_idParaDest-60"><a id="_idTextAnchor061"/>并行加载和保存数据</h2>
+			<p>当加载和保存数据时，使用分布式引擎非常有用，因为它可以同时使用多个 CPU/GPU 核心来并行化数据加载过程，这意味着更快的数据加载时间。</p>
+			<p>创建 Optimus 数据帧时，会创建具有特定类的对象，具体取决于初始化 Optimus 实例时配置的引擎。例如，看一下下面的代码:</p>
+			<pre>op_dask = Optimus("dask", n_workers=4, threads_per_worker=1)
+df = op_dask.load.csv("foo.csv")
+op_pandas = Optimus("pandas")
+df2 = op_pandas.load.csv("foo.csv")</pre>
+			<p>这里，<a id="_idIndexMarker165"/>我们用两个不同的<a id="_idIndexMarker166"/>数据帧创建两个不同的引擎:<code>df</code>，这是一个<code>df2</code>，这是一个<code>n_workers</code>，它将同时使用四个并行线程加载您的文件。</p>
+			<p>如果你的数据适合内存，用 Dask 引擎装载它可能是一个好策略。这允许您并行加载数据，然后将其转换为 pandas 引擎，如以下代码所示:</p>
+			<pre>from optimus import Optimus 
+op_dask = Optimus("dask", n_workers=4, threads_per_worker=1)
+df = op_dask.load.csv("foo.csv")
+df = df.to_optimus_pandas()</pre>
+			<p class="callout-heading">注意</p>
+			<p class="callout">Dask 可以配置为使用线程或进程。Optimus 默认配置 Dask 使用进程，允许它们并行管理字符串。另一方面，线程在处理数字数据时更加方便。这是由于 Python 的<strong class="bold">全局解释器锁</strong> ( <strong class="bold"> GIL </strong>)。讨论 GIL 是如何工作的超出了本书的范围。</p>
+			<p>保存时，您<a id="_idIndexMarker169"/>也可以并行化操作，重新分区<a id="_idIndexMarker170"/>数据帧并保存到磁盘。但是首先，你需要把熊猫擎天柱数据帧转换成 Dask 擎天柱数据帧。如果您正在使用熊猫数据框架，您可以尝试以下方法:</p>
+			<pre>df = df.to_optimus_dask()
+df = df.repartition(4)
+df.save.csv("output.csv", single_file=False)</pre>
+			<p>在前面的例子中，我们在<code>output.csv</code>文件夹中创建了四个文件。默认情况下，Optimus 的输出保存到一个文件中，以确保您可以轻松地将其移植到任何其他包中进行可视化或报告。</p>
+			<h1 id="_idParaDest-61"><a id="_idTextAnchor062"/>总结</h1>
+			<p>加载和保存是争论数据时最常用的操作。Optimus 创建了一个流，可以帮助创建到数据源的连接，这些连接可以被重用来加载和保存数据。Optimus 还实现了最常用的文件存储技术，如亚马逊 S3 和谷歌云存储，以及数据库连接，如<strong class="bold"> PostgreSQL </strong>和<strong class="bold"> MySQL </strong>，这样用户就可以将所有必要的工具放在手边，使他们的工作更加轻松。</p>
+			<p>在数据库方面，我们研究了每种引擎/数据库技术保存和加载数据库数据所需的驱动程序。</p>
+			<p>我们还探讨了如何优化数据帧内存的使用，如果您正在处理大数据，这是一个非常重要的步骤，因为您可以节省多达 50%的内存空间。</p>
+			<p>在下一章中，我们将开始探索过滤、重复数据删除和转换数据以供进一步分析的一些基本方法。</p>
+		</div>
+	</div>
+</body></html>

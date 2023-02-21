@@ -1,0 +1,689 @@
+<html><head/><body>
+
+  
+    <title>Get Up and Running with TensorFlow</title>
+    <meta content="urn:uuid:b6d6a510-8f2b-40e4-8a30-e199afd87745" name="Adept.expected.resource"/>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+  
+
+
+  
+        
+
+                            
+                    <h1 class="header-title">使用 TensorFlow 开始运行</h1>
+                
+            
+            
+                
+<p class="calibre2">在这一章中，我们将概述一个最广泛使用的深度学习框架。TensorFlow 拥有每天都在增长的大型社区支持，这使它成为构建复杂的深度学习应用程序的一个好选择。来自 TensorFlow 网站:</p>
+<div><q class="calibre52">"TensorFlow is an open source software library for numerical computation using data flow graphs. Nodes in the graph represent mathematical operations, while the graph edges represent the multidimensional data arrays (tensors) communicated between them. The flexible architecture allows you to deploy computation to one or more CPUs or GPUs in a desktop, server, or mobile device with a single API. TensorFlow was originally developed by researchers and engineers working on the Google Brain Team within Google's Machine Intelligence research organization for the purposes of conducting machine learning and deep neural networks research, but the system is general enough to be applicable in a wide variety of other domains as well."</q></div>
+<p class="calibre2">本章将涵盖以下主题:</p>
+<ul class="calibre7">
+<li class="calibre8">张量流装置</li>
+<li class="calibre8">张量流环境</li>
+<li class="calibre8">计算图形</li>
+<li class="calibre8">张量流数据类型、变量和占位符</li>
+<li class="calibre8">从 TensorFlow 获取输出</li>
+<li class="calibre8">tensor board——可视化学习</li>
+</ul>
+
+
+            
+
+            
+        
+    
+
+
+
+
+
+  
+    <title>TensorFlow installation</title>
+    <meta content="urn:uuid:b6d6a510-8f2b-40e4-8a30-e199afd87745" name="Adept.expected.resource"/>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+  
+
+
+  
+        
+
+                            
+                    <h1 class="header-title">张量流装置</h1>
+                
+            
+            
+                
+<p class="calibre2">TensorFlow 安装自带两种模式:CPU 和 GPU。我们将通过在 GPU 模式下安装 TensorFlow 来开始安装教程。</p>
+
+
+            
+
+            
+        
+    
+
+
+
+
+
+  
+    <title>TensorFlow GPU installation for Ubuntu 16.04</title>
+    <meta content="urn:uuid:b6d6a510-8f2b-40e4-8a30-e199afd87745" name="Adept.expected.resource"/>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+  
+
+
+  
+        
+
+                            
+                    <h1 class="header-title">适用于 Ubuntu 16.04 的 TensorFlow GPU 安装</h1>
+                
+            
+            
+                
+<p class="calibre2">TensorFlow 的 GPU 模式安装需要安装最新的 NVIDIA 驱动程序，因为 TensorFlow 的 GPU 版本目前仅支持 CUDA。以下部分将带您一步一步地安装 NVIDIA 驱动程序和 CUDA 8。</p>
+
+
+            
+
+            
+        
+    
+
+
+
+
+
+  
+    <title>Installing NVIDIA drivers and CUDA 8</title>
+    <meta content="urn:uuid:b6d6a510-8f2b-40e4-8a30-e199afd87745" name="Adept.expected.resource"/>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+  
+
+
+  
+        
+
+                            
+                    <h1 class="header-title">安装 NVIDIA 驱动程序和 CUDA 8</h1>
+                
+            
+            
+                
+<p class="calibre2">首先，你需要根据你的 GPU 安装正确的 NVIDIA 驱动。我有一个 GeForce GTX 960M GPU，所以我会继续安装<kbd class="calibre12">nvidia-375</kbd>(如果你有不同的 GPU，你可以使用英伟达搜索工具<a href="http://www.nvidia.com/Download/index.aspx" class="calibre11">http://www.nvidia.com/Download/index.aspx</a>来帮助你找到正确的驱动程序版本)。如果您想知道您机器的 GPU，您可以在终端中发出以下命令:</p>
+<pre class="calibre21">lspci | grep -i nvidia</pre>
+<p class="innercell">您应该在终端中得到以下输出:</p>
+<div><img src="img/b73594fd-a0b9-48d2-a972-db1fc651aa25.png" class="calibre53"/></div>
+<p class="calibre2">接下来，我们需要添加一个专有的 NVIDIA 驱动程序库，以便能够使用<kbd class="calibre12">apt-get</kbd>安装驱动程序:</p>
+<div><pre class="calibre21">sudo add-apt-repository ppa:graphics-drivers/ppa<br class="title-page-name"/>sudo apt-get update<br class="title-page-name"/>sudo apt-get install nvidia-375</pre></div>
+<div><p class="calibre2">成功安装 NVIDIA 驱动程序后，重新启动机器。要验证驱动程序是否安装正确，请在终端中发出以下命令:</p>
+<pre class="calibre21">cat /proc/driver/nvidia/version</pre></div>
+<p class="calibre2">您应该在终端中得到以下输出:</p>
+<div><img src="img/d82ab7c0-53ee-4fb3-a5e7-e6a98d33fcc6.png" class="calibre54"/></div>
+<p class="calibre2">接下来，我们需要安装 CUDA 8。打开以下 CUDA 下载链接:<a href="https://developer.nvidia.com/cuda-downloads" class="calibre11">https://developer.nvidia.com/cuda-downloads</a>。按照下面的屏幕截图选择您的操作系统、架构、发行版、版本，最后是安装程序类型:</p>
+<div><img src="img/8e23b031-65b4-4c1c-9df7-a036dd2af7ac.png" class="calibre55"/></div>
+<p class="calibre2">安装程序文件大约有 2 GB。您需要发出以下安装说明:</p>
+<div><pre class="calibre21">sudo dpkg -i cuda-repo-ubuntu1604-8-0-local-ga2_8.0.61-1_amd64.deb<br class="title-page-name"/>sudo apt-get update<br class="title-page-name"/>sudo apt-get install cuda</pre></div>
+<div><p class="calibre2">接下来，我们需要通过发出以下命令将库添加到<kbd class="calibre12">.bashrc</kbd>文件中:</p>
+</div>
+<pre class="calibre21">echo 'export PATH=/usr/local/cuda/bin:$PATH' &gt;&gt; ~/.bashrc</pre>
+<pre class="calibre21">echo 'export LD_LIBRARY_PATH=/usr/local/cuda/lib64:$LD_LIBRARY_PATH' &gt;&gt; ~/.bashrc</pre>
+<pre class="calibre21">source ~/.bashrc</pre>
+<p class="calibre2">接下来，您需要通过发出以下命令来验证 CUDA 8 的安装:</p>
+<pre class="calibre21">nvcc -V</pre>
+<p class="calibre2">您应该在终端中得到以下输出:</p>
+<div><img src="img/430d007d-a24c-4921-b941-b0e96bc1945d.png" class="calibre56"/></div>
+<p class="calibre2">最后，在这一节，我们需要安装 cuDNN 6.0。<strong class="calibre13"> NVIDIA CUDA 深度神经网络库</strong> ( <strong class="calibre13"> cuDNN </strong>)是一个 GPU 加速的深度神经网络原语库。你可以从 NVIDIA 的网页上下载。发出以下命令来提取和安装 cuDNN:</p>
+<div><pre class="calibre21">cd ~/Downloads/</pre>
+<pre class="calibre21">tar xvf cudnn*.tgz</pre>
+<pre class="calibre21">cd cuda</pre>
+<pre class="calibre21">sudo cp */*.h /usr/local/cuda/include/</pre>
+<pre class="calibre21">sudo cp */libcudnn* /usr/local/cuda/lib64/</pre>
+<pre class="calibre21">sudo chmod a+r /usr/local/cuda/lib64/libcudnn*</pre></div>
+<p class="calibre2">为了确保安装成功，您可以使用终端中的<kbd class="calibre12">nvidia-smi</kbd>工具。如果你有一个成功的安装，这个工具将为你提供一个监测信息，如内存和你的 GPU 运行过程。</p>
+
+
+            
+
+            
+        
+    
+
+
+
+
+
+  
+    <title>Installing TensorFlow</title>
+    <meta content="urn:uuid:b6d6a510-8f2b-40e4-8a30-e199afd87745" name="Adept.expected.resource"/>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+  
+
+
+  
+        
+
+                            
+                    <h1 class="header-title">安装 TensorFlow</h1>
+                
+            
+            
+                
+<p class="calibre2">为 TensorFlow 准备好 GPU 环境后，我们现在准备在 GPU 模式下安装 TensorFlow。但是对于 TensorFlow 安装过程，您可以首先安装几个有用的 Python 包，它们将在接下来的章节中帮助您，并使您的开发环境更容易。</p>
+<p class="calibre2">我们可以通过发出以下命令来安装一些数据操作、分析和可视化库:</p>
+<pre class="calibre21">sudo apt-get update &amp;&amp; apt-get install -y python-numpy python-scipy python-nose python-h5py python-skimage python-matplotlib python-pandas python-sklearn python-sympy</pre>
+<pre class="calibre21">sudo apt-get clean &amp;&amp; sudo apt-get autoremove</pre>
+<pre class="calibre21">sudo rm -rf /var/lib/apt/lists/*</pre>
+<p class="calibre2">接下来，您可以安装更多有用的库，如虚拟环境、Jupyter 笔记本等等:</p>
+<pre class="calibre21">sudo apt-get update</pre>
+<pre class="calibre21">sudo apt-get install git python-dev python3-dev python-numpy python3-numpy build-essential  python-pip python3-pip python-virtualenv swig python-wheel libcurl3-dev</pre>
+<pre class="calibre21">sudo apt-get install -y libfreetype6-dev libpng12-dev</pre>
+<pre class="calibre21">pip3 install -U matplotlib ipython[all] jupyter pandas scikit-image</pre>
+<p class="calibre2">最后，我们可以通过发出以下命令开始在 GPU 模式下安装 TensorFlow:</p>
+<pre class="calibre21">pip3 install --upgrade tensorflow-gpu</pre>
+<p class="calibre2">您可以使用 Python 验证 TensorFlow 的成功安装:</p>
+<pre class="calibre21">python3<br class="title-page-name"/>&gt;&gt;&gt; import tensorflow as tf<br class="title-page-name"/>&gt;&gt;&gt; a = tf.constant(5)<br class="title-page-name"/>&gt;&gt;&gt; b = tf.constant(6)<br class="title-page-name"/>&gt;&gt;&gt; sess = tf.Session()<br class="title-page-name"/>&gt;&gt;&gt; sess.run(a+b)<br class="title-page-name"/>// this should print bunch of messages showing device status etc. // If everything goes well, you should see gpu listed in device<br class="title-page-name"/>&gt;&gt;&gt; sess.close()</pre>
+<p class="calibre2">您应该在终端中得到以下输出:</p>
+<div><img src="img/0ec98d26-4d2a-4c15-840d-1064375bad66.png" class="calibre31"/></div>
+
+
+            
+
+            
+        
+    
+
+
+
+
+
+  
+    <title>TensorFlow CPU installation for Ubuntu 16.04</title>
+    <meta content="urn:uuid:b6d6a510-8f2b-40e4-8a30-e199afd87745" name="Adept.expected.resource"/>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+  
+
+
+  
+        
+
+                            
+                    <h1 class="header-title">适用于 Ubuntu 16.04 的 TensorFlow CPU 安装</h1>
+                
+            
+            
+                
+<p class="calibre2">在本节中，我们将安装 CPU 版本，它在安装之前不需要任何驱动程序。因此，让我们从安装一些用于数据操作和可视化的有用包开始:</p>
+<pre class="calibre21">sudo apt-get update &amp;&amp; apt-get install -y python-numpy python-scipy python-nose python-h5py python-skimage python-matplotlib python-pandas python-sklearn python-sympy</pre>
+<pre class="calibre21">sudo apt-get clean &amp;&amp; sudo apt-get autoremove</pre>
+<pre class="calibre21">sudo rm -rf /var/lib/apt/lists/*</pre>
+<p class="calibre2">接下来，您可以安装更多有用的库，如虚拟环境、Jupyter 笔记本等等:</p>
+<pre class="calibre21">sudo apt-get update</pre>
+<pre class="calibre21">sudo apt-get install git python-dev python3-dev python-numpy python3-numpy build-essential  python-pip python3-pip python-virtualenv swig python-wheel libcurl3-dev</pre>
+<pre class="calibre21">sudo apt-get install -y libfreetype6-dev libpng12-dev</pre>
+<pre class="calibre21">pip3 install -U matplotlib ipython[all] jupyter pandas scikit-image</pre>
+<p class="calibre2">最后，您可以通过发出以下命令在 CPU 模式下安装最新的 TensorFlow:</p>
+<pre class="calibre21">pip3 install --upgrade tensorflow</pre>
+<p class="calibre2">您可以通过运行以下 TensorFlow 语句来检查 TensorFlow 是否安装成功:</p>
+<pre class="calibre21">python3<br class="title-page-name"/>&gt;&gt;&gt; import tensorflow as tf<br class="title-page-name"/>&gt;&gt;&gt; a = tf.constant(5)<br class="title-page-name"/>&gt;&gt;&gt; b = tf.constant(6)<br class="title-page-name"/>&gt;&gt;&gt; sess = tf.Session()<br class="title-page-name"/>&gt;&gt;&gt; sess.run(a+b)<br class="title-page-name"/>&gt;&gt; sess.close()</pre>
+<p class="calibre2">您应该在终端中得到以下输出:</p>
+<div><img src="img/f1741db2-73e4-4a95-8ffe-94aba75c3c4d.png" class="calibre31"/></div>
+
+
+            
+
+            
+        
+    
+
+
+
+
+
+  
+    <title>TensorFlow CPU installation for macOS X</title>
+    <meta content="urn:uuid:b6d6a510-8f2b-40e4-8a30-e199afd87745" name="Adept.expected.resource"/>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+  
+
+
+  
+        
+
+                            
+                    <h1 class="header-title">macOS X 的 TensorFlow CPU 安装</h1>
+                
+            
+            
+                
+<p class="calibre2">在本节中，我们将使用<kbd class="calibre12">virtualenv</kbd>为 macOS X 安装 TensorFlow。因此，让我们通过发出以下命令来安装<kbd class="calibre12">pip</kbd>工具:</p>
+<pre class="calibre21">sudo easy_install pip</pre>
+<p class="calibre2">接下来，我们需要安装虚拟环境库:</p>
+<pre class="calibre21">sudo pip install --upgrade virtualenv</pre>
+<p class="calibre2">安装虚拟环境库后，我们需要创建一个容器或虚拟环境来托管 TensorFlow 的安装以及您可能希望安装的任何软件包，而不会影响底层主机系统:</p>
+<pre class="calibre21">virtualenv --system-site-packages targetDirectory # for Python 2.7</pre>
+<pre class="calibre21">virtualenv --system-site-packages -p python3 targetDirectory # for Python 3.n</pre>
+<p class="calibre2">这里假设<kbd class="calibre12">targetDirectory</kbd>是<kbd class="calibre12">~/tensorflow</kbd>。</p>
+<p class="calibre2">现在您已经创建了虚拟环境，您可以通过发出以下命令来访问它:</p>
+<pre class="calibre21">source ~/tensorflow/bin/activate </pre>
+<p class="calibre2">发出此命令后，您将可以访问刚刚创建的虚拟机，并且可以安装任何只在此环境中安装的软件包，这些软件包不会影响您正在使用的底层或主机系统。</p>
+<p class="calibre2">为了从环境中退出，您可以发出以下命令:</p>
+<pre class="calibre21">deactivate</pre>
+<p class="calibre2">注意，现在，我们确实想在虚拟环境中，所以现在把它打开。一旦你玩完 TensorFlow，你应该停用它:</p>
+<pre class="calibre21">source bin/activate</pre>
+<p class="calibre2">为了安装 TensorFlow 的 CPU 版本，您可以发出以下命令，这也将安装 TensorFlow 需要的任何相关库:</p>
+<pre class="calibre21">(tensorflow)$ pip install --upgrade tensorflow      # for Python 2.7</pre>
+<pre class="calibre21">(tensorflow)$ pip3 install --upgrade tensorflow     # for Python 3.n</pre>
+
+
+            
+
+            
+        
+    
+
+
+
+
+
+  
+    <title>TensorFlow GPU/CPU installation for Windows</title>
+    <meta content="urn:uuid:b6d6a510-8f2b-40e4-8a30-e199afd87745" name="Adept.expected.resource"/>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+  
+
+
+  
+        
+
+                            
+                    <h1 class="header-title">用于 Windows 的 TensorFlow GPU/CPU 安装</h1>
+                
+            
+            
+                
+<p class="calibre2">我们假设您的系统上已经安装了 Python 3。要安装 TensorFlow，请以管理员身份启动终端，如下所示。打开开始菜单，搜索 cmd，然后右键单击它，并单击以管理员身份运行:</p>
+<div><img src="img/da53c90a-8a64-464d-a807-0fa362e3cfd2.png" class="calibre57"/></div>
+<p class="calibre2">打开命令窗口后，可以发出以下命令在 GPU 模式下安装 TensorFlow:</p>
+<p>在发出下一个命令之前，您需要安装<kbd class="calibre12">pip</kbd>或<kbd class="calibre12">pip3</kbd>(取决于您的 Python 版本)。</p>
+<pre class="calibre21">C:\&gt; pip3 install --upgrade tensorflow-gpu</pre>
+<p class="calibre2">发出以下命令，在 CPU 模式下安装 TensorFlow:</p>
+<pre class="calibre21">C:\&gt; pip3 install --upgrade tensorflow</pre>
+
+
+            
+
+            
+        
+    
+
+
+
+
+
+  
+    <title>The TensorFlow environment</title>
+    <meta content="urn:uuid:b6d6a510-8f2b-40e4-8a30-e199afd87745" name="Adept.expected.resource"/>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+  
+
+
+  
+        
+
+                            
+                    <h1 class="header-title">张量流环境</h1>
+                
+            
+            
+                
+<p class="calibre2">TensorFlow 是谷歌的另一个深度学习框架，正如名称<strong class="calibre13"> TensorFlow </strong>所暗示的那样，它源于神经网络对多维数据阵列或张量执行的操作！它实际上是一个张量流。</p>
+<p class="calibre2">但是首先，为什么我们要在本书中使用深度学习框架？</p>
+<ul class="calibre7">
+<li class="calibre8"><strong class="calibre1">它缩放机器学习代码</strong>:大部分对深度学习和机器学习的研究都可以应用/归因于这些深度学习框架。它们允许数据科学家极快地迭代，并使深度学习和其他 ML 算法更容易为从业者所用。谷歌、脸书等大公司正在使用这样的深度学习框架来扩展到数十亿用户。</li>
+<li class="calibre8"><strong class="calibre1">它计算梯度</strong>:深度学习框架也可以自动计算梯度。如果你一步一步地进行梯度计算，你会发现梯度计算并不简单，而且自己实现一个没有错误的版本是很棘手的。</li>
+<li class="calibre8"><strong class="calibre1">它规范了机器学习应用的分享</strong>:还有，预训练的模型在网上有，可以跨不同的深度学习框架使用，这些预训练的模型帮助了在 GPU 方面资源有限的人，让他们不用每次都从头开始。我们可以站在巨人的肩膀上，从那里开始。</li>
+<li class="calibre8"><strong class="calibre1">有许多深度学习框架可用</strong>，它们具有不同的优势、范例、抽象级别、编程语言等等。</li>
+<li class="calibre8"><strong class="calibre1">与 GPU 接口进行并行处理</strong>:使用 GPU 进行计算是一项迷人的功能，因为由于内核数量和并行化，GPU 比 CPU 更快地加速您的代码。</li>
+</ul>
+<p class="calibre2">这就是为什么 Tensorflow 几乎是必要的，以便在深度学习方面取得进展，因为它可以促进您的项目。</p>
+<p class="calibre2">那么，简单来说，什么是张量流？</p>
+<ul class="calibre7">
+<li class="calibre8">TensorFlow 是 Google 的深度学习框架，是使用数据流图进行数值计算的开源框架</li>
+<li class="calibre8">它最初是由谷歌大脑团队开发的，以促进他们的机器学习研究</li>
+<li class="calibre8">TensorFlow 是用于表达机器学习算法的接口和用于执行这种算法的实现</li>
+</ul>
+<p class="calibre2">张量流是如何工作的，底层范式是什么？</p>
+
+
+            
+
+            
+        
+    
+
+
+
+
+
+  
+    <title>Computational graphs</title>
+    <meta content="urn:uuid:b6d6a510-8f2b-40e4-8a30-e199afd87745" name="Adept.expected.resource"/>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+  
+
+
+  
+        
+
+                            
+                    <h1 class="header-title">计算图形</h1>
+                
+            
+            
+                
+<p class="calibre2">关于 TensorFlow 的所有重要想法中，最重要的想法是将数值计算表示为计算图，如下图所示。因此，任何 TensorFlow 程序的主干都将是一个计算图，以下情况为真:</p>
+<ul class="calibre7">
+<li class="calibre8">图节点是具有任意数量的输入和输出的操作</li>
+<li class="calibre8">我们节点之间的图边将会是在这些操作之间流动的张量，在实践中思考张量是什么的最好方式是 n 维数组</li>
+</ul>
+<p class="calibre2">使用这样的流程图作为深度学习框架的主干的优势在于，它允许你根据小而简单的操作来建立复杂的模型。此外，这将使梯度计算变得极其简单，我们将在后面的部分讨论这一点:</p>
+<div><img src="img/e996731b-b5d1-4fd3-9409-937bffdea297.png" class="calibre58"/></div>
+<div><p class="calibre2">另一种思考张量流图的方式是，每一个操作都是一个可以在该点进行求值的函数。</p>
+</div>
+
+
+            
+
+            
+        
+    
+
+
+
+
+
+  
+    <title>TensorFlow data types, variables, and placeholders</title>
+    <meta content="urn:uuid:b6d6a510-8f2b-40e4-8a30-e199afd87745" name="Adept.expected.resource"/>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+  
+
+
+  
+        
+
+                            
+                    <h1 class="header-title">张量流数据类型、变量和占位符</h1>
+                
+            
+            
+                
+<p class="calibre2">对计算图的理解将帮助我们从小的子图和操作的角度来考虑复杂的模型。</p>
+<p class="calibre2">让我们看一个只有一个隐藏层的神经网络示例，以及它在 TensorFlow 中的计算图:</p>
+<div><img class="fm-editor-equation7" src="img/e7423ec6-bcff-4926-aa39-1dfaeef0ea5f.png"/></div>
+<p class="calibre2">因此，我们有一些隐藏层，我们试图计算，因为一些参数矩阵的重新激活<em class="calibre19"> W </em>乘以一些输入<em class="calibre19"> x </em>加上一个偏置项<em class="calibre19"> b </em>。ReLU 函数取输出的最大值和零。</p>
+<p class="calibre2">下图显示了该图形在 TensorFlow 中的外观:</p>
+<div><img src="img/efac83f1-6997-4383-a90b-64d40eb1aabf.png" class="calibre59"/></div>
+<div><p class="calibre2">在这个图中，我们有变量为我们的<em class="calibre19"> b </em>和<em class="calibre19"> W </em>，我们有一个东西叫做占位符为<em class="calibre19">x</em>；在我们的图表中，每个操作都有节点。那么，让我们更详细地了解这些节点类型。</p>
+</div>
+
+
+            
+
+            
+        
+    
+
+
+
+
+
+  
+    <title>Variables</title>
+    <meta content="urn:uuid:b6d6a510-8f2b-40e4-8a30-e199afd87745" name="Adept.expected.resource"/>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+  
+
+
+  
+        
+
+                            
+                    <h1 class="header-title">变量</h1>
+                
+            
+            
+                
+<p class="calibre2">变量将成为有状态的节点，输出它们的当前值。在这个例子中，只有<em class="calibre19"> b </em>和<em class="calibre19"> W </em>。我们所说的变量是有状态的，是指它们在多次执行中保持其当前值，并且很容易将保存的值恢复到变量中:</p>
+<div><img src="img/40b4497a-5fd5-48c1-8603-d839b777bdfb.png" class="calibre60"/></div>
+<div><p class="calibre2">此外，变量还有其他有用的特性；例如，它们可以在培训期间和之后保存到您的磁盘上，这有助于我们前面提到的使用，它允许来自不同公司和团体的人保存、存储和发送他们的模型参数给其他人。此外，变量是您想要调整以最小化损失的东西，我们将很快看到如何做到这一点。</p>
+<p class="calibre2">重要的是要知道图中的变量，比如<em class="calibre19"> b </em>和<em class="calibre19"> W </em>，仍然是操作，因为根据定义，图中的所有节点都是操作。因此，当您在运行时评估这些保存了<em class="calibre19"> b </em>和<em class="calibre19"> W </em>的值的操作时，您将获得这些变量的值。</p>
+<p class="calibre2">我们可以使用 TensorFlow 的<kbd class="calibre12">Variable()</kbd>函数来定义一个变量，并赋予它一些初始值:</p>
+</div>
+<pre class="calibre21">var = tf.Variable(tf.random_normal((0,1)),name='random_values')</pre>
+<p class="calibre2">这行代码将定义一个 2 乘 2 的变量，并从标准正态分布初始化它。您也可以给变量起一个名字。</p>
+
+
+            
+
+            
+        
+    
+
+
+
+
+
+  
+    <title>Placeholders</title>
+    <meta content="urn:uuid:b6d6a510-8f2b-40e4-8a30-e199afd87745" name="Adept.expected.resource"/>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+  
+
+
+  
+        
+
+                            
+                    <h1 class="header-title">占位符</h1>
+                
+            
+            
+                
+<p class="calibre2">下一类节点是占位符。占位符是在执行时输入值的节点:</p>
+<div><img src="img/4580007b-fbef-402c-b9ab-0c549ca2e9be.png" class="calibre61"/></div>
+<div><p class="calibre2">如果您的计算图中有依赖于一些外部数据的输入，这些是我们将在训练期间添加到计算中的值的占位符。因此，对于占位符，我们不提供任何初始值。我们只是指定了张量的数据类型和形状，所以图形仍然知道要计算什么，即使它还没有任何存储的值。</p>
+</div>
+<p class="calibre2">我们可以使用 TensorFlow 的占位符函数来创建一个占位符:</p>
+<div><div><div><pre class="calibre21">ph_var1 = tf.placeholder(tf.float32,shape=(2,3))
+ph_var2 = tf.placeholder(tf.float32,shape=(3,2))
+result = tf.matmul(ph_var1,ph_var2)</pre></div>
+</div>
+</div>
+<p class="calibre2">这些代码行定义了特定形状的两个占位符变量，然后定义了将这两个值相乘的运算(见下一节)。</p>
+
+
+            
+
+            
+        
+    
+
+
+
+
+
+  
+    <title>Mathematical operations</title>
+    <meta content="urn:uuid:b6d6a510-8f2b-40e4-8a30-e199afd87745" name="Adept.expected.resource"/>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+  
+
+
+  
+        
+
+                            
+                    <h1 class="header-title">数学运算</h1>
+                
+            
+            
+                
+<p class="calibre2">第三种类型的节点是数学运算，这将是我们的矩阵乘法(MatMul)，加法(Add)和 ReLU。所有这些都是张量流图中的节点，它非常类似于 NumPy 运算:</p>
+<div><img src="img/80bde29f-4adb-45e7-bc6c-1ffc47fbebf0.png" class="calibre62"/></div>
+<p class="calibre2">让我们看看这个图在代码中会是什么样子。</p>
+<p class="calibre2">我们执行以下步骤来生成上图:</p>
+<ol class="calibre16">
+<li class="calibre8">创建权重<em class="calibre25"> W </em>和<em class="calibre25"> b </em>，包括初始化。我们可以通过从均匀分布<em class="calibre25"> W ~均匀(-1，1) </em>采样来初始化权重矩阵<em class="calibre25"> W </em>，并将<em class="calibre25"> b </em>初始化为 0。</li>
+<li class="calibre8">创建输入占位符<em class="calibre25"> x </em>，其形状为<em class="calibre25"> m * 784 </em>输入矩阵。</li>
+<li class="calibre8">建立一个流程图。</li>
+</ol>
+<p class="calibre2">让我们继续按照这些步骤来构建流程图:</p>
+<pre class="calibre21"># import TensorFlow package<br class="title-page-name"/>import tensorflow as tf<br class="title-page-name"/># build a TensorFlow variable b taking in initial zeros of size 100<br class="title-page-name"/># ( a vector of 100 values)<br class="title-page-name"/>b  = tf.Variable(tf.zeros((100,)))<br class="title-page-name"/># TensorFlow variable uniformly distributed values between -1 and 1<br class="title-page-name"/># of shape 784 by 100<br class="title-page-name"/>W = tf.Variable(tf.random_uniform((784, 100),-1,1))<br class="title-page-name"/># TensorFlow placeholder for our input data that doesn't take in<br class="title-page-name"/># any initial values, it just takes a data type 32 bit floats as<br class="title-page-name"/># well as its shape<br class="title-page-name"/>x = tf.placeholder(tf.float32, (100, 784))<br class="title-page-name"/># express h as Tensorflow ReLU of the TensorFlow matrix<br class="title-page-name"/>#Multiplication of x and W and we add b<br class="title-page-name"/>h = tf.nn.relu(tf.matmul(x,W) + b )
+h and see its value until we run this graph. So, this code snippet is just for building a backbone for our model. If you try to print the value of <em class="calibre19">W</em> or <em class="calibre19">b</em> in the preceding code, you should get the following output in Python:</pre>
+<div><img src="img/1a80ee6c-f094-4944-b153-0d6cdcb98b7d.png" class="calibre63"/></div>
+<p class="calibre2">到目前为止，我们已经定义了我们的图表，现在，我们需要实际运行它。</p>
+
+
+            
+
+            
+        
+    
+
+
+
+
+
+  
+    <title>Getting output from TensorFlow</title>
+    <meta content="urn:uuid:b6d6a510-8f2b-40e4-8a30-e199afd87745" name="Adept.expected.resource"/>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+  
+
+
+  
+        
+
+                            
+                    <h1 class="header-title">从 TensorFlow 获取输出</h1>
+                
+            
+            
+                
+<p class="calibre2">在上一节中，我们知道了如何构建计算图，但是我们需要实际运行它并获得它的值。</p>
+<p class="calibre2">我们可以用一个叫做会话的东西来部署/运行该图，它只是一个到特定执行上下文(比如 CPU 或 GPU)的绑定。因此，我们将利用我们构建的图表，将其部署到 CPU 或 GPU 环境中。</p>
+<p class="calibre2">为了运行该图，我们需要定义一个名为<kbd class="calibre12">sess</kbd>的会话对象，我们将调用函数<kbd class="calibre12">run</kbd>，它有两个参数:</p>
+<pre class="calibre21">sess.run(fetches, feeds)</pre>
+<p class="calibre2">这里:</p>
+<ul class="calibre7">
+<li class="calibre8"><kbd class="calibre12">fetches</kbd>是返回节点输出的图节点列表。这些是我们有兴趣计算其值的节点。</li>
+<li class="calibre8"><kbd class="calibre12">feeds</kbd>我们将在模型中运行一个从图节点到实际值的字典映射。所以，这是我们实际填充占位符的地方，我们之前讨论过。</li>
+</ul>
+<p class="calibre2">那么，让我们继续运行我们的图表:</p>
+<pre class="calibre21"># importing the numpy package for generating random variables for<br class="title-page-name"/># our placeholder x<br class="title-page-name"/>import numpy as np<br class="title-page-name"/># build a TensorFlow session object which takes a default execution<br class="title-page-name"/># environment which will be most likely a CPU<br class="title-page-name"/>sess = tf.Session()<br class="title-page-name"/># calling the run function of the sess object to initialize all the<br class="title-page-name"/># variables.<br class="title-page-name"/>sess.run(tf.global_variables_initializer())<br class="title-page-name"/># calling the run function on the node that we are interested in,<br class="title-page-name"/># the h, and we feed in our second argument which is a dictionary<br class="title-page-name"/># for our placeholder x with the values that we are interested in.<br class="title-page-name"/>sess.run(h, {x: np.random.random((100,784))})   </pre>
+<p class="calibre2">在通过<kbd class="calibre12">sess</kbd>对象运行我们的图表后，我们应该得到类似如下的输出:</p>
+<div><img src="img/7faee772-f55c-41db-b38f-9768eb147d71.png" class="calibre64"/></div>
+<pre>lazy evaluation. It means that the evaluation of your graph only ever happens at runtime, and runtime in TensorFlow means the session. So, calling this function, <kbd class="calibre12">global_variables_initializer()</kbd>, will actually initialize anything called variable in your graph, such as <em class="calibre19">W</em> and <em class="calibre19">b</em> in our case.</pre>
+<p class="calibre2">我们还可以在 with 块中使用会话变量，以确保它在执行图形后关闭:</p>
+<pre class="calibre21">ph_var1 = tf.placeholder(tf.float32,shape=(2,3))<br class="title-page-name"/>ph_var2 = tf.placeholder(tf.float32,shape=(3,2))<br class="title-page-name"/>result = tf.matmul(ph_var1,ph_var2)
+with tf.Session() as sess:
+    print(sess.run([result],feed_dict={ph_var1:[[1.,3.,4.],[1.,3.,4.]],ph_var2:[[1., 3.],[3.,1.],[.1,4.]]}))<br class="title-page-name"/><br class="title-page-name"/>Output:<br class="title-page-name"/>[array([[10.4, 22. ],<br class="title-page-name"/>       [10.4, 22. ]], dtype=float32)]<br class="title-page-name"/></pre>
+
+
+            
+
+            
+        
+    
+
+
+
+
+
+  
+    <title>TensorBoard – visualizing learning</title>
+    <meta content="urn:uuid:b6d6a510-8f2b-40e4-8a30-e199afd87745" name="Adept.expected.resource"/>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+  
+
+
+  
+        
+
+                            
+                    <h1 class="header-title">tensor board–可视化学习</h1>
+                
+            
+            
+                
+<p class="calibre2">您将使用 TensorFlow 进行的计算-例如训练大规模深度神经网络-可能会很复杂，令人困惑，其相应的计算图也会很复杂。为了更容易理解、调试和优化 TensorFlow 程序，TensorFlow 团队提供了一套名为 TensorBoard 的可视化工具，这是一套可以通过浏览器运行的 web 应用程序。TensorBoard 可用于可视化您的 TensorFlow 图表，绘制有关图表执行的量化指标，并显示其他数据，如通过它的图像。TensorBoard 完全配置后，看起来像这样:</p>
+<div><img src="img/f35cf3a4-a002-4007-94bd-c4be2f595744.png" class="calibre65"/></div>
+<p class="calibre2">为了理解 TensorBoard 如何工作，我们将构建一个计算图，作为 MNIST 数据集的分类器，该数据集是手写图像的数据集。</p>
+<p class="calibre2">你不必了解这个模型的所有细节，但它会向你展示一个在 TensorFlow 中实现的机器学习模型的大致流水线。</p>
+<p class="calibre2">因此，让我们从导入 TensorFlow 开始，并使用 TensorFlow 辅助函数加载所需的数据集；这些帮助函数将检查您是否已经下载了数据集，否则它将为您下载:</p>
+<pre class="calibre21">import tensorflow as tf<br class="title-page-name"/><br class="title-page-name"/># Using TensorFlow helper function to get the MNIST dataset<br class="title-page-name"/>from tensorflow.examples.tutorials.mnist import input_data<br class="title-page-name"/>mnist_dataset = input_data.read_data_sets("/tmp/data/", one_hot=True)<br class="title-page-name"/><br class="title-page-name"/><br class="title-page-name"/>Output:<br class="title-page-name"/>Extracting /tmp/data/train-images-idx3-ubyte.gz<br class="title-page-name"/>Extracting /tmp/data/train-labels-idx1-ubyte.gz<br class="title-page-name"/>Extracting /tmp/data/t10k-images-idx3-ubyte.gz<br class="title-page-name"/>Extracting /tmp/data/t10k-labels-idx1-ubyte.gz</pre>
+<p class="calibre2">接下来，我们需要定义超参数(可以用来微调模型性能的参数)和模型的输入:</p>
+<pre class="calibre21"># hyperparameters of the the model (you don't have to understand the functionality of each parameter)<br class="title-page-name"/>learning_rate = 0.01<br class="title-page-name"/>num_training_epochs = 25<br class="title-page-name"/>train_batch_size = 100<br class="title-page-name"/>display_epoch = 1<br class="title-page-name"/>logs_path = '/tmp/tensorflow_tensorboard/'<br class="title-page-name"/><br class="title-page-name"/># Define the computational graph input which will be a vector of the image pixels<br class="title-page-name"/># Images of MNIST has dimensions of 28 by 28 which will multiply to 784<br class="title-page-name"/>input_values = tf.placeholder(tf.float32, [None, 784], name='input_values')<br class="title-page-name"/><br class="title-page-name"/># Define the target of the model which will be a classification problem of 10 classes from 0 to 9<br class="title-page-name"/>target_values = tf.placeholder(tf.float32, [None, 10], name='target_values')<br class="title-page-name"/><br class="title-page-name"/># Define some variables for the weights and biases of the model<br class="title-page-name"/>weights = tf.Variable(tf.zeros([784, 10]), name='weights')<br class="title-page-name"/>biases = tf.Variable(tf.zeros([10]), name='biases')</pre>
+<p class="calibre2">现在，我们需要构建模型，并定义要优化的成本函数:</p>
+<pre class="calibre21"># Create the computational graph and encapsulating different operations to different scopes<br class="title-page-name"/># which will make it easier for us to understand the visualizations of TensorBoard<br class="title-page-name"/>with tf.name_scope('Model'):<br class="title-page-name"/> # Defining the model<br class="title-page-name"/> predicted_values = tf.nn.softmax(tf.matmul(input_values, weights) + biases)<br class="title-page-name"/> <br class="title-page-name"/>with tf.name_scope('Loss'):<br class="title-page-name"/> # Minimizing the model error using cross entropy criteria<br class="title-page-name"/> model_cost = tf.reduce_mean(-tf.reduce_sum(target_values*tf.log(predicted_values), reduction_indices=1))<br class="title-page-name"/><br class="title-page-name"/>with tf.name_scope('SGD'):<br class="title-page-name"/> # using Gradient Descent as an optimization method for the model cost above<br class="title-page-name"/> model_optimizer = tf.train.GradientDescentOptimizer(learning_rate).minimize(model_cost)<br class="title-page-name"/> <br class="title-page-name"/>with tf.name_scope('Accuracy'):<br class="title-page-name"/> #Calculating the accuracy<br class="title-page-name"/> model_accuracy = tf.equal(tf.argmax(predicted_values, 1), tf.argmax(target_values, 1))<br class="title-page-name"/> model_accuracy = tf.reduce_mean(tf.cast(model_accuracy, tf.float32))<br class="title-page-name"/><br class="title-page-name"/># TensorFlow use the lazy evaluation strategy while defining the variables<br class="title-page-name"/># So actually till now none of the above variable got created or initialized<br class="title-page-name"/>init = tf.global_variables_initializer()</pre>
+<p class="calibre2">我们将定义汇总变量，用于监控特定变量的变化，如损失以及在整个培训过程中如何改善:</p>
+<pre class="calibre21"># Create a summary to monitor the model cost tensor<br class="title-page-name"/>tf.summary.scalar("model loss", model_cost)<br class="title-page-name"/><br class="title-page-name"/># Create another summary to monitor the model accuracy tensor<br class="title-page-name"/>tf.summary.scalar("model accuracy", model_accuracy)<br class="title-page-name"/><br class="title-page-name"/># Merging the summaries to single operation<br class="title-page-name"/>merged_summary_operation = tf.summary.merge_all()</pre>
+<p class="calibre2">最后，我们将通过定义一个会话变量来运行模型，该变量将用于执行我们构建的计算图:</p>
+<pre class="calibre21"># kick off the training process<br class="title-page-name"/>with tf.Session() as sess:<br class="title-page-name"/><br class="title-page-name"/> # Intialize the variables <br class="title-page-name"/> sess.run(init)<br class="title-page-name"/><br class="title-page-name"/> # operation to feed logs to TensorBoard<br class="title-page-name"/> summary_writer = tf.summary.FileWriter(logs_path, graph=tf.get_default_graph())<br class="title-page-name"/><br class="title-page-name"/> # Starting the training cycle by feeding the model by batch at a time<br class="title-page-name"/> for train_epoch in range(num_training_epochs):<br class="title-page-name"/> <br class="title-page-name"/> average_cost = 0.<br class="title-page-name"/> total_num_batch = int(mnist_dataset.train.num_examples/train_batch_size)<br class="title-page-name"/> <br class="title-page-name"/> # iterate through all training batches<br class="title-page-name"/> for i in range(total_num_batch):<br class="title-page-name"/> batch_xs, batch_ys = mnist_dataset.train.next_batch(train_batch_size)<br class="title-page-name"/> <br class="title-page-name"/> # Run the optimizer with gradient descent and cost to get the loss<br class="title-page-name"/> # and the merged summary operations for the TensorBoard<br class="title-page-name"/> _, c, summary = sess.run([model_optimizer, model_cost, merged_summary_operation],<br class="title-page-name"/> feed_dict={input_values: batch_xs, target_values: batch_ys})<br class="title-page-name"/> <br class="title-page-name"/> # write statistics to the log et every iteration<br class="title-page-name"/> summary_writer.add_summary(summary, train_epoch * total_num_batch + i)<br class="title-page-name"/> <br class="title-page-name"/> # computing average loss<br class="title-page-name"/> average_cost += c / total_num_batch<br class="title-page-name"/> <br class="title-page-name"/> # Display logs per epoch step<br class="title-page-name"/> if (train_epoch+1) % display_epoch == 0:<br class="title-page-name"/> print("Epoch:", '%03d' % (train_epoch+1), "cost=", "{:.9f}".format(average_cost))<br class="title-page-name"/><br class="title-page-name"/> print("Optimization Finished!")<br class="title-page-name"/><br class="title-page-name"/> # Testing the trained model on the test set and getting the accuracy compared to the actual labels of the test set<br class="title-page-name"/> print("Accuracy:", model_accuracy.eval({input_values: mnist_dataset.test.images, target_values: mnist_dataset.test.labels}))<br class="title-page-name"/><br class="title-page-name"/> print("To view summaries in the Tensorboard, run the command line:\n" \<br class="title-page-name"/> "--&gt; tensorboard --logdir=/tmp/tensorflow_tensorboard " \<br class="title-page-name"/>"\nThen open http://0.0.0.0:6006/ into your web browser")</pre>
+<p class="calibre2">培训过程的输出应该类似于以下内容:</p>
+<pre class="calibre21">Epoch: 001 cost= 1.183109128<br class="title-page-name"/>Epoch: 002 cost= 0.665210275<br class="title-page-name"/>Epoch: 003 cost= 0.552693334<br class="title-page-name"/>Epoch: 004 cost= 0.498636444<br class="title-page-name"/>Epoch: 005 cost= 0.465516675<br class="title-page-name"/>Epoch: 006 cost= 0.442618381<br class="title-page-name"/>Epoch: 007 cost= 0.425522513<br class="title-page-name"/>Epoch: 008 cost= 0.412194222<br class="title-page-name"/>Epoch: 009 cost= 0.401408134<br class="title-page-name"/>Epoch: 010 cost= 0.392437336<br class="title-page-name"/>Epoch: 011 cost= 0.384816745<br class="title-page-name"/>Epoch: 012 cost= 0.378183398<br class="title-page-name"/>Epoch: 013 cost= 0.372455584<br class="title-page-name"/>Epoch: 014 cost= 0.367275238<br class="title-page-name"/>Epoch: 015 cost= 0.362772711<br class="title-page-name"/>Epoch: 016 cost= 0.358591895<br class="title-page-name"/>Epoch: 017 cost= 0.354892231<br class="title-page-name"/>Epoch: 018 cost= 0.351451424<br class="title-page-name"/>Epoch: 019 cost= 0.348337946<br class="title-page-name"/>Epoch: 020 cost= 0.345453095<br class="title-page-name"/>Epoch: 021 cost= 0.342769080<br class="title-page-name"/>Epoch: 022 cost= 0.340236065<br class="title-page-name"/>Epoch: 023 cost= 0.337953151<br class="title-page-name"/>Epoch: 024 cost= 0.335739001<br class="title-page-name"/>Epoch: 025 cost= 0.333702818<br class="title-page-name"/>Optimization Finished!<br class="title-page-name"/>Accuracy: 0.9146<br class="title-page-name"/>To view summaries in the Tensorboard, run the command line:<br class="title-page-name"/>--&gt; tensorboard --logdir=/tmp/tensorflow_tensorboard <br class="title-page-name"/>Then open http://0.0.0.0:6006/ into your web browser</pre>
+<p class="calibre2">要在 TensorBoard 中查看汇总的统计数据，我们将在终端中发出以下命令，以跟踪输出末尾的消息:</p>
+<pre class="calibre21">tensorboard --logdir=/tmp/tensorflow_tensorboard</pre>
+<p class="calibre2">然后，在网络浏览器中打开<kbd class="calibre12">http://0.0.0.0:6006/</kbd>。</p>
+<p class="calibre2">当你打开 TensorBoard 的时候，你应该会得到类似下面的截图:</p>
+<p class="calibre2"/>
+<div><img src="img/1f3b4ade-178f-41ca-aae9-76566e5db405.png" class="calibre31"/></div>
+<p class="calibre2">这显示了我们正在监控的变量，例如模型准确性及其如何变高，以及模型损失及其如何在整个训练过程中变低。所以，你观察到我们在这里有一个正常的学习过程。但有时你会发现准确性和模型损失是随机变化的，或者你想跟踪一些变量以及它们在整个会话中是如何变化的，TensorBoard 将非常有用，可以帮助你发现任何随机性或错误。</p>
+<p class="calibre2">此外，如果切换到 TensorBoard 中的 GRAPHS 选项卡，您将看到我们在前面的代码中构建的计算图形:</p>
+<div><img src="img/e74b2f16-147f-44e7-a169-1bc1f731860b.png" class="calibre31"/></div>
+
+
+            
+
+            
+        
+    
+
+
+
+
+
+  
+    <title>Summary</title>
+    <meta content="urn:uuid:b6d6a510-8f2b-40e4-8a30-e199afd87745" name="Adept.expected.resource"/>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+  
+
+
+  
+        
+
+                            
+                    <h1 class="header-title">摘要</h1>
+                
+            
+            
+                
+<div><p class="calibre2">在本章中，我们介绍了 Ubuntu 和 Mac 的安装过程，概述了 TensorFlow 编程模型，并解释了可用于构建复杂操作的不同类型的简单节点，以及如何使用会话对象从 TensorFlow 获取输出。此外，我们还介绍了 TensorBoard，以及它为什么有助于调试和分析复杂的深度学习应用程序。</p>
+<p class="calibre2">接下来，我们将对神经网络和拥有多层神经网络背后的直觉进行基本解释。我们还将介绍张量流的一些基本例子，并演示它如何用于回归和分类问题。</p>
+</div>
+
+
+            
+
+            
+        
+    
+
+
+</body></html>

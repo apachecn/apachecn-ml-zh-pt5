@@ -1,0 +1,325 @@
+<html><head/><body>
+
+
+
+
+
+
+
+
+
+<title>Chapter 15: Principal Component Analysis</title>
+
+
+
+
+
+
+
+<div><div><h1 id="_idParaDest-168"><em class="italic"> <a id="_idTextAnchor170"/>第十五章</em>:主成分分析</h1>
+
+<p>降维是机器学习中比较重要的概念/策略之一。它有时等同于特征选择，但这是一种过于狭隘的降维观点。我们的模型经常不得不处理过多的特征，其中一些特征捕捉相同的信息。不解决这个问题会大大增加过度拟合或结果不稳定的风险。但是删除一些特性并不是我们工具箱中的唯一工具。特征<a id="_idIndexMarker1102"/>提取策略，如<strong class="bold">主成分分析</strong> ( <strong class="bold"> PCA </strong>)，往往能产生好的结果。</p>
+
+<p>我们可以使用 PCA 来降低数据集的维度(特征的数量),而不会失去显著的预测能力。捕捉数据中大部分方差所需的主成分的数量通常少于特征的数量，通常少得多。</p>
+
+<p>这些组件可用于我们的回归或分类模型，而不是初始特征。这不仅可以加快我们的模型学习的速度，还可以减少我们估计的方差。这种特征提取策略的主要缺点是新特征通常更难解释。当我们有分类特征时，PCA 也不是一个好的选择。</p>
+
+<p>我们将通过首先检查每个组件是如何构造的来发展我们对 PCA 如何工作的理解。我们将构建一个主成分分析，解释结果，然后在分类模型中使用这些结果。最后，当我们的组件可能不是线性可分时，我们将使用内核来改进 PCA。</p>
+
+<p>具体来说，我们将在本章中探讨以下主题:</p>
+
+<ul>
+
+<li>PCA 的关键概念</li>
+
+<li>基于主成分分析的特征提取</li>
+
+<li>使用带 PCA 的内核<a id="_idTextAnchor171"/></li>
+
+</ul>
+
+<h1 id="_idParaDest-169"><a id="_idTextAnchor172"/>技术要求</h1>
+
+<p>在本章中，我们将主要关注 pandas、NumPy 和 scikit-learn 库。所有代码都用 scikit-learn 版本 0.24.2 和 1.0.2 进行了测试。</p>
+
+<p>本章的代码可以从 GitHub 资源库下载:<a href="https://github.com/PacktPublishing/Data-Cleaning-and-Exploration-with-Machine-Learning">https://GitHub . com/packt publishing/Data-Cleaning-and-Exploration-with-Machine-Learning</a>。</p>
+
+<h1 id="_idParaDest-170"><a id="_idTextAnchor173"/>PCA 的关键概念</h1>
+
+<p>PCA 产生特征的多个线性组合，每个线性组合是一个组件。它确定一个获取最大方差的组件，第二个获取最大剩余方差的组件，然后是第三个组件，依此类推，直到到达我们指定的停止点。停止点可以基于组件的数量、解释的变化百分比或领域知识。</p>
+
+<p>主成分的一个非常有用的特征是它们相互正交。这意味着它们是不相关的，这对建模来说是个好消息。<em class="italic">图 15.1 </em>显示了由特征 x1 和 x2 构成的两个组件。用<em class="italic"> PC1 </em>捕捉最大方差，用<em class="italic"> PC2 </em>捕捉最大剩余方差。(图中数据点是瞎编的。)注意，这两个向量是正交的(垂直的)。</p>
+
+<div><div><img alt="Figure 15.1 – An illustration of PCA with two features&#10;&#10;" height="503" src="img/B17978_15_001.jpg" width="696"/>
+
+</div>
+
+</div>
+
+<p class="figure-caption">图 15.1–具有两个特征的 PCA 示意图</p>
+
+<p>你们中那些做过很多因子分析的人可能已经明白了大概的意思，即使这是你们第一次探索 PCA。主成分与因子没有太大的不同，尽管有一些概念和数学上的差异。使用主成分分析，可以分析所有的方差。只有变量之间的共享方差用因子分析来分析。在因子分析中，未观察到的因子被理解为<em class="italic">导致了</em>观察到的变量。PCA 不需要对潜在的、未观察到的力进行假设。</p>
+
+<p>那么，这一点计算魔法是如何实现的呢？可通过以下步骤计算主成分:</p>
+
+<ol>
+
+<li>标准化您的数据。</li>
+
+<li>计算变量的协方差矩阵。</li>
+
+<li>计算协方差矩阵的特征向量和特征值。</li>
+
+<li>按特征值降序排列特征向量。第一个特征向量是主成分 1，第二个是主成分 2，以此类推。</li>
+
+</ol>
+
+<p>没有必要完全理解这些步骤来理解本章其余部分的讨论。我们将得到 scikit-learn 来为我们做这项工作。不过，如果您计算一个非常小的数据子集(两列或三列，只有几行)的协方差矩阵，然后对该矩阵进行特征分解，这可能会提高您的直觉。一种更简单的尝试构造组件的方法是使用 NumPy 线性代数函数(<code>numpy.linalg</code>)，同时仍然是说明性的。这里的关键点是推导主分量的计算有多简单。</p>
+
+<p>PCA 用于<a id="_idIndexMarker1106"/>许多机器学习任务。它可以用来调整图像大小，分析财务数据，或者用于推荐系统。从本质上讲，对于任何有大量特性并且其中许多特性相互关联的应用程序来说，这都是一个不错的选择。</p>
+
+<p>毫无疑问，你们中的一些人已经注意到，我无意中提到 PCA 构建了特征的线性组合。当线性可分性不可行时，我们该怎么办，就像我们在支持向量机中遇到的那样？事实证明，我们依赖于支持向量机的核心技巧也适用于 PCA。我们将在本章探讨如何实现内核 PCA。然而，我们将从一个相对简单的 PCA 例子开始。</p>
+
+<h1 id="_idParaDest-171"><a id="_idTextAnchor174"/>利用主成分分析进行特征提取</h1>
+
+<p>PCA 可用于<a id="_idIndexMarker1107"/>降维，为我们随后运行的模型做准备。虽然严格来说，PCA 不是一个特征选择工具，但我们可以用与运行<a href="B17978_05_ePub.xhtml#_idTextAnchor058"> <em class="italic">第 5 章</em> </a>、<em class="italic">特征选择</em>中的包装器特征选择方法几乎相同的方式来运行它。在一些预处理(比如处理异常值)之后，我们生成组件，然后我们可以将这些组件用作我们的新特性。有时我们实际上并不在模型中使用这些组件。相反，我们生成它们主要是为了帮助我们更好地可视化我们的数据。</p>
+
+<p>为了说明 PCA 的使用，我们将使用国家篮球协会的比赛数据。该数据集包含从 2017/2018 赛季到 2020/2021 赛季的每场 NBA 比赛的统计数据。这包括主队；主队是否获胜；客队；客队和主队的投篮命中率；两队失误、篮板、助攻；以及其他一些措施。</p>
+
+<p class="callout-heading">注意</p>
+
+<p class="callout">公众可以在 https://www.kaggle.com/datasets/wyattowalsh/basketball<a href="https://www.kaggle.com/datasets/wyattowalsh/basketball">下载 NBA 比赛数据。该数据集包含从 1946/1947 NBA 赛季开始的比赛数据。它使用<code>nba_api</code>从 nba.com 获取统计数据。该 API 在 https://github.com/swar/nba_api 有售。</a></p>
+
+<p>让我们在模型中使用<a id="_idIndexMarker1108"/> PCA:</p>
+
+<ol>
+
+<li value="1">我们从加载所需的库开始。除了 scikit-learn 的<code>PCA</code>模块:<pre>import pandas as pd import numpy as np from sklearn.model_selection import train_test_split from sklearn.preprocessing import StandardScaler from sklearn.pipeline import make_pipeline from sklearn.impute import SimpleImputer from sklearn.linear_model import LogisticRegression from sklearn.decomposition import PCA from sklearn.model_selection import RandomizedSearchCV from scipy.stats import uniform from scipy.stats import randint import os import sys sys.path.append(os.getcwd() + “/helperfunctions”) from preprocfunc import OutlierTrans</pre>之外，你已经在前面的章节中看到了所有这些</li>
+
+<li>接下来，我们加载 NBA 数据并做一些清理。一些实例没有主队赢或输的值，<code>WL_HOME</code>，所以我们删除它们。<code>WL_HOME</code>将是我们的目标。在我们构建好组件之后，我们将尝试稍后对其进行建模。注意，主队大部分时间都赢了，但是阶级不平衡还不错:<pre>nbagames = pd.read_csv(“data/nbagames2017plus.csv”, parse_dates=[‘GAME_DATE’]) nbagames = nbagames.loc[nbagames.WL_HOME.isin([‘W’,’L’])] nbagames.shape <strong class="bold">(4568, 149)</strong> nbagames[‘WL_HOME’] = \   np.where(nbagames.WL_HOME==’L’,0,1).astype(‘int’) nbagames.WL_HOME.value_counts(dropna=False) <strong class="bold">1    2586</strong> <strong class="bold">0    1982</strong> <strong class="bold">Name: WL_HOME, dtype: int64</strong></pre></li>
+
+<li>我们应该<a id="_idIndexMarker1110"/>看一些描述性统计:<pre>num_cols = [‘FG_PCT_HOME’,’FTA_HOME’,’FG3_PCT_HOME’,   ‘FTM_HOME’,’FT_PCT_HOME’,’OREB_HOME’,’DREB_HOME’,   ‘REB_HOME’,’AST_HOME’,’STL_HOME’,’BLK_HOME’,   ‘TOV_HOME’, ‘FG_PCT_AWAY’,’FTA_AWAY’,’FG3_PCT_AWAY’,   ‘FT_PCT_AWAY’,’OREB_AWAY’,’DREB_AWAY’,’REB_AWAY’,   ‘AST_AWAY’,’STL_AWAY’,’BLK_AWAY’,’TOV_AWAY’] nbagames[[‘WL_HOME’] + num_cols].agg([‘count’,’min’,’median’,’max’]).T</pre></li>
+
+</ol>
+
+<p>这产生了<a id="_idIndexMarker1111"/>以下输出。没有丢失值，但是我们的特征具有非常不同的范围。我们需要做一些扩展:</p>
+
+<pre><strong class="bold">                count       min     median    max</strong>
+<strong class="bold">WL_HOME         4,568.00    0.00    1.00      1.00</strong>
+<strong class="bold">FG_PCT_HOME     4,568.00    0.27    0.47      0.65</strong>
+<strong class="bold">FTA_HOME        4,568.00    1.00    22.00     64.00</strong>
+<strong class="bold">FG3_PCT_HOME    4,568.00    0.06    0.36      0.84</strong>
+<strong class="bold">FTM_HOME        4,568.00    1.00    17.00     44.00</strong>
+<strong class="bold">FT_PCT_HOME     4,568.00    0.14    0.78      1.00</strong>
+<strong class="bold">OREB_HOME       4,568.00    1.00    10.00     25.00</strong>
+<strong class="bold">DREB_HOME       </strong><strong class="bold">4,568.00    18.00   35.00     55.00</strong>
+<strong class="bold">REB_HOME        4,568.00    22.00   45.00     70.00</strong>
+<strong class="bold">AST_HOME        4,568.00    10.00   </strong><strong class="bold">24.00     50.00</strong>
+<strong class="bold">STL_HOME        4,568.00    0.00    7.00      22.00</strong>
+<strong class="bold">BLK_HOME        4,568.00    0.00    5.00      20.00</strong>
+<strong class="bold">TOV_HOME        </strong><strong class="bold">4,568.00    1.00    14.00     29.00</strong>
+<strong class="bold">FG_PCT_AWAY     4,568.00    0.28    0.46      0.67</strong>
+<strong class="bold">FTA_AWAY        4,568.00    3.00    </strong><strong class="bold">22.00     54.00</strong>
+<strong class="bold">FG3_PCT_AWAY    4,568.00    0.08    0.36      0.78</strong>
+<strong class="bold">FT_PCT_AWAY     4,568.00    0.26    0.78      1.00</strong>
+<strong class="bold">OREB_AWAY       </strong><strong class="bold">4,568.00    0.00    10.00     26.00</strong>
+<strong class="bold">DREB_AWAY       4,568.00    18.00   34.00     56.00</strong>
+<strong class="bold">REB_AWAY        4,568.00    22.00   </strong><strong class="bold">44.00     71.00</strong>
+<strong class="bold">AST_AWAY        4,568.00    9.00    24.00     46.00</strong>
+<strong class="bold">STL_AWAY        4,568.00    0.00    8.00      19.00</strong>
+<strong class="bold">BLK_AWAY        </strong><strong class="bold">4,568.00    0.00    5.00      15.00</strong>
+<strong class="bold">TOV_AWAY        4,568.00    3.00    14.00     30.00</strong></pre>
+
+<ol>
+
+<li value="4">让我们也检查一下<a id="_idIndexMarker1112"/>我们的特征是如何关联的:<pre>corrmatrix = nbagames[[‘WL_HOME’] + num_cols].\   corr(method=”pearson”) sns.heatmap(corrmatrix, xticklabels=corrmatrix.columns,   yticklabels=corrmatrix.columns, cmap=”coolwarm”) plt.title(‘Heat Map of Correlation Matrix’) plt.tight_layout() plt.show()</pre></li>
+
+</ol>
+
+<p>这会产生以下情节:</p>
+
+<div><div><img alt="Figure 15.2 – Heat map of NBA features" height="460" src="img/B17978_15_002.jpg" width="608"/>
+
+</div>
+
+</div>
+
+<p class="figure-caption">图 15.2-NBA 特征热图</p>
+
+<p>许多<a id="_idIndexMarker1113"/>特征是显著正相关或负相关的。比如主队(<code>FG_PCT_HOME</code>)的投篮命中率和主队(<code>FG3_PCT_HOME</code>)的三分球命中率是正相关的，并不奇怪。此外，主队的篮板(<code>REB_HOME</code>)和主队的防守篮板(<code>DREB_HOME</code>)可能过于密切相关，任何模型都无法理清它们的影响。</p>
+
+<p>这个数据集可能是 PCA 的一个很好的候选。虽然有些特征是高度相关的，但我们仍然会丢失一些信息。PCA 至少提供了在不丢失信息的情况下处理相关性的可能性。</p>
+
+<ol>
+
+<li value="5">现在我们创建训练和测试数据帧:<pre>X_train, X_test, y_train, y_test =  \   train_test_split(nbagames[num_cols],\   nbagames[[‘WL_HOME’]],test_size=0.2, random_state=0)</pre></li>
+
+<li>我们现在已经准备好创建组件了。我们有点武断地指出，我们想要七个组件。(稍后，我们将使用超参数调谐来选择组件的数量。)在运行 PCA 之前，我们设置了管道来做一些预处理:<pre>pca = PCA(n_components=7) pipe1 = make_pipeline(OutlierTrans(2),       SimpleImputer(strategy=”median”),       StandardScaler(), pca) pipe1.fit(X_train)</pre></li>
+
+<li>我们现在可以使用<code>pca</code>对象的<code>components_</code>属性。这将返回所有 23 个特征在七个组件中的每一个上的分数:<pre>components = pd.DataFrame(pipe1[‘pca’].components_,   columns=num_cols) components.T.to_excel(‘views/components.xlsx’)</pre></li>
+
+</ol>
+
+<p>这将生成以下电子表格:</p>
+
+<div><div><img alt="Figure 15.3 – Principal components of NBA features&#10;&#10;" height="1020" src="img/B17978_15_003.jpg" width="1145"/>
+
+</div>
+
+</div>
+
+<p class="figure-caption">图 15.3-NBA 特征的主要组成部分</p>
+
+<p>每个<a id="_idIndexMarker1115"/>特征说明了每个组件差异的一部分。(如果对每个部分，你对 23 个分数中的每一个进行平方，然后对平方求和，你得到的总数是 1。)如果您想了解哪些特性真正驱动了一个组件，请寻找绝对值最大的特性。对于组件 1，主队的投篮命中率(<code>FG_PCT_HOME</code>)最为重要，其次是客场队的篮板数(<code>REB_AWAY</code>)。</p>
+
+<p>回想一下我们在本章开始时的讨论，每个组件都试图捕捉前一个或多个组件之后剩余的差异。</p>
+
+<ol>
+
+<li value="8">让我们展示前三个组件的五个最重要的特性。第一个组成部分似乎主要是关于主队的投篮命中率和每个队的篮板。第二个组成部分似乎没有太大的不同，但第三个组成部分是由罚球和尝试(<code>FTM_HOME</code>和<code>FTA_HOME</code>)以及失误(<code>TOV_HOME</code>和<code>TOV_AWAY</code> ): <pre>components.pc1.abs().nlargest(5) <strong class="bold">FG_PCT_HOME    0.38</strong> <strong class="bold">REB_AWAY       0.37</strong> <strong class="bold">DREB_AWAY      0.34</strong> <strong class="bold">REB_HOME       0.33</strong> <strong class="bold">FG_PCT_AWAY    0.30</strong> <strong class="bold">Name: pc1, dtype: float64</strong> components.pc2.abs().nlargest(5) <strong class="bold">DREB_HOME      0.38</strong> <strong class="bold">FG_PCT_AWAY    0.37</strong> <strong class="bold">DREB_AWAY      0.32</strong> <strong class="bold">REB_HOME       0.32</strong> <strong class="bold">FG_PCT_HOME    0.29</strong> <strong class="bold">Name: pc2, dtype: float64</strong> components.pc3.abs().nlargest(5) <strong class="bold">FTM_HOME    0.55</strong> <strong class="bold">FTA_HOME    0.53</strong> <strong class="bold">TOV_HOME    0.30</strong> <strong class="bold">STL_AWAY    0.27</strong> <strong class="bold">TOV_AWAY    0.26</strong> <strong class="bold">Name: pc3, dtype: float64</strong></pre>所驱动的</li>
+
+<li>我们可以使用<code>pca</code>对象的<code>explained_variance_ratio_</code>属性来检查每个组件捕获了多少差异。第一个成分解释了特征变化的 14.5%。第二个成分解释了另外 13.4%。如果我们使用 NumPy 的<code>cumsum</code>方法，我们可以看到这七个因素总共解释了大约 65%的方差。</li>
+
+</ol>
+
+<p>所以,<a id="_idIndexMarker1117"/>仍然存在相当大的差异。我们可能希望为我们构建的任何模型使用更多组件:</p>
+
+<pre>np.set_printoptions(precision=3)
+pipe1[‘pca’].explained_variance_ratio_
+<strong class="bold">array([0.145, 0.134, 0.095, 0.086, 0.079, 0.059, 0.054])</strong>
+np.cumsum(pipe1[‘pca’].explained_variance_ratio_)
+<strong class="bold">array([0.145, 0.279, 0.374, 0.46 , 0.539, 0.598, 0.652])</strong></pre>
+
+<ol>
+
+<li value="10">我们可以绘制前两个主成分图，看看它们能在多大程度上区分主队的输赢。我们可以使用管道的<code>transform</code>方法创建一个包含主要组件的数据帧，并将其与目标的数据帧连接起来。</li>
+
+</ol>
+
+<p>我们使用 Seaborn 的<code>scatterplot</code>的便利的<code>hue</code>属性来显示输赢。前两个主成分很好地区分了输赢，尽管它们加起来只占我们特征变化的 28%:</p>
+
+<pre>X_train_pca = pd.DataFrame(pipe1.transform(X_train),
+  columns=components.columns, index=X_train.index).join(y_train)
+sns.scatterplot(x=X_train_pca.pc1, y=X_train_pca.pc2, hue=X_train_pca.WL_HOME)
+plt.title(“Scatterplot of First and Second Components”)
+plt.xlabel(“Principal Component 1”)
+plt.ylabel(“Principal Component 2”)
+plt.show()</pre>
+
+<p>此<a id="_idIndexMarker1118"/>产生以下图形:</p>
+
+<div><div><img alt="Figure 15.4 – Scatterplot of wins and losses by first and second principal components&#10;&#10;" height="450" src="img/B17978_15_004.jpg" width="564"/>
+
+</div>
+
+</div>
+
+<p class="figure-caption">图 15.4–第一和第二主成分的赢输散点图</p>
+
+<ol>
+
+<li value="11">让我们用主成分来预测主队是否会赢。我们只需在管道中添加一个逻辑回归就可以做到这一点。我们还进行网格搜索以找到<a id="_idIndexMarker1119"/>最佳超参数值:<pre>lr = LogisticRegression() pipe2 = make_pipeline(OutlierTrans(2),   SimpleImputer(strategy=”median”), StandardScaler(),   pca, lr) lr_params = {   “pca__n_components”: randint(3, 20),   “logisticregression__C”: uniform(loc=0, scale=10) } rs = RandomizedSearchCV(pipe2, lr_params, cv=4,    n_iter=40, scoring=’accuracy’, random_state=1) rs.fit(X_train, y_train.values.ravel())</pre></li>
+
+<li>我们现在可以查看最佳参数并进行评分。正如我们在前面的步骤中所怀疑的那样，网格搜索表明，我们的逻辑回归模型在包含更多组件的情况下表现更好。我们得到了很高的分数。</li>
+
+</ol>
+
+<p>我们在<a href="B17978_10_ePub.xhtml#_idTextAnchor126"> <em class="italic">第十章</em> </a> <em class="italic">、逻辑回归</em>中详细讨论超参数<em class="italic"> C </em>:</p>
+
+<pre>rs.best_params_
+<strong class="bold">{‘logisticregression__C’: 6.865009276815837, ‘pca__n_components’: 19}</strong>
+rs.best_score_
+<strong class="bold">0.9258345296842831</strong></pre>
+
+<p>这个<a id="_idIndexMarker1120"/>部分展示了我们如何从数据集生成主成分，以及如何解释这些成分。我们还研究了如何在模型中使用主要组件，而不是初始特征。但是我们假设主成分可以很好地描述为特征的线性组合。事实往往并非如此。在下一节中，我们将使用核 PCA 来处理非线性关系。</p>
+
+<h1 id="_idParaDest-172"><a id="_idTextAnchor175"/>使用带 PCA 的内核</h1>
+
+<p>对于某些数据，不可能构建线性可分的主成分。在我们建模之前，这可能不太容易想象。幸运的是，我们可以使用一些工具来确定产生最佳结果的内核，包括线性内核。具有线性核的核 PCA 应该与标准 PCA 类似地执行。</p>
+
+<p>在本节中，我们将使用<a id="_idIndexMarker1122"/> kernel PCA 对国家一级的劳动力参与率、教育程度、青少年生育频率以及按性别划分的参政情况进行特征提取。</p>
+
+<p class="callout-heading">注意</p>
+
+<p class="callout">这份关于教育和劳动力结果性别差异的数据集由联合国开发计划署在 https://www.kaggle.com/datasets/undp/human-development 公开使用。2015 年，每个国家都有一份按性别分列的就业、收入和教育数据记录。</p>
+
+<p>让我们开始构建模型:</p>
+
+<ol>
+
+<li value="1">我们将导入我们一直在使用的相同库加上 scikit-learn 的<code>KernelPCA</code>模块。我们<a id="_idIndexMarker1123"/>还将导入<code>RandomForestRegressor</code>模块:<pre>import pandas as pd import numpy as np from sklearn.model_selection import train_test_split from sklearn.preprocessing import MinMaxScaler from sklearn.pipeline import make_pipeline from sklearn.impute import SimpleImputer from sklearn.decomposition import KernelPCA from sklearn.ensemble import RandomForestRegressor from sklearn.model_selection import RandomizedSearchCV import seaborn as sns import matplotlib.pyplot as plt import os import sys sys.path.append(os.getcwd() + “/helperfunctions”) from preprocfunc import OutlierTrans</pre></li>
+
+<li>我们按性别加载教育和劳动力成果的数据。我们构建了女性与男性收入比率、受教育年限比率、劳动力参与率和人类发展指数比率的序列:<pre>un_income_gap = pd.read_csv(“data/un_income_gap.csv”) un_income_gap.set_index(‘country’, inplace=True) un_income_gap[‘incomeratio’] = \   un_income_gap.femaleincomepercapita / \     un_income_gap.maleincomepercapita un_income_gap[‘educratio’] = \   un_income_gap.femaleyearseducation / \      un_income_gap.maleyearseducation un_income_gap[‘laborforcepartratio’] = \   un_income_gap.femalelaborforceparticipation / \      un_income_gap.malelaborforceparticipation un_income_gap[‘humandevratio’] = \   un_income_gap.femalehumandevelopment / \      un_income_gap.malehumandevelopment un_income_gap.dropna(subset=[‘incomeratio’], inplace=True)</pre></li>
+
+<li>让我们来看一些描述性的统计数据。有一些丢失的值，特别是<code>genderinequality</code>和<code>humandevratio</code>。有些功能的范围比其他功能大得多:<pre>num_cols = [‘educratio’,’laborforcepartratio’,   ‘humandevratio’,’genderinequality’,   ‘maternalmortality’,’adolescentbirthrate’,   ‘femaleperparliament’,’incomepercapita’] gap_sub = un_income_gap[[‘incomeratio’] + num_cols] gap_sub.\   agg([‘count’,’min’,’median’,’max’]).T <strong class="bold">                       count    min    median  max</strong> <strong class="bold">incomeratio            177.00   0.16   0.60    0.93</strong> <strong class="bold">educratio              169.00   0.24   0.93    1.35</strong> <strong class="bold">laborforcepartratio    177.00   0.19   0.75    1.04</strong> <strong class="bold">humandevratio          161.00   0.60   0.95    1.03</strong> <strong class="bold">genderinequality       155.00   0.02   0.39    0.74</strong> <strong class="bold">maternalmortality     174.00   1.00   60.00  1,100.00</strong> <strong class="bold">adolescentbirthrate    177.00   0.60   40.90  204.80</strong> <strong class="bold">femaleperparliament    174.00   0.00   19.35    57.50</strong> <strong class="bold">incomepercapita        177.00   581.00 10,512.00  123,124.00</strong></pre></li>
+
+<li>我们<a id="_idIndexMarker1127"/>还应该看看一些<a id="_idIndexMarker1128"/>相关性:<pre>corrmatrix = gap_sub.corr(method=”pearson”) sns.heatmap(corrmatrix,    xticklabels=corrmatrix.columns,   yticklabels=corrmatrix.columns, cmap=”coolwarm”) plt.title(‘Heat Map of Correlation Matrix’) plt.tight_layout() plt.show()</pre></li>
+
+</ol>
+
+<p>这会产生以下情节:</p>
+
+<div><div><img alt="Figure 15.5 – Correlation matrix of NBA games data&#10;&#10;" height="463" src="img/B17978_15_005.jpg" width="615"/>
+
+</div>
+
+</div>
+
+<p class="figure-caption">图 15.5-NBA 比赛数据的相关矩阵</p>
+
+<p><code>humandevratio</code>和<code>educratio</code>高度相关，<code>genderinequality</code>和<code>adolescentbirthrate</code>也是如此。我们可以看到<code>educratio</code>和<code>maternalmortality</code>是高度负相关的。考虑到所有这些特征的高度相关性，很难<a id="_idIndexMarker1129"/>建立一个性能良好的<a id="_idIndexMarker1130"/>模型。然而，我们可以用核主成分分析来降低维数。</p>
+
+<ol>
+
+<li value="5">我们创建训练和测试数据框架:<pre>X_train, X_test, y_train, y_test =  \   train_test_split(gap_sub[num_cols],\   gap_sub[[‘incomeratio’]], test_size=0.2,   random_state=0)</pre></li>
+
+<li>我们现在准备实例化<code>KernelPCA</code>和<code>RandomForestRegressor</code>对象。我们将两者都添加到管道中。我们还用我们的核 PCA 和随机森林回归子的超参数创建了一个字典。</li>
+
+</ol>
+
+<p>字典<a id="_idIndexMarker1131"/>有一系列<a id="_idIndexMarker1132"/>超参数值，用于组件数量、伽玛和内核 PCA 使用的内核。对于那些不使用 gamma 的内核，这些值将被忽略。注意，内核的一个选项是线性内核。</p>
+
+<p>我们在<a href="B17978_08_ePub.xhtml#_idTextAnchor106"> <em class="italic">第 8 章</em> </a> <em class="italic">、支持向量回归</em>和<a href="B17978_13_ePub.xhtml#_idTextAnchor152"> <em class="italic">第 13 章</em> </a> <em class="italic">、支持向量机分类</em>中更详细地讨论伽马:</p>
+
+<pre>rfreg = RandomForestRegressor()
+kpca = KernelPCA()
+pipe1 = make_pipeline(OutlierTrans(2),
+  SimpleImputer(strategy=”median”), MinMaxScaler(),
+  kpca, rfreg)
+rfreg_params = {
+ ‘kernelpca__n_components’:
+    randint(2, 9),
+ ‘kernelpca__gamma’:
+     np.linspace(0.03, 0.3, 10),
+ ‘kernelpca__kernel’:
+     [‘linear’, ‘poly’, ‘rbf’, 
+      ‘sigmoid’, ‘cosine’],
+ ‘randomforestregressor__max_depth’:
+     randint(2, 20),
+ ‘randomforestregressor__min_samples_leaf’:
+     randint(5, 11)
+}</pre>
+
+<ol>
+
+<li value="7">现在让我们用这些超参数值进行<a id="_idIndexMarker1133"/>随机网格搜索。为<a id="_idIndexMarker1134"/>提供最佳随机森林回归性能的主成分分析的核心是多项式。我们得到一个很好的均方误差的平方，大约是平均值的 10%:<pre>rs = RandomizedSearchCV(pipe1, rfreg_params,   cv=4, n_iter=40,   scoring=’neg_mean_absolute_error’,   random_state=1) rs.fit(X_train, y_train.values.ravel()) rs.best_params_ <strong class="bold">{‘kernelpca__gamma’: 0.12000000000000001,</strong> <strong class="bold"> ‘kernelpca__kernel’: ‘poly’,</strong> <strong class="bold"> ‘kernelpca__n_components’: 4,</strong> <strong class="bold"> ‘randomforestregressor__max_depth’: 18,</strong> <strong class="bold"> ‘randomforestregressor__min_samples_leaf’: 5}</strong> rs.best_score_ <strong class="bold">-0.06630618838886537</strong></pre></li>
+
+<li>再来看看其他表现优秀的车型。内核为<code>rbf</code>的模型和内核为 sigmoid <a id="_idIndexMarker1135"/>的模型表现几乎一样好。第二和第三个表现最好的模型比表现最好的模型有更多的主成分<a id="_idIndexMarker1136"/>:<pre>results = \   pd.DataFrame(rs.cv_results_[‘mean_test_score’], \     columns=[‘meanscore’]).\   join(pd.DataFrame(rs.cv_results_[‘params’])).\   sort_values([‘meanscore’], ascending=False) results.iloc[1:3].T <strong class="bold">                                        39     0 </strong> <strong class="bold">meanscore                              -0.067 -0.070</strong> <strong class="bold">kernelpca__gamma                        0.240  0.180</strong> <strong class="bold">kernelpca__kernel                       rbf    sigmoid</strong> <strong class="bold">kernelpca__n_components                 6      6</strong> <strong class="bold">randomforestregressor__max_depth        12     10</strong> <strong class="bold">randomforestregressor__min_samples_leaf 5      6</strong></pre></li>
+
+</ol>
+
+<p>核 PCA 是一个相对容易实现的降维选项。当我们有许多高度相关的特征，而这些特征可能不是线性可分的，并且对预测的解释并不重要时，这是最有用的。</p>
+
+<h1 id="_idParaDest-173"><a id="_idTextAnchor176"/>总结</h1>
+
+<p>本章探讨了主成分分析，包括它是如何工作的，以及我们什么时候可能需要使用它。我们学习了如何检查从 PCA 创建的组件，包括每个特征如何贡献给每个组件，以及解释了多少差异。我们讨论了如何可视化组件，以及如何在后续分析中使用组件。我们还研究了如何将内核用于 PCA，以及什么时候这可能会给我们带来更好的结果。</p>
+
+<p>我们在下一章探索另一种无监督学习技术，k-means 聚类。</p>
+
+</div>
+
+</div>
+
+
+
+</body></html>

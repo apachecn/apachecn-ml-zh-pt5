@@ -1,0 +1,297 @@
+<html><head/><body>
+
+
+	
+		<title>B17076_02_ePub_RK</title>
+		
+	
+	
+		<div><h1 id="_idParaDest-46">第二章:Dnotebook——一个 JavaScript 的交互式计算环境</h1>
+			<p>唐纳德·克努特(Donald Knuth)率先提出了让我们的代码具有足够的表达能力，让人类能够阅读，而不仅仅是让机器能够消费的想法，他还写了一本关于这方面的书，名为<em class="italic">识字编程</em>(<a href="https://www.amazon.com/Literate-Programming-byKnuth-Knuth/dp/B004WKFC4S">https://www . Amazon . com/Literate-Programming-byKnuth-Knuth/DP/b 004 wkfc4 s</a>)。Jupyter Notebook 等工具对散文和代码给予了同等的重视，因此程序员和研究人员可以自由地通过代码和文本(包括图像和工作流)广泛地表达自己。</p>
+			<p>在这一章中，你将了解到<strong class="bold">Dnotebook</strong>——一个 JavaScript 的交互式编码环境。您将学习如何在本地安装 Dnotebook。您还将学习如何在其中编写代码和 Markdown。此外，您将学习如何保存和导入已保存的笔记本。</p>
+			<p>本章将涵盖以下主题:</p>
+			<ul>
+				<li>Dnotebook 简介</li>
+				<li>Dnotebook 的设置和安装</li>
+				<li>Dnotebook 中交互计算背后的基本概念</li>
+				<li>编写交互式代码</li>
+				<li>使用降价单元格</li>
+				<li>保存笔记本</li>
+			</ul>
+			<h1 id="_idParaDest-47"><a id="_idTextAnchor046"/>技术要求</h1>
+			<p>为了顺利完成本章，你需要在电脑上安装<strong class="bold"> Node.js </strong>和 Chrome、Safari、Firefox 或 Opera 等现代浏览器。</p>
+			<p>要安装 Node.js，你可以按照这里的官方指南:<a href="https://nodejs.org/en/">https://nodejs.org/en/</a>。</p>
+			<p>本章的代码可以从 GitHub 获得，可以从 https://GitHub . com/packt publishing/Building-Data-Driven-Applications-with-danfo . js/tree/main/chapter 02</p>
+			<h1 id="_idParaDest-48"><a id="_idTextAnchor047"/>Dnotebook 简介</h1>
+			<p>在过去的几年中，在数据科学领域，交互式计算环境(如 Jupyter Notebook 和 JupyterLab)实际上在代码共享方面产生了巨大的影响，这增强了思想的快速迭代。</p>
+			<p>最近，数据科学正在向浏览器方面发展，以支持不同的用户，如 web 开发人员。这意味着 Python 生态系统中可用的许多成熟的数据科学工具也需要移植到 JavaScript 中或在 JavaScript 中可用。按照这种思路，我们，这本书的作者，以及 Danfo.js 的创造者，决定创建一个新版本的 Jupyter Notebook，专门针对 JavaScript 生态系统。</p>
+			<p>Dnotebook，<a id="_idIndexMarker135"/>我们称之为 dnotebook，它帮助你用 JavaScript 进行快速的交互式实验/原型制作。这意味着您可以编写代码，并以类似笔记本的交互式方式即时查看结果，如下图所示:</p>
+			<div><div><img src="img/B17076_02_01.jpg" alt="Figure 2.1 – Sample Interactive coding using Dnotebook&#13;&#10;"/>
+				</div>
+			</div>
+			<p class="figure-caption">图 2.1–使用 Dnotebook 的交互式编码示例</p>
+			<p>Dnotebook 可用于许多领域和不同的<a id="_idIndexMarker136"/>事物，例如:</p>
+			<ul>
+				<li><strong class="bold">数据科学/分析</strong>:使用<em class="italic"> Danfo.js </em>、<em class="italic"> Plotly.js </em>、<em class="italic"> Vega </em>、<em class="italic"> Imagecook </em>等高效的 JavaScript 包，帮助您轻松进行交互式数据探索和分析。</li>
+				<li><strong class="bold">机器学习</strong>:使用<em class="italic"> Tensorflow.js </em>等机器学习库，可以帮助你轻松建立、训练、原型化机器学习模型。</li>
+				<li><strong class="bold">交互式学习 JavaScript</strong>:它可以帮助你以一种交互式、可视化的方式学习或教授 JavaScript。这可以促进学习和理解。</li>
+				<li>普通实验/原型制作:任何可以用 JavaScript 编写的实验都可以在 Dnotebook 上运行，因此这有助于快速进行创意实验。</li>
+			</ul>
+			<p>现在您已经了解了 Dnotebook 是什么，让我们学习如何在本地设置和使用它。</p>
+			<h1 id="_idParaDest-49"><a id="_idTextAnchor048"/>Dnotebook 的设置和安装</h1>
+			<p>要在本地安装并运行 Dnotebook <a id="_idIndexMarker137"/>，您需要确保 Node.js 已经安装<a id="_idIndexMarker138"/>。一旦安装了 Node.js，您可以通过在终端中运行以下命令来轻松安装 Dnotebook:</p>
+			<pre>npm install –g dnotebook</pre>
+			<p>前面的命令全局安装 Dnotebook。这是推荐的安装方式，因为它确保 Dnotebook 服务器可以从我们计算机上的任何地方启动。</p>
+			<p class="callout-heading">注意</p>
+			<p class="callout">不安装也可以在线使用 Dnotebook 去看看<a id="_idIndexMarker139"/> Dnotebook 游乐场(<a href="https://playnotebook.jsdata.org/demo">https://playnotebook.jsdata.org/demo</a>)。</p>
+			<p>安装后，您可以通过在终端/命令提示符下运行以下命令来启动服务器:</p>
+			<pre>&gt; dnotebook</pre>
+			<p>该命令将在默认浏览器的端口 http://localhost:4400 中打开一个选项卡，如下图所示:</p>
+			<div><div><img src="img/B17076_02_02.jpg" alt="Figure 2.2 – Dnotebook home page&#13;&#10;"/>
+				</div>
+			</div>
+			<p class="figure-caption">图 2.2–Dnotebook 主页</p>
+			<p>打开的<a id="_idIndexMarker140"/>页面是 Dnotebook 界面的默认页面，从<a id="_idIndexMarker141"/>这里可以开始编写 JavaScript 和 Markdown。</p>
+			<p class="callout-heading">注意</p>
+			<p class="callout">我们目前使用的是<strong class="bold"> Dnotebook 版本 0.1.1 </strong>，因此，将来使用这本书时，你可能会注意到一些微小的变化，尤其是在 UI 方面。</p>
+			<h1 id="_idParaDest-50"><a id="_idTextAnchor049"/>Dnotebook 中交互计算背后的基本概念</h1>
+			<p>为了在 Dnotebook 中编写<a id="_idIndexMarker143"/>交互代码/Markdown，你需要理解一些概念，比如 cells 和 persistence/state。我们从解释这些概念开始这一部分。</p>
+			<h2 id="_idParaDest-51"><a id="_idTextAnchor050"/>细胞</h2>
+			<p>Dnotebook <a id="_idIndexMarker145"/>中的单元格<a id="_idIndexMarker144"/>是一个单元块，代码或文本可以写入其中以便执行。以下是显示代码和降价单元格的示例屏幕截图:</p>
+			<div><div><img src="img/B17076_02_03.jpg" alt="Figure 2.3 – Empty code and Markdown cells in Dnotebook&#13;&#10;"/>
+				</div>
+			</div>
+			<p class="figure-caption"> </p>
+			<p class="figure-caption">图 2.3-Dnotebook 中的空代码和降价单元格</p>
+			<p>每个<a id="_idIndexMarker146"/>单元格都有可用于不同目的的编辑<a id="_idIndexMarker147"/>按钮，如下图所示:</p>
+			<div><div><img src="img/B17076_02_04.jpg" alt="Figure 2.4 – Action buttons available in each cell&#13;&#10;"/>
+				</div>
+			</div>
+			<p class="figure-caption">图 2.4–每个单元格中可用的操作按钮</p>
+			<p>现在，让我们了解这些按钮的作用:</p>
+			<ul>
+				<li><strong class="bold">运行</strong>:可以使用<strong class="bold">运行</strong>按钮执行一个单元格，以显示输出。</li>
+				<li><strong class="bold">添加代码</strong>:添加代码按钮有两种变体(向上和向下)，由箭头方向指定。它们可用于在当前单元格的上方或下方添加代码单元格。</li>
+				<li><strong class="bold">Add Markdown</strong>:Add Markdown 按钮和 add code 按钮一样，有两个变体，可以在当前单元格的下方或上方添加 Markdown 单元格。</li>
+				<li><strong class="bold">删除</strong>:顾名思义，该按钮可以用来删除单元格。</li>
+			</ul>
+			<p>有两种类型的单元格，即代码单元格和降价单元格。</p>
+			<h2 id="_idParaDest-52"><a id="_idTextAnchor051"/>编码单元格</h2>
+			<p>一个<strong class="bold">代码单元</strong>是一个<a id="_idIndexMarker149"/>单元，在这里可以编写和执行任何 JavaScript 代码。<a id="_idIndexMarker150"/>新笔记本的第一个单元格总是代码单元格，我们可以用经典的 hello world 示例来测试这一点。</p>
+			<p>在您打开的 Dnotebook 中，编写以下命令并点击<strong class="bold">运行</strong>按钮:</p>
+			<pre>console.log('Hello World!')</pre>
+			<p class="callout-heading">注意</p>
+			<p class="callout">将鼠标悬停在代码单元格上方会显示<strong class="bold">运行</strong>按钮。或者，您可以使用 Windows 中的快捷键<em class="italic"> Ctrl </em> + <em class="italic"> Enter </em>或 Mac 中的<em class="italic">命令</em> + <em class="italic"> Enter </em>来运行代码单元。</p>
+			<p>hello world 代码和输出应该类似于下面的屏幕截图:</p>
+			<div><div><img src="img/B17076_02_05.jpg" alt="Figure 2.5 – A code cell and executed output in Dnotebook&#13;&#10;"/>
+				</div>
+			</div>
+			<p class="figure-caption">图 2.5-Dnotebook 中的代码单元和执行输出</p>
+			<p>接下来，我们来了解一下 Markdown cells。</p>
+			<h2 id="_idParaDest-53"><a id="_idTextAnchor052"/>降价单元格</h2>
+			<p><strong class="bold">降价单元格</strong>与代码单元格<a id="_idIndexMarker151"/>相似，除了它们只能执行<a id="_idIndexMarker152"/>降价或文本。这意味着 Markdown 文本可以编译用 Markdown 语法编写的任何文本。</p>
+			<p>Dnotebook 中的 Markdown 单元格通常是白色的，可以通过在打开的单元格中单击<strong class="bold">文本</strong>按钮来打开。每个单元格通常都有<strong class="bold">文本</strong>按钮，如下图所示:</p>
+			<div><div><img src="img/B17076_02_06.jpg" alt="Figure 2.6 – Opening a Markdown cell in Dnotebook&#13;&#10;"/>
+				</div>
+			</div>
+			<p class="figure-caption">图 2.6–在 Dnotebook 中打开降价单元格</p>
+			<p>点击<strong class="bold">文本</strong>按钮打开一个降价单元格，如以下截图所示:</p>
+			<div><div><img src="img/B17076_02_07.jpg" alt="Figure 2.7 – Writing Markdown text in a Markdown cell&#13;&#10;"/>
+				</div>
+			</div>
+			<p class="figure-caption">图 2.7–在降价单元格中写入降价文本</p>
+			<p>在这里，您可以编写任何带有 Markdown 风格的文本，当执行时，结果被编译成文本并显示在 Markdown 单元格的位置，如下所示:</p>
+			<div><div><img src="img/B17076_02_08.jpg" alt="Figure 2.8 – Output of a Markdown cell&#13;&#10;"/>
+				</div>
+			</div>
+			<p class="figure-caption">图 2.8–降价单元的输出</p>
+			<p>现在，我们来谈谈交互编程中的另一个重要概念，叫做<strong class="bold">持久性</strong> / <strong class="bold">状态</strong>。</p>
+			<h2 id="_idParaDest-54"><a id="_idTextAnchor053"/>持久性/状态</h2>
+			<p>交互式计算中的持久性<a id="_idIndexMarker153"/>或状态<a id="_idIndexMarker154"/>是<a id="_idIndexMarker155"/>环境变量或数据能够<a id="_idIndexMarker156"/>比创建它的单元活得更久(持久)。这意味着在一个单元中声明/创建的变量可用于另一个单元，而不管该单元的位置。</p>
+			<p>Dnotebook 的每个实例运行一个持久状态，在没有<code>let</code>和<code>const</code>声明的单元格中声明的变量对所有单元格都可用。</p>
+			<p class="callout-heading">注意</p>
+			<p class="callout">在 Dnotebook 中工作时，我们鼓励您通过两种主要方式来声明变量。</p>
+			<p class="callout">选项 1–没有声明关键字(首选方法):</p>
+			<p class="callout"><code>food_price = 100</code></p>
+			<p class="callout"><code>clothing_price = 200</code></p>
+			<p class="callout"><code>total = food_price + clothing_price</code></p>
+			<p class="callout">选项 2——使用<code>var</code>全局关键字(这可行，但不是首选):</p>
+			<p class="callout"><code>var food_price = 100</code></p>
+			<p class="callout"><code>var clothing_price = 200</code></p>
+			<p class="callout"><code>var total = food_price + clothing_price</code></p>
+			<p class="callout">使用关键字如<code>let</code>或<code>const</code>会使变量在新的单元格中不可访问。</p>
+			<p>为了更好地理解这一点，让我们声明一些变量，并尝试在之前或之后创建的多个单元格中访问它们:</p>
+			<ol>
+				<li>Create a new cell in your open notebook and add the following code:<pre>num1 = 20
+num2 = 35
+sum = num1 + num2
+console.log(sum)
+//output 55</pre><p>运行这个代码单元格，您会看到在单元格的正下方打印了 sum，如下面的屏幕截图所示:</p><div><img src="img/B17076_02_09.jpg" alt="Figure 2.9 – Simple code to add two numbers&#13;&#10;"/></div><p class="figure-caption">图 2.9–将两个数字相加的简单代码</p></li>
+				<li>Next, create a <a id="_idIndexMarker158"/>new cell following your first cell, by clicking on a code cell button, and try to use the <code>sum</code> variable as shown in the following code block:<pre>newSum = sum + 30
+console.log(newSum)
+//outputs 85</pre><p>通过执行前面的单元格，您得到了<code>85</code>的输出。这意味着变量 sum 从第一个单元格持续到第二个单元格以及您将创建的任何其他单元格，如下面的屏幕截图所示:</p></li>
+			</ol>
+			<div><div><img src="img/B17076_02_10.jpg" alt="Figure 2.10 – Two code cells sharing a persistent state&#13;&#10;"/>
+				</div>
+			</div>
+			<p class="figure-caption">图 2.10–共享一个持久状态的两个代码单元</p>
+			<p class="callout-heading">注意</p>
+			<p class="callout">Markdown 单元格不保存变量，因为它们不执行 JavaScript 代码。</p>
+			<p>现在，您已经理解了什么是细胞和持久性，您现在可以轻松地在 Dnotebook 中编写交互式代码，在下一节中，我们将向您展示如何做到这一点。</p>
+			<h1 id="_idParaDest-55"><a id="_idTextAnchor054"/>编写交互代码</h1>
+			<p>在这一节中，我们将强调在 Dnotebook 中编写交互代码时需要知道的一些<a id="_idIndexMarker160"/>重要事情。</p>
+			<h2 id="_idParaDest-56"><a id="_idTextAnchor055"/>装载外部包装</h2>
+			<p>在编写 JavaScript 时，将外部<a id="_idIndexMarker161"/>包导入到您的笔记本中非常重要，因此，Dnotebook 有一个名为<code>load_package</code>的内置函数来完成这项工作。</p>
+			<p><code>load_package</code>方法帮助您通过外部包/库的 CDN 链接轻松地将它们添加到您的笔记本电脑中。例如，要加载<code>Tensorflow.js</code>和<code>Plotly.js</code>，您可以将它们的 CDN 链接传递给<code>load_package</code>函数，如下面的代码所示:</p>
+			<pre>load_package(["https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@3.4.0/dist/tf.min.js","https://cdn.plot.ly/plotly-latest.min.js"])</pre>
+			<p>这将加载包并将它们添加到笔记本状态，以便可以从任何单元访问它们。在下面的小节中，我们使用刚刚导入的<code>Plotly</code>库。</p>
+			<p>将下面的<a id="_idIndexMarker162"/>代码添加到笔记本的新单元格中:</p>
+			<pre>trace1 = {
+  x: [1, 2, 3, 4],
+  y: [10, 11, 12, 13],
+  mode: 'markers',
+  marker: {
+    size: [40, 60, 80, 100]
+  }
+};
+ 
+data = [trace1];
+layout = {
+  title: 'Marker Size',
+  showlegend: false,
+  height: 600,
+  width: 600
+};
+ 
+Plotly.newPlot(this_div(), data, layout); //this_div is a built-in function that returns the current output's div name.</pre>
+			<p>执行上一节中的<a id="_idIndexMarker163"/>代码单元将显示一个绘图，如下面的屏幕截图所示:</p>
+			<p class="figure-caption"> </p>
+			<div><div><img src="img/B17076_02_11.jpg" alt="Figure 2.11 – Making a plot with an external package &#13;&#10;"/>
+				</div>
+			</div>
+			<p class="figure-caption">图 2.11–使用外部包绘制图</p>
+			<p>因此，通过使用<code>load_package</code>，您可以添加您选择的任何外部 JavaScript 包，并在 Dnotebook 中交互地使用它。</p>
+			<h2 id="_idParaDest-57"><a id="_idTextAnchor056"/>加载 CSV 文件</h2>
+			<p>将数据输入你的笔记本，尤其是数据框，这非常重要。因此，我们在这里介绍的另一个内置函数是<code>load_csv</code>。</p>
+			<p class="callout-heading">注意</p>
+			<p class="callout">数据帧以行和列的形式表示数据。它们类似于电子表格或数据库的行和列的集合。我们将在<a href="B17076_03_ePub_RK.xhtml#_idTextAnchor066"> <em class="italic">第 3 章</em> </a>、<em class="italic">danfo . js</em>中深入讨论数据帧和系列。</p>
+			<p><code>load_csv</code>功能帮助您通过互联网将 CSV 文件异步加载到<code>Danfo.js</code>数据帧中。当读取大文件并且希望跟踪进度时，应该使用这个函数而不是 Danfo 的内置<code>read_csv</code>函数。这是因为<code>load_csv</code>在导航条上显示一个微调按钮来指示进度。</p>
+			<p>让我们用一个例子来更好地理解这一点。在新的代码单元格中，添加以下代码:</p>
+			<pre>load_csv("https://raw.githubusercontent.com/plotly/datasets/master/finance-charts-apple.csv")
+.then((data)=&gt;{
+  df = data
+})</pre>
+			<p>在执行单元格时，如果您看一下右上角，您会注意到一个指示数据加载进度的微调器。</p>
+			<p>执行单元后，您可以像处理 Danfo 数据框架一样与数据集进行交互。例如，您可以使用另一个内置函数<code>table</code>轻松地以表格格式显示数据。</p>
+			<p>在新单元格中，添加以下代码:</p>
+			<pre>table(df)</pre>
+			<p>在执行时，您应该会看到一个数据表，如下面的屏幕截图所示:</p>
+			<div><div><img src="img/B17076_02_12.jpg" alt="Figure 2.12 – Loading and displaying a CSV file &#13;&#10;"/>
+				</div>
+			</div>
+			<p class="figure-caption">图 2.12–加载和显示 CSV 文件</p>
+			<p>接下来，我们将简要介绍另一个内置函数，它有助于在笔记本中显示图形。</p>
+			<h2 id="_idParaDest-58"><a id="_idTextAnchor057"/>获取用于绘图的 div 容器</h2>
+			<p>为了<a id="_idIndexMarker165"/>显示绘图，大多数绘图库需要某种容器或 HTML <code>div</code>。这是使用 Danfo.js 和 Plotly.js 库进行打印所必需的。为了更容易访问输出<code>div</code>，Dnotebook 内置了<code>this_div</code>函数。</p>
+			<p>函数将返回当前代码单元输出的 HTML ID。例如，在下面的代码中，我们将<code>this_div</code>值传递给 DataFrame 的<code>plot</code>方法:</p>
+			<pre>const df = new dfd.DataFrame({col1: [1,2,3,4], col2: [2,4,6,8]})
+ 
+df.plot(this_div()).line({x: "col1", y: "col2"})</pre>
+			<p>这将把当前单元格的<code>div</code> ID 传递给 DataFrame 的<code>plot</code>方法，并在执行时显示结果图，如下面的屏幕截图所示:</p>
+			<div><div><img src="img/B17076_02_13.jpg" alt="Figure 2.13 – Plotting a DataFrame&#13;&#10;"/>
+				</div>
+			</div>
+			<p class="figure-caption">图 2.13–绘制数据帧</p>
+			<p>最后，在接下来的<a id="_idIndexMarker166"/>部分，我们将简要讨论在<code>for</code>循环中打印值。这不像预期的那样工作，我们将解释原因。</p>
+			<h2 id="_idParaDest-59"><a id="_idTextAnchor058"/>使用 for 循环时的陷阱</h2>
+			<p>当您<a id="_idIndexMarker167"/>编写一个<code>for</code>循环并试图打印 Dnotebook 代码单元格中的每个元素时，您只能得到最后一个元素。这个问题与控制台在浏览器中的工作方式有关。例如，尝试执行以下代码并观察输出:</p>
+			<pre>for(let i=0; i&lt;10; i++){
+  console.log(i)
+}
+//outputs 9</pre>
+			<p>如果你想在运行一个<code>for</code>循环时看到所有的输出，特别是在 Dnotebook 中调试时，可以使用 Dnotebook 内置的<code>forlog</code>方法。此方法已被附加到默认的 console 对象中，可以按下面的代码块所示使用:</p>
+			<pre>for(let i=0; i&lt;10; i++){
+  console.forlog(i)
+}</pre>
+			<p>执行前面的<a id="_idIndexMarker168"/>代码单元格返回所有值，如下面的屏幕截图所示:</p>
+			<div><div><img src="img/B17076_02_14.jpg" alt="Figure 2.14 – Comparing the for and forlog methods &#13;&#10;"/>
+				</div>
+			</div>
+			<p class="figure-caption">图 2.14–比较 for 和 forlog 方法</p>
+			<p>您会注意到，当使用<code>console.forlog</code>方法时，每个输出都打印在新的一行上，就像脚本环境中的默认行为<code>console.log</code>。</p>
+			<p>在这一节中，我们介绍了一些在 Dnotebook 环境中编写交互式代码时有用的重要函数和特性。在下一节中，我们将了解如何使用降价单元格。</p>
+			<h1 id="_idParaDest-60"><a id="_idTextAnchor059"/>使用降价单元格</h1>
+			<p>Dnotebook 支持<a id="_idIndexMarker169"/> Markdown，它能够将您的代码与文本和多媒体混合，从而使访问笔记本的人易于理解。</p>
+			<p>Markdown 是一种使用纯文本编辑器创建格式化文本的标记语言。它广泛用于博客、文档页面和自述文件。如果你使用 GitHub 之类的工具，那么你可能用过 Markdown。</p>
+			<p>像许多其他工具一样，Dnotebook 支持所有的 Markdown 语法、图像导入、添加链接等等。</p>
+			<p>在接下来的几节中，我们将看到在 Dnotebook 中使用 Markdown 时可以利用的一些重要特性。</p>
+			<h2 id="_idParaDest-61"><a id="_idTextAnchor060"/>创建降价单元格</h2>
+			<p>为了在 Dnotebook 环境中编写<a id="_idIndexMarker170"/> Markdown，您需要通过单击<strong class="bold">文本</strong>按钮(向上或向下)来添加一个 Markdown 单元格。此操作会在您的笔记本中添加一个新的减价单元格。下面的屏幕截图显示了写在 Markdown 单元格中的示例文本:</p>
+			<div><div><img src="img/B17076_02_15.jpg" alt="Fig 2.15 – Writing simple text in a Markdown cell&#13;&#10;"/>
+				</div>
+			</div>
+			<p class="figure-caption">图 2.15–在减价单元格中书写简单文本</p>
+			<p>在减价单元格中写入减价文本后，您可以点击<strong class="bold">运行</strong>按钮来执行它。这将在读取模式下用 transpiled 文本替换单元格。双击文本会在编辑模式下再次显示 Markdown 单元格。</p>
+			<h2 id="_idParaDest-62"><a id="_idTextAnchor061"/>添加图像</h2>
+			<p>为了将<a id="_idIndexMarker171"/>图像添加到 Markdown 单元格中，您可以使用以下代码片段中所示的图像语法:</p>
+			<pre>![alt Text](links to the image)</pre>
+			<p>以下是输出:</p>
+			<div><div><img src="img/B17076_02_16.jpg" alt="Fig 2.16 – Adding images&#13;&#10;"/>
+				</div>
+			</div>
+			<p class="figure-caption">图 2.16–添加图像</p>
+			<p>例如，在前面的屏幕截图中，我们添加了一个链接，指向互联网上的一个图片。代码如下所示:</p>
+			<pre>![](https://tinyurl.com/yygzqzrq)</pre>
+			<p>提供的链接是一个狗图片的链接。需要点击<strong class="bold">运行</strong>按钮查看图像结果，如下图所示:</p>
+			<div><div><img src="img/B17076_02_17.jpg" alt="Fig 2.17 – Markdown image result&#13;&#10;"/>
+				</div>
+			</div>
+			<p class="figure-caption">图 2.17–降价图像结果</p>
+			<p>在接下来的几节中，你会学到一些基本的降价语法，你也可以把它们添加到你的笔记本中。要看一个全面的指南，你可以访问网站<a href="https://www.markdownguide.org/basic-syntax/">https://www.markdownguide.org/basic-syntax/</a>。</p>
+			<h2 id="_idParaDest-63"><a id="_idTextAnchor062"/>标题</h2>
+			<p>要创建一个标题，你只需在单词或短语前加上井号<code>(#)</code>:</p>
+			<pre># First Heading
+## Second Heading 
+### Third Heading</pre>
+			<p>如果我们将之前的文本粘贴到 Markdown 中并点击<strong class="bold"> Run </strong>按钮，我们将得到以下输出:</p>
+			<div><div><img src="img/B17076_02_18.jpg" alt="Fig 2.18 – Adding header text&#13;&#10;"/>
+				</div>
+			</div>
+			<p class="figure-caption">图 2.18–添加标题文本</p>
+			<p>在结果中，您会注意到文本前面不同数量的井号会导致不同的大小。</p>
+			<h2 id="_idParaDest-64"><a id="_idTextAnchor063"/>列表</h2>
+			<p>列表对于<a id="_idIndexMarker175"/>枚举对象很重要，可以通过在文本前放置星号(<strong class="bold"> * </strong>)来添加。我们在以下部分提供了一个示例:</p>
+			<pre>* Food
+* Cat
+    * kitten
+* Dog</pre>
+			<p>前面的示例创建了一个无序列表，其中包含项目<strong class="bold"> Food </strong>、<strong class="bold"> Cat </strong>和<strong class="bold"> Dog </strong>，并将<strong class="bold"> kitten </strong>作为<strong class="bold"> Cat </strong>的子列表。</p>
+			<p>要创建编号列表，只需在文本前添加编号，如下所示:</p>
+			<ol>
+				<li value="1"><strong class="bold">第一项</strong></li>
+				<li><strong class="bold">第二项</strong></li>
+				<li><strong class="bold">多多更</strong></li>
+			</ol>
+			<p>前面的文本输入到减价输入字段时，应输出以下内容:</p>
+			<div><div><img src="img/B17076_02_19.jpg" alt="Fig 2.19 – List&#13;&#10;"/>
+				</div>
+			</div>
+			<p class="figure-caption">图 2.19–列表</p>
+			<p>在下一节中，我们将介绍 Dnotebook 的一个重要部分——保存。为了重复使用您的笔记本并与其他人共享，这一点非常重要。</p>
+			<h1 id="_idParaDest-65"><a id="_idTextAnchor064"/>保存笔记本</h1>
+			<p>Dnotebook 支持保存<a id="_idIndexMarker176"/>和导入已保存的笔记本。保存和导入笔记本使您/他人能够重复使用您的笔记本。</p>
+			<p>要保存和导入笔记本，点击<strong class="bold">文件</strong>菜单，并根据您的需要选择<strong class="bold">下载笔记本</strong>或<strong class="bold">上传笔记本</strong>按钮。这些选项显示在下面的屏幕截图中:</p>
+			<div><div><img src="img/B17076_02_20.jpg" alt="Fig 2.20 – Saving and importing a notebook&#13;&#10;"/>
+				</div>
+			</div>
+			<p class="figure-caption">图 2.20–保存和导入笔记本</p>
+			<p>点击<strong class="bold">下载笔记本</strong>将笔记本保存为 JSON 格式，这样可以很容易的共享或重新加载。</p>
+			<p class="callout-heading">保存和导入</p>
+			<p class="callout">要测试此功能，请转到<a href="https://playnotebook.jsdata.org/demo">https://playnotebook.jsdata.org/demo</a>。尝试保存演示笔记本。然后打开一个新的笔记本，<a href="https://playnotebook.jsdata.org">https://playnotebook.jsdata.org</a>，导入保存的文件。</p>
+			<h1 id="_idParaDest-66"><a id="_idTextAnchor065"/>总结</h1>
+			<p>在这一章中，我们介绍了 Dnotebook，一个支持文本和多媒体的交互式库。首先，我们介绍了 Dnotebook 的本地安装，并指出您可以在线免费运行部署版本。接下来，我们介绍了一些基本概念和使用代码和 Markdown 时遇到的问题，最后，我们向您展示了如何保存笔记本以供共享和重用。</p>
+			<p>在下一章，我们将从 Danfo.js 开始，并介绍这个令人敬畏的库的一些底层概念。</p>
+		</div>
+	
+
+</body></html>

@@ -1,0 +1,853 @@
+<html><head/><body>
+
+
+
+
+
+
+
+
+
+<title>Chapter 6: Preparing for Model Evaluation</title>
+
+
+
+
+
+
+
+<div><div><h1 id="_idParaDest-79"><em class="italic"> <a id="_idTextAnchor078"/>第六章</em>:模型评估准备</h1>
+
+<p>在开始运行模型之前，仔细考虑如何评估模型的性能是一个好主意。一种常见的技术是将数据分成训练数据集和测试数据集。我们在过程的相对早期这样做，以避免所谓的数据泄漏；也就是说，根据为模型评估而留出的数据进行分析。在本章中，我们将探讨创建训练数据集的方法，包括如何确保训练数据具有代表性。我们将研究交叉验证策略，例如<strong class="bold"> K-fold </strong>，它解决了使用静态训练/测试分割的一些限制。我们也将开始更仔细地评估模型的性能。</p>
+
+<p>你可能想知道为什么我们在详细讨论任何算法之前讨论模型评估。这是因为有实际的考虑。我们倾向于在具有相似目的的算法中使用相同的度量和评估技术。我们在评估分类模型时检查准确性和敏感性，在检查回归模型时检查平均绝对误差和 R 平方。我们对所有监督学习模型进行交叉验证。因此，我们将在接下来的章节中多次重复这里介绍的策略。当稍后重新介绍这些概念时，您甚至会发现自己又回到了这些页面。</p>
+
+<p>除了这些实际的考虑之外，当我们不把数据提取、数据清理、探索性分析、特征工程和预处理、模型规范和模型评估看作是离散的、连续的任务时，我们的建模工作就会改进。如果你建立机器学习模型的时间只有 6 个月或超过 30 年，你可能会意识到这种严格的排序与我们作为数据科学家的工作流程不一致。我们总是在为模型验证做准备，并且总是在清理数据。这是好事。当我们整合这些任务时，我们做得更好；当我们在选择特征时继续询问我们的数据清理，当我们在计算精度或均方根误差后回头看二元相关性或散点图时。</p>
+
+<p>我们还将花相当多的时间来构建这些概念的可视化。处理分类问题时，最好养成查看混淆矩阵和累积精度分布图的习惯，处理连续目标时，最好养成查看残差图的习惯。这也将在随后的章节中很好地为我们服务。</p>
+
+<p>具体来说，在本章中，我们将讨论以下主题:</p>
+
+<ul>
+
+<li>测量二元分类的准确度、灵敏度、特异性和精确度</li>
+
+<li>检查二元分类的 CAP、ROC 和精度-灵敏度曲线</li>
+
+<li>评估多类模型</li>
+
+<li>评估回归模型</li>
+
+<li>使用 K 倍交叉验证</li>
+
+<li>用管道预处理数据</li>
+
+</ul>
+
+<h1 id="_idParaDest-80"><a id="_idTextAnchor079"/>技术要求</h1>
+
+<p>在本章中，除了 scikit-learn 库之外，我们还将使用<code>feature_engine</code>和<code>matplotlib</code>库。你可以使用<code>pip</code>来安装这些软件包。本章的代码文件可以在本书的 GitHub 资源库中找到，网址是<a href="https://github.com/PacktPublishing/Data-Cleaning-and-Exploration-with-Machine-Learning">https://GitHub . com/packt publishing/Data-Cleaning-and-Exploration-with-Machine-Learning</a>。</p>
+
+<h1 id="_idParaDest-81"><a id="_idTextAnchor080"/>测量二元分类的准确度、灵敏度、特异性和精确度</h1>
+
+<p>当评估一个分类模型时，我们通常想知道我们正确的频率。在二元目标的情况下——目标有两个可能的分类值——我们计算<strong class="bold">准确度</strong>,作为我们预测正确分类的次数与观察总数的比率<a id="_idIndexMarker504"/>。</p>
+
+<p>但是，取决于分类问题，准确性可能不是最重要的性能度量。也许我们愿意接受一个可以识别更多真阳性的模型的更多假阳性，即使这意味着更低的准确性。对于预测乳腺癌、安全漏洞或桥梁结构损坏可能性的模型来说，这可能是真的。在这些情况下，我们<a id="_idIndexMarker505"/>可能会强调<strong class="bold">敏感性</strong>(识别阳性病例的倾向)而非准确性。</p>
+
+<p>另一方面，我们可能希望有一个模型能够高度可靠地识别阴性病例，即使这意味着它不能很好地识别阳性病例。<strong class="bold">特异性</strong>是由模型识别的所有阴性百分比的<a id="_idIndexMarker506"/>度量。</p>
+
+<p><strong class="bold">精度</strong>，即实际上是阳性的预测阳性的<a id="_idIndexMarker507"/>百分比，是另一个重要的衡量标准。对于某些应用，限制假阳性是很重要的，即使我们不得不容忍较低的灵敏度。苹果种植者使用图像识别来识别坏苹果，可能更喜欢高精度的模型而不是更灵敏的模型，不想不必要地丢弃苹果。</p>
+
+<p>通过查看混淆矩阵<a id="_idIndexMarker508"/>,可以更清楚地了解这一点:</p>
+
+<div><div><img alt="Figure 6.1 – Confusion matrix&#10;&#10;" height="562" src="img/B17978_06_001.jpg" width="1635"/>
+
+</div>
+
+</div>
+
+<p class="figure-caption">图 6.1-混淆矩阵</p>
+
+<p>混淆矩阵帮助我们概念化准确性、敏感性、特异性和精确性。准确度<a id="_idIndexMarker509"/>是我们的预测正确的观测值的百分比<a id="_idIndexMarker510"/>。这可以更精确地表述如下:</p>
+
+<div><div><img alt="" height="149" src="img/B17978_06_0011.jpg" width="964"/>
+
+</div>
+
+</div>
+
+<p>灵敏度<a id="_idIndexMarker511"/>是我们正确预测阳性的次数<a id="_idIndexMarker512"/>除以阳性的次数。再次查看混淆矩阵并确认实际正值可以是<strong class="bold">预测正值</strong> ( <strong class="bold"> TP </strong>)或<strong class="bold">预测负值</strong> ( <strong class="bold"> FN </strong>)可能会有所帮助。灵敏度<a id="_idIndexMarker514"/>也称<a id="_idIndexMarker515"/>为<strong class="bold">召回</strong>或<strong class="bold">真阳性率</strong>:</p>
+
+<div><div><img alt="" height="148" src="img/B17978_06_002.jpg" width="715"/>
+
+</div>
+
+</div>
+
+<p>特异性是<a id="_idIndexMarker516"/>我们正确预测<a id="_idIndexMarker518"/>一个<strong class="bold">负值</strong> ( <strong class="bold"> TN </strong>)的次数除以实际负值的次数(<strong class="bold"> TN + FP </strong>)。特异性也被称为<a id="_idIndexMarker519"/>真阴性率<strong class="bold"/>:</p>
+
+<div><div><img alt="" height="133" src="img/B17978_06_003.jpg" width="662"/>
+
+</div>
+
+</div>
+
+<p>精度<a id="_idIndexMarker520"/>是我们正确<a id="_idIndexMarker522"/>预测一个<strong class="bold">正值</strong> ( <strong class="bold"> TP </strong>)的<a id="_idIndexMarker521"/>次数除以预测的正值次数:</p>
+
+<div><div><img alt="" height="158" src="img/B17978_06_004.jpg" width="730"/>
+
+</div>
+
+</div>
+
+<p>当存在类别不平衡时，诸如准确性和敏感性之类的度量可以给出我们模型的性能的非常不同的估计。一个极端的例子可以说明这一点。黑猩猩有时会在白蚁丘里放一根棍子，希望能抓到几只白蚁。这只是偶尔成功。我不是灵长类动物学家，但我们也许可以把一次成功的捕鱼尝试建模为所用棍子的大小、一年中的时间和黑猩猩的年龄的函数。在我们的测试数据中，钓鱼尝试的成功率只有 2%。(此数据为本次演示所补。)</p>
+
+<p>让我们也说，我们建立了一个成功的白蚁钓鱼的分类模型，其灵敏度为 50%。因此，如果在我们的测试数据中有 100 次钓鱼尝试，我们只能正确预测两次成功尝试中的一次。还有一个假阳性，当打捞失败时，我们的模型预测成功打捞。这给了我们以下混淆矩阵:</p>
+
+<div><div><img alt="Figure 6.2 – Successful termite fishing confusion matrix&#10;&#10;" height="453" src="img/B17978_06_0021.jpg" width="1586"/>
+
+</div>
+
+</div>
+
+<p class="figure-caption">图 6.2-成功的白蚁钓鱼混淆矩阵</p>
+
+<p>请注意，我们获得了 98%的非常高的精度，即(97+1) / 100。我们得到高精度和低灵敏度，因为大部分的捕鱼尝试是负面的，这很容易预测。一个仅仅预测失败的模型也总是有 98%的准确率。</p>
+
+<p>现在，让我们用真实数据来看看这些<a id="_idIndexMarker524"/>模型评估方法。我们可以用一个<strong class="bold"> k 近邻</strong> ( <strong class="bold"> KNN </strong>)模型<a id="_idIndexMarker525"/>进行实验，以预测学士学位<a id="_idIndexMarker526"/>的获得程度，而<a id="_idIndexMarker527"/>则评估其准确性、敏感性、特异性和精确度:</p>
+
+<ol>
+
+<li>我们将首先加载用于编码和标准化数据的库，以及用于创建训练和测试数据帧的库。我们还将加载 scikit-learn 的 KNN 分类器<a id="_idIndexMarker528"/>和<code>metrics</code>库:<pre>import pandas as pd import numpy as np from feature_engine.encoding import OneHotEncoder from sklearn.model_selection import train_test_split from sklearn.preprocessing import StandardScaler from sklearn.neighbors import KNeighborsClassifier import sklearn.metrics as skmet import matplotlib.pyplot as plt</pre></li>
+
+<li>现在，我们<a id="_idIndexMarker529"/>可以创建训练和<a id="_idIndexMarker530"/>测试数据帧，编码<a id="_idIndexMarker531"/>并缩放数据:<pre>nls97compba = pd.read_csv("data/nls97compba.csv") feature_cols = ['satverbal','satmath','gpaoverall',   'parentincome','gender'] X_train, X_test, y_train, y_test =  \   train_test_split(nls97compba[feature_cols],\   nls97compba[['completedba']], test_size=0.3, random_state=0) ohe = OneHotEncoder(drop_last=True, variables=['gender']) ohe.fit(X_train) X_train_enc, X_test_enc = \   ohe.transform(X_train), ohe.transform(X_test) scaler = StandardScaler() standcols = X_train_enc.iloc[:,:-1].columns scaler.fit(X_train_enc[standcols]) X_train_enc = \   pd.DataFrame(scaler.transform(X_train_enc[standcols]),   columns=standcols, index=X_train_enc.index).\   join(X_train_enc[['gender_Female']]) X_test_enc = \   pd.DataFrame(scaler.transform(X_test_enc[standcols]),   columns=standcols, index=X_test_enc.index).\   join(X_test_enc[['gender_Female']])</pre></li>
+
+<li>让我们<a id="_idIndexMarker532"/>创建一个 KNN 分类<a id="_idIndexMarker533"/>模型。我们不会<a id="_idIndexMarker534"/>太担心<a id="_idIndexMarker535"/>我们如何指定它，因为我们只想在这一部分关注评估方法。我们将使用<code>feature_cols</code>中列出的所有特性，我们使用 KNN 分类器的预测方法从测试数据中生成预测:<pre>knn = KNeighborsClassifier(n_neighbors = 5) knn.fit(X_train_enc, y_train.values.ravel()) pred = knn.predict(X_test_enc)</pre></li>
+
+<li>我们可以使用 scikit-learn 来绘制混淆矩阵。我们将把测试数据中的实际值(<code>y_test</code>)和预测值传递给<code>confusion_matrix</code>方法:<pre>cm = skmet.confusion_matrix(y_test, pred, labels=knn.classes_) cmplot = skmet.ConfusionMatrixDisplay(   confusion_matrix=cm,    display_labels=['Negative', 'Positive']) cmplot.plot() cmplot.ax_.set(title='Confusion Matrix',    xlabel='Predicted Value', ylabel='Actual Value')</pre></li>
+
+</ol>
+
+<p>这产生了<a id="_idIndexMarker536"/>下面的图:</p>
+
+<div><div><img alt="Figure 6.3 – Confusion matrix of actual and predicted values&#10;&#10;" height="443" src="img/B17978_06_0031.jpg" width="551"/>
+
+</div>
+
+</div>
+
+<p class="figure-caption">图 6.3–实际值和预测值的混淆矩阵</p>
+
+<ol>
+
+<li value="5">我们<a id="_idIndexMarker537"/>可以<a id="_idIndexMarker538"/>也只是返回真阴性，假阳性<a id="_idIndexMarker539"/>，假阴性，真阳性计数:<pre>tn, fp, fn, tp = skmet.confusion_matrix(   y_test.values.ravel(), pred).ravel() tn, fp, fn, tp <strong class="bold">(53, 63, 31, 126)</strong></pre></li>
+
+<li>我们现在<a id="_idIndexMarker540"/>已经有了计算准确度、灵敏度、特异性和精确度所需的东西:<pre>accuracy = (tp + tn) / pred.shape[0] accuracy <strong class="bold">0.6556776556776557</strong> sensitivity = tp / (tp + fn) sensitivity <strong class="bold">0.802547770700637</strong> specificity = tn / (tn+fp) specificity <strong class="bold">0.45689655172413796</strong> precision = tp / (tp + fp) precision <strong class="bold">0.6666666666666666</strong></pre></li>
+
+</ol>
+
+<p>这个<a id="_idIndexMarker541"/>模型精度相对较低，但灵敏度稍好；也就是说，它在识别测试数据中已经完成学士学位的人方面做得比正确识别学位完成者和未完成者更好。如果我们回头看混淆矩阵，我们会看到有相当数量的假阳性，因为我们的模型预测测试数据中有 63 个人会有学士学位，而他们没有。</p>
+
+<ol>
+
+<li value="7">我们也可以<a id="_idIndexMarker544"/>使用 scikit-learn 简便的方法直接生成这些统计数据:<pre>skmet.accuracy_score(y_test.values.ravel(), pred) <strong class="bold">0.6556776556776557</strong> skmet.recall_score(y_test.values.ravel(), pred) <strong class="bold">0.802547770700637</strong> skmet.precision_score(y_test.values.ravel(), pred) <strong class="bold">0.6666666666666666</strong></pre></li>
+
+</ol>
+
+<p>只是为了比较，让我们尝试一个随机森林分类器，看看我们是否能得到更好的结果。</p>
+
+<ol>
+
+<li value="8">让我们<a id="_idIndexMarker545"/>将一个随机森林分类器与相同的数据相匹配，并再次调用<code>confusion_matrix</code>:<pre>rfc = RandomForestClassifier(n_estimators=100,    max_depth=2, n_jobs=-1, random_state=0) rfc.fit(X_train_enc, y_train.values.ravel()) pred = rfc.predict(X_test_enc) tn, fp, fn, tp = skmet.confusion_matrix(   y_test.values.ravel(), pred).ravel() tn, fp, fn, tp (<strong class="bold">49, 67, 17, 140)</strong> accuracy = (tp + tn) / pred.shape[0] accuracy <strong class="bold">0.6923076923076923</strong> sensitivity = tp / (tp + fn) sensitivity <strong class="bold">0.89171974522293</strong> specificity = tn / (tn+fp) specificity <strong class="bold">0.4224137931034483</strong> precision = tp / (tp + fp) precision <strong class="bold">0.6763285024154589</strong></pre></li>
+
+</ol>
+
+<p>与第一种模式相比，<a id="_idIndexMarker546"/>第二种模式让我们获得了<a id="_idIndexMarker547"/>更少的假阴性和<a id="_idIndexMarker548"/>更多的真阳性。当测试数据中的个人已经完成学士学位时，预测没有学士学位的可能性较小，而当个人已经完成学士学位时，预测学士学位的可能性较大。较低的 FP 和较高的 TP 的主要影响是显著较高的灵敏度。与第一个模型的 80%相比，第二个模型在 89%的时间里识别出实际阳性。</p>
+
+<p>我们在本节中讨论的测量方法——准确度、灵敏度、特异性和精确度——在我们评估分类模型时都值得考虑。但是很难很好地理解我们有时面临的权衡，例如在精确度和灵敏度之间。在构建分类模型时，数据科学家依靠几种标准的可视化来提高我们对这些权衡的感觉。我们将在下一节研究这些可视化。</p>
+
+<h1 id="_idParaDest-82"><a id="_idTextAnchor081"/>检查二元分类的 CAP、ROC 和精度-灵敏度曲线</h1>
+
+<p>有几种方法可以可视化二元分类模型的性能。一个相对直接的可视化是<strong class="bold">累积准确度分布图</strong> ( <strong class="bold"> CAP </strong>)，它<a id="_idIndexMarker550"/>显示了我们的模型识别类内或阳性病例的能力。它在<em class="italic"> X </em>轴上显示<a id="_idIndexMarker551"/>累积病例，在<em class="italic"> Y </em>轴上显示累积阳性结果。帽曲线是一个很好的方法，可以看出我们的模型在区分课堂观察方面做得有多好。(在讨论二元分类模型时，我会互换使用术语<em class="italic">类内</em>和<em class="italic">正</em>。)</p>
+
+<p><strong class="bold">接收器工作特性</strong> ( <strong class="bold"> ROC </strong>)曲线<a id="_idIndexMarker552"/>说明了当我们调整对正值进行分类的阈值时，模型灵敏度(能够识别正值)和假阳性率之间的权衡。类似地，当我们调整阈值时，精度-灵敏度曲线显示了我们正面预测的可靠性(它们的精度)和灵敏度(我们的模型识别正面实际值的能力)之间的关系。</p>
+
+<h2 id="_idParaDest-83"><a id="_idTextAnchor082"/>构造帽曲线</h2>
+
+<p>让我们从学士学位完成 KNN 模型的 CAP 曲线开始。让我们将它与决策树模型进行比较。同样，我们在这里不会做太多的特性选择。前一章详细介绍了特性选择。</p>
+
+<p>除了我们模型的曲线之外，CAP 曲线还有一个<strong class="bold">随机模型</strong>和一个<strong class="bold">完美模型</strong>的图，以供比较。随机模型除了正值的总体分布之外，不提供任何信息。完美模型精确预测正值。为了说明这些图是如何绘制的，我们将从一个假设的例子开始。想象一下，你抽取了一副洗得很好的扑克牌中的前六张。您创建一个表，在一列中显示累积牌总数，在下一列中显示红牌数。它可能看起来像这样:</p>
+
+<div><div><img alt="Figure 6.4 – Sample of playing cards &#10;&#10;" height="549" src="img/B17978_06_0041.jpg" width="972"/>
+
+</div>
+
+</div>
+
+<p class="figure-caption">图 6.4–扑克牌样本</p>
+
+<p>我们可以根据我们对红牌数量的了解来绘制一个随机模型。随机模型只有两个点，(0，0)和(6，3)，但这就是我们所需要的。</p>
+
+<p>完美的模型图需要更多的解释。如果我们的模型完美地预测了红牌，并且我们按照预测降序排序，我们将得到<em class="italic">图 6.5 </em>。在红卡用完之前，累积的类别计数与牌的数量相匹配，在本例中为 3。使用完美的<a id="_idIndexMarker554"/>模型绘制的累计类内总数图有两个斜率；等于 1，直到达到类内总数，之后等于 0:</p>
+
+<div><div><img alt="Figure 6.5 – Sample of playing cards&#10;&#10;" height="618" src="img/B17978_06_005.jpg" width="1283"/>
+
+</div>
+
+</div>
+
+<p class="figure-caption">图 6.5–扑克牌样本</p>
+
+<p>我们现在已经知道足够绘制随机模型和完美模型。完美的模型会有三点:(0，0)，(类内计数，类内计数)，和(卡片数，类内计数)。在这种情况下，课堂计数为<code>3</code>，卡片数量为<code>6</code>:</p>
+
+<pre class="source-code">numobs = 6</pre>
+
+<pre class="source-code">inclasscnt = 3</pre>
+
+<pre class="source-code">plt.yticks([1,2,3])</pre>
+
+<pre class="source-code">plt.plot([0, numobs], [0, inclasscnt], c = 'b', label = 'Random Model')</pre>
+
+<pre class="source-code">plt.plot([0, inclasscnt, numobs], [0, inclasscnt, inclasscnt], c = 'grey', linewidth = 2, label = 'Perfect Model')</pre>
+
+<pre class="source-code">plt.title("Cumulative Accuracy Profile")</pre>
+
+<pre class="source-code">plt.xlabel("Total Cards")</pre>
+
+<pre class="source-code">plt.ylabel("In-class (Red) Cards")</pre>
+
+<p>此<a id="_idIndexMarker555"/>产生以下情节:</p>
+
+<div><div><img alt="Figure 6.6 – CAP with playing card data&#10;&#10;" height="443" src="img/B17978_06_006.jpg" width="548"/>
+
+</div>
+
+</div>
+
+<p class="figure-caption">图 6.6–带有扑克牌数据的帽子</p>
+
+<p>理解完美模型优于随机模型的一个方法是考虑随机模型在中点会预测多少张红牌，即 3 张。在这一点上，随机模型将预测 1.5 张红牌。然而，完美的模型会预测 3。(请记住，我们已经根据预测按降序对卡片进行了排序。)</p>
+
+<p>已经用虚构的数据构建了随机和完美模型的图，让我们用我们的学士学位完成数据来尝试一下:</p>
+
+<ol>
+
+<li value="1">首先，我们必须导入与上一节相同的模块:<pre>import pandas as pd import numpy as np from feature_engine.encoding import OneHotEncoder from sklearn.model_selection import train_test_split from sklearn.preprocessing import StandardScaler from sklearn.neighbors import KNeighborsClassifier from sklearn.ensemble import RandomForestClassifier import sklearn.metrics as skmet import matplotlib.pyplot as plt import seaborn as sb</pre></li>
+
+<li>然后，我们<a id="_idIndexMarker556"/>加载、编码和缩放 NLS 学士学位数据:<pre>nls97compba = pd.read_csv("data/nls97compba.csv") feature_cols = ['satverbal','satmath','gpaoverall',   'parentincome','gender'] X_train, X_test, y_train, y_test =  \   train_test_split(nls97compba[feature_cols],\   nls97compba[['completedba']], test_size=0.3, random_state=0) ohe = OneHotEncoder(drop_last=True, variables=['gender']) ohe.fit(X_train) X_train_enc, X_test_enc = \   ohe.transform(X_train), ohe.transform(X_test) scaler = StandardScaler() standcols = X_train_enc.iloc[:,:-1].columns scaler.fit(X_train_enc[standcols]) X_train_enc = \   pd.DataFrame(scaler.transform(X_train_enc[standcols]),   columns=standcols, index=X_train_enc.index).\   join(X_train_enc[['gender_Female']]) X_test_enc = \   pd.DataFrame(scaler.transform(X_test_enc[standcols]),   columns=standcols, index=X_test_enc.index).\   join(X_test_enc[['gender_Female']])</pre></li>
+
+<li>接下来，我们<a id="_idIndexMarker557"/>创建<code>KNeighborsClassifier</code>和<code>RandomForestClassifier</code>实例:<pre>knn = KNeighborsClassifier(n_neighbors = 5) rfc = RandomForestClassifier(n_estimators=100, max_depth=2,    n_jobs=-1, random_state=0)</pre></li>
+
+</ol>
+
+<p>我们现在准备开始绘制我们的帽曲线。我们将从绘制一个随机模型开始，然后是一个完美的模型。这两个模型分别不使用任何信息(除了正值的总体分布)和提供完美信息。</p>
+
+<ol>
+
+<li value="4">我们统计测试数据中的观察值的数量和正值的数量。我们将使用(0，0)和(观察次数，课内计数)来绘制随机模型线。对于完美的模型，我们将绘制一条从(0，0)到(类内计数，类内计数)的线，因为该模型可以完美地区分类内值(它永远不会出错)。它在那个点的右边是平的，因为没有更多的正值可以寻找。</li>
+
+</ol>
+
+<p>我们将<a id="_idIndexMarker558"/>在中点画一条垂直线，在与随机模型线相交的地方画一条水平线。这在以后会更有用:</p>
+
+<pre>numobs = y_test.shape[0]
+inclasscnt = y_test.iloc[:,0].sum()
+plt.plot([0, numobs], [0, inclasscnt], c = 'b', label = 'Random Model')
+plt.plot([0, inclasscnt, numobs], [0, inclasscnt, inclasscnt], c = 'grey', linewidth = 2, label = 'Perfect Model')
+plt.axvline(numobs/2, color='black', linestyle='dashed', linewidth=1)
+plt.axhline(numobs/2, color='black', linestyle='dashed', linewidth=1)
+plt.title("Cumulative Accuracy Profile")
+plt.xlabel("Total Observations")
+plt.ylabel("In-class Observations")
+plt.legend()</pre>
+
+<p>这会产生以下情节:</p>
+
+<div><div><img alt="Figure 6.7 – CAP with just random and perfect models&#10;&#10;" height="446" src="img/B17978_06_007.jpg" width="563"/>
+
+</div>
+
+</div>
+
+<p class="figure-caption">图 6.7–仅随机和完美模型的 CAP</p>
+
+<ol>
+
+<li value="5">接下来，我们<a id="_idIndexMarker559"/>定义一个函数，为我们传递给它的模型绘制一个 CAP 曲线。我们将使用<code>predict_proba</code>方法得到一个数组，其概率为测试数据中的每个观察值都是在班的(在本例中，已经完成了学士学位)。然后，我们将创建一个包含这些概率和实际目标值的数据框架，按概率逆序排序，并计算正实际目标值的累计值。</li>
+
+</ol>
+
+<p>我们还将获得中间观察点的累计值，并在该点画一条水平线。最后，我们将绘制一条线，该线有一个从 0 到观察次数的数组作为<em class="italic"> x </em>值，运行的类内总数作为<em class="italic"> y </em>值:</p>
+
+<pre>def addplot(model, X, Xtest, y, modelname, linecolor):
+  model.fit(X, y.values.ravel())
+  probs = model.predict_proba(Xtest)[:, 1]
+  
+  probdf = pd.DataFrame(zip(probs, y_test.values.ravel()),
+    columns=(['prob','inclass']))
+  probdf.loc[-1] = [0,0]
+  probdf = probdf.sort_values(['prob','inclass'],
+    ascending=False).\
+    assign(inclasscum = lambda x: x.inclass.cumsum())
+  inclassmidpoint = \
+    probdf.iloc[int(probdf.shape[0]/2)].inclasscum
+  plt.axhline(inclassmidpoint, color=linecolor,
+    linestyle='dashed', linewidth=1)
+  plt.plot(np.arange(0, probdf.shape[0]),
+    probdf.inclasscum, c = linecolor,
+    label = modelname, linewidth = 4)</pre>
+
+<ol>
+
+<li value="6">现在，让我们<a id="_idIndexMarker560"/>使用相同的数据运行 KNN 和随机森林分类器模型的函数:<pre>addplot(knn, X_train_enc, X_test_enc, y_train,   'KNN', 'red') addplot(rfc, X_train_enc, X_test_enc, y_train,   'Random Forest', 'green') plt.legend()</pre></li>
+
+</ol>
+
+<p>这更新了我们之前的情节:</p>
+
+<div><div><img alt="Figure 6.8 – CAP updated with KNN and random forest models&#10;&#10;" height="449" src="img/B17978_06_008.jpg" width="569"/>
+
+</div>
+
+</div>
+
+<p class="figure-caption">图 6.8–用 KNN 和随机森林模型更新的 CAP</p>
+
+<p>不出所料，CAP 曲线显示我们的 KNN 和随机森林模型比随机猜测要好，但不如完美模型好。问题是，分别好多少和差多少。水平线给了我们一些概念。一个完美的模型应该从 138 个观察值中正确识别出 138 个正值。(回想一下，观察值是这样排序的，即最有可能为正的观察值排在最前面。)随机模型将识别 70(线未示出)，而 KNN 和随机森林模型将分别识别 102 和 103。我们的两个模型在辨别正值方面分别是完美模型的 74%和 75%。70%到 80%之间的任何东西都被认为是好的模型；高于这一比例就很好，低于这一比例就很差。</p>
+
+<h2 id="_idParaDest-84"><a id="_idTextAnchor083"/>绘制受试者工作特性(ROC)曲线</h2>
+
+<p>ROC 曲线<a id="_idIndexMarker562"/>说明了调整阈值时假阳性率和真阳性率(也称为灵敏度)之间的权衡。在进一步讨论之前，我们应该讨论一下假阳性率。它是我们的模型错误地识别为阳性的实际阴性(真阴性加上假阳性)的百分比:</p>
+
+<div><div><img alt="" height="136" src="img/B17978_06_0051.jpg" width="856"/>
+
+</div>
+
+</div>
+
+<p>在这里，您可以看到假阳性率与特异性之间的关系，这在本章开始时已经讨论过。差就是分子。特异性是我们的模型正确识别为阴性的实际阴性的百分比:</p>
+
+<div><div><img alt="" height="133" src="img/B17978_06_0061.jpg" width="661"/>
+
+</div>
+
+</div>
+
+<p>我们还可以将假阳性率与灵敏度进行比较，灵敏度是我们的模型正确识别为阳性的实际阳性(真阳性加上假阴性)的百分比:</p>
+
+<div><div><img alt="" height="131" src="img/B17978_06_0071.jpg" width="648"/>
+
+</div>
+
+</div>
+
+<p>我们通常面临灵敏度和假阳性率之间的权衡。我们希望我们的模型能够识别大部分的实际阳性，但我们不希望有问题的高假阳性率。什么是<em class="italic">高</em>取决于你的背景。</p>
+
+<p>区分阴性和阳性病例越困难，灵敏度和假阳性率之间的权衡就越棘手。当我们绘制预测概率时，我们可以通过我们的学士学位完成模型看到这一点:</p>
+
+<ol>
+
+<li value="1">首先，让我们再次拟合我们的随机森林分类器，并生成预测和预测概率。我们会看到，这个模型在预测概率大于<code>0.500</code> : <pre>rfc.fit(X_train_enc, y_train.values.ravel()) pred = rfc.predict(X_test_enc) pred_probs = rfc.predict_proba(X_test_enc)[:, 1] probdf = pd.DataFrame(zip(   pred_probs, pred, y_test.values.ravel()),   columns=(['prob','pred','actual'])) probdf.groupby(['pred'])['prob'].agg(['min','max']) <strong class="bold">                min             max</strong> <strong class="bold">pred             </strong> <strong class="bold">0.000           0.305           0.500</strong> <strong class="bold">1.000           0.502           0.883</strong></pre>时，预测这个人完成学士学位</li>
+
+<li>将这些概率的分布与实际的类值进行比较是有帮助的。我们可以用密度图做到这一点:<pre>sb.kdeplot(probdf.loc[probdf.actual==1].prob,    shade=True, color='red',   label="Completed BA") sb.kdeplot(probdf.loc[probdf.actual==0].prob,     shade=True, color='green',   label="Did Not Complete") plt.axvline(0.5, color='black', linestyle='dashed', linewidth=1) plt.axvline(0.65, color='black', linestyle='dashed', linewidth=1) plt.title("Predicted Probability Distribution") plt.legend(loc="upper left")</pre></li>
+
+</ol>
+
+<p>此<a id="_idIndexMarker564"/>产生以下图形:</p>
+
+<div><div><img alt="Figure 6.9 – Density plot of in-class and out-of-class observations&#10;&#10;" height="446" src="img/B17978_06_009.jpg" width="561"/>
+
+</div>
+
+</div>
+
+<p class="figure-caption">图 6.9–课内和课外观察的密度图</p>
+
+<p>在这里，我们可以看到，我们的模型在区分实际的正值和负值方面有些困难，因为有相当多的类内和类外重叠。阈值 0.500(左侧虚线)会给我们带来很多假阳性，因为很大一部分课外观察(那些没有完成学士学位的人)预测的概率大于 0.500。如果我们将阈值移得更高，比如 0.650，我们会得到更多的假阴性，因为许多类内观察的概率低于 0.65。</p>
+
+<ol>
+
+<li value="3">根据测试数据和随机森林模型很容易构建 ROC 曲线。<code>roc_curve</code>方法返回不同阈值(<code>ths</code>)下的假阳性率(<code>fpr</code>)和灵敏度(真阳性率，<code>tpr</code>)。</li>
+
+</ol>
+
+<p>首先，让我们按阈值分别画出假阳性率和灵敏度线:</p>
+
+<pre>fpr, tpr, ths = skmet.roc_curve(y_test, pred_probs)
+ths = ths[1:]
+fpr = fpr[1:]
+tpr = tpr[1:]
+fig, ax = plt.subplots()
+ax.plot(ths, fpr, label="False Positive Rate")
+ax.plot(ths, tpr, label="Sensitivity")
+ax.set_title('False Positive Rate and Sensitivity by Threshold')
+ax.set_xlabel('Threshold')
+ax.set_ylabel('False Positive Rate and Sensitivity')
+ax.legend()</pre>
+
+<p>这会产生以下情节:</p>
+
+<div><div><img alt="Figure 6.10 – False positive rate and sensitivity lines&#10;&#10;" height="449" src="img/B17978_06_010.jpg" width="567"/>
+
+</div>
+
+</div>
+
+<p class="figure-caption">图 6.10-假阳性率和灵敏度线</p>
+
+<p>在这里，我们<a id="_idIndexMarker566"/>可以看到，提高阈值会提高(降低)我们的假阳性率，但也会降低我们的灵敏度。</p>
+
+<ol>
+
+<li value="4">现在，让我们绘制相关的 ROC 曲线，该曲线绘制了每个阈值的假阳性率与灵敏度的关系:<pre>fig, ax = plt.subplots() ax.plot(fpr, tpr, linewidth=4, color="black") ax.set_title('ROC curve') ax.set_xlabel('False Positive Rate') ax.set_ylabel('Sensitivity')</pre></li>
+
+</ol>
+
+<p>这会产生以下情节:</p>
+
+<div><div><img alt="Figure 6.11 – ROC curve with false positive rate and sensitivity&#10;&#10;" height="440" src="img/B17978_06_011.jpg" width="561"/>
+
+</div>
+
+</div>
+
+<p class="figure-caption">图 6.11–假阳性率和灵敏度的 ROC 曲线</p>
+
+<p><a id="_idIndexMarker567"/> ROC 曲线表明假阳性率和灵敏度之间的权衡非常陡峭，直到假阳性率大约为 0.5 或更高。让我们看看用于随机森林模型预测的阈值 0.5 意味着什么。</p>
+
+<ol>
+
+<li value="5">让我们从阈值数组中选择一个接近 0.5 的指数，以及一个接近 0.4 和 0.6 的指数进行比较。然后，我们将为这些指标的假阳性率画垂直线，为这些指标的敏感度值画水平线:<pre>tholdind = np.where((ths&gt;0.499) &amp; (ths&lt;0.501))[0][0] tholdindlow = np.where((ths&gt;0.397) &amp; (ths&lt;0.404))[0][0] tholdindhigh = np.where((ths&gt;0.599) &amp; (ths&lt;0.601))[0][0] plt.vlines((fpr[tholdindlow],fpr[tholdind],   fpr[tholdindhigh]), 0, 1, linestyles ="dashed",    colors =["green","blue","purple"]) plt.hlines((tpr[tholdindlow],tpr[tholdind],   tpr[tholdindhigh]), 0, 1, linestyles ="dashed",    colors =["green","blue","purple"])</pre></li>
+
+</ol>
+
+<p>本更新<a id="_idIndexMarker568"/>我们的剧情:</p>
+
+<div><div><img alt="Figure 6.12 – ROC curve with lines for thresholds&#10;&#10;" height="443" src="img/B17978_06_012.jpg" width="560"/>
+
+</div>
+
+</div>
+
+<p class="figure-caption">图 6.12–阈值的 ROC 曲线</p>
+
+<p>这说明了在用于预测的 0.5 阈值(蓝色虚线)下假阳性率和灵敏度之间的权衡。ROC 曲线<a id="_idIndexMarker569"/>在阈值高于 0.5 时具有非常小的斜率，例如阈值为 0.6 时(绿色虚线)。因此，将阈值从 0.6 降低到 0.5 会导致较低的假阳性率(从 0.8 以上降低到 0.6 以下)，但灵敏度不会降低太多。然而，通过将阈值从 0.5 降低到 0.4(从蓝色到紫色线)来提高(降低)假阳性率会导致灵敏度显著变差。它从将近 90%下降到刚刚超过 70%。</p>
+
+<h2 id="_idParaDest-85"><a id="_idTextAnchor084"/>绘制精度-灵敏度曲线</h2>
+
+<p>调整阈值时，<a id="_idIndexMarker570"/>检查精度和灵敏度之间的关系通常很有帮助。请记住，精度告诉我们，当我们预测一个正值时，我们的正确率是多少:</p>
+
+<div><div><img alt="" height="135" src="img/B17978_06_0081.jpg" width="610"/>
+
+</div>
+
+</div>
+
+<p>我们可以通过增加将一个值分类为正数的阈值来提高精度。然而，这可能意味着灵敏度的降低。当我们提高预测正值的正确率(精确度)时，我们将减少能够识别的正值的数量(敏感度)。精确度-灵敏度曲线，通常称为精确度-召回曲线，说明了这种权衡。</p>
+
+<p>在绘制<a id="_idIndexMarker571"/>精度-灵敏度曲线之前，让我们来看看相对于阈值绘制的单独的精度和灵敏度曲线:</p>
+
+<ol>
+
+<li value="1">我们可以用<code>precision_recall_curve</code>方法得到精度-灵敏度曲线的点。我们在最高阈值时移除一些不可思议，这有时会发生:<pre>prec, sens, ths = skmet.precision_recall_curve(y_test, pred_probs) prec = prec[1:-10] sens = sens[1:-10] ths  = ths[:-10] fig, ax = plt.subplots() ax.plot(ths, prec, label='Precision') ax.plot(ths, sens, label='Sensitivity') ax.set_title('Precision and Sensitivity by Threshold') ax.set_xlabel('Threshold') ax.set_ylabel('Precision and Sensitivity') ax.set_xlim(0.3,0.9) ax.legend()</pre></li>
+
+</ol>
+
+<p>这会产生以下情节:</p>
+
+<div><div><img alt="Figure 6.13 – Precision and sensitivity lines&#10;&#10;" height="439" src="img/B17978_06_013.jpg" width="569"/>
+
+</div>
+
+</div>
+
+<p class="figure-caption">图 6.13-精度和灵敏度线</p>
+
+<p>这里，我们<a id="_idIndexMarker572"/>可以看到，阈值高于 0.5 时，灵敏度下降得更快。这种下降并没有给我们带来超过 0.6 阈值的更高精度。</p>
+
+<ol>
+
+<li value="2">现在，让我们绘制灵敏度与精度的关系图，以查看精度-灵敏度曲线:<pre>fig, ax = plt.subplots() ax.plot(sens, prec) ax.set_title('Precision-Sensitivity Curve') ax.set_xlabel('Sensitivity') ax.set_ylabel('Precision') plt.yticks(np.arange(0.2, 0.9, 0.2))</pre></li>
+
+</ol>
+
+<p>这会产生以下情节:</p>
+
+<div><div><img alt="Figure 6.14 – Precision-sensitivity curve&#10;&#10;" height="444" src="img/B17978_06_014.jpg" width="560"/>
+
+</div>
+
+</div>
+
+<p class="figure-caption">图 6.14-精度-灵敏度曲线</p>
+
+<p>精度-灵敏度<a id="_idIndexMarker573"/>曲线反映了这样一个事实，即灵敏度对阈值的响应比该特定模型的精度更敏感。这意味着我们可以将阈值降低到 0.5 以下，以获得更高的灵敏度，而不会显著降低精度。</p>
+
+<p class="callout-heading">注意</p>
+
+<p class="callout">阈值的选择在一定程度上是一个判断和领域知识的问题，并且主要是当我们有显著的阶级不平衡时的一个问题。但是，在第十章<a href="B17978_10_ePub.xhtml#_idTextAnchor126"><em class="italic"/></a><em class="italic">、逻辑回归</em>中我们将探讨如何计算一个最优阈值。</p>
+
+<p>这一节以及上一节演示了如何评估二元分类模型。他们表明，模型评估不仅仅是一个竖起大拇指和竖起大拇指的过程。这更像是在做蛋糕时品尝面糊。我们对我们的模型规范做出良好的初始假设，并使用模型评估过程进行改进。这通常涉及准确性、敏感性、特异性和精确性之间的权衡，以及抵制一刀切建议的建模决策。这些决定在很大程度上依赖于领域，是专业判断的问题。</p>
+
+<p>本节中的讨论<a id="_idIndexMarker574"/>以及大多数技术同样适用于多类建模。我们将在下一节讨论评估多类模型。</p>
+
+<h1 id="_idParaDest-86"><a id="_idTextAnchor085"/>评估多类模型</h1>
+
+<p>我们用来评估二元分类模型的所有相同的<a id="_idIndexMarker575"/>原则适用于多类模型评估。计算混淆矩阵同样重要，尽管解释起来要困难一些。我们还需要检查一些竞争性的度量标准，比如精度和灵敏度。这也比用二元分类法更混乱。</p>
+
+<p>我们将再次使用 NLS 学位完成数据。在这种情况下，我们将改变目标，从是否完成学士学位改为完成高中学业、完成学士学位和完成研究生学位:</p>
+
+<ol>
+
+<li value="1">我们将从加载必要的库开始。这些是我们在前两节中使用的相同的库:<pre>import pandas as pd import numpy as np from feature_engine.encoding import OneHotEncoder from sklearn.model_selection import train_test_split from sklearn.preprocessing import StandardScaler from sklearn.neighbors import KNeighborsClassifier import sklearn.metrics as skmet import matplotlib.pyplot as plt</pre></li>
+
+<li>接下来，我们将加载 NLS 学位程度数据，创建培训和测试数据框架，并对数据进行编码和缩放:<pre>nls97degreelevel = pd.read_csv("data/nls97degreelevel.csv") feature_cols = ['satverbal','satmath','gpaoverall',   'parentincome','gender'] X_train, X_test, y_train, y_test =  \   train_test_split(nls97degreelevel[feature_cols],\   nls97degreelevel[['degreelevel']], test_size=0.3, random_state=0) ohe = OneHotEncoder(drop_last=True, variables=['gender']) ohe.fit(X_train) X_train_enc, X_test_enc = \   ohe.transform(X_train), ohe.transform(X_test) scaler = StandardScaler() standcols = X_train_enc.iloc[:,:-1].columns scaler.fit(X_train_enc[standcols]) X_train_enc = \   pd.DataFrame(scaler.transform(X_train_enc[standcols]),   columns=standcols, index=X_train_enc.index).\   join(X_train_enc[['gender_Female']]) X_test_enc = \   pd.DataFrame(scaler.transform(X_test_enc[standcols]),   columns=standcols, index=X_test_enc.index).\   join(X_test_enc[['gender_Female']])</pre></li>
+
+<li>现在，我们将运行一个 KNN 模型，并预测每个学位级别类别的值:<pre>knn = KNeighborsClassifier(n_neighbors = 5) knn.fit(X_train_enc, y_train.values.ravel()) pred = knn.predict(X_test_enc) pred_probs = knn.predict_proba(X_test_enc)[:, 1]</pre></li>
+
+<li>我们可以<a id="_idIndexMarker576"/>使用这些预测来生成一个混淆矩阵:<pre>cm = skmet.confusion_matrix(y_test, pred) cmplot = skmet.ConfusionMatrixDisplay(confusion_matrix=cm, display_labels=['High School', 'Bachelor','Post-Graduate']) cmplot.plot() cmplot.ax_.set(title='Confusion Matrix',    xlabel='Predicted Value', ylabel='Actual Value')</pre></li>
+
+</ol>
+
+<p>这会生成以下图:</p>
+
+<div><div><img alt="Figure 6.15 – Confusion matrix with a multiclass target&#10;&#10;" height="475" src="img/B17978_06_015.jpg" width="621"/>
+
+</div>
+
+</div>
+
+<p class="figure-caption">图 6.15-多类目标的混淆矩阵</p>
+
+<p>可以手动计算评估指标。精度是我们的类内预测实际类内的百分比。所以，对于我们预测的高中，是 48 / (48 + 38 + 8) = 0.51。高中班级的敏感度——即我们的模型预测的高中实际值的百分比——为 48 / (48 + 19 +5) = 0.67。然而，这相当繁琐。幸运的是，scikit-learn 可以为我们做到这一点。</p>
+
+<ol>
+
+<li value="5">我们可以调用<code>classification_report</code>方法来获得这些统计数据，传递实际值和预测值(记住，召回和敏感度是相同的度量):<pre>print(skmet.classification_report(y_test, pred,   target_names=['High School', 'Bachelor', 'Post-Graduate']))                <strong class="bold">precision    recall  f1-score   support</strong> <strong class="bold">  High School       0.51      0.67      0.58        72</strong> <strong class="bold">     Bachelor       0.51      0.49      0.50        92</strong> <strong class="bold">Post-Graduate       0.42      0.24      0.30        42</strong> <strong class="bold">     accuracy                           0.50       206</strong> <strong class="bold">    macro avg       0.48      0.46      0.46       206</strong> <strong class="bold"> weighted avg       0.49      0.50      0.49       206</strong></pre></li>
+
+</ol>
+
+<p>除了按类别划分的<a id="_idIndexMarker578"/>精度和灵敏度比率之外，我们还获得了一些其他统计数据。F1 分数是精确度和灵敏度的调和平均值。</p>
+
+<div><div><img alt="" height="114" src="img/B17978_06_0091.jpg" width="444"/>
+
+</div>
+
+</div>
+
+<p>这里，<em class="italic"> p </em>是精度，<em class="italic"> s </em>是灵敏度。</p>
+
+<p>要获得所有类别的平均精度、敏感度和 F1 值，我们可以使用简单平均值(宏观平均值)或根据类别大小调整的加权平均值。使用加权平均值，我们得到的精确度、灵敏度和 F1 值分别为 0.49、0.50 和 0.49。(由于这里班级相对均衡，所以宏观平均和加权平均没有太大区别。)</p>
+
+<p>这演示了如何将我们讨论的二元分类模型的评估方法扩展到多类评估。同样的概念和技术也适用，尽管它们更难实现。</p>
+
+<p>到目前为止，我们已经关注了度量和可视化来帮助我们评估分类模型。我们还没有检查评估回归模型的度量标准。这些指标可能比分类指标更直接。我们将在下一节讨论它们。</p>
+
+<h1 id="_idParaDest-87"><a id="_idTextAnchor086"/>评估回归模型</h1>
+
+<p>回归评估的指标<a id="_idIndexMarker579"/>通常基于目标变量的实际值和模型预测值之间的距离。最常见的衡量标准——均方误差、均方根误差、平均绝对误差和 R 平方——都是跟踪我们的预测如何成功地捕捉目标中的变化。</p>
+
+<p>实际值和我们的预测之间的距离被称为残差，或误差。<strong class="bold">均方误差</strong> ( <strong class="bold"> MSE </strong>)是残差平方的<a id="_idIndexMarker580"/>平均值:</p>
+
+<div><div><img alt="" height="164" src="img/B17978_06_0101.jpg" width="490"/>
+
+</div>
+
+</div>
+
+<p>这里，<img alt="" height="37" src="img/B17978_06_011.png" width="40"/>是第 I 次观察时的实际目标变量值，<img alt="" height="47" src="img/B17978_06_012.png" width="40"/>是我们对目标的预测。残差被平方以处理负值，其中预测值高于实际值。为了让我们的测量回到一个更有意义的范围，我们经常使用 MSE 的平方根。那就是<a id="_idIndexMarker581"/>被称为<strong class="bold">均方根误差</strong> ( <strong class="bold"> RMSE </strong>)。</p>
+
+<p>由于平方，MSE 对较大残差的惩罚要比较小残差大得多。例如，如果我们有五个观测值的预测，其中一个具有 25 的残差，而其他四个具有 0 的残差，我们将得到<em class="italic"> (0+0+0+0+625)/5 = 125 </em>。然而，如果所有五个观测值的残差都为 5，则 MSE 将为<em class="italic"> (25+25+25+25+25)/5 = 25 </em>。</p>
+
+<p>对残差求平方的一个好的替代方法是取它们的绝对值。这给出了平均绝对误差:</p>
+
+<div><div><img alt="" height="164" src="img/B17978_06_0131.jpg" width="480"/>
+
+</div>
+
+</div>
+
+<p>r 平方，也称为决定系数，是我们的模型捕获的目标变量的变化比例的估计值。我们对残差求平方，就像计算 MSE 时所做的那样，然后除以每个实际目标值与其样本均值的偏差。这给了我们仍然无法解释的变化，我们减去 1 得到解释的变化:</p>
+
+<div><div><img alt="" height="121" src="img/B17978_06_0141.jpg" width="1023"/>
+
+</div>
+
+</div>
+
+<div><div><img alt="" height="133" src="img/B17978_06_0151.jpg" width="394"/>
+
+</div>
+
+</div>
+
+<p>幸运的是，scikit-learn <a id="_idIndexMarker582"/>使得生成这些统计数据变得很容易。在本节中，我们将构建一个土地温度的线性回归模型，并使用这些统计数据对其进行评估。我们将在 2019 年使用美国国家海洋和大气管理局关于气象站年平均温度、海拔和纬度的数据。</p>
+
+<p class="callout-heading">注意</p>
+
+<p class="callout">陆地温度数据集包含 2019 年全球 12，000 多个站点的平均温度读数(摄氏度)，尽管大多数站点位于美国。原始数据来自全球历史气候学网络综合数据库。美国国家海洋和大气管理局已在<a href="https://www.ncdc.noaa.gov/data-access/land-based-station-data/land-based-datasets/global-historical-climatology-network-monthly-version-4">网站 https://www . ncdc . NOAA . gov/data-access/land-based-station-data/land-based-datasets/global-historical-climatology-network-monthly-version-4</a>上公开使用。</p>
+
+<p>让我们开始建立一个线性回归模型:</p>
+
+<ol>
+
+<li value="1">We will start by loading the libraries we need and the land temperatures data. We will also<a id="_idIndexMarker583"/> create training and testing DataFrames:<pre>import pandas as pd
+import numpy as np
+from sklearn.model_selection import train_test_split
+from sklearn.linear_model import LinearRegression
+import sklearn.metrics as skmet
+import matplotlib.pyplot as plt
+landtemps = pd.read_csv("data/landtemps2019avgs.csv")
+feature_cols = ['latabs','elevation']
+X_train, X_test, y_train, y_test =  \
+  train_test_split(landtemps[feature_cols],\
+  landtemps[['avgtemp']], test_size=0.3, random_state=0)</pre><p class="callout-heading">注意</p><p class="callout"><code>latabs</code>特征<a id="_idIndexMarker584"/>是没有南北指示器的纬度值；因此，位于北纬 30 度的埃及开罗和南纬 30 度的巴西阿雷格里港具有相同的数值。</p></li>
+
+<li>现在，我们扩展我们的数据:<pre>scaler = StandardScaler() scaler.fit(X_train) X_train = \   pd.DataFrame(scaler.transform(X_train),   columns=feature_cols, index=X_train.index) X_test = \   pd.DataFrame(scaler.transform(X_test),   columns=feature_cols, index=X_test.index) scaler.fit(y_train) y_train, y_test = \   pd.DataFrame(scaler.transform(y_train),   columns=['avgtemp'], index=y_train.index),\   pd.DataFrame(scaler.transform(y_test),   columns=['avgtemp'], index=y_test.index)</pre></li>
+
+<li>接下来，我们<a id="_idIndexMarker585"/>实例化一个 scikit-learn <code>LinearRegression</code>对象，并在训练数据上拟合一个模型。我们的目标是年平均温度(<code>avgtemp</code>)，而特征是纬度(<code>latabs</code>)和<code>elevation</code>。<code>coef_</code>属性给出了每个特性的系数:<pre>lr = LinearRegression() lr.fit(X_train, y_train) np.column_stack((lr.coef_.ravel(),   X_test.columns.values)) <strong class="bold">array([[-0.8538957537748768, 'latabs'],</strong> <strong class="bold">       [-0.3058979822791853, 'elevation']], dtype=object)</strong></pre></li>
+
+</ol>
+
+<p><code>latabs</code>系数的解释是纬度每增加一个标准差，标准化年平均温度将下降 0.85。(<code>LinearRegression</code>模块不返回 p 值，p 值是系数估计值的统计显著性的度量。您可以使用<code>statsmodels</code>来查看普通最小二乘模型的完整摘要。)</p>
+
+<ol>
+
+<li value="4">现在，我们<a id="_idIndexMarker586"/>可以得到预测值。让我们将返回的 NumPy 数组与测试数据中的特性和目标连接起来。然后，我们可以通过从实际值中减去预测值来计算残差(<code>avgtemp</code>)。残差看起来并不差，尽管有一点负偏斜和过度峰度:<pre>pred = lr.predict(X_test) preddf = pd.DataFrame(pred, columns=['prediction'],   index=X_test.index).join(X_test).join(y_test) preddf['resid'] = preddf.avgtemp-preddf.prediction preddf.resid.agg(['mean','median','skew','kurtosis']) <strong class="bold">mean             -0.021</strong> <strong class="bold">median           0.032</strong> <strong class="bold">skew              -0.641</strong> <strong class="bold">kurtosis        6.816</strong> <strong class="bold">Name: resid, dtype: float64</strong></pre></li>
+
+</ol>
+
+<p>值得注意的是，在本书中，我们在使用回归模型的大部分时间里都会以这种方式生成预测和计算残差。如果您对我们刚刚在前面的代码块中所做的事情有一点不清楚，那么最好再看一遍。</p>
+
+<ol>
+
+<li value="5">我们应该绘制残差图，以便更好地了解它们是如何分布的。<pre>Plt.hist(preddf.resid, color="blue") plt.axvline(preddf.resid.mean(), color='red', linestyle='dashed', linewidth=1) plt.title("Histogram of Residuals for Temperature Model") plt.xlabel("Residuals") plt.ylabel("Frequency")</pre></li>
+
+</ol>
+
+<p>这会产生以下情节:</p>
+
+<div><div><img alt="Figure 6.16 – Histogram of residuals for the linear regression model&#10;&#10;" height="442" src="img/B17978_06_016.jpg" width="572"/>
+
+</div>
+
+</div>
+
+<p class="figure-caption">图 6.16–线性回归模型的残差直方图</p>
+
+<p>这看起来并不太糟糕，但是我们有更多的正残差，我们在测试数据中预测的温度比实际温度低，而不是负残差。</p>
+
+<ol>
+
+<li value="6">用残差来绘制我们的预测可能会让我们更好地理解正在发生的事情:<pre>plt.scatter(preddf.prediction, preddf.resid, color="blue") plt.axhline(0, color='red', linestyle='dashed', linewidth=1) plt.title("Scatterplot of Predictions and Residuals") plt.xlabel("Predicted Temperature") plt.ylabel("Residuals")</pre></li>
+
+</ol>
+
+<p>这会产生以下情节:</p>
+
+<div><div><img alt="Figure 6.17 – Scatterplot of predictions by residuals for the linear regression model&#10;&#10;" height="446" src="img/B17978_06_017.jpg" width="560"/>
+
+</div>
+
+</div>
+
+<p class="figure-caption">图 6.17–线性回归模型残差预测散点图</p>
+
+<p>这看起来并不可怕。残差在 0 附近随机浮动。但是，1 到 2 个标准差之间的预测值更有可能过低(没有正残差)而不是过高。高于 2，预测总是太高(它们有负残差)。这个模型的线性假设可能不合理。我们应该探索一下我们在第四章<em class="italic">中讨论过的几个变换，编码、变换和缩放特性</em>，或者尝试一个非参数模型，比如 KNN 回归。</p>
+
+<p>极值也有可能将我们的系数拉得相当大。一个好的下一步可能是移除异常值，正如我们在第 1 章<a href="B17978_01_ePub.xhtml#_idTextAnchor014"><em class="italic"/></a>、<em class="italic">检查特性和目标的分布</em>的<em class="italic">识别极值和异常值</em>部分中所讨论的。然而，我们不会在这里这样做。</p>
+
+<ol>
+
+<li value="7">再来看<a id="_idIndexMarker589"/>一些评价措施。这可以通过 scikit-learn 的<code>metrics</code>库轻松完成。我们可以调用相同的函数来获得 RMSE 作为 MSE。我们只需要将平方参数设置为<code>False</code> : <pre>mse = skmet.mean_squared_error(y_test, pred) mse <strong class="bold">0.18906346144036693</strong> rmse = skmet.mean_squared_error(y_test, pred, squared=False) rmse <strong class="bold">0.4348142838504353</strong> mae = skmet.mean_absolute_error(y_test, pred) mae <strong class="bold">0.318307379728143</strong> r2 = skmet.r2_score(y_test, pred) r2 <strong class="bold">0.8162525715296725</strong></pre></li>
+
+</ol>
+
+<p>小于标准偏差 0.2 的 MSE 和小于 0 的 MAE。3 的标准差看起来相当不错，尤其是对于这样一个稀疏的模型。超过 80%的 R 平方也相当有希望。</p>
+
+<ol>
+
+<li value="8">让我们看看<a id="_idIndexMarker590"/>如果我们使用 KNN 模型，我们会得到什么:<pre>knn = KNeighborsRegressor(n_neighbors=5) knn.fit(X_train, y_train) pred = knn.predict(X_test) mae = skmet.mean_absolute_error(y_test, pred) mae <strong class="bold">0.2501829988751876</strong> r2 = skmet.r2_score(y_test, pred) r2 <strong class="bold">0.8631113217183314</strong></pre></li>
+
+</ol>
+
+<p>这个模型实际上是对 MAE 和 R 平方的改进。</p>
+
+<ol>
+
+<li value="9">我们还应该再看一看残差:<pre>preddf = pd.DataFrame(pred, columns=['prediction'],   index=X_test.index).join(X_test).join(y_test) preddf['resid'] = preddf.avgtemp-preddf.prediction plt.scatter(preddf.prediction, preddf.resid, color="blue") plt.axhline(0, color='red', linestyle='dashed', linewidth=1) plt.title("Scatterplot of Predictions and Residuals with KNN Model") plt.xlabel("Predicted Temperature") plt.ylabel("Residuals") plt.show()</pre></li>
+
+</ol>
+
+<p>这产生了<a id="_idIndexMarker591"/>下面的情节:</p>
+
+<div><div><img alt="Figure 6.18 – Scatterplot of predictions by residuals for the KNN model&#10;&#10;" height="443" src="img/B17978_06_018.jpg" width="556"/>
+
+</div>
+
+</div>
+
+<p class="figure-caption">图 6.18–KNN 模型残差预测散点图</p>
+
+<p>这张残差图看起来也更好。在目标的分布中，没有我们更容易高估或低估的部分。</p>
+
+<p>本节介绍了评估回归模型的关键方法，以及如何解释它们。它还展示了可视化，尤其是模型残差，如何能够改善这种解释。</p>
+
+<p>然而，到目前为止，我们在使用回归和分类方法时，受到了我们如何构建训练和测试数据框架的限制。如果出于某种原因，测试数据在某些方面不寻常，该怎么办？更一般地说，我们得出我们的评估方法是准确的结论的依据是什么？如果我们使用 K-fold 交叉验证，我们会对这些方法更有信心，这将在下一节中介绍。</p>
+
+<h1 id="_idParaDest-88"><a id="_idTextAnchor087"/>使用 K 倍交叉验证</h1>
+
+<p>到目前为止，我们已经保留了 30%的数据进行验证。这是一个不错的策略。它阻止我们在训练模型时提前查看测试数据。然而，这种方法没有充分利用所有可用的数据，无论是用于训练还是用于测试。如果我们使用 K-fold 交叉验证，我们可以使用我们所有的数据，同时也避免数据泄漏。也许这看起来好得不像是真的。但这并不是因为一个巧妙的小技巧。</p>
+
+<p><strong class="bold"> K 折叠交叉验证</strong>训练<a id="_idIndexMarker593"/>我们的模型，除了一个 K 折叠或部分，留下一个用于测试。这被重复<em class="italic"> k </em>次，每次排除不同的折叠进行测试。然后，性能指标基于 K 倍的平均分数。</p>
+
+<p>不过，在开始之前，我们需要再次考虑数据泄露的可能性。如果我们将用于训练模型的所有数据进行缩放，然后将其拆分成多个折叠，我们将在训练中使用来自所有折叠的信息。为了避免这种情况，我们需要对每次迭代的训练折叠进行缩放以及任何其他预处理。虽然我们可以手动完成这项工作，但 scikit-learn 的<code>pipeline</code>库可以为我们完成大部分工作。在这一节中，我们将讨论如何使用管道进行交叉验证。</p>
+
+<p>让我们尝试使用 K-fold 交叉验证来评估我们在上一节中指定的两个模型。当我们这样做的时候，让我们看看随机森林回归器的工作效果如何:</p>
+
+<ol>
+
+<li value="1">除了我们到目前为止使用过的库，我们还需要 scikit-learn 的<em class="italic"/><code>make_pipeline</code><code>cross_validate</code>和<code>Kfold</code>库:<pre>import pandas as pd from sklearn.model_selection import train_test_split from sklearn.preprocessing import StandardScaler from sklearn.linear_model import LinearRegression from sklearn.neighbors import KNeighborsRegressor from sklearn.ensemble import RandomForestRegressor from sklearn.pipeline import make_pipeline from sklearn.model_selection import cross_validate from sklearn.model_selection import KFold</pre></li>
+
+<li>我们<a id="_idIndexMarker594"/>再次加载陆地温度数据，并创建训练和测试数据框架。我们仍然想留下一些数据进行最终验证，但是这一次，我们将只留下 10%。我们将用剩下的 90%进行培训和测试:<pre>landtemps = pd.read_csv("data/landtemps2019avgs.csv") feature_cols = ['latabs','elevation'] X_train, X_test, y_train, y_test =  \   train_test_split(landtemps[feature_cols],\   landtemps[['avgtemp']],test_size=0.1,random_state=0)</pre></li>
+
+<li>现在，我们创建一个<code>KFold</code>对象，并指出我们想要五个折叠，并对数据进行洗牌(如果数据还没有被随机排序，洗牌是一个好主意):<pre>kf = Kfold(n_splits=5, shuffle=True, random_state=0)</pre></li>
+
+<li>接下来，我们定义一个函数来创建管道。然后，该函数运行<code>cross_validate</code>，它接受管道和我们之前创建的<code>KFold</code>对象:<pre>def getscores(model):   pipeline = make_pipeline(StandardScaler(), model)   scores = cross_validate(pipeline, X=X_train,      y=y_train, cv=kf, scoring=['r2'], n_jobs=1)   scorelist.append(dict(model=str(model),     fit_time=scores['fit_time'].mean(),     r2=scores['test_r2'].mean()))</pre></li>
+
+<li>现在，我们<a id="_idIndexMarker595"/>准备好为线性回归、随机森林回归和 KNN 回归模型调用<code>getscores</code>函数:<pre>scorelist = [] getscores(LinearRegression()) getscores(RandomForestRegressor(max_depth=2)) getscores(KNeighborsRegressor(n_neighbors=5))</pre></li>
+
+<li>我们可以打印<code>scorelist</code>列表来查看我们的结果:<pre>scorelist [{'model': 'LinearRegression()',   'fit_time': 0.004968833923339844,   'r2': 0.8181125031214872},  {'model': 'RandomForestRegressor(max_depth=2)',   'fit_time': 0.28124608993530276,   'r2': 0.7122492698889024},  {'model': 'KNeighborsRegressor()',   'fit_time': 0.006945991516113281,   'r2': 0.8686733636724104}]</pre></li>
+
+</ol>
+
+<p>基于 R 平方，KNN 回归模型比线性回归或随机森林回归模型表现更好。随机森林回归器也有一个明显的缺点，即它的拟合时间要长得多。</p>
+
+<h1 id="_idParaDest-89"><a id="_idTextAnchor088"/>用管道预处理数据</h1>
+
+<p>在上一节中，我们仅仅触及了 scikit-learn 管道的皮毛。我们经常需要将所有的预处理和特征工程整合到一个管道中，包括缩放、编码和处理异常值和缺失值。这可能很复杂，因为不同的功能可能需要不同的处理方式。我们可能需要估算带有数字特征的缺失值的中值和分类特征的最常见值。我们可能还需要转换我们的目标变量。我们将在本节中探讨如何做到这一点。</p>
+
+<p>请遵循以下步骤:</p>
+
+<ol>
+
+<li value="1">我们将从载入本章中已经使用过的库开始。然后，我们将添加<code>ColumnTransformer</code>和<code>TransformedTargetRegressor</code>类。我们将分别使用这些类来转换我们的特性和目标:<pre>import pandas as pd import numpy as np from sklearn.model_selection import train_test_split from sklearn.preprocessing import StandardScaler from sklearn.linear_model import LinearRegression from sklearn.impute import SimpleImputer from sklearn.pipeline import make_pipeline from feature_engine.encoding import OneHotEncoder from sklearn.impute import KNNImputer from sklearn.model_selection import cross_validate, KFold import sklearn.metrics as skmet from sklearn.compose import ColumnTransformer from sklearn.compose import TransformedTargetRegressor</pre></li>
+
+<li>列转换器非常灵活。我们甚至可以将它与我们自己定义的预处理函数一起使用。下面的代码块从<code>helperfunctions</code>子文件夹中的<code>preprocfunc</code>模块导入<a id="_idIndexMarker598"/>类<code>OutlierTrans</code></li>
+
+<li><code>OutlierTrans</code>类<a id="_idIndexMarker599"/>通过与四分位数范围的距离识别极值。这是我们在<a href="B17978_03_ePub.xhtml#_idTextAnchor034"> <em class="italic">第 3 章</em> </a>、<em class="italic">中演示的识别和修复缺失值</em>的技术。</li>
+
+</ol>
+
+<p>为了在 scikit-learn 管道中工作，我们的类必须有 fit 和 transform 方法。我们还需要继承<code>BaseEstimator</code>和<code>TransformerMixin</code>类。</p>
+
+<p>在这个类中，几乎所有的动作都发生在<code>transform</code>方法中。任何大于第三个四分位数以上或第一个四分位数以下的四分位数范围的 1.5 倍的值都被指定为缺失值:</p>
+
+<pre>class OutlierTrans(BaseEstimator,TransformerMixin):
+  def __init__(self,threshold=1.5):
+    self.threshold = threshold
+  
+  def fit(self,X,y=None):
+    return self
+  
+  def transform(self,X,y=None):
+    Xnew = X.copy()
+    for col in Xnew.columns:
+      thirdq, firstq = Xnew[col].quantile(0.75),\
+        Xnew[col].quantile(0.25)
+      inlierrange = self.threshold*(thirdq-firstq)
+      outlierhigh, outlierlow = inlierrange+thirdq,\
+        firstq-inlierrange
+      Xnew.loc[(Xnew[col]&gt;outlierhigh) | \
+        (Xnew[col]&lt;outlierlow),col] = np.nan
+    return Xnew.values                                 </pre>
+
+<p>我们的<code>OutlierTrans</code>类<a id="_idIndexMarker600"/>稍后可以在我们的管道中使用，就像我们在上一节中使用<code>StandardScaler</code>一样。我们以后再做。</p>
+
+<ol>
+
+<li value="4">现在，我们<a id="_idIndexMarker601"/>准备加载需要处理的数据。在这一部分，我们将使用 NLS 每周工资数据。周薪将是我们的目标，我们将使用高中 GPA、母亲和父亲完成的最高年级、父母收入、性别以及个人是否完成学士学位作为特征。</li>
+
+</ol>
+
+<p>我们将在这里创建以不同方式处理的特性列表。稍后，当我们指示管道对数字、分类和二元特征执行不同的操作时，这将很有帮助:</p>
+
+<pre>nls97wages = pd.read_csv("data/nls97wagesb.csv")
+nls97wages.set_index("personid", inplace=True)
+nls97wages.dropna(subset=['wageincome'], inplace=True)
+nls97wages.loc[nls97wages.motherhighgrade==95,
+  'motherhighgrade'] = np.nan
+nls97wages.loc[nls97wages.fatherhighgrade==95,
+  'fatherhighgrade'] = np.nan
+num_cols = ['gpascience','gpaenglish','gpamath','gpaoverall',
+  'motherhighgrade','fatherhighgrade','parentincome']
+cat_cols = ['gender']
+bin_cols = ['completedba']
+target = nls97wages[['wageincome']]
+features = nls97wages[num_cols + cat_cols + bin_cols]
+X_train, X_test, y_train, y_test =  \
+  train_test_split(features,\
+  target, test_size=0.2, random_state=0)</pre>
+
+<ol>
+
+<li value="5">让我们看看一些描述性的统计数据。一些<a id="_idIndexMarker603"/>变量有一千多个缺失值(<code>gpascience</code>、<code>gpaenglish</code>、<code>gpamath</code>、<code>gpaoverall</code>和<code>parentincome</code> ): <pre>nls97wages[['wageincome'] + num_cols].agg(['count','min','median','max']).T <strong class="bold">                 count    min      median    max</strong> <strong class="bold">wageincome       5,091    0        40,000    235,884</strong> <strong class="bold">gpascience       3,521    0        284       424</strong> <strong class="bold">gpaenglish       3,558    0        288       418</strong> <strong class="bold">gpamath          3,549    0        280       419</strong> <strong class="bold">gpaoverall       3,653    42       292       411</strong> <strong class="bold">motherhighgrade  4,734    1        12        20</strong> <strong class="bold">fatherhighgrade  4,173    1        12        29</strong> <strong class="bold">parentincome     3,803   -48,100   40,045    246,474</strong></pre></li>
+
+<li>现在，我们可以设置一个列转换器。首先，我们将创建处理数字数据(<code>standtrans</code>)、分类数据和二进制数据的管道。</li>
+
+</ol>
+
+<p>对于数值数据，我们希望将异常值指定为缺失值。这里，我们将把一个值<code>2</code>传递给阈值参数<code>OutlierTrans</code>，表示我们希望高于或低于四分位数范围两倍的值被<a id="_idIndexMarker604"/>设置为缺失。回想一下，默认值是 1.5，所以我们稍微保守一些。</p>
+
+<p>然后，我们<a id="_idIndexMarker605"/>将创建一个<code>ColumnTransformer</code>对象，将我们刚刚创建的三个管道传递给它，并指示哪个管道使用哪个特性:</p>
+
+<pre>standtrans = make_pipeline(OutlierTrans(2),
+  StandardScaler())
+cattrans = make_pipeline(SimpleImputer(strategy="most_frequent"),
+  OneHotEncoder(drop_last=True))
+bintrans = make_pipeline(SimpleImputer(strategy="most_frequent"))
+coltrans = ColumnTransformer(
+  transformers=[
+    ("stand", standtrans, num_cols),
+    ("cat", cattrans, ['gender']),
+    ("bin", bintrans, ['completedba'])
+  ]
+)</pre>
+
+<ol>
+
+<li value="7">现在，我们可以将 column transformer 添加到一个管道中，该管道也包含我们想要运行的线性模型。我们将在管道中添加 KNN 插补，以<a id="_idIndexMarker606"/>处理缺失值。</li>
+
+</ol>
+
+<p>我们还需要扩展目标，这在我们的管道中是做不到的。为此，我们将使用 scikit-learn 的<code>TransformedTargetRegressor</code>。我们将把刚刚创建的管道传递给目标回归器的<code>regressor</code>参数:</p>
+
+<pre>lr = LinearRegression()
+pipe1 = make_pipeline(coltrans,
+  KNNImputer(n_neighbors=5), lr)
+ttr=TransformedTargetRegressor(regressor=pipe1,
+  transformer=StandardScaler())</pre>
+
+<ol>
+
+<li value="8">让我们使用这个管道进行 K-fold 交叉验证。我们可以通过目标回归器<code>ttr</code>将我们的管道传递给<code>cross_validate</code>函数:<pre>kf = KFold(n_splits=10, shuffle=True, random_state=0) scores = cross_validate(ttr, X=X_train, y=y_train,   cv=kf, scoring=('r2', 'neg_mean_absolute_error'),   n_jobs=1) print("Mean Absolute Error: %.2f, R-squared: %.2f" %    (scores['test_neg_mean_absolute_error'].mean(),   scores['test_r2'].mean())) Mean Absolute Error: -23781.32, R-squared: 0.20</pre></li>
+
+</ol>
+
+<p>这些分数不是很好，尽管这并不是这次练习的重点。这里关键的一点是，我们通常希望将我们要做的大部分预处理放在一个管道中。这是避免数据泄露的最佳方式。列转换器是一个非常灵活的工具，允许我们对不同的特性应用不同的转换。</p>
+
+<h1 id="_idParaDest-90"><a id="_idTextAnchor089"/>总结</h1>
+
+<p>本章介绍了关键的模型评估方法和技术，这样当我们在本书的剩余章节中广泛使用和扩展它们时，它们就会变得熟悉。我们研究了分类和回归模型的非常不同的评估方法。我们还探索了如何使用可视化来改善我们的预测分析。最后，我们使用管道和交叉验证来获得模型性能的可靠估计。</p>
+
+<p>我希望这一章也给了你一个机会去习惯这本书前进的一般方法。尽管大量的算法将在后面的章节中讨论，我们将继续讨论前几章中讨论过的预处理问题。当然，我们将讨论每个算法的核心概念。但是，在真正的<em class="italic">动手</em>方式中，我们也将处理现实世界数据的混乱。每章将从相对原始的数据到特征工程，再到模型规范和模型评估，严重依赖 scikit-learn 的管道将所有内容整合在一起。</p>
+
+<p>我们将在接下来的几章中讨论回归算法——那些允许我们对连续目标建模的算法。我们将探讨一些最流行的回归算法——线性回归、支持向量回归、K 近邻回归和决策树回归。我们还将考虑对回归模型进行修改，解决欠拟合和过拟合问题，包括非线性变换和正则化。</p>
+
+</div>
+
+</div>
+
+
+
+</body></html>
